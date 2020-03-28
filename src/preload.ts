@@ -7,7 +7,7 @@ export function preload(this: {
   preload: () => void;
   create: (this: { preload: () => void; create: () => void }) => void;
 }) {
-  const images = ['insignea', 'tile', 'hand', 'foot', 'backgrounds/plain'];
+  const images = ['insignea', 'tile', 'hand', 'foot', 'backgrounds/plain', 'backgrounds/squad_edit'];
 
   images.forEach(str => this.load.image(str, PUBLIC_URL + '/' + str + '.svg'));
 

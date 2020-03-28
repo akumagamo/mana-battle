@@ -25,6 +25,9 @@ export class EditSquadScene extends Phaser.Scene {
   preload = preload;
 
   create({squad}: {squad:Squad}) {
+
+    this.add.image(0,0,'backgrounds/squad_edit')
+
     this.renderBoard(squad);
 
     this.renderUnitList();
@@ -102,15 +105,19 @@ export class EditSquadScene extends Phaser.Scene {
     const btn = this.add.text(1100, 100, 'Return to title');
     btn.setInteractive();
     btn.on('pointerdown', () => {
-      this.scene.stop('UnitListScene')
-      this.scene.stop('BoardScene')
+
+      this.scene.transition({
+        target: 'TitleScene',
+        duration: 0,
+        moveBelow: true,
+      })
+
       console.log(this.unitListScene)
      // this.scene.remove('unitList');
      // this.unitListScene?.rows.forEach((row) =>
      //   this.scene.remove(row.chara.key),
      // );
      // this.boardScene?.unitList.forEach((unit) => this.scene.remove(unit.key));
-    this.scene.start('TitleScene');
 
      // this.sys.displayList.removeAll()
       
