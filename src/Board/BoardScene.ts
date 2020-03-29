@@ -39,7 +39,7 @@ export default class BoardScene extends Phaser.Scene {
       mapWidth: 3,
       mapHeight: 3,
     });
-    this.unitList = this.placeUnits();
+    this.placeUnits();
   }
   findTileByXY(x: number, y: number) {
     return this.tiles.find(
@@ -48,8 +48,6 @@ export default class BoardScene extends Phaser.Scene {
   }
 
   changeUnitPositionInBoard({unit, x, y}: {unit: Unit; x: number; y: number}) {
-    //update new positions in data
-    const {tileWidth, tileHeight, centerX, centerY} = this;
 
     const updatedBoard = changeSquadMemberPosition(
       this.squad.members[unit.id],
@@ -95,9 +93,12 @@ export default class BoardScene extends Phaser.Scene {
   }
 
   onUnitDragEnd() {
-    const {squad, tileWidth, tileHeight} = this;
 
     return (unit: Unit, x: number, y: number) => {
+
+      const {squad, tileWidth, tileHeight} = this;
+
+      console.log(`the squad`, squad)
       console.log(this.tiles, x, y);
       const boardSprite = this.findTileByXY(x, y);
 
@@ -195,6 +196,7 @@ export default class BoardScene extends Phaser.Scene {
   }
 
   addUnitToBoard(squadMember: SquadMember) {
+    
     const {x, y} = getUnitPositionInScreen(
       squadMember,
       this.tileWidth,
@@ -239,15 +241,22 @@ export default class BoardScene extends Phaser.Scene {
     };
   }
 
-  placeUnits(): Chara[] {
+  placeUnits() {
     const {squad} = this;
-    const initial: Chara[] = [];
-    const reducer = (acc: Chara[], squadMember: SquadMember) => {
-      const chara = this.addUnitToBoard(squadMember);
+    
+    Object.values(squad.members).forEach(member=>this.placeUnit({member:member, fromOutside: false}))
+  }
 
-      return acc.concat([chara]);
-    };
-    return Object.values(squad.members).reduce(reducer, initial);
+  placeUnit({member, fromOutside}:{member:SquadMember, fromOutside: boolean}){
+
+    const chara = this.addUnitToBoard(member);
+
+    this.unitList = this.unitList.concat([chara])
+
+    if(fromOutside){
+      this.squad.members[member.id]= member
+    }
+
   }
 
   private makeUnitKey(unit: {id: string}) {

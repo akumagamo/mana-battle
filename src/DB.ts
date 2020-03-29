@@ -70,6 +70,7 @@ export const saveSquadUnit = ({
 
 export const unitsWithoutSquad = () => unitsWithoutSquadSelector(getUnits());
 
+// TODO: remove unit in target tile
 export const addUnitToSquad = (
   unit: Unit,
   squad: Squad,

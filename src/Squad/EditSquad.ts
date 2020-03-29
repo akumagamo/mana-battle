@@ -56,6 +56,7 @@ export class EditSquadScene extends Phaser.Scene {
   }
 
   onDragEndFromList(unit: Unit, x: number, y: number, chara: Chara) {
+
     const boardSprite = this.boardScene?.findTileByXY(x, y);
 
     console.log(`dropped on `, boardSprite);
@@ -74,13 +75,16 @@ export class EditSquadScene extends Phaser.Scene {
       boardScene.squad = updatedSquad;
 
       this.unitListScene?.removeUnit(unit);
-      boardScene.addUnitToBoard(updatedSquad.members[unit.id]);
+      boardScene.placeUnit({member:updatedSquad.members[unit.id],fromOutside:true});
     } else {
       console.log(`lets return`, unit, this.unitListScene?.rows);
 
       this.unitListScene?.returnToOriginalPosition(unit);
       this.unitListScene?.scaleDown(chara);
+
     }
+
+    boardScene.tiles.forEach((tile) => tile.sprite.clearTint());
   }
 
   onDragFromList(_: Unit, x: number, y: number) {
