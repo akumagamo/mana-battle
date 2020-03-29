@@ -1,8 +1,8 @@
-import { Squad, SquadMember, SquadMemberMap, SquadMap } from './Squad/Model';
-import { unitsWithoutSquadSelector } from './Unit/selectors';
-import { Item, itemTypeSlots, ItemTypeSlots, ItemMap } from './Item/Model';
-import { Unit, UnitMap } from './Unit/Model';
-import { removeIdFromMap } from './utils';
+import {Squad, SquadMember, SquadMemberMap, SquadMap} from './Squad/Model';
+import {unitsWithoutSquadSelector} from './Unit/selectors';
+import {Item, itemTypeSlots, ItemTypeSlots, ItemMap} from './Item/Model';
+import {Unit, UnitMap} from './Unit/Model';
+import {removeIdFromMap} from './utils';
 
 const get = (str: string) => JSON.parse(localStorage.getItem(str) || '{}');
 const set = (str: string, data: any) =>
@@ -26,14 +26,14 @@ export const saveItems = (items: ItemMap) => set('items', items);
 
 export const saveSquad = (squad: Squad) => {
   const squads = getSquads();
-  saveSquads({ ...squads, [squad.id]: squad });
+  saveSquads({...squads, [squad.id]: squad});
 };
 
 // Unit queries
 
 export const saveUnit = (unit: Unit) => {
   const units = getUnits();
-  saveUnits({ ...units, [unit.id]: unit });
+  saveUnits({...units, [unit.id]: unit});
 };
 
 /** Persists unit representation in squad map */
@@ -41,7 +41,7 @@ export const saveSquadUnit = ({
   squadId,
   unitId,
   x,
-  y
+  y,
 }: {
   squadId: string;
   unitId: string;
@@ -61,10 +61,10 @@ export const saveSquadUnit = ({
           id: unitId,
           x,
           y,
-          leader: squad.members[unitId]?.leader === true
-        }
-      }
-    }
+          leader: squad.members[unitId]?.leader === true,
+        },
+      },
+    },
   });
 };
 
@@ -74,81 +74,95 @@ export const addUnitToSquad = (
   unit: Unit,
   squad: Squad,
   x: number,
-  y: number
+  y: number,
 ) => {
-  const updatedUnit = { ...unit, squad: squad.id };
+  const updatedUnit = {...unit, squad: squad.id};
 
-  const { members } = squad;
+  const {members} = squad;
 
   const newEntry = {
     leader: false,
     x,
     y,
-    id: unit.id
+    id: unit.id,
   };
 
-  const updatedMembers = { ...members, [unit.id]: newEntry };
+  const updatedMembers = {...members, [unit.id]: newEntry};
 
-  const updatedSquad = { ...squad, members: updatedMembers };
+  const updatedSquad = {...squad, members: updatedMembers};
 
   saveUnit(updatedUnit);
   saveSquad(updatedSquad);
 
   return updatedSquad;
 };
-export const changeUnitPosition = (
+
+
+// TODO: add new fn for units coming from outside the board
+export const changeSquadMemberPosition = (
   unit: SquadMember,
   squad: Squad,
   x: number,
-  y: number
+  y: number,
 ) => {
   console.log('change position', unit, squad, x, y);
-  const { members } = squad;
+  const {members} = squad;
 
-  const updatedMembers = placeUnitInBoard(x, y, unit, members);
+  const updatedBoard = placeUnitInBoard(x, y, unit, members);
 
-  const updatedSquad = { ...squad, members: updatedMembers };
+  console.log(`ujpdated board`, updatedBoard)
 
+  const updatedSquad = {...squad, members: updatedBoard.members};
+
+
+  console.log(`will save updatedSquad`, updatedSquad)
   saveSquad(updatedSquad);
+
+  console.log(`will return`, updatedBoard)
+
+  return updatedBoard;
 };
 
-/**
- * @param x
- * @param y
- * @param unit
- * @param members
- */
 function placeUnitInBoard(
   x: number,
   y: number,
   unit: SquadMember,
-  members: SquadMemberMap
+  members: SquadMemberMap,
 ) {
   const newEntry: SquadMember = {
     leader: unit.leader,
     x,
     y,
-    id: unit.id
+    id: unit.id,
   };
 
   const unitInTargetPosition = Object.values(members).find(
-    member => member.x === x && member.y === y
+    (member) => member.x === x && member.y === y,
   );
 
   if (unitInTargetPosition) {
     const unitToReplace: SquadMember = {
       ...unitInTargetPosition,
       x: unit.x,
-      y: unit.y
+      y: unit.y,
     };
 
     return {
-      ...members,
-      [unit.id]: newEntry,
-      [unitInTargetPosition.id]: unitToReplace
+      members: {
+        ...members,
+        [unit.id]: newEntry,
+        [unitInTargetPosition.id]: unitToReplace,
+      },
+      updatedUnits: [
+        {id: unit.id, x, y},
+        {id: unitInTargetPosition.id, x: unit.x, y: unit.y},
+      ],
     };
   } else {
-    return { ...members, [unit.id]: newEntry };
+    return {
+      members: {...members, [unit.id]: newEntry},
+      updatedUnits: [{id: unit.id, x, y}],
+    };
   }
 }
 
@@ -157,13 +171,13 @@ export const removeUnitFromSquad = (unitId: string, squad: Squad) => {
   if (!unit) {
     throw new Error('ERROR: tried to save unit with invalid ID');
   }
-  const updatedUnit = { ...unit, squad: null };
+  const updatedUnit = {...unit, squad: null};
 
-  const { members } = squad;
+  const {members} = squad;
 
   const updatedMembers: SquadMemberMap = removeIdFromMap(unitId, members);
 
-  const updatedSquad = { ...squad, members: updatedMembers };
+  const updatedSquad = {...squad, members: updatedMembers};
 
   saveUnit(updatedUnit);
   saveSquad(updatedSquad);
@@ -178,23 +192,23 @@ export const createSquad = (leader: Unit) => {
     name: leader.name,
     emblem: 'Emoji',
     members: {
-      [leader.id]: { id: leader.id, leader: true, x: 2, y: 2 }
-    }
+      [leader.id]: {id: leader.id, leader: true, x: 2, y: 2},
+    },
   };
   const updatedSquads = {
     ...squads,
-    [newId]: newSquad
+    [newId]: newSquad,
   };
 
-  const updatedUnit = { ...leader, squad: newId };
+  const updatedUnit = {...leader, squad: newId};
   const fn = (
-    resolve: ({ units, squads }: { units: UnitMap; squads: SquadMap }) => void
+    resolve: ({units, squads}: {units: UnitMap; squads: SquadMap}) => void,
   ) => {
     saveSquads(updatedSquads);
     saveUnit(updatedUnit);
     const units = getUnits();
     console.log(units, updatedSquads);
-    resolve({ units, squads: updatedSquads });
+    resolve({units, squads: updatedSquads});
   };
 
   return new Promise(fn);
@@ -207,7 +221,7 @@ export const equipItem = (item: Item, unitId: string) => {
 
   const slot = getItemTypes()[item.type];
 
-  const updatedUnit = { ...unit, equips: { ...unit.equips, [slot]: item.id } };
+  const updatedUnit = {...unit, equips: {...unit.equips, [slot]: item.id}};
 
   saveUnit(updatedUnit);
 };

@@ -24,9 +24,8 @@ export class EditSquadScene extends Phaser.Scene {
 
   preload = preload;
 
-  create({squad}: {squad:Squad}) {
-
-    this.add.image(0,0,'backgrounds/squad_edit')
+  create({squad}: {squad: Squad}) {
+    this.add.image(0, 0, 'backgrounds/squad_edit');
 
     this.renderBoard(squad);
 
@@ -36,7 +35,7 @@ export class EditSquadScene extends Phaser.Scene {
     console.log(`btn`);
   }
 
-  renderBoard(squad:Squad) {
+  renderBoard(squad: Squad) {
     this.boardScene = new BoardScene(
       centerX,
       centerY,
@@ -50,17 +49,14 @@ export class EditSquadScene extends Phaser.Scene {
 
   renderUnitList() {
     this.unitListScene = new UnitListScene(
-      this.onDragFromList,
-      this.onDragEndFromList,
+      (unit, x, y) => this.onDragFromList(unit, x, y),
+      (unit, x, y, chara) => this.onDragEndFromList(unit, x, y, chara),
     );
     this.scene.add('UnitListScene', this.unitListScene, true);
   }
 
   onDragEndFromList(unit: Unit, x: number, y: number, chara: Chara) {
-    const boardSprite = this.boardScene?.findTileByXY({
-      x: x,
-      y: y,
-    });
+    const boardSprite = this.boardScene?.findTileByXY(x, y);
 
     console.log(`dropped on `, boardSprite);
 
@@ -90,11 +86,9 @@ export class EditSquadScene extends Phaser.Scene {
   onDragFromList(_: Unit, x: number, y: number) {
     const {boardScene} = this;
     if (!boardScene) return;
+
     boardScene.tiles.forEach((tile) => tile.sprite.clearTint());
-    const boardSprite = boardScene.findTileByXY({
-      x: x,
-      y: y,
-    });
+    const boardSprite = boardScene.findTileByXY(x, y);
 
     if (boardSprite) boardSprite.sprite.setTint(0x33ff88);
   }
@@ -105,22 +99,20 @@ export class EditSquadScene extends Phaser.Scene {
     const btn = this.add.text(1100, 100, 'Return to title');
     btn.setInteractive();
     btn.on('pointerdown', () => {
-
       this.scene.transition({
         target: 'TitleScene',
         duration: 0,
         moveBelow: true,
-      })
+      });
 
-      console.log(this.unitListScene)
-     // this.scene.remove('unitList');
-     // this.unitListScene?.rows.forEach((row) =>
-     //   this.scene.remove(row.chara.key),
-     // );
-     // this.boardScene?.unitList.forEach((unit) => this.scene.remove(unit.key));
+      console.log(this.unitListScene);
+      // this.scene.remove('unitList');
+      // this.unitListScene?.rows.forEach((row) =>
+      //   this.scene.remove(row.chara.key),
+      // );
+      // this.boardScene?.unitList.forEach((unit) => this.scene.remove(unit.key));
 
-     // this.sys.displayList.removeAll()
-      
+      // this.sys.displayList.removeAll()
     });
 
     console.log(`done`);

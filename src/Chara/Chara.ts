@@ -66,6 +66,9 @@ export class Chara extends Phaser.Scene {
     animatedUnit.container = this.container;
     this.container.name = animatedUnit.id;
 
+    const name = this.add.text(0,100,this.unit.name, {color:"#000"})
+    this.container.add(name)
+
     this.makeInteractive();
   }
 

@@ -4,7 +4,7 @@ import {CenterX, CenterY, TileHeight, TileWidth, Image} from '../Models';
 import {preload} from '../preload';
 import {SquadMember, Squad} from '../Squad/Model';
 import {cartesianToIsometric} from '../utils/isometric';
-import {getUnit, saveSquadUnit} from '../DB';
+import {getUnit, saveSquadUnit, changeSquadMemberPosition} from '../DB';
 import {Unit} from '../Unit/Model';
 
 type BoardTile = {
@@ -41,84 +41,80 @@ export default class BoardScene extends Phaser.Scene {
     });
     this.unitList = this.placeUnits();
   }
-  findTileByXY({x, y}: {x: number; y: number}) {
+  findTileByXY(x: number, y: number) {
     return this.tiles.find(
       isPointerInTile({x, y: y + 100}, this.tileWidth, this.tileHeight),
     );
   }
 
-  changeUnitPosition({
-    unit,
-    squadMember,
-    chara,
-  }: {
-    unit: Unit;
-    squadMember: SquadMember;
-    chara?: Chara;
-  }) {
-    const {tileWidth, tileHeight, centerX, centerY, squad} = this;
-    const {x, y} = getUnitPositionInScreen(
-      squadMember,
-      tileWidth,
-      tileHeight,
-      centerX,
-      centerY,
-    );
+  changeUnitPositionInBoard({unit, x, y}: {unit: Unit; x: number; y: number}) {
+    //update new positions in data
+    const {tileWidth, tileHeight, centerX, centerY} = this;
 
-    console.log(`unit position in screen will be`, x, y);
-
-    const target = chara ? chara : this.getChara(unit);
-
-    if (chara) this.unitList.push(chara);
-
-    console.log(`target`, unit.name, target);
-    this.tweens.add({
-      targets: target?.container,
+    const updatedBoard = changeSquadMemberPosition(
+      this.squad.members[unit.id],
+      this.squad,
       x,
       y,
+    );
+
+    this.squad.members = updatedBoard.members;
+
+    console.log(`the received updatedBoard`, updatedBoard);
+    //animate updated units
+
+    updatedBoard.updatedUnits.forEach((updatedUnit) => {
+      this.moveUnitToBoardTile(updatedUnit.id, updatedUnit.x, updatedUnit.y);
+    });
+  }
+  moveUnitToBoardTile(id: string, x: number, y: number) {
+    const chara = this.unitList.find((chara) => chara.unit.id === id);
+
+    if (!chara) return;
+
+    const {unit} = chara;
+
+    const pos = getUnitPositionInScreen(
+      this.squad.members[unit.id],
+      this.tileWidth,
+      this.tileHeight,
+      this.centerX,
+      this.centerY,
+    );
+
+    this.tweens.add({
+      targets: chara?.container,
+      x: pos.x,
+      y: pos.y,
       ease: 'Cubic',
       duration: 400,
       repeat: 0,
       paused: false,
       yoyo: false,
     });
-
-    saveSquadUnit({
-      squadId: squad.id,
-      unitId: squadMember.id,
-      x: squadMember.x,
-      y: squadMember.y,
-    });
   }
+
   onUnitDragEnd() {
     const {squad, tileWidth, tileHeight} = this;
 
     return (unit: Unit, x: number, y: number) => {
       console.log(this.tiles, x, y);
-      const boardSprite = this.findTileByXY({
-        x,
-        y,
-      });
+      const boardSprite = this.findTileByXY(x, y);
 
       const squadMember = squad.members[unit.id];
 
       if (!squadMember)
         throw new Error('Invalid state. Unit should be in board object.');
 
-      const isMoved = () =>
-        (boardSprite && squadMember.x !== boardSprite.boardX) ||
-        (boardSprite && squadMember.y !== boardSprite.boardY);
+      const isMoved = (boardSprite: BoardTile) =>
+        squadMember.x !== boardSprite.boardX ||
+        squadMember.y !== boardSprite.boardY;
 
-      if (boardSprite && isMoved()) {
-        const updatedSquadMember = {
-          ...squadMember,
+      if (boardSprite && isMoved(boardSprite)) {
+        this.changeUnitPositionInBoard({
+          unit,
           x: boardSprite.boardX,
           y: boardSprite.boardY,
-        };
-
-        this.changeUnitPosition({
-          unit,
-          squadMember: updatedSquadMember,
         });
       } else {
         const {x, y} = getUnitPositionInScreen(
@@ -129,6 +125,8 @@ export default class BoardScene extends Phaser.Scene {
           this.centerY,
         );
 
+        // return to original position
+        console.log(`TWEEN: return to original`);
         this.tweens.add({
           targets: this.getChara(unit)?.container,
           x: x,
@@ -147,7 +145,7 @@ export default class BoardScene extends Phaser.Scene {
       );
     };
   }
-  private getChara(unit: Unit) {
+  private getChara(unit: {id: string}) {
     return this.unitList.find((chara) => chara.key === this.makeUnitKey(unit));
   }
   placeTiles({mapWidth, mapHeight}: {mapWidth: number; mapHeight: number}) {
@@ -229,10 +227,7 @@ export default class BoardScene extends Phaser.Scene {
   }
   onUnitDrag() {
     return (unit: Unit, x: number, y: number) => {
-      const boardSprite = this.findTileByXY({
-        x,
-        y,
-      });
+      const boardSprite = this.findTileByXY(x, y);
 
       this.tiles.map((tile) => tile.sprite.clearTint());
 
@@ -249,12 +244,13 @@ export default class BoardScene extends Phaser.Scene {
     const initial: Chara[] = [];
     const reducer = (acc: Chara[], squadMember: SquadMember) => {
       const chara = this.addUnitToBoard(squadMember);
+
       return acc.concat([chara]);
     };
     return Object.values(squad.members).reduce(reducer, initial);
   }
 
-  private makeUnitKey(unit: Unit) {
+  private makeUnitKey(unit: {id: string}) {
     return `board-${unit.id}`;
   }
 }
@@ -275,7 +271,7 @@ function getUnitPositionInScreen(
     tileHeight,
   );
 
-  //fixme: unit should be rendered at origin 0.5
+  //FIXME: unit should be rendered at origin 0.5
   return {x, y: y - 230};
 }
 
