@@ -48,7 +48,6 @@ export default class BoardScene extends Phaser.Scene {
   }
 
   changeUnitPositionInBoard({unit, x, y}: {unit: Unit; x: number; y: number}) {
-
     const updatedBoard = changeSquadMemberPosition(
       this.squad.members[unit.id],
       this.squad,
@@ -80,7 +79,7 @@ export default class BoardScene extends Phaser.Scene {
       this.centerY,
     );
 
-    this.tweens.add({
+    const tween = this.tweens.add({
       targets: chara?.container,
       x: pos.x,
       y: pos.y,
@@ -90,15 +89,15 @@ export default class BoardScene extends Phaser.Scene {
       paused: false,
       yoyo: false,
     });
+    // TODO: optimize, fire only once if multiple units were move at the same time
+    tween.on('complete',()=>{this.sortUnitsByDepth()})
   }
 
   onUnitDragEnd() {
-
     return (unit: Unit, x: number, y: number) => {
-
       const {squad, tileWidth, tileHeight} = this;
 
-      console.log(`the squad`, squad)
+      console.log(`the squad`, squad);
       console.log(this.tiles, x, y);
       const boardSprite = this.findTileByXY(x, y);
 
@@ -196,7 +195,6 @@ export default class BoardScene extends Phaser.Scene {
   }
 
   addUnitToBoard(squadMember: SquadMember) {
-    
     const {x, y} = getUnitPositionInScreen(
       squadMember,
       this.tileWidth,
@@ -243,24 +241,43 @@ export default class BoardScene extends Phaser.Scene {
 
   placeUnits() {
     const {squad} = this;
-    
-    Object.values(squad.members).forEach(member=>this.placeUnit({member:member, fromOutside: false}))
+    console.log(`...`, squad.members);
+
+    Object.values(squad.members).forEach((member) =>
+      this.placeUnit({member: member, fromOutside: false}),
+    );
   }
 
-  placeUnit({member, fromOutside}:{member:SquadMember, fromOutside: boolean}){
-
+  placeUnit({
+    member,
+    fromOutside,
+  }: {
+    member: SquadMember;
+    fromOutside: boolean;
+  }) {
     const chara = this.addUnitToBoard(member);
 
-    this.unitList = this.unitList.concat([chara])
+    this.unitList = this.unitList.concat([chara]);
 
-    if(fromOutside){
-      this.squad.members[member.id]= member
+    this.sortUnitsByDepth();
+
+    if (fromOutside) {
+      this.squad.members[member.id] = member;
     }
-
   }
 
   private makeUnitKey(unit: {id: string}) {
     return `board-${unit.id}`;
+  }
+
+  sortUnitsByDepth() {
+
+    this.unitList
+    .forEach(chara=>chara.container?.setDepth(chara.container?.y))
+
+    this.unitList
+      .sort((a, b) => (a.container?.depth || 0) - (b.container?.depth || 0))
+      .forEach((chara) => chara.scene.bringToTop());
   }
 }
 
@@ -282,26 +299,6 @@ function getUnitPositionInScreen(
 
   //FIXME: unit should be rendered at origin 0.5
   return {x, y: y - 230};
-}
-
-function onDragEnd(
-  squadMember: SquadMember,
-  tiles: BoardTile[],
-  tileWidth: number,
-  tileHeight: number,
-  onDragEndCallback: Function,
-) {
-  return function(unit: Unit, x: number, y: number) {
-    const tile = tiles.find(
-      isPointerInTile({x: x, y: y}, tileWidth, tileHeight),
-    );
-
-    if (tile) {
-      onDragEndCallback(unit, tile.x, tile.y);
-    }
-
-    tiles.map((tile) => tile.sprite.clearTint());
-  };
 }
 
 function isPointerInTile(
