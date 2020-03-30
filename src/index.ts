@@ -1,7 +1,7 @@
 import 'phaser';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from './constants';
 import TitleScene from './Scenes/TitleScene';
-import {EditSquadScene} from './Squad/EditSquad';
+import {EditSquadScene} from './Squad/EditSquadScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,

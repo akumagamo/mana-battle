@@ -4,13 +4,14 @@ import {getUnits} from '../DB';
 import {Chara} from '../Chara/Chara';
 import {error, INVALID_STATE} from '../errors';
 import {BASE_WINDOW_SIZE} from '../constants/window';
-import {Pointer, Text} from '../Models';
+import {Pointer, Text, Image} from '../Models';
 
 export default class UnitListScene extends Phaser.Scene {
   rows: {chara: Chara; text: Text}[];
   page: number;
   totalPages: number;
   itemsPerPage: number;
+  controls: Image[] = [];
 
   constructor(
     public onDrag: (unit: Unit, x: number, y: number) => void,
@@ -29,6 +30,8 @@ export default class UnitListScene extends Phaser.Scene {
   }
 
   renderControls() {
+    this.controls.forEach((btn) => btn.destroy());
+
     const next = this.add.image(
       200,
       BASE_WINDOW_SIZE.BASE_WINDOW_HEIGHT + 60,
@@ -45,22 +48,32 @@ export default class UnitListScene extends Phaser.Scene {
       'arrow_right',
     );
     prev.setScale(-1, 1);
-    prev.setInteractive();
-    prev.on('pointerdown', (_: Pointer) => {
-      this.prevPage();
-    });
+
+    if (this.page === 0) {
+      prev.setAlpha(0.5);
+    } else {
+      prev.setInteractive();
+      prev.on('pointerdown', (_: Pointer) => {
+        this.prevPage();
+      });
+    }
+
+    this.controls = [next, prev];
   }
 
   nextPage() {
     this.page = this.page + 1;
     this.clearUnitList();
     this.render();
+    this.renderControls()
   }
 
   prevPage() {
     this.page = this.page - 1;
     this.clearUnitList();
     this.render();
+
+    this.renderControls()
   }
 
   clearUnitList() {
@@ -91,7 +104,7 @@ export default class UnitListScene extends Phaser.Scene {
 
   private renderUnitListItem(unit: Unit, index: number) {
     const onClick = (unit: Unit) => console.log(`onclick`, unit);
-    const {charaX, charaY, textX, textY} = this.getUnitPosition(index);
+    const {charaX, charaY, textX, textY} = this.getRowPosition(index);
     const key = this.makeUnitKey(unit);
     const chara = new Chara(
       key,
@@ -119,7 +132,7 @@ export default class UnitListScene extends Phaser.Scene {
     return chara;
   }
 
-  private getUnitPosition(index: number) {
+  private getRowPosition(index: number) {
     const lineHeight = 100;
     return {
       charaX: 50,
@@ -130,9 +143,7 @@ export default class UnitListScene extends Phaser.Scene {
   }
 
   private getUnitIndex(unit: Unit) {
-    return this.rows.findIndex(
-      (row) => row.chara.key === this.makeUnitKey(unit),
-    );
+    return this.rows.findIndex((row) => row.chara.unit.id === unit.id);
   }
 
   returnToOriginalPosition(unit: Unit) {
@@ -177,7 +188,7 @@ export default class UnitListScene extends Phaser.Scene {
   }
 
   reposition({chara, text}: {chara: Chara; text: Text}, index: number) {
-    const {charaX, charaY, textX, textY} = this.getUnitPosition(index);
+    const {charaX, charaY, textX, textY} = this.getRowPosition(index);
 
     this.tweens.add({
       targets: chara.container,
@@ -203,26 +214,28 @@ export default class UnitListScene extends Phaser.Scene {
 
   removeUnit(unit: Unit) {
     const findUnit = (row: {chara: Chara; text: Text}): boolean =>
-      row.chara.key === this.makeUnitKey(unit);
+      row.chara.unit.id === unit.id;
     this.rows.filter(findUnit).forEach((row) => {
-      this.scene.remove(this.makeUnitKey(unit));
+      this.scene.remove(row.chara);
       this.children.remove(row.text);
     });
 
     this.rows = this.rows.filter((row) => !findUnit(row));
     this.rows.forEach((row, index) => this.reposition(row, index));
 
-    // add new unit to end of the list
+    // add new unit to end of the visible list
 
     const unitsToRender = this.getUnitsToRender();
 
-    if (unitsToRender.length < 1 ) return;
+    if (unitsToRender.length < 1) return;
 
     const last = unitsToRender[unitsToRender.length - 1];
 
-    const isAlreadyRendered = this.rows.some(row=>row.chara.unit.id === last.id)
+    const isAlreadyRendered = this.rows.some(
+      (row) => row.chara.unit.id === last.id,
+    );
 
-    if(isAlreadyRendered) return;
+    if (isAlreadyRendered) return;
 
     const newChara = this.renderUnitListItem(last, this.itemsPerPage - 1);
 

@@ -1,11 +1,12 @@
 import * as Phaser from 'phaser';
 import {Chara} from '../Chara/Chara';
-import {CenterX, CenterY, TileHeight, TileWidth, Image} from '../Models';
+import {Image} from '../Models';
 import {preload} from '../preload';
 import {SquadMember, Squad} from '../Squad/Model';
 import {cartesianToIsometric} from '../utils/isometric';
-import {getUnit, saveSquadUnit, changeSquadMemberPosition} from '../DB';
+import {getUnit, changeSquadMemberPosition} from '../DB';
 import {Unit} from '../Unit/Model';
+import { tileWidth, tileHeight } from '../constants';
 
 type BoardTile = {
   sprite: Image;
@@ -22,11 +23,7 @@ export default class BoardScene extends Phaser.Scene {
   unitList: Chara[] = [];
 
   constructor(
-    public centerX: number,
-    public centerY: number,
     public squad: Squad,
-    public tileWidth: number,
-    public tileHeight: number,
   ) {
     super(BOARD_SCENE_KEY);
     console.log(`boardScene constructor`);
@@ -43,7 +40,7 @@ export default class BoardScene extends Phaser.Scene {
   }
   findTileByXY(x: number, y: number) {
     return this.tiles.find(
-      isPointerInTile({x, y: y + 100}, this.tileWidth, this.tileHeight),
+      isPointerInTile({x, y: y + 100}),
     );
   }
 
@@ -65,19 +62,15 @@ export default class BoardScene extends Phaser.Scene {
     });
   }
   moveUnitToBoardTile(id: string, x: number, y: number) {
+
+    //TODO: check why params are not being used
     const chara = this.unitList.find((chara) => chara.unit.id === id);
 
     if (!chara) return;
 
     const {unit} = chara;
 
-    const pos = getUnitPositionInScreen(
-      this.squad.members[unit.id],
-      this.tileWidth,
-      this.tileHeight,
-      this.centerX,
-      this.centerY,
-    );
+    const pos = getUnitPositionInScreen( this.squad.members[unit.id]);
 
     const tween = this.tweens.add({
       targets: chara?.container,
@@ -95,7 +88,7 @@ export default class BoardScene extends Phaser.Scene {
 
   onUnitDragEnd() {
     return (unit: Unit, x: number, y: number) => {
-      const {squad, tileWidth, tileHeight} = this;
+      const {squad} = this;
 
       console.log(`the squad`, squad);
       console.log(this.tiles, x, y);
@@ -117,13 +110,7 @@ export default class BoardScene extends Phaser.Scene {
           y: boardSprite.boardY,
         });
       } else {
-        const {x, y} = getUnitPositionInScreen(
-          squadMember,
-          tileWidth,
-          tileHeight,
-          this.centerX,
-          this.centerY,
-        );
+        const {x, y} = getUnitPositionInScreen( squadMember);
 
         // return to original position
         console.log(`TWEEN: return to original`);
@@ -159,14 +146,7 @@ export default class BoardScene extends Phaser.Scene {
 
     grid.forEach((row, yIndex) => {
       row.forEach((_, xIndex) => {
-        var {x, y} = cartesianToIsometric(
-          xIndex,
-          yIndex,
-          this.centerX,
-          this.centerY,
-          this.tileWidth,
-          this.tileHeight,
-        );
+        var {x, y} = cartesianToIsometric( xIndex, yIndex);
 
         const tileSprite = this.add.image(x, y, 'tile');
         tileSprite.depth = y;
@@ -185,7 +165,7 @@ export default class BoardScene extends Phaser.Scene {
 
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       this.tiles
-        .filter(isPointerInTile(pointer, this.tileWidth, this.tileHeight))
+        .filter(isPointerInTile(pointer))
         .forEach((tile) => {
           console.log(`clicked>>`, tile.x, tile.y);
         });
@@ -195,13 +175,7 @@ export default class BoardScene extends Phaser.Scene {
   }
 
   addUnitToBoard(squadMember: SquadMember) {
-    const {x, y} = getUnitPositionInScreen(
-      squadMember,
-      this.tileWidth,
-      this.tileHeight,
-      this.centerX,
-      this.centerY,
-    );
+    const {x, y} = getUnitPositionInScreen( squadMember);
 
     const unit = getUnit(squadMember.id);
 
@@ -283,28 +257,15 @@ export default class BoardScene extends Phaser.Scene {
 
 function getUnitPositionInScreen(
   squadMember: SquadMember,
-  tileWidth: TileWidth,
-  tileHeight: TileHeight,
-  centerX: CenterX,
-  centerY: CenterY,
 ) {
-  const {x, y} = cartesianToIsometric(
-    squadMember.x,
-    squadMember.y,
-    centerX,
-    centerY,
-    tileWidth,
-    tileHeight,
-  );
+  const {x, y} = cartesianToIsometric( squadMember.x, squadMember.y);
 
   //FIXME: unit should be rendered at origin 0.5
   return {x, y: y - 230};
 }
 
 function isPointerInTile(
-  pointer: {x: number; y: number},
-  tileWidth: number,
-  tileHeight: number,
+  pointer: {x: number; y: number}
 ) {
   return function(tile: BoardTile) {
     const dx = Math.abs(tile.sprite.x - pointer.x);

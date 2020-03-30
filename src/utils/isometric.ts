@@ -1,20 +1,17 @@
+import { tileWidth, tileHeight, centerX, centerY } from "../constants";
+
 /**
  *
  * Converts board coordinates to a x,y position on a isometric scene
  * considering an origin point
  * @param x
  * @param y
- * @param tileWidth
- * @param tileHeight
  */
+
 
 export function cartesianToIsometric(
   x: number,
   y: number,
-  centerX: number,
-  centerY: number,
-  tileWidth: number,
-  tileHeight: number
 ) {
   return {
     x: (x - y) * tileWidth + centerX,
@@ -28,14 +25,10 @@ export function cartesianToIsometric(
  * more dramatic :O
  * @param x
  * @param y
- * @param tileWidth
- * @param tileHeight
  */
 export function cartesianToIsometricBattle(
   x: number,
   y: number,
-  tileWidth: number,
-  tileHeight: number
 ) {
   var tx = (x - y) * tileWidth;
   var ty = ((x + y) * tileHeight) / 2;

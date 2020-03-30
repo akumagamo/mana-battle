@@ -6,12 +6,6 @@ import {addUnitToSquad} from '../DB';
 import UnitListScene from '../Unit/UnitListScene';
 import {Unit} from '../Unit/Model';
 import BoardScene, {BOARD_SCENE_KEY} from '../Board/BoardScene';
-import {SCREEN_WIDTH, SCREEN_HEIGHT} from '../constants';
-
-const centerX = SCREEN_WIDTH / 2;
-const centerY = SCREEN_HEIGHT / 2 - 100;
-const tileWidth = 128;
-const tileHeight = 64;
 
 export class EditSquadScene extends Phaser.Scene {
   unitListScene: UnitListScene | null = null;
@@ -36,14 +30,7 @@ export class EditSquadScene extends Phaser.Scene {
   }
 
   renderBoard(squad: Squad) {
-    this.boardScene = new BoardScene(
-      centerX,
-      centerY,
-      squad,
-      tileWidth,
-      tileHeight,
-    );
-
+    this.boardScene = new BoardScene(squad); 
     this.scene.add(BOARD_SCENE_KEY, this.boardScene, true);
   }
 
