@@ -56,7 +56,6 @@ export class EditSquadScene extends Phaser.Scene {
   }
 
   onDragEndFromList(unit: Unit, x: number, y: number, chara: Chara) {
-
     const boardSprite = this.boardScene?.findTileByXY(x, y);
 
     console.log(`dropped on `, boardSprite);
@@ -72,16 +71,43 @@ export class EditSquadScene extends Phaser.Scene {
         boardSprite.boardY,
       );
 
+      const unitToReplace = Object.values(boardScene.squad.members).find(
+        (unit) =>
+          unit.x === boardSprite.boardX && unit.y === boardSprite.boardY,
+      );
+
+      console.log(`xxx unit to replace`, unitToReplace);
       boardScene.squad = updatedSquad;
 
+      //remove dragged unit chara
       this.unitListScene?.removeUnit(unit);
-      boardScene.placeUnit({member:updatedSquad.members[unit.id],fromOutside:true});
+      //create new chara on board, representing same unit
+      boardScene.placeUnit({
+        member: updatedSquad.members[unit.id],
+        fromOutside: true,
+      });
+      //remove replaced unit
+      if (unitToReplace) {
+        const charaToRemove = boardScene.unitList.find(
+          (chara) => chara.unit.id === unitToReplace.id,
+        );
+
+        this.tweens.add({
+          targets: charaToRemove?.container,
+          y: (charaToRemove?.container?.y || 0) - 200,
+          alpha: 0,
+          ease: 'Cubic',
+          duration: 400,
+          repeat: 0,
+          paused: false,
+          yoyo: false,
+        });
+      }
     } else {
       console.log(`lets return`, unit, this.unitListScene?.rows);
 
       this.unitListScene?.returnToOriginalPosition(unit);
       this.unitListScene?.scaleDown(chara);
-
     }
 
     boardScene.tiles.forEach((tile) => tile.sprite.clearTint());

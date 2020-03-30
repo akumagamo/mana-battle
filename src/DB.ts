@@ -77,7 +77,6 @@ export const addUnitToSquad = (
   x: number,
   y: number,
 ) => {
-  const updatedUnit = {...unit, squad: squad.id};
 
   const {members} = squad;
 
@@ -88,16 +87,41 @@ export const addUnitToSquad = (
     id: unit.id,
   };
 
-  const updatedMembers = {...members, [unit.id]: newEntry};
+  const unitInTargetPosition = Object.values(members).find(
+    (member) => member.x === x && member.y === y,
+  );
 
-  const updatedSquad = {...squad, members: updatedMembers};
+  if (unitInTargetPosition) {
 
-  saveUnit(updatedUnit);
-  saveSquad(updatedSquad);
+    console.log(`REMOVE EXISTING`)
 
-  return updatedSquad;
+    const remainingMembers = Object.values(members).filter(member=>member.id !== unitInTargetPosition.id);
+    const updatedMembers = remainingMembers.concat([newEntry]).reduce((acc,curr)=>({...acc, [curr.id]:curr}),{})
+
+    const updatedSquad = {...squad, members: updatedMembers as SquadMemberMap};
+
+    const removedUnit = getUnit(unitInTargetPosition.id) 
+
+    if(!removedUnit)throw new Error('Invalid state')
+
+    saveUnit({...removedUnit, squad:null})
+    saveUnit({...unit, squad: squad.id});
+    saveSquad(updatedSquad);
+
+    return updatedSquad;
+
+
+  } else {
+    const updatedMembers = {...members, [unit.id]: newEntry};
+
+    const updatedSquad = {...squad, members: updatedMembers};
+
+    saveUnit({...unit, squad: squad.id});
+    saveSquad(updatedSquad);
+
+    return updatedSquad;
+  }
 };
-
 
 // TODO: add new fn for units coming from outside the board
 export const changeSquadMemberPosition = (
@@ -111,15 +135,14 @@ export const changeSquadMemberPosition = (
 
   const updatedBoard = placeUnitInBoard(x, y, unit, members);
 
-  console.log(`ujpdated board`, updatedBoard)
+  console.log(`ujpdated board`, updatedBoard);
 
   const updatedSquad = {...squad, members: updatedBoard.members};
 
-
-  console.log(`will save updatedSquad`, updatedSquad)
+  console.log(`will save updatedSquad`, updatedSquad);
   saveSquad(updatedSquad);
 
-  console.log(`will return`, updatedBoard)
+  console.log(`will return`, updatedBoard);
 
   return updatedBoard;
 };
