@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import {Unit, UnitMap, getUnitsWithoutSquad} from './Model';
+import {Unit, getUnitsWithoutSquad} from './Model';
 import {getUnits} from '../DB';
 import {Chara} from '../Chara/Chara';
 import {error, INVALID_STATE} from '../errors';
@@ -37,10 +37,19 @@ export default class UnitListScene extends Phaser.Scene {
       BASE_WINDOW_SIZE.BASE_WINDOW_HEIGHT + 60,
       'arrow_right',
     );
-    next.setInteractive();
-    next.on('pointerdown', (_: Pointer) => {
-      this.nextPage();
-    });
+
+    const isLastPage =
+      this.rows.length < this.itemsPerPage ||
+      this.page === Math.floor(this.rows.length / this.itemsPerPage);
+
+    if (!isLastPage) {
+      next.setInteractive();
+      next.on('pointerdown', (_: Pointer) => {
+        this.nextPage();
+      });
+    } else {
+      next.setAlpha(0.5);
+    }
 
     const prev = this.add.image(
       100,
@@ -65,7 +74,7 @@ export default class UnitListScene extends Phaser.Scene {
     this.page = this.page + 1;
     this.clearUnitList();
     this.render();
-    this.renderControls()
+    this.renderControls();
   }
 
   prevPage() {
@@ -73,7 +82,7 @@ export default class UnitListScene extends Phaser.Scene {
     this.clearUnitList();
     this.render();
 
-    this.renderControls()
+    this.renderControls();
   }
 
   clearUnitList() {
