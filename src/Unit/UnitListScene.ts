@@ -72,42 +72,51 @@ export default class UnitListScene extends Phaser.Scene {
     this.rows = [];
   }
 
-  render() {
+  getUnitsToRender() {
     const units = getUnitsWithoutSquad(getUnits());
 
-    const onClick = (unit: Unit) => console.log(`onclick`, unit);
-
-    const unitsToRender = Object.values(units).slice(
+    return Object.values(units).slice(
       this.page * this.itemsPerPage,
       this.page * this.itemsPerPage + this.itemsPerPage,
     );
+  }
+
+  render() {
+    const unitsToRender = this.getUnitsToRender();
 
     unitsToRender.forEach((unit, index) => {
-      const {charaX, charaY, textX, textY} = this.getUnitPosition(index);
-      const key = this.makeUnitKey(unit);
-      const chara = new Chara(
-        key,
-        this,
-        unit,
-        charaX,
-        charaY,
-        0.5,
-        true,
-        onClick,
-        (unit: Unit, x: number, y: number) => {
-          this.scaleUp(chara);
-          this.scene.bringToTop(key);
-          return this.onDrag(unit, x, y);
-        },
-        this.onDragEnd,
-      );
-
-      this.scene.add(key, chara, true);
-
-      const text = this.add.text(textX, textY, unit.name);
-
-      this.rows.push({chara, text});
+      this.renderUnitListItem(unit, index);
     });
+  }
+
+  private renderUnitListItem(unit: Unit, index: number) {
+    const onClick = (unit: Unit) => console.log(`onclick`, unit);
+    const {charaX, charaY, textX, textY} = this.getUnitPosition(index);
+    const key = this.makeUnitKey(unit);
+    const chara = new Chara(
+      key,
+      this,
+      unit,
+      charaX,
+      charaY,
+      0.5,
+      true,
+      onClick,
+      (unit: Unit, x: number, y: number) => {
+        this.scaleUp(chara);
+        this.scene.bringToTop(key);
+        return this.onDrag(unit, x, y);
+      },
+      this.onDragEnd,
+    );
+
+    this.scene.add(key, chara, true);
+
+    const text = this.add.text(textX, textY, unit.name);
+
+    this.rows.push({chara, text});
+
+    return chara;
   }
 
   private getUnitPosition(index: number) {
@@ -202,5 +211,31 @@ export default class UnitListScene extends Phaser.Scene {
 
     this.rows = this.rows.filter((row) => !findUnit(row));
     this.rows.forEach((row, index) => this.reposition(row, index));
+
+    // add new unit to end of the list
+
+    const unitsToRender = this.getUnitsToRender();
+
+    if (unitsToRender.length < 1 ) return;
+
+    const last = unitsToRender[unitsToRender.length - 1];
+
+    const isAlreadyRendered = this.rows.some(row=>row.chara.unit.id === last.id)
+
+    if(isAlreadyRendered) return;
+
+    const newChara = this.renderUnitListItem(last, this.itemsPerPage - 1);
+
+    if (newChara.container)
+      newChara.container.setPosition(
+        newChara.container.x,
+        newChara.container.y + 300,
+      );
+
+    const row = this.rows[this.rows.length - 1];
+
+    if (!row) return;
+
+    this.reposition(row, this.itemsPerPage - 1);
   }
 }
