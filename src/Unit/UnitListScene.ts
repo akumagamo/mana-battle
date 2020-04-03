@@ -32,6 +32,10 @@ export default class UnitListScene extends Phaser.Scene {
   renderControls() {
     this.controls.forEach((btn) => btn.destroy());
 
+    // TODO: optimize to avoid reloading this
+    const units = getUnitsWithoutSquad(getUnits());
+    const totalUnits = Object.keys(units).length
+
     const next = this.add.image(
       200,
       BASE_WINDOW_SIZE.BASE_WINDOW_HEIGHT + 60,
@@ -39,8 +43,8 @@ export default class UnitListScene extends Phaser.Scene {
     );
 
     const isLastPage =
-      this.rows.length < this.itemsPerPage ||
-      this.page === Math.floor(this.rows.length / this.itemsPerPage);
+      totalUnits < this.itemsPerPage ||
+      this.itemsPerPage * (this.page + 1) >= totalUnits;
 
     if (!isLastPage) {
       next.setInteractive();
@@ -129,7 +133,12 @@ export default class UnitListScene extends Phaser.Scene {
         this.scene.bringToTop(key);
         return this.onDrag(unit, x, y);
       },
-      this.onDragEnd,
+      (unit:Unit, x:number,y:number,chara:Chara)=>{
+
+        this.renderControls()
+
+        this.onDragEnd(unit,x,y,chara)
+      },
     );
 
     this.scene.add(key, chara, true);
