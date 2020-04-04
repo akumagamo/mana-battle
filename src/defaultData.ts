@@ -43,7 +43,7 @@ function squad(n: number, leader: Unit) {
 }
 
 export var squads: SquadMap = {};
-for (var j = 0; j < 3; j++) squads[j.toString()] = squad(j, units[j]);
+for (var j = 0; j < 7; j++) squads[j.toString()] = squad(j, units[j]);
 
 function makeItem(acc: Item[], itemData: any): Item[] {
   const { type, name } = itemData;
