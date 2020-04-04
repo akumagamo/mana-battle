@@ -35,6 +35,11 @@ export default class TitleScene extends Phaser.Scene {
     listSquads .setInteractive();
     listSquads .on('pointerdown', () => {
       //this.scene.start('BoardScene', boardSceneConfig);
+      this.scene.transition({
+        target: 'ListSquadsScene',
+        duration: 0,
+        moveBelow: true
+      })
     });
 
     const erase = this.add.text(10, 600, 'Erase Data');

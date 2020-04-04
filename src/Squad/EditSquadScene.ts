@@ -5,7 +5,7 @@ import {Squad} from '../Squad/Model';
 import {addUnitToSquad} from '../DB';
 import UnitListScene from '../Unit/UnitListScene';
 import {Unit} from '../Unit/Model';
-import BoardScene, {BOARD_SCENE_KEY} from '../Board/BoardScene';
+import BoardScene, {BOARD_SCENE_KEY} from '../Board/InteractiveBoardScene';
 
 export class EditSquadScene extends Phaser.Scene {
   unitListScene: UnitListScene | null = null;
