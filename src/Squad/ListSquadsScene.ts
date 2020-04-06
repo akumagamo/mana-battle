@@ -1,16 +1,18 @@
 import * as Phaser from 'phaser';
 import {preload} from '../preload';
 import {Squad} from '../Squad/Model';
-import {getSquads} from '../DB';
+import {getSquads, getSquad} from '../DB';
 import BoardScene from '../Board/StaticBoardScene';
+import {Container} from '../Models';
 
 export class ListSquadsScene extends Phaser.Scene {
   boardScenes: BoardScene[];
+  selectedSquadInfo: Container | null;
 
   constructor() {
     super('ListSquadsScene');
-    console.log('ListSquadScene constructor');
     this.boardScenes = [];
+    this.selectedSquadInfo = null;
   }
 
   preload = preload;
@@ -43,9 +45,27 @@ export class ListSquadsScene extends Phaser.Scene {
     }
   }
 
+  renderSelectSquadInfo(squad: Squad) {
+    if (this.selectedSquadInfo) this.selectedSquadInfo.destroy();
+
+    this.selectedSquadInfo = this.add.container(0, 0);
+
+    const squadLeader = this.add.text(10, 680, squad.name);
+    this.selectedSquadInfo.add(squadLeader);
+
+    const editBtn = this.add.text(400, 680, 'Edit');
+    editBtn.setInteractive();
+    editBtn.on(`pointerdown`, () => {
+      this.editSquad(squad);
+    });
+    this.selectedSquadInfo.add(editBtn);
+  }
+
   renderBoard(squad: Squad, x: number, y: number) {
-    const boardScene = new BoardScene(squad, x * 300, y * 200, 0.3);
+    const boardScene = new BoardScene(squad, x * 320, y * 220, 0.3);
     this.scene.add(`board-squad-${squad.id}`, boardScene, true);
+
+    boardScene.onClick((sqd) => this.renderSelectSquadInfo(sqd));
 
     this.boardScenes.push(boardScene);
   }
@@ -58,9 +78,25 @@ export class ListSquadsScene extends Phaser.Scene {
     btn.on('pointerdown', () => {
       this.scene.transition({
         target: 'TitleScene',
-        duration: 0,
+        duration: 100,
         moveBelow: true,
+        onUpdate: () => {
+          console.log(new Date());
+        },
       });
+    });
+  }
+
+  editSquad(squad: Squad) {
+    this.boardScenes.forEach((scene) => {
+      scene.destroy(this);
+    });
+
+    this.scene.transition({
+      target: 'EditSquadScene',
+      duration: 0,
+      moveBelow: true,
+      data: {squad},
     });
   }
 }

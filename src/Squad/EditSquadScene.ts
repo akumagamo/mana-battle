@@ -30,7 +30,7 @@ export class EditSquadScene extends Phaser.Scene {
   }
 
   renderBoard(squad: Squad) {
-    this.boardScene = new BoardScene(squad); 
+    this.boardScene = new BoardScene(squad);
     this.scene.add(BOARD_SCENE_KEY, this.boardScene, true);
   }
 
@@ -122,16 +122,27 @@ export class EditSquadScene extends Phaser.Scene {
         moveBelow: true,
       });
 
-      console.log(this.unitListScene);
-      // this.scene.remove('unitList');
-      // this.unitListScene?.rows.forEach((row) =>
-      //   this.scene.remove(row.chara.key),
-      // );
-      // this.boardScene?.unitList.forEach((unit) => this.scene.remove(unit.key));
+      this.destroyChildren();
+    });
+    const list = this.add.text(1100, 200, 'Return to list');
+    list.setInteractive();
+    list.on('pointerdown', () => {
 
-      // this.sys.displayList.removeAll()
+      this.destroyChildren();
+
+      this.scene.transition({
+        target: 'ListSquadsScene',
+        duration: 0,
+        moveBelow: true,
+      });
+
     });
 
     console.log(`done`);
+  }
+
+  destroyChildren() {
+    this.boardScene?.destroy();
+    this.unitListScene?.destroy();
   }
 }

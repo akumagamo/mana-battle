@@ -253,6 +253,15 @@ export default class BoardScene extends Phaser.Scene {
       .sort((a, b) => (a.container?.depth || 0) - (b.container?.depth || 0))
       .forEach((chara) => chara.scene.bringToTop());
   }
+destroy(){
+
+    this.tiles.forEach(tile=>tile.sprite.destroy())
+
+    this.unitList.forEach(chara=> this.scene.remove(this.makeUnitKey(chara.unit) ))
+
+
+    this.scene.remove()
+  }
 }
 
 function getUnitPositionInScreen(

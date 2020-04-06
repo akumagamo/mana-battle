@@ -29,6 +29,11 @@ export default class UnitListScene extends Phaser.Scene {
     this.renderControls();
   }
 
+  destroy(){
+    this.rows.forEach(row=>this.scene.remove(this.makeUnitKey(row.chara.unit)))
+    this.scene.remove()
+  }
+
   renderControls() {
     this.controls.forEach((btn) => btn.destroy());
 

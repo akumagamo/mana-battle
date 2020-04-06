@@ -19,3 +19,4 @@ export type Image = Phaser.GameObjects.Image
 export type Container = Phaser.GameObjects.Container
 export type Text = Phaser.GameObjects.Text
 export type Tween = Phaser.Tweens.Tween;
+export type Graphics = Phaser.GameObjects.Graphics;

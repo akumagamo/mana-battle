@@ -14,7 +14,7 @@ export default class TitleScene extends Phaser.Scene {
     //
     this.add.image(0,0,"backgrounds/squad_edit")
 
-    const editSquad = this.add.text(10, 100, 'Edit Squad', { color: '#fff' });
+    const editSquad = this.add.text(10, 100, 'Edit Squad 0', { color: '#fff' });
     editSquad.setInteractive();
     editSquad.on('pointerdown', () => {
       //this.scene.start('EditSquadScene', getSquads()[0]);
@@ -34,12 +34,8 @@ export default class TitleScene extends Phaser.Scene {
     const listSquads = this.add.text(10, 200, 'List Squads', { color: '#fff' });
     listSquads .setInteractive();
     listSquads .on('pointerdown', () => {
-      //this.scene.start('BoardScene', boardSceneConfig);
-      this.scene.transition({
-        target: 'ListSquadsScene',
-        duration: 0,
-        moveBelow: true
-      })
+      this.scene.start('ListSquadsScene');
+      //this.scene.remove()
     });
 
     const erase = this.add.text(10, 600, 'Erase Data');

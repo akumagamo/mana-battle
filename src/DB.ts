@@ -10,6 +10,9 @@ const set = (str: string, data: any) =>
 
 export const getSquads = (): SquadMap => get('squads');
 
+export const getSquad = (id: string): Squad | undefined =>
+  Object.values(getSquads()).find((squad) => squad.id === id);
+
 export const getUnits = (): UnitMap => get('units');
 
 export const getItems = (): ItemMap => get('items');
@@ -77,7 +80,6 @@ export const addUnitToSquad = (
   x: number,
   y: number,
 ) => {
-
   const {members} = squad;
 
   const newEntry = {
@@ -92,25 +94,26 @@ export const addUnitToSquad = (
   );
 
   if (unitInTargetPosition) {
+    console.log(`REMOVE EXISTING`);
 
-    console.log(`REMOVE EXISTING`)
-
-    const remainingMembers = Object.values(members).filter(member=>member.id !== unitInTargetPosition.id);
-    const updatedMembers = remainingMembers.concat([newEntry]).reduce((acc,curr)=>({...acc, [curr.id]:curr}),{})
+    const remainingMembers = Object.values(members).filter(
+      (member) => member.id !== unitInTargetPosition.id,
+    );
+    const updatedMembers = remainingMembers
+      .concat([newEntry])
+      .reduce((acc, curr) => ({...acc, [curr.id]: curr}), {});
 
     const updatedSquad = {...squad, members: updatedMembers as SquadMemberMap};
 
-    const removedUnit = getUnit(unitInTargetPosition.id) 
+    const removedUnit = getUnit(unitInTargetPosition.id);
 
-    if(!removedUnit)throw new Error('Invalid state')
+    if (!removedUnit) throw new Error('Invalid state');
 
-    saveUnit({...removedUnit, squad:null})
+    saveUnit({...removedUnit, squad: null});
     saveUnit({...unit, squad: squad.id});
     saveSquad(updatedSquad);
 
     return updatedSquad;
-
-
   } else {
     const updatedMembers = {...members, [unit.id]: newEntry};
 
