@@ -13,7 +13,7 @@ export class EditSquadScene extends Phaser.Scene {
 
   constructor() {
     super('EditSquadScene');
-    console.log('editsqud constructor');
+    console.log('EditSquadScene constructor. this:', this);
   }
 
   preload = preload;
@@ -35,10 +35,9 @@ export class EditSquadScene extends Phaser.Scene {
   }
 
   renderUnitList() {
-    this.unitListScene = new UnitListScene(
-      (unit, x, y) => this.onDragFromList(unit, x, y),
-      (unit, x, y, chara) => this.onDragEndFromList(unit, x, y, chara),
-    );
+    this.unitListScene = new UnitListScene(50,40);
+    this.unitListScene.onDrag = (unit, x, y) => this.onDragFromList(unit, x, y);
+    this.unitListScene.onDragEnd = (unit, x, y, chara) => this.onDragEndFromList(unit, x, y, chara);
     this.scene.add('UnitListScene', this.unitListScene, true);
   }
 

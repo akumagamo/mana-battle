@@ -4,19 +4,29 @@ import {getUnits} from '../DB';
 import {Chara} from '../Chara/Chara';
 import {error, INVALID_STATE} from '../errors';
 import {BASE_WINDOW_SIZE} from '../constants/window';
-import {Pointer, Text, Image} from '../Models';
+import {Pointer, Text, Image, Graphics, Container} from '../Models';
+
+// TODO: fix list display when unit in board is replaced with unit from list
+//
+
+const rowWidth = 200;
+const rowHeight = 90;
+const rowOffsetY = -30;
+const rowOffsetX = -50;
 
 export default class UnitListScene extends Phaser.Scene {
-  rows: {chara: Chara; text: Text}[];
-  page: number;
-  totalPages: number;
-  itemsPerPage: number;
-  controls: Image[] = [];
+  public rows: {chara: Chara; text: Text; container: Container}[];
+  private page: number;
+  private totalPages: number;
+  private itemsPerPage: number;
+  private controls: Image[] = [];
+  public onUnitClick: ((unit: Unit) => void) | null = null;
+  public onDrag: ((unit: Unit, x: number, y: number) => void) | null = null;
+  public onDragEnd:
+    | ((unit: Unit, x: number, y: number, chara: Chara) => void)
+    | null = null;
 
-  constructor(
-    public onDrag: (unit: Unit, x: number, y: number) => void,
-    public onDragEnd: (unit: Unit, x: number, y: number, chara: Chara) => void,
-  ) {
+  constructor(public x: number, public y: number) {
     super('UnitListScene');
     this.rows = [];
     this.page = 0;
@@ -29,9 +39,28 @@ export default class UnitListScene extends Phaser.Scene {
     this.renderControls();
   }
 
-  destroy(){
-    this.rows.forEach(row=>this.scene.remove(this.makeUnitKey(row.chara.unit)))
-    this.scene.remove()
+  makeBackground() {
+    var rect = new Phaser.Geom.Rectangle(
+      rowOffsetX,
+      rowOffsetY,
+      rowWidth,
+      rowHeight,
+    );
+    var graphics = this.add.graphics({
+      fillStyle: {color: 0x0000ff},
+    });
+
+    graphics.alpha = 0.2;
+
+    graphics.fillRectShape(rect);
+    return graphics;
+  }
+
+  destroy() {
+    this.rows.forEach((row) =>
+      this.scene.remove(this.makeUnitKey(row.chara.unit)),
+    );
+    this.scene.remove();
   }
 
   renderControls() {
@@ -39,13 +68,9 @@ export default class UnitListScene extends Phaser.Scene {
 
     // TODO: optimize to avoid reloading this
     const units = getUnitsWithoutSquad(getUnits());
-    const totalUnits = Object.keys(units).length
+    const totalUnits = Object.keys(units).length;
 
-    const next = this.add.image(
-      200,
-      BASE_WINDOW_SIZE.BASE_WINDOW_HEIGHT + 60,
-      'arrow_right',
-    );
+    const next = this.add.image(this.x + 100, this.y + 630, 'arrow_right');
 
     const isLastPage =
       totalUnits < this.itemsPerPage ||
@@ -60,11 +85,7 @@ export default class UnitListScene extends Phaser.Scene {
       next.setAlpha(0.5);
     }
 
-    const prev = this.add.image(
-      100,
-      BASE_WINDOW_SIZE.BASE_WINDOW_HEIGHT + 60,
-      'arrow_right',
-    );
+    const prev = this.add.image(this.x, this.y + 630, 'arrow_right');
     prev.setScale(-1, 1);
 
     if (this.page === 0) {
@@ -97,7 +118,7 @@ export default class UnitListScene extends Phaser.Scene {
   clearUnitList() {
     this.rows.forEach((row) => {
       this.scene.remove(row.chara.key);
-      this.children.remove(row.text);
+      this.children.remove(row.container);
     });
 
     this.rows = [];
@@ -120,10 +141,55 @@ export default class UnitListScene extends Phaser.Scene {
     });
   }
 
+  private handleUnitClick(unit: Unit) {
+    if (this.onUnitClick) {
+      console.log(`An event to handle unit click has been defined`, unit);
+      this.onUnitClick(unit);
+    }
+  }
+
+  private handleUnitDrag(unit: Unit, x: number, y: number, chara: Chara) {
+    this.scaleUp(chara);
+    this.scene.bringToTop(chara.key);
+    if (this.onDrag) return this.onDrag(unit, x, y);
+  }
+
+  private handleUnitDragEnd(unit: Unit, x: number, y: number, chara: Chara) {
+    this.renderControls();
+    if (this.onDragEnd) this.onDragEnd(unit, x, y, chara);
+  }
+
   private renderUnitListItem(unit: Unit, index: number) {
-    const onClick = (unit: Unit) => console.log(`onclick`, unit);
-    const {charaX, charaY, textX, textY} = this.getRowPosition(index);
+    const {charaX, charaY} = this.getRowPosition(index);
     const key = this.makeUnitKey(unit);
+
+    const container = this.add.container(charaX, charaY)
+
+    const onRowClick = this.onUnitClick
+      ? this.handleUnitClick.bind(this)
+      : undefined;
+    const onDrag = this.onDrag ? this.handleUnitDrag.bind(this) : undefined;
+    const onDragEnd = this.onDragEnd
+      ? this.handleUnitDragEnd.bind(this)
+      : undefined;
+
+    var rect = new Phaser.Geom.Rectangle(
+       rowOffsetX,
+       rowOffsetY,
+      rowWidth,
+      rowHeight,
+    );
+    const background = this.makeBackground();
+    background.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
+
+    container.add(background)
+
+    if (onRowClick) {
+      background.on(`pointerdown`, () => {
+        onRowClick(unit);
+      });
+    }
+
     const chara = new Chara(
       key,
       this,
@@ -132,25 +198,21 @@ export default class UnitListScene extends Phaser.Scene {
       charaY,
       0.5,
       true,
-      onClick,
-      (unit: Unit, x: number, y: number) => {
-        this.scaleUp(chara);
-        this.scene.bringToTop(key);
-        return this.onDrag(unit, x, y);
-      },
-      (unit:Unit, x:number,y:number,chara:Chara)=>{
-
-        this.renderControls()
-
-        this.onDragEnd(unit,x,y,chara)
-      },
+      undefined,
+      onDrag,
+      onDragEnd,
     );
+
+    if(chara.container)
+      container.add(chara.container)
 
     this.scene.add(key, chara, true);
 
-    const text = this.add.text(textX, textY, unit.name);
+    const text = this.add.text(40, 30, unit.name);
 
-    this.rows.push({chara, text});
+    container.add(text)
+    //TODO: move background createion to
+    this.rows.push({chara, text, container});
 
     return chara;
   }
@@ -158,10 +220,8 @@ export default class UnitListScene extends Phaser.Scene {
   private getRowPosition(index: number) {
     const lineHeight = 100;
     return {
-      charaX: 50,
-      charaY: 50 + lineHeight * index,
-      textX: 100,
-      textY: 50 + lineHeight * index,
+      charaX: this.x,
+      charaY: this.y + lineHeight * index,
     };
   }
 
@@ -210,8 +270,11 @@ export default class UnitListScene extends Phaser.Scene {
     return 'unit-list-' + unit.id;
   }
 
-  reposition({chara, text}: {chara: Chara; text: Text}, index: number) {
-    const {charaX, charaY, textX, textY} = this.getRowPosition(index);
+  reposition(
+    {chara, container}: {chara: Chara; container: Container},
+    index: number,
+  ) {
+    const {charaX, charaY} = this.getRowPosition(index);
 
     this.tweens.add({
       targets: chara.container,
@@ -223,10 +286,11 @@ export default class UnitListScene extends Phaser.Scene {
       paused: false,
       yoyo: false,
     });
+    
     this.tweens.add({
-      targets: text,
-      x: textX,
-      y: textY,
+      targets: container,
+      x: charaX ,
+      y: charaY ,
       duration: 600,
       ease: 'Cubic',
       repeat: 0,
@@ -240,7 +304,7 @@ export default class UnitListScene extends Phaser.Scene {
       row.chara.unit.id === unit.id;
     this.rows.filter(findUnit).forEach((row) => {
       this.scene.remove(row.chara);
-      this.children.remove(row.text);
+      this.children.remove(row.container);
     });
 
     this.rows = this.rows.filter((row) => !findUnit(row));

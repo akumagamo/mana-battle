@@ -29,7 +29,7 @@ export class ListSquadsScene extends Phaser.Scene {
       row.forEach((col, x) => this.renderBoard(col, x, y)),
     );
 
-    this.renderReturnBtn();
+    this.renderControls();
   }
 
   formatList(squads: Squad[], accumulator: Squad[][]): Squad[][] {
@@ -70,27 +70,44 @@ export class ListSquadsScene extends Phaser.Scene {
     this.boardScenes.push(boardScene);
   }
 
-  renderReturnBtn() {
+  renderControls() {
     console.log('Rendering return btn');
 
     const btn = this.add.text(1100, 10, 'Return to title');
     btn.setInteractive();
     btn.on('pointerdown', () => {
+
+      this.removeChildren();
+
       this.scene.transition({
         target: 'TitleScene',
-        duration: 100,
+        duration: 0,
         moveBelow: true,
-        onUpdate: () => {
-          console.log(new Date());
-        },
       });
+    });
+
+    const createSquad = this.add.text(1100, 600, 'Create Squad');
+    createSquad .setInteractive();
+    createSquad .on('pointerdown', () => {
+
+      this.removeChildren();
+      this.scene.transition({
+        target: 'CreateSquadScene',
+        duration: 0,
+        moveBelow: true,
+      });
+    });
+
+  }
+  removeChildren(){
+    this.boardScenes.forEach((scene) => {
+      scene.destroy(this);
     });
   }
 
   editSquad(squad: Squad) {
-    this.boardScenes.forEach((scene) => {
-      scene.destroy(this);
-    });
+  
+    this.removeChildren();
 
     this.scene.transition({
       target: 'EditSquadScene',

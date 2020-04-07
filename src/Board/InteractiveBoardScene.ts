@@ -190,8 +190,8 @@ export default class BoardScene extends Phaser.Scene {
       y,
       1,
       true,
-      () => {},
-      this.onUnitDrag(),
+      undefined,
+      this.onUnitDrag(), //TODO: move to public method
       this.onUnitDragEnd(),
     );
 

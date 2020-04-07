@@ -5,9 +5,6 @@ import {animate} from './animations/animate';
 import {error, NOT_IMPLEMENTED} from '../errors';
 import {Container, Pointer} from '../Models';
 
-export function singleChara(unit: Unit, front = true, onClick = () => {}) {
-  error(NOT_IMPLEMENTED);
-}
 
 export class Chara extends Phaser.Scene {
   container: Container | null = null;
@@ -19,8 +16,8 @@ export class Chara extends Phaser.Scene {
     public cy: number,
     public scaleSizing: number, // todo: rename
     public front: boolean,
-    public onClick?: (unit: Unit) => void,
-    public onDrag?: ((unit: Unit, x: number, y: number) => void) | undefined,
+    public onClick?: (chara: Chara) => void,
+    public onDrag?: ((unit: Unit, x: number, y: number, chara:Chara) => void) | undefined,
     public onDragEnd?:
        (unit: Unit, x: number, y: number, chara: Chara) => void
   ) {
@@ -95,7 +92,7 @@ export class Chara extends Phaser.Scene {
           obj.x = x;
           obj.y = y;
 
-          if (this.onDrag) this.onDrag(this.unit, x, y);
+          if (this.onDrag) this.onDrag(this.unit, x, y, this);
         },
       );
     }
@@ -117,12 +114,15 @@ export class Chara extends Phaser.Scene {
         },
       );
 
-    if (this.onClick)
+    console.log(`....`,this.onClick)
+    if (this.onClick){
+      console.log(`set listener`)
       this.container.on('pointerdown', (pointer: Pointer) => {
-        console.log(`clicked`, this.unit);
 
-        if (this.onClick) this.onClick(this.unit);
+          console.log(`clicked container `)
+        if (this.onClick) this.onClick(this);
       });
+    }
   }
 }
 
