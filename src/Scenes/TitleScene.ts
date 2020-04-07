@@ -26,9 +26,6 @@ export default class TitleScene extends Phaser.Scene {
         data: {squad: getSquads()[0] }
       })
 
-     //const edit = new EditSquad(getSquads()[0])
-     //this.scene.add("edit", edit, true);
-
     });
 
     const listSquads = this.add.text(10, 200, 'List Squads', { color: '#fff' });
@@ -43,6 +40,12 @@ export default class TitleScene extends Phaser.Scene {
     erase.on('pointerdown', () => {
       defaultData();
       alert("Data erased!")
+    });
+ 
+    const fullscreen = this.add.text(200, 600, 'Go Fullscreen');
+    fullscreen .setInteractive();
+    fullscreen .on('pointerdown', () => {
+      window.document.body.requestFullscreen();
     });
   }
 }
