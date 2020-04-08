@@ -3,6 +3,7 @@ import {unitsWithoutSquadSelector} from './Unit/selectors';
 import {Item, itemTypeSlots, ItemTypeSlots, ItemMap} from './Item/Model';
 import {Unit, UnitMap} from './Unit/Model';
 import {removeIdFromMap} from './utils';
+import {INVALID_STATE} from './errors';
 
 const get = (str: string) => JSON.parse(localStorage.getItem(str) || '{}');
 const set = (str: string, data: any) =>
@@ -73,7 +74,6 @@ export const saveSquadUnit = ({
 
 export const unitsWithoutSquad = () => unitsWithoutSquadSelector(getUnits());
 
-// TODO: remove unit in target tile
 export const addUnitToSquad = (
   unit: Unit,
   squad: Squad,
@@ -83,11 +83,12 @@ export const addUnitToSquad = (
   const {members} = squad;
 
   const newEntry = {
-    leader: false,
+    leader: Object.keys(members).length === 0,
     x,
     y,
     id: unit.id,
   };
+  console.log(`NEW ENTRY`, newEntry);
 
   const unitInTargetPosition = Object.values(members).find(
     (member) => member.x === x && member.y === y,
@@ -103,11 +104,15 @@ export const addUnitToSquad = (
       .concat([newEntry])
       .reduce((acc, curr) => ({...acc, [curr.id]: curr}), {});
 
-    const updatedSquad = {...squad, members: updatedMembers as SquadMemberMap};
+    //TODO: as only one unit can be the leader, the `leader` prop should be from the squad:
+    const updatedSquad = {
+      ...squad,
+      members: updatedMembers as SquadMemberMap,
+    };
 
     const removedUnit = getUnit(unitInTargetPosition.id);
 
-    if (!removedUnit) throw new Error('Invalid state');
+    if (!removedUnit) throw new Error(INVALID_STATE);
 
     saveUnit({...removedUnit, squad: null});
     saveUnit({...unit, squad: squad.id});
@@ -117,7 +122,11 @@ export const addUnitToSquad = (
   } else {
     const updatedMembers = {...members, [unit.id]: newEntry};
 
-    const updatedSquad = {...squad, members: updatedMembers};
+    const updatedSquad = {
+      ...squad,
+      members: updatedMembers,
+      name: newEntry.leader ? unit.name : squad.name,
+    };
 
     saveUnit({...unit, squad: squad.id});
     saveSquad(updatedSquad);

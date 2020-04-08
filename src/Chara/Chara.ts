@@ -85,14 +85,15 @@ export class Chara extends Phaser.Scene {
 
       this.input.on(
         'drag',
-        (pointer: Pointer, obj: Container, x: number, y: number) => {
-          // console.log(`???`, this.container);
-          if (this.container) this.container.setDepth(Infinity);
+        (_pointer: Pointer, obj: Container, x: number, y: number) => {
+          if (this.container){
+            this.container.setDepth(Infinity);
+          }
 
           obj.x = x;
           obj.y = y;
 
-          if (this.onDrag) this.onDrag(this.unit, x, y, this);
+          if (this.onDrag){ this.onDrag(this.unit, x, y, this);}
         },
       );
     }
@@ -100,7 +101,7 @@ export class Chara extends Phaser.Scene {
     if (this.onDragEnd)
       this.container.on(
         'dragend',
-        (pointer: Pointer, dragX: number, dragY: number) => {
+        (_pointer: Pointer, _dragX: number, dragY: number) => {
           if (this.container) {
             this.container.setDepth(dragY);
           }
@@ -114,12 +115,8 @@ export class Chara extends Phaser.Scene {
         },
       );
 
-    console.log(`....`,this.onClick)
     if (this.onClick){
-      console.log(`set listener`)
-      this.container.on('pointerdown', (pointer: Pointer) => {
-
-          console.log(`clicked container `)
+      this.container.on('pointerdown', (_pointer: Pointer) => {
         if (this.onClick) this.onClick(this);
       });
     }
