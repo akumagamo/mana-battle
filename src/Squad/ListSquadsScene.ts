@@ -3,11 +3,11 @@ import {preload} from '../preload';
 import {Squad} from '../Squad/Model';
 import {getSquads, getSquad} from '../DB';
 import BoardScene from '../Board/StaticBoardScene';
-import {Container, Pointer, Image} from '../Models';
+import {Container, Pointer, Image, Text} from '../Models';
 
 export class ListSquadsScene extends Phaser.Scene {
   boardScenes: BoardScene[] = [];
-  controls: Image[] = [];
+  controls: (Image|Text)[] = [];
   selectedSquadInfo: Container | null = null;
   page: number = 0;
   itemsPerPage: number = 9;
@@ -78,11 +78,9 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   renderControls() {
-    console.log('Rendering return btn');
-
-    const btn = this.add.text(1100, 10, 'Return to title');
-    btn.setInteractive();
-    btn.on('pointerdown', () => {
+    const returnBtn = this.add.text(1100, 10, 'Return to title');
+    returnBtn.setInteractive();
+    returnBtn.on('pointerdown', () => {
       this.removeChildren();
 
       this.scene.transition({
@@ -92,9 +90,11 @@ export class ListSquadsScene extends Phaser.Scene {
       });
     });
 
-    const createSquad = this.add.text(1100, 600, 'Create Squad');
-    createSquad.setInteractive();
-    createSquad.on('pointerdown', () => {
+    this.controls.push(returnBtn)
+
+    const createSquadBtn = this.add.text(1100, 600, 'Create Squad');
+    createSquadBtn.setInteractive();
+    createSquadBtn.on('pointerdown', () => {
       this.removeChildren();
 
       const squads = Object.keys(getSquads());
@@ -112,6 +112,8 @@ export class ListSquadsScene extends Phaser.Scene {
         },
       });
     });
+
+    this.controls.push(createSquadBtn)
 
     this.renderNavigation();
   }
@@ -135,6 +137,8 @@ export class ListSquadsScene extends Phaser.Scene {
       next.setAlpha(0.5);
     }
 
+    this.controls.push(next)
+
     const prev = this.add.image(300, 630, 'arrow_right');
     prev.setScale(-1, 1);
 
@@ -147,7 +151,8 @@ export class ListSquadsScene extends Phaser.Scene {
       });
     }
 
-    this.controls = [next, prev];
+    this.controls.push(prev)
+
   }
 
   nextPage() {
@@ -168,7 +173,9 @@ export class ListSquadsScene extends Phaser.Scene {
     this.boardScenes.forEach((scene) => {
       scene.destroy(this);
     });
+    this.boardScenes = [];
     this.controls.forEach((control) => control.destroy());
+    this.controls = [];
   }
 
   editSquad(squad: Squad) {
