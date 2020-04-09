@@ -140,7 +140,6 @@ export default class StaticBoardScene extends Phaser.Scene {
 
   placeUnits() {
     const {squad} = this;
-    console.log(`...`, squad.members);
 
     Object.values(squad.members).forEach((member) => this.placeUnit(member));
   }

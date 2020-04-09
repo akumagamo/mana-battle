@@ -72,6 +72,19 @@ export const saveSquadUnit = ({
   });
 };
 
+export const disbandSquad = (id:string) =>{
+
+  const squads = getSquads();
+
+  const squadToRemove = squads[id]
+
+  Object.values(squadToRemove.members).forEach(member=>removeUnitFromSquad(member.id, squadToRemove))
+
+  const updatedSquads = removeIdFromMap(id, squads)
+  saveSquads(updatedSquads)
+
+}
+
 export const unitsWithoutSquad = () => unitsWithoutSquadSelector(getUnits());
 
 export const addUnitToSquad = (
