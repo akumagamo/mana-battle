@@ -3,6 +3,7 @@ import { SCREEN_WIDTH, SCREEN_HEIGHT } from './constants';
 import TitleScene from './Scenes/TitleScene';
 import {EditSquadScene} from './Squad/EditSquadScene';
 import {ListSquadsScene} from './Squad/ListSquadsScene';
+import {ListUnitsScene} from './Unit/ListUnits';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -13,7 +14,7 @@ const config: Phaser.Types.Core.GameConfig = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH
   },
-  scene: [TitleScene, EditSquadScene, ListSquadsScene]
+  scene: [TitleScene, EditSquadScene, ListSquadsScene, ListUnitsScene]
 };
 
 const game = new Phaser.Game(config);

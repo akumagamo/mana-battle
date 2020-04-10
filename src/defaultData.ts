@@ -26,7 +26,7 @@ export const randomItem = (items: any[]) =>
   items[Math.floor(Math.random() * items.length)];
 
 export var units: UnitMap = indexById(
-  Array.from({ length: 29 }, (x, i) => i).map(unitJSON => fromJSON(unitJSON))
+  Array.from({ length: 70 }, (x, i) => i).map(unitJSON => fromJSON(unitJSON))
 );
 
 function squad(n: number, leader: Unit) {

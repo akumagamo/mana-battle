@@ -134,6 +134,7 @@ export default class UnitListScene extends Phaser.Scene {
   render() {
     const unitsToRender = this.getUnitsToRender();
 
+    console.log(`....`,unitsToRender)
     unitsToRender.forEach((unit, index) => {
       this.renderUnitListItem(unit, index);
     });

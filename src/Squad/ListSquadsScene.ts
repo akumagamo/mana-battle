@@ -58,33 +58,27 @@ export class ListSquadsScene extends Phaser.Scene {
     const squadLeader = this.add.text(10, 680, squad.name);
     this.selectedSquadInfo.add(squadLeader);
 
-    const editBtn = this.add.text(400, 680, 'Edit');
+    const editBtn = this.add.text(1100, 350, 'Edit');
     editBtn.setInteractive();
     editBtn.on(`pointerdown`, () => {
       this.editSquad(squad);
     });
     this.selectedSquadInfo.add(editBtn);
+
     const removeSquadBtn = this.add.text(1100, 400, 'Disband Squad');
     removeSquadBtn .setInteractive();
     removeSquadBtn .on('pointerdown', () => {
-
       if(this.selectedSquadInfo){
-
         api.disbandSquad(this.selectedSquadInfo.name)
-
         this.refresh();
-
       }
-      
     });
-
     this.selectedSquadInfo.add(removeSquadBtn);
-
 
   }
 
   renderBoard(squad: Squad, x: number, y: number) {
-    const boardScene = new BoardScene(squad, x * 320, y * 220, 0.3);
+    const boardScene = new BoardScene(squad, x * 320, y * 170, 0.3);
     this.scene.add(`board-squad-${squad.id}`, boardScene, true);
 
     boardScene.onClick((sqd) => this.renderSelectSquadInfo(sqd));
@@ -137,7 +131,21 @@ export class ListSquadsScene extends Phaser.Scene {
 
     const totalSquads = Object.keys(squads).length;
 
-    const next = this.add.image(400, 630, 'arrow_right');
+    const prev = this.add.image(400, 630, 'arrow_right');
+    prev.setScale(-1, 1);
+
+    if (this.page === 0) {
+      prev.setAlpha(0.5);
+    } else {
+      prev.setInteractive();
+      prev.on('pointerdown', (_pointer: Pointer) => {
+        this.prevPage();
+      });
+    }
+
+    this.controls.push(prev)
+
+    const next = this.add.image(500, 630, 'arrow_right');
 
     const isLastPage =
       totalSquads < this.itemsPerPage ||
@@ -154,19 +162,7 @@ export class ListSquadsScene extends Phaser.Scene {
 
     this.controls.push(next)
 
-    const prev = this.add.image(300, 630, 'arrow_right');
-    prev.setScale(-1, 1);
 
-    if (this.page === 0) {
-      prev.setAlpha(0.5);
-    } else {
-      prev.setInteractive();
-      prev.on('pointerdown', (_pointer: Pointer) => {
-        this.prevPage();
-      });
-    }
-
-    this.controls.push(prev)
 
   }
 

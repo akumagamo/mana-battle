@@ -14,6 +14,19 @@ export default class TitleScene extends Phaser.Scene {
     //
     this.add.image(0,0,"backgrounds/squad_edit")
 
+    const listUnits = this.add.text(10, 50, 'List Units', { color: '#fff' });
+    listUnits .setInteractive();
+    listUnits .on('pointerdown', () => {
+      //this.scene.start('EditSquadScene', getSquads()[0]);
+
+      this.scene.transition({
+        target: 'ListUnitsScene',
+        duration: 0,
+        moveBelow: true,
+      })
+
+    });
+
     const editSquad = this.add.text(10, 100, 'Edit Squad 0', { color: '#fff' });
     editSquad.setInteractive();
     editSquad.on('pointerdown', () => {
