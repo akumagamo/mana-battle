@@ -76,6 +76,12 @@ export class Chara extends Phaser.Scene {
     }
   }
 
+  setClickEvent(fn:(chara:Chara)=>void){
+
+
+
+  }
+
   makeInteractive() {
     if (!this.container) return;
 
@@ -115,11 +121,20 @@ export class Chara extends Phaser.Scene {
         },
       );
 
+    //TODO: deprecate constructor events
     if (this.onClick){
       this.container.on('pointerdown', (_pointer: Pointer) => {
         if (this.onClick) this.onClick(this);
       });
     }
+  }
+
+  handleClick(fn:(chara:Chara, pointer:Pointer)=>void){
+  
+      this.container?.on('pointerdown', (pointer: Pointer) => {
+        fn(this, pointer)
+      });
+
   }
 }
 
