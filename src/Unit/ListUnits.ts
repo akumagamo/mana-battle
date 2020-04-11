@@ -20,6 +20,13 @@ export class ListUnitsScene extends Phaser.Scene {
   preload = preload;
 
   create() {
+
+    const panel = this.add.image(50,500,'panel');
+
+    panel.setOrigin(0,0)
+    panel.displayWidth= 800
+    panel.displayHeight = 170
+
     this.renderUnitsList();
     this.renderControls();
   }
@@ -78,22 +85,29 @@ export class ListUnitsScene extends Phaser.Scene {
     this.unitDetails.forEach((item) => item.destroy());
     this.unitDetails = [];
 
-    const write = (x: number, y: number, str: string) =>
-      this.unitDetails.push(this.add.text(x, y, str));
+    const write = (x: number, y: number, str: string | number) =>
+      this.unitDetails.push(this.add.text(x, y, typeof str === 'number'? str.toString() : str));
 
-    write(100, 600, chara.unit.name);
-    write(200, 600, 'STR');
-    write(200, 630, 'AGI');
-    write(200, 660, 'INT');
-    write(250, 600, chara.unit.str.toString());
-    write(250, 630, chara.unit.agi.toString());
-    write(250, 660, chara.unit.int.toString());
-    write(300, 600, 'WIS');
-    write(300, 630, 'VIT');
-    write(300, 660, 'DEX');
-    write(350, 600, chara.unit.wis.toString());
-    write(350, 630, chara.unit.vit.toString());
-    write(350, 660, chara.unit.dex.toString());
+    const baseX = 100
+    const baseY = 550
+
+    const colWidth = 100
+    const rowHeight = 30
+
+    const col = (x:number,y:number, strs:(string|number)[])=>
+      strs.forEach((str,index)=>write(x, y + (rowHeight*index), str))
+
+    const {unit:{ str, agi, int, wis, vit, dex}} = chara
+
+    write(baseX, baseY, chara.unit.name);
+
+    col(baseX+colWidth, baseY, ['STR', 'AGI', 'INT'])
+    col(baseX+colWidth*2, baseY,  [str, agi, int])
+
+    col(baseX+colWidth*3, baseY, ['WIS', 'VIT', 'DEX'])
+    col(baseX+colWidth*4, baseY, [wis, vit, dex])
+
+
   }
 
   renderControls() {}
