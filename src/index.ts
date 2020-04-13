@@ -1,5 +1,5 @@
 import 'phaser';
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from './constants';
+import {SCREEN_WIDTH, SCREEN_HEIGHT} from './constants';
 import TitleScene from './Scenes/TitleScene';
 import {EditSquadScene} from './Squad/EditSquadScene';
 import {ListSquadsScene} from './Squad/ListSquadsScene';
@@ -12,12 +12,16 @@ const config: Phaser.Types.Core.GameConfig = {
   height: SCREEN_HEIGHT,
   scale: {
     mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH
+    autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [TitleScene, EditSquadScene, ListSquadsScene, ListUnitsScene]
+  scene: [
+    TitleScene,
+    EditSquadScene,
+    ListSquadsScene,
+    ListUnitsScene,
+  ],
 };
 
 const game = new Phaser.Game(config);
-
 
 game.scale.lockOrientation(Phaser.Scale.PORTRAIT);

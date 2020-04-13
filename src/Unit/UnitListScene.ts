@@ -148,6 +148,7 @@ export default class UnitListScene extends Phaser.Scene {
   }
 
   private handleUnitDrag(unit: Unit, x: number, y: number, chara: Chara) {
+
     this.scaleUp(chara);
     this.scene.bringToTop(chara.key);
     if (this.onDrag) return this.onDrag(unit, x, y);
@@ -197,15 +198,10 @@ export default class UnitListScene extends Phaser.Scene {
       charaY,
       0.5,
       true,
-      undefined,
-      onDrag,
-      onDragEnd,
     );
 
-    if(chara.container)
-      container.add(chara.container)
-
-    this.scene.add(key, chara, true);
+    if(onDrag && onDragEnd)
+      chara.enableDrag(onDrag.bind(this), onDragEnd.bind(this))
 
     const text = this.add.text(40, 30, unit.name);
 

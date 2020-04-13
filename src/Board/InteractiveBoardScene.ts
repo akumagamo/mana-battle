@@ -6,7 +6,7 @@ import {SquadMember, Squad} from '../Squad/Model';
 import {cartesianToIsometric} from '../utils/isometric';
 import {getUnit, changeSquadMemberPosition} from '../DB';
 import {Unit} from '../Unit/Model';
-import { tileWidth, tileHeight } from '../constants';
+import {tileWidth, tileHeight} from '../constants';
 
 type BoardTile = {
   sprite: Image;
@@ -22,9 +22,7 @@ export default class BoardScene extends Phaser.Scene {
   tiles: BoardTile[] = [];
   unitList: Chara[] = [];
 
-  constructor(
-    public squad: Squad,
-  ) {
+  constructor(public squad: Squad) {
     super(BOARD_SCENE_KEY);
     console.log(`boardScene constructor`);
   }
@@ -39,9 +37,7 @@ export default class BoardScene extends Phaser.Scene {
     this.placeUnits();
   }
   findTileByXY(x: number, y: number) {
-    return this.tiles.find(
-      isPointerInTile({x, y: y + 100}),
-    );
+    return this.tiles.find(isPointerInTile({x, y: y + 100}));
   }
 
   changeUnitPositionInBoard({unit, x, y}: {unit: Unit; x: number; y: number}) {
@@ -62,7 +58,6 @@ export default class BoardScene extends Phaser.Scene {
     });
   }
   moveUnitToBoardTile(id: string, x: number, y: number) {
-
     //TODO: check why params are not being used
     const chara = this.unitList.find((chara) => chara.unit.id === id);
 
@@ -70,7 +65,7 @@ export default class BoardScene extends Phaser.Scene {
 
     const {unit} = chara;
 
-    const pos = getUnitPositionInScreen( this.squad.members[unit.id]);
+    const pos = getUnitPositionInScreen(this.squad.members[unit.id]);
 
     const tween = this.tweens.add({
       targets: chara?.container,
@@ -83,55 +78,55 @@ export default class BoardScene extends Phaser.Scene {
       yoyo: false,
     });
     // TODO: optimize, fire only once if multiple units were move at the same time
-    tween.on('complete',()=>{this.sortUnitsByDepth()})
+    tween.on('complete', () => {
+      this.sortUnitsByDepth();
+    });
   }
 
-  onUnitDragEnd() {
-    return (unit: Unit, x: number, y: number) => {
-      const {squad} = this;
+  onUnitDragEnd = (unit: Unit, x: number, y: number) => {
+    const {squad} = this;
 
-      console.log(`the squad`, squad);
-      console.log(this.tiles, x, y);
-      const boardSprite = this.findTileByXY(x, y);
+    console.log(`the squad`, squad);
+    console.log(this.tiles, x, y);
+    const boardSprite = this.findTileByXY(x, y);
 
-      const squadMember = squad.members[unit.id];
+    const squadMember = squad.members[unit.id];
 
-      if (!squadMember)
-        throw new Error('Invalid state. Unit should be in board object.');
+    if (!squadMember)
+      throw new Error('Invalid state. Unit should be in board object.');
 
-      const isMoved = (boardSprite: BoardTile) =>
-        squadMember.x !== boardSprite.boardX ||
-        squadMember.y !== boardSprite.boardY;
+    const isMoved = (boardSprite: BoardTile) =>
+      squadMember.x !== boardSprite.boardX ||
+      squadMember.y !== boardSprite.boardY;
 
-      if (boardSprite && isMoved(boardSprite)) {
-        this.changeUnitPositionInBoard({
-          unit,
-          x: boardSprite.boardX,
-          y: boardSprite.boardY,
-        });
-      } else {
-        const {x, y} = getUnitPositionInScreen( squadMember);
+    if (boardSprite && isMoved(boardSprite)) {
+      this.changeUnitPositionInBoard({
+        unit,
+        x: boardSprite.boardX,
+        y: boardSprite.boardY,
+      });
+    } else {
+      const {x, y} = getUnitPositionInScreen(squadMember);
 
-        // return to original position
-        console.log(`TWEEN: return to original`);
-        this.tweens.add({
-          targets: this.getChara(unit)?.container,
-          x: x,
-          y: y,
-          ease: 'Cubic',
-          duration: 400,
-          repeat: 0,
-          paused: false,
-          yoyo: false,
-        });
-      }
+      // return to original position
+      console.log(`TWEEN: return to original`);
+      this.tweens.add({
+        targets: this.getChara(unit)?.container,
+        x: x,
+        y: y,
+        ease: 'Cubic',
+        duration: 400,
+        repeat: 0,
+        paused: false,
+        yoyo: false,
+      });
+    }
 
-      this.tiles.map((boardSprite) => boardSprite.sprite.clearTint());
-      (this.getChara(unit)?.container?.list as Image[]).map((sprite) =>
-        sprite.clearTint(),
-      );
-    };
-  }
+    this.tiles.map((boardSprite) => boardSprite.sprite.clearTint());
+    (this.getChara(unit)?.container?.list as Image[]).map((sprite) =>
+      sprite.clearTint(),
+    );
+  };
   private getChara(unit: {id: string}) {
     return this.unitList.find((chara) => chara.key === this.makeUnitKey(unit));
   }
@@ -146,7 +141,7 @@ export default class BoardScene extends Phaser.Scene {
 
     grid.forEach((row, yIndex) => {
       row.forEach((_, xIndex) => {
-        var {x, y} = cartesianToIsometric( xIndex, yIndex);
+        var {x, y} = cartesianToIsometric(xIndex, yIndex);
 
         const tileSprite = this.add.image(x, y, 'tile');
         tileSprite.depth = y;
@@ -164,54 +159,40 @@ export default class BoardScene extends Phaser.Scene {
     });
 
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      this.tiles
-        .filter(isPointerInTile(pointer))
-        .forEach((tile) => {
-          console.log(`clicked>>`, tile.x, tile.y);
-        });
+      this.tiles.filter(isPointerInTile(pointer)).forEach((tile) => {
+        console.log(`clicked>>`, tile.x, tile.y);
+      });
     });
 
     return tiles;
   }
 
   addUnitToBoard(squadMember: SquadMember) {
-    const {x, y} = getUnitPositionInScreen( squadMember);
+    const {x, y} = getUnitPositionInScreen(squadMember);
 
     const unit = getUnit(squadMember.id);
 
-    if (!unit) throw new Error('Invalid member supplied');
+    if (!unit) throw new Error('Invalid member supplied.');
 
     const key = this.makeUnitKey(unit);
-    const chara = new Chara(
-      key,
-      this,
-      unit,
-      x,
-      y,
-      1,
-      true,
-      undefined,
-      this.onUnitDrag(), //TODO: move to public method
-      this.onUnitDragEnd(),
-    );
+    const chara = new Chara(key, this, unit, x, y, 1, true);
 
-    this.scene.add(key, chara, true);
+    chara.enableDrag(this.onUnitDrag.bind(this), this.onUnitDragEnd.bind(this));
+
 
     return chara;
   }
-  onUnitDrag() {
-    return (unit: Unit, x: number, y: number) => {
-      const boardSprite = this.findTileByXY(x, y);
+  onUnitDrag = (unit: Unit, x: number, y: number) => {
+    const boardSprite = this.findTileByXY(x, y);
 
-      this.tiles.map((tile) => tile.sprite.clearTint());
+    this.tiles.map((tile) => tile.sprite.clearTint());
 
-      if (boardSprite) {
-        boardSprite.sprite.setTint(0x00cc00);
-      }
+    if (boardSprite) {
+      boardSprite.sprite.setTint(0x00cc00);
+    }
 
-      this.scene.bringToTop(this.makeUnitKey(unit));
-    };
-  }
+    this.scene.bringToTop(this.makeUnitKey(unit));
+  };
 
   placeUnits() {
     const {squad} = this;
@@ -245,37 +226,33 @@ export default class BoardScene extends Phaser.Scene {
   }
 
   sortUnitsByDepth() {
-
-    this.unitList
-    .forEach(chara=>chara.container?.setDepth(chara.container?.y))
+    this.unitList.forEach((chara) =>
+      chara.container?.setDepth(chara.container?.y),
+    );
 
     this.unitList
       .sort((a, b) => (a.container?.depth || 0) - (b.container?.depth || 0))
       .forEach((chara) => chara.scene.bringToTop());
   }
-destroy(){
+  destroy() {
+    this.tiles.forEach((tile) => tile.sprite.destroy());
 
-    this.tiles.forEach(tile=>tile.sprite.destroy())
+    this.unitList.forEach((chara) =>
+      this.scene.remove(this.makeUnitKey(chara.unit)),
+    );
 
-    this.unitList.forEach(chara=> this.scene.remove(this.makeUnitKey(chara.unit) ))
-
-
-    this.scene.remove()
+    this.scene.remove();
   }
 }
 
-function getUnitPositionInScreen(
-  squadMember: SquadMember,
-) {
-  const {x, y} = cartesianToIsometric( squadMember.x, squadMember.y);
+function getUnitPositionInScreen(squadMember: SquadMember) {
+  const {x, y} = cartesianToIsometric(squadMember.x, squadMember.y);
 
   //FIXME: unit should be rendered at origin 0.5
   return {x, y: y - 230};
 }
 
-function isPointerInTile(
-  pointer: {x: number; y: number}
-) {
+function isPointerInTile(pointer: {x: number; y: number}) {
   return function(tile: BoardTile) {
     const dx = Math.abs(tile.sprite.x - pointer.x);
     const dy = Math.abs(tile.sprite.y - pointer.y);

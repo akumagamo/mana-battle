@@ -5,7 +5,6 @@ import {animate} from './animations/animate';
 import {error, NOT_IMPLEMENTED} from '../errors';
 import {Container, Pointer} from '../Models';
 
-
 export class Chara extends Phaser.Scene {
   container: Container | null = null;
   constructor(
@@ -16,12 +15,10 @@ export class Chara extends Phaser.Scene {
     public cy: number,
     public scaleSizing: number, // todo: rename
     public front: boolean,
-    public onClick?: (chara: Chara) => void,
-    public onDrag?: ((unit: Unit, x: number, y: number, chara:Chara) => void) | undefined,
-    public onDragEnd?:
-       (unit: Unit, x: number, y: number, chara: Chara) => void
   ) {
     super(key);
+
+    parent.scene.add(key, this, true);
     return this;
   }
   create() {
@@ -63,10 +60,8 @@ export class Chara extends Phaser.Scene {
     animatedUnit.container = this.container;
     this.container.name = animatedUnit.id;
 
-    const name = this.add.text(0,100,this.unit.name, {color:"#000"})
-    this.container.add(name)
-
-    this.makeInteractive();
+    const name = this.add.text(0, 100, this.unit.name, {color: '#000'});
+    this.container.add(name);
   }
 
   private maybeRenderInsignea() {
@@ -76,65 +71,59 @@ export class Chara extends Phaser.Scene {
     }
   }
 
-  setClickEvent(fn:(chara:Chara)=>void){
-
-
-
-  }
-
-  makeInteractive() {
+  onClick(fn: (chara: Chara) => void) {
     if (!this.container) return;
 
-    if (this.onDrag) {
-      this.container.setInteractive();
-      this.input.setDraggable(this.container);
+    this.container.setInteractive();
 
-      this.input.on(
-        'drag',
-        (_pointer: Pointer, obj: Container, x: number, y: number) => {
-          if (this.container){
-            this.container.setDepth(Infinity);
-          }
-
-          obj.x = x;
-          obj.y = y;
-
-          if (this.onDrag){ this.onDrag(this.unit, x, y, this);}
-        },
-      );
-    }
-
-    if (this.onDragEnd)
-      this.container.on(
-        'dragend',
-        (_pointer: Pointer, _dragX: number, dragY: number) => {
-          if (this.container) {
-            this.container.setDepth(dragY);
-          }
-          if (this.onDragEnd)
-            this.onDragEnd(
-              this.unit,
-              this.container?.x || 0,
-              this.container?.y || 0,
-              this,
-            );
-        },
-      );
-
-    //TODO: deprecate constructor events
-    if (this.onClick){
-      this.container.on('pointerdown', (_pointer: Pointer) => {
-        if (this.onClick) this.onClick(this);
-      });
-    }
+    this.container.on('pointerdown', (_pointer: Pointer) => {
+      fn(this);
+    });
   }
 
-  handleClick(fn:(chara:Chara, pointer:Pointer)=>void){
-  
-      this.container?.on('pointerdown', (pointer: Pointer) => {
-        fn(this, pointer)
-      });
+  enableDrag(
+    dragStart: (unit: Unit, x: number, y: number, chara: Chara) => void,
+    dragEnd: (unit: Unit, x: number, y: number, chara: Chara) => void,
+  ) {
+    if (!this.container) return;
 
+    this.container.setInteractive();
+    this.input.setDraggable(this.container);
+
+    this.input.on(
+      'drag',
+      (_pointer: Pointer, obj: Container, x: number, y: number) => {
+        if (this.container) {
+          this.container.setDepth(Infinity);
+        }
+
+        obj.x = x;
+        obj.y = y;
+
+        dragStart(this.unit, x, y, this);
+      },
+    );
+
+    this.container.on(
+      'dragend',
+      (_pointer: Pointer, _dragX: number, dragY: number) => {
+        if (this.container) {
+          this.container.setDepth(dragY);
+        }
+        dragEnd(
+          this.unit,
+          this.container?.x || 0,
+          this.container?.y || 0,
+          this,
+        );
+      },
+    );
+  }
+
+  handleClick(fn: (chara: Chara, pointer: Pointer) => void) {
+    this.container?.on('pointerdown', (pointer: Pointer) => {
+      fn(this, pointer);
+    });
   }
 }
 

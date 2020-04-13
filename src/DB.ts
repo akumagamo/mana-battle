@@ -17,6 +17,7 @@ export const getSquad = (id: string): Squad | undefined =>
 export const getUnits = (): UnitMap => get('units');
 
 export const getItems = (): ItemMap => get('items');
+export const getItem = (id: string): Item | undefined => getItems()[id];
 
 export const getItemTypes = (): ItemTypeSlots => itemTypeSlots;
 
@@ -72,18 +73,18 @@ export const saveSquadUnit = ({
   });
 };
 
-export const disbandSquad = (id:string) =>{
-
+export const disbandSquad = (id: string) => {
   const squads = getSquads();
 
-  const squadToRemove = squads[id]
+  const squadToRemove = squads[id];
 
-  Object.values(squadToRemove.members).forEach(member=>removeUnitFromSquad(member.id, squadToRemove))
+  Object.values(squadToRemove.members).forEach((member) =>
+    removeUnitFromSquad(member.id, squadToRemove),
+  );
 
-  const updatedSquads = removeIdFromMap(id, squads)
-  saveSquads(updatedSquads)
-
-}
+  const updatedSquads = removeIdFromMap(id, squads);
+  saveSquads(updatedSquads);
+};
 
 export const unitsWithoutSquad = () => unitsWithoutSquadSelector(getUnits());
 

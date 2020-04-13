@@ -29,4 +29,13 @@ export function preload(this: {
     this.load.image(id, `${PUBLIC_URL}/ui/${id}.svg`);
   });
 
+  const items = ['amulet',
+    'iron_armor', 'iron_shield','iron_sword',
+    'steel_armor', 'steel_shield','steel_sword',
+    'baldar_armor', 'baldar_shield','baldar_sword',
+  ];
+  items.forEach((id: string) => {
+    this.load.image(id, `${PUBLIC_URL}/items/${id}.svg`);
+  });
+
 }

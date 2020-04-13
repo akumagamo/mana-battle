@@ -133,8 +133,6 @@ export default class StaticBoardScene extends Phaser.Scene {
     const key = this.makeUnitKey(unit);
     const chara = new Chara(key, this, unit, x, y, this.scaleSizing, true);
 
-    this.scene.add(key, chara, true);
-
     return chara;
   }
 
