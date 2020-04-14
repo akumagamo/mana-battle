@@ -5,6 +5,7 @@ import {Text} from '../Models';
 import {Chara} from '../Chara/Chara';
 import {Unit} from './Model';
 import {UnitDetailsBarScene} from './UnitDetailsBarScene';
+import { ItemDetailWindowScene } from '../Item/ItemDetailWindowScene';
 
 export class ListUnitsScene extends Phaser.Scene {
   units: Chara[] = [];
@@ -20,6 +21,8 @@ export class ListUnitsScene extends Phaser.Scene {
 
   }
 
+
+
   preload = preload;
 
   create() {
@@ -27,6 +30,7 @@ export class ListUnitsScene extends Phaser.Scene {
     this.renderUnitsList();
 
     this.scene.add('details-bar',this.detailsBar, true);
+
   }
 
   renderUnitsList() {

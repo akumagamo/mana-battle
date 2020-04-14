@@ -6,6 +6,7 @@ import {Chara} from '../Chara/Chara';
 import {Unit} from './Model';
 import {INVALID_STATE} from '../errors';
 import {ItemSlot} from '../Item/Model';
+import { ItemDetailWindowScene } from '../Item/ItemDetailWindowScene';
 
 export class UnitDetailsBarScene extends Phaser.Scene {
   colWidth = 100;
@@ -13,14 +14,20 @@ export class UnitDetailsBarScene extends Phaser.Scene {
   chara: Chara | null = null;
   selectedSlot: ItemSlot | null = null;
   container: Container | null = null;
+  itemDetail: ItemDetailWindowScene;
 
   constructor() {
     super('EditUnitScene');
+
+    this.itemDetail = new ItemDetailWindowScene();
   }
 
   preload = preload;
 
-  create() {}
+  create() {
+
+    this.scene.add('item-detail',this.itemDetail,true)
+  }
 
   clearChildren() {
     this.container?.destroy();
@@ -103,6 +110,8 @@ export class UnitDetailsBarScene extends Phaser.Scene {
       icon.setInteractive();
       icon.on('pointerdown', () => {
         console.log(`clicked1!!`, slotId);
+
+        this.itemDetail.render(slot.id)
         this.selectedSlot = slotId;
         //this.renderItemDetails()
       });
