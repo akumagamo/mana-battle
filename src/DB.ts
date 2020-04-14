@@ -18,6 +18,7 @@ export const getUnits = (): UnitMap => get('units');
 
 export const getItems = (): ItemMap => get('items');
 export const getItem = (id: string): Item | undefined => getItems()[id];
+export const getItemList = ():Item[] =>Object.values(getItems())
 
 export const getItemTypes = (): ItemTypeSlots => itemTypeSlots;
 
