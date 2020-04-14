@@ -25,11 +25,12 @@ export class ItemDetailWindowScene extends Phaser.Scene {
   }
 
   render(itemId: string) {
-    this.container = this.add.container(this.x, this.y);
+
+    this.clearChildren()
 
     const panel = this.add.image(0, 0, 'panel');
 
-    this.container.add(panel);
+    this.container?.add(panel);
 
     panel.setOrigin(0, 0);
     panel.displayWidth = 300;
