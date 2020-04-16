@@ -31,15 +31,16 @@ export class UnitDetailsBarScene extends Phaser.Scene {
 
   clearChildren() {
     this.container?.destroy();
-    this.container = this.add.container(0, 0);
+    this.container = this.add.container(10, 520);
   }
 
   render(unitId: string) {
-    this.container = this.add.container(10, 520);
+
+    this.clearChildren() 
 
     const panel = this.add.image(0, 0, 'panel');
 
-    this.container.add(panel);
+    this.container?.add(panel);
 
     panel.setOrigin(0, 0);
     panel.displayWidth = 1260;
@@ -111,7 +112,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
       icon.on('pointerdown', () => {
         console.log(`clicked1!!`, slotId);
 
-        this.itemDetail.render(slot.id)
+        this.itemDetail.render(slot.id, unit.id,()=>this.render(unit.id))
         this.selectedSlot = slotId;
         //this.renderItemDetails()
       });

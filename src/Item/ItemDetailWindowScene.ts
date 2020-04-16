@@ -24,7 +24,7 @@ export class ItemDetailWindowScene extends Phaser.Scene {
     this.container = this.add.container(this.x, this.y);
   }
 
-  render(itemId: string) {
+  render(itemId: string, unitId:string, onItemSelect:()=>void) {
     this.clearChildren();
 
     this.renderPanel(0, 0, 300, 300);
@@ -39,7 +39,7 @@ export class ItemDetailWindowScene extends Phaser.Scene {
 
     this.btn(300, 0, 30, 30, 'X', () => this.clearChildren());
 
-    this.btn(150, 250, 100, 50, 'Replace', () => this.replaceItem(item));
+    this.btn(150, 250, 100, 50, 'Replace', () => this.replaceItem(item,unitId, onItemSelect));
 
     //this.renderItemDetails();
   }
@@ -54,7 +54,7 @@ export class ItemDetailWindowScene extends Phaser.Scene {
     this.container?.add(panel);
   }
 
-  replaceItem(itemToReplace: Item) {
+  replaceItem(itemToReplace: Item, unitId:string, onItemSelect:()=>void) {
     const otherItems = api
       .getItemList()
       .filter(
@@ -87,7 +87,12 @@ export class ItemDetailWindowScene extends Phaser.Scene {
 
         this.itemStats(item, baseX+ 370,  baseY + 30)
 
-        this.btn(baseX + 400, baseY + 250, 100, 50, 'Equip', ()=>{console.log(`replace with`, item)})
+        this.btn(baseX + 400, baseY + 250, 100, 50, 'Equip', ()=>{
+
+          api.equipItem(item.id, unitId)
+          this.clearChildren();
+          onItemSelect();
+          console.log(`replaced with`, item)})
 
       });
 

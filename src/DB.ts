@@ -265,10 +265,12 @@ export const createSquad = (leader: Unit) => {
   return new Promise(fn);
 };
 
-export const equipItem = (item: Item, unitId: string) => {
+export const equipItem = (itemId: string, unitId: string) => {
   const unit = getUnit(unitId);
+  const item = getItem(itemId);
 
   if (!unit) throw new Error('An invalid unit id was supplied to equipItem');
+  if (!item) throw new Error('An invalid item id was supplied to equipItem');
 
   const slot = getItemTypes()[item.type];
 
