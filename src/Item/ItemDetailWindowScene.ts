@@ -10,6 +10,7 @@ export class ItemDetailWindowScene extends Phaser.Scene {
   colWidth = 100;
   rowHeight = 30;
   container: Container | null = null;
+  selectecItemDetailsContainer: Container | null = null;
 
   constructor() {
     super('ItemDetailWindowScene');
@@ -21,40 +22,66 @@ export class ItemDetailWindowScene extends Phaser.Scene {
 
   clearChildren() {
     this.container?.destroy();
-    this.container = this.add.container(this.x, this.y);
   }
 
-  render(itemId: string, unitId:string, onItemSelect:()=>void) {
+  render(itemId: string, unitId: string, onItemSelect: () => void) {
     this.clearChildren();
 
-    this.renderPanel(0, 0, 300, 300);
+    this.container = this.add.container(this.x, this.y);
+
+    this.renderPanel(0, 0, 300, 300, this.container);
 
     const item = api.getItem(itemId);
 
     if (!item) throw new Error(INVALID_STATE);
 
-    this.write(10, 10, item.name);
+    this.itemIcon(100, 50, item, 60, this.container);
 
-    this.itemStats(item, 10, 100);
+    this.write(100, 10, item.name, this.container);
 
-    this.btn(300, 0, 30, 30, 'X', () => this.clearChildren());
+    this.itemStats(item, 10, 120, this.container);
 
-    this.btn(150, 250, 100, 50, 'Replace', () => this.replaceItem(item,unitId, onItemSelect));
+    this.btn(300, 0, 'X', () => this.clearChildren());
+
+    this.btn(150, 250, 'Replace', () =>
+      this.replaceItemList(item, unitId, onItemSelect),
+    );
 
     //this.renderItemDetails();
   }
 
+  renderPanel(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    parent: Container | null,
+  ) {
+    var rect = new Phaser.Geom.Rectangle(x, y, width, height);
+    var graphics = this.add.graphics({
+      fillStyle: {color: 0xdeaa87},
+      lineStyle: {
+        width: 2,
+        color: 0x000000,
+      },
+    });
 
-  renderPanel(x: number, y: number, width: number, height: number) {
-    const panel = this.add.image(x, y, 'panel');
-    panel.setOrigin(0, 0);
-    panel.displayWidth = width;
-    panel.displayHeight = height;
+    graphics.alpha = 0.9;
 
-    this.container?.add(panel);
+    graphics.strokeRectShape(rect);
+
+    graphics.fillRectShape(rect);
+    graphics.strokeRect(x, y, width, height);
+
+    if (parent) parent.add(graphics);
+    else this.container?.add(graphics);
   }
 
-  replaceItem(itemToReplace: Item, unitId:string, onItemSelect:()=>void) {
+  replaceItemList(
+    itemToReplace: Item,
+    unitId: string,
+    onItemSelect: () => void,
+  ) {
     const otherItems = api
       .getItemList()
       .filter(
@@ -63,12 +90,14 @@ export class ItemDetailWindowScene extends Phaser.Scene {
       );
 
     const baseX = 350;
-    const baseY = -150
+    const baseY = -150;
     const rowHeight = 100;
 
-    this.renderPanel(baseX, baseY, 300, 400);
+    this.renderPanel(baseX, baseY, 300, 400, this.container);
 
     otherItems.forEach((item, index) => {
+      if (!this.container) throw new Error(INVALID_STATE);
+
       const row = rowHeight * index;
 
       const bg = this.makeBackground(baseX, baseY);
@@ -81,34 +110,60 @@ export class ItemDetailWindowScene extends Phaser.Scene {
       var rect = new Phaser.Geom.Rectangle(0, baseY, 300, 80);
       bg.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
 
-      bg.on('pointerdown', () =>{
-
-        this.renderPanel(baseX+350,baseY, 300, 300 )
-
-        this.itemStats(item, baseX+ 370,  baseY + 30)
-
-        this.btn(baseX + 400, baseY + 250, 100, 50, 'Equip', ()=>{
-
-          api.equipItem(item.id, unitId)
-          this.clearChildren();
-          onItemSelect();
-          console.log(`replaced with`, item)})
-
+      bg.on('pointerdown', () => {
+        this.selectedItemDetails(item, unitId, baseX, baseY, onItemSelect);
       });
 
-      this.container?.add(bg);
+      this.container.add(bg);
 
-      const icon = this.add.image(baseX + 50,baseY + 50 + row, item.id);
-      icon.displayWidth = 80;
-      icon.displayHeight = 80;
-      this.container?.add(icon);
+      this.itemIcon(baseX + 20, baseY + row, item, 50, this.container);
 
-      this.write(baseX + 100, baseY + 50 + row, item.name);
+      this.write(baseX + 100, baseY + 50 + row, item.name, this.container);
     });
   }
 
-  makeBackground(baseX:number, baseY:number) {
-    var rect = new Phaser.Geom.Rectangle(-10,baseY + -10, 300, 80);
+  itemIcon(x: number, y: number, item: Item, size: number, parent: Container | null) {
+    const padding = 10;
+    this.renderPanel(x, y, size + padding * 2, size + padding * 2, parent);
+    const icon = this.add.image(
+      x + size / 2 + padding,
+      y + size / 2 + padding,
+      item.id,
+    );
+    icon.displayWidth = size;
+    icon.displayHeight = size;
+    parent?.add(icon);
+  }
+
+  selectedItemDetails(
+    item: Item,
+    unitId: string,
+    x: number,
+    y: number,
+    onItemSelect: () => void,
+  ) {
+    this.selectecItemDetailsContainer?.destroy();
+    this.selectecItemDetailsContainer = this.add.container(0, 0);
+
+    this.container?.add(this.selectecItemDetailsContainer)
+
+    this.renderPanel(x + 350, y, 300, 300, this.selectecItemDetailsContainer);
+
+    this.write(x + 370, y + 20, item.name, this.selectecItemDetailsContainer);
+
+    this.itemIcon(x + 450, y + 50, item, 60, this.selectecItemDetailsContainer);
+
+    this.itemStats(item, x + 370, y + 130, this.selectecItemDetailsContainer);
+
+    this.btn(x + 400, y + 250, 'Equip', () => {
+      api.equipItem(item.id, unitId);
+      this.clearChildren();
+      onItemSelect();
+    });
+  }
+
+  makeBackground(baseX: number, baseY: number) {
+    var rect = new Phaser.Geom.Rectangle(-10, baseY + -10, 300, 80);
     var graphics = this.add.graphics({
       fillStyle: {color: 0x0000ff},
     });
@@ -119,40 +174,45 @@ export class ItemDetailWindowScene extends Phaser.Scene {
     return graphics;
   }
 
-  btn(
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    text: string,
-    onClick: () => void,
-  ) {
-    const btn = this.add.image(x, y, 'panel');
+  btn(x: number, y: number, text: string, onClick: () => void) {
     const text_ = this.add.text(x, y, text, {color: '#000'});
+    const btn = this.add.image(x - 15, y - 10, 'panel');
+    btn.setOrigin(0, 0);
     this.container?.add(btn);
     this.container?.add(text_);
     btn.setInteractive();
-    btn.displayWidth = width;
-    btn.displayHeight = height;
+    btn.displayWidth = text_.width + 30;
+    btn.displayHeight = text_.height + 20;
     btn.on('pointerdown', () => {
       onClick();
     });
   }
 
-  write = (x: number, y: number, str: string | number) =>
-    this.container?.add(
-      this.add.text(x, y, typeof str === 'number' ? str.toString() : str, {
+  write = (
+    x: number,
+    y: number,
+    str: string | number,
+    parent: Container | null,
+  ) => {
+    const text = this.add.text(
+      x,
+      y,
+      typeof str === 'number' ? str.toString() : str,
+      {
         color: '#000',
-      }),
+      },
     );
+
+    if (parent) parent.add(text);
+    else this.container?.add(text);
+  };
 
   col = (x: number, y: number, strs: (string | number)[]) =>
     strs.forEach((str, index) =>
-      this.write(x, y + this.rowHeight * index, str),
+      this.write(x, y + this.rowHeight * index, str, null),
     );
 
-  itemStats(item: Item, baseX:number, baseY:number) {
-
+  itemStats(item: Item, baseX: number, baseY: number, parent: Container | null) {
     (Object.keys(item.modifiers) as Modifier[])
       .filter((key) => {
         const value = item.modifiers[key];
@@ -161,11 +221,12 @@ export class ItemDetailWindowScene extends Phaser.Scene {
       .forEach((key, index) => {
         const value = item.modifiers[key];
 
-        this.write(baseX, baseY + this.rowHeight * index, key);
+        this.write(baseX, baseY + this.rowHeight * index, key,parent);
         this.write(
           baseX + 200,
           baseY + this.rowHeight * index,
           value.toString(),
+          parent
         );
       });
   }
