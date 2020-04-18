@@ -1,12 +1,12 @@
 import * as Phaser from 'phaser';
 import {preload} from '../preload';
 import * as api from '../DB';
-import {Text, Image, Container} from '../Models';
+import {Container} from '../Models';
 import {Chara} from '../Chara/Chara';
 import {Unit} from './Model';
 import {INVALID_STATE} from '../errors';
 import {ItemSlot} from '../Item/Model';
-import { ItemDetailWindowScene } from '../Item/ItemDetailWindowScene';
+import {ItemDetailWindowScene} from '../Item/ItemDetailWindowScene';
 
 export class UnitDetailsBarScene extends Phaser.Scene {
   colWidth = 100;
@@ -14,19 +14,23 @@ export class UnitDetailsBarScene extends Phaser.Scene {
   chara: Chara | null = null;
   selectedSlot: ItemSlot | null = null;
   container: Container | null = null;
-  itemDetail: ItemDetailWindowScene;
+  itemDetail: ItemDetailWindowScene | null = null;
 
   constructor() {
-    super('EditUnitScene');
-
-    this.itemDetail = new ItemDetailWindowScene();
+    super('UnitDetailsBarScene');
   }
 
   preload = preload;
 
   create() {
+    this.itemDetail = new ItemDetailWindowScene();
+    this.scene.add('item-detail', this.itemDetail, true);
+  }
 
-    this.scene.add('item-detail',this.itemDetail,true)
+  destroy(parentScene: Phaser.Scene) {
+    this.container?.destroy();
+    parentScene.scene.remove('ItemDetailWindowScene');
+    parentScene.scene.remove('UnitDetailsBarScene');
   }
 
   clearChildren() {
@@ -35,8 +39,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
   }
 
   render(unitId: string) {
-
-    this.clearChildren() 
+    this.clearChildren();
 
     const panel = this.add.image(0, 0, 'panel');
 
@@ -92,8 +95,8 @@ export class UnitDetailsBarScene extends Phaser.Scene {
     const iconSize = 64;
     const padding = 10;
     const margin = 5;
-    const textWidth = 200
-    const boxSize = iconSize + padding + margin
+    const textWidth = 200;
+    const boxSize = iconSize + padding + margin;
 
     const item = (x: number, y: number, slotId: ItemSlot) => {
       const slot = api.getItem(unit.equips[slotId]);
@@ -112,13 +115,17 @@ export class UnitDetailsBarScene extends Phaser.Scene {
       icon.on('pointerdown', () => {
         console.log(`clicked1!!`, slotId);
 
-        this.itemDetail.render(slot.id, unit.id,()=>this.render(unit.id))
+        this.itemDetail?.render(slot.id, unit.id, () => this.render(unit.id));
         this.selectedSlot = slotId;
         //this.renderItemDetails()
       });
 
-      const itemName = this.add.text(x + iconSize/2 + margin + padding, y,  slot.name)
-      this.container?.add(itemName)
+      const itemName = this.add.text(
+        x + iconSize / 2 + margin + padding,
+        y,
+        slot.name,
+      );
+      this.container?.add(itemName);
 
       this.container?.add(icon);
     };

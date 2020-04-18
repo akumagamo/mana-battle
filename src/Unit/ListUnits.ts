@@ -5,32 +5,39 @@ import {Text} from '../Models';
 import {Chara} from '../Chara/Chara';
 import {Unit} from './Model';
 import {UnitDetailsBarScene} from './UnitDetailsBarScene';
-import { ItemDetailWindowScene } from '../Item/ItemDetailWindowScene';
+import button from '../UI/button';
 
 export class ListUnitsScene extends Phaser.Scene {
   units: Chara[] = [];
   page: number = 0;
   itemsPerPage: number = 40;
   unitDetails: Text[] = [];
-  detailsBar: UnitDetailsBarScene;
+  detailsBar: UnitDetailsBarScene | null = null;
 
   constructor() {
     super('ListUnitsScene');
-
-    this.detailsBar = new UnitDetailsBarScene();
-
   }
-
-
 
   preload = preload;
 
   create() {
 
+    this.detailsBar = new UnitDetailsBarScene();
     this.renderUnitsList();
 
-    this.scene.add('details-bar',this.detailsBar, true);
+    this.scene.add('details-bar', this.detailsBar, true);
 
+    button(1120, 20, 'Back to Title', this.add.container(0, 0), this, () => {
+      this.removeChildren();
+
+      this.scene.remove('UnitDetailsBarScene')
+
+      this.scene.transition({
+        target: 'TitleScene',
+        duration: 0,
+        moveBelow: true,
+      });
+    });
   }
 
   renderUnitsList() {
@@ -67,22 +74,20 @@ export class ListUnitsScene extends Phaser.Scene {
       this,
       unit,
       50 + x * 130,
-      50 + y * 120,
+      150 + y * 120,
       0.6,
       true,
     );
 
     chara.onClick((unit: Chara) => {
       this.renderUnitDetails(unit);
-    })
+    });
 
     this.units.push(chara);
   }
 
   renderUnitDetails(chara: Chara) {
-
-    this.detailsBar.render(chara.unit.id)
-    
+    this.detailsBar?.render(chara.unit.id);
   }
 
   renderNavigation() {}
@@ -107,7 +112,6 @@ export class ListUnitsScene extends Phaser.Scene {
       this.scene.remove(`list-chara-${chara.unit.id}`);
     });
     this.units = [];
-    this.detailsBar.clearChildren()
-
+    this.detailsBar?.destroy(this);
   }
 }

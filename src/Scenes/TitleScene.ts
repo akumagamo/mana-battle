@@ -1,63 +1,49 @@
 import Phaser from 'phaser';
-import { getSquads } from '../DB';
+import {getSquads} from '../DB';
 import defaultData from '../defaultData';
 
 import {preload} from '../preload';
+import button from '../UI/button';
 
 export default class TitleScene extends Phaser.Scene {
   constructor() {
     super('TitleScene');
   }
-  preload = preload
+  preload = preload;
   create() {
     // dynamic creation of scenes
     //
-    this.add.image(0,0,"backgrounds/squad_edit")
+    this.add.image(0, 0, 'backgrounds/squad_edit');
 
-    const listUnits = this.add.text(10, 50, 'List Units', { color: '#fff' });
-    listUnits .setInteractive();
-    listUnits .on('pointerdown', () => {
-      //this.scene.start('EditSquadScene', getSquads()[0]);
+    const container = this.add.container(0,0);
 
+    button(20, 50, 'List Units', container, this, () => {
       this.scene.transition({
         target: 'ListUnitsScene',
         duration: 0,
         moveBelow: true,
-      })
-
+      });
     });
 
-    const editSquad = this.add.text(10, 100, 'Edit Squad 0', { color: '#fff' });
-    editSquad.setInteractive();
-    editSquad.on('pointerdown', () => {
-      //this.scene.start('EditSquadScene', getSquads()[0]);
-
+    button(20, 100, 'Edit Squad 0', container, this, () => {
       this.scene.transition({
         target: 'EditSquadScene',
         duration: 0,
         moveBelow: true,
-        data: {squad: getSquads()[0] }
-      })
-
+        data: {squad: getSquads()[0]},
+      });
     });
 
-    const listSquads = this.add.text(10, 200, 'List Squads', { color: '#fff' });
-    listSquads .setInteractive();
-    listSquads .on('pointerdown', () => {
+    button(20, 150, 'List Squads', container, this, () => {
       this.scene.start('ListSquadsScene');
-      //this.scene.remove()
     });
 
-    const erase = this.add.text(10, 600, 'Erase Data');
-    erase.setInteractive();
-    erase.on('pointerdown', () => {
+    button(20, 600, 'Erase Data', container, this, () => {
       defaultData();
-      alert("Data erased!")
+      alert('Data erased!');
     });
- 
-    const fullscreen = this.add.text(200, 600, 'Go Fullscreen');
-    fullscreen .setInteractive();
-    fullscreen .on('pointerdown', () => {
+
+    button(220, 600, 'Go Fullscreen', container, this, () => {
       window.document.body.requestFullscreen();
     });
   }
