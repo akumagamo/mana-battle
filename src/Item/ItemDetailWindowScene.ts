@@ -5,8 +5,8 @@ import {Text, Image, Container} from '../Models';
 import {INVALID_STATE} from '../errors';
 import {ItemSlot, Item, Modifier} from '../Item/Model';
 export class ItemDetailWindowScene extends Phaser.Scene {
-  x = 200;
-  y = 200;
+  x = 100;
+  y = 100;
   colWidth = 100;
   rowHeight = 30;
   container: Container | null = null;
@@ -28,6 +28,8 @@ export class ItemDetailWindowScene extends Phaser.Scene {
     this.clearChildren();
 
     this.container = this.add.container(this.x, this.y);
+  
+    this.renderBgLayer(this.container);
 
     this.renderPanel(0, 0, 300, 300, this.container);
 
@@ -41,13 +43,34 @@ export class ItemDetailWindowScene extends Phaser.Scene {
 
     this.itemStats(item, 10, 120, this.container);
 
-    this.btn(300, 0, 'X', () => this.clearChildren());
+    //this.btn(300, 0, 'X', () => this.clearChildren());
 
     this.btn(150, 250, 'Replace', () =>
       this.replaceItemList(item, unitId, onItemSelect),
     );
 
     //this.renderItemDetails();
+  }
+
+  renderBgLayer(container:Container){
+    let rect = new Phaser.Geom.Rectangle(this.x * -1, this.y * -1, 1280, 520);
+    let graphics = this.add.graphics({fillStyle: {color: 0x000000}});
+    graphics.alpha = 0.3
+    graphics.fillRectShape(rect);
+
+    container.add(graphics)
+
+    //this.itemDetail?.container?.add(graphics);
+
+    graphics.setInteractive(
+      rect,
+      Phaser.Geom.Rectangle.Contains,
+    );
+    graphics.on('pointerdown', () => {
+      this.clearChildren();
+      graphics.destroy()
+    });
+
   }
 
   renderPanel(
@@ -65,8 +88,6 @@ export class ItemDetailWindowScene extends Phaser.Scene {
         color: 0x000000,
       },
     });
-
-    graphics.alpha = 0.9;
 
     graphics.strokeRectShape(rect);
 
@@ -90,7 +111,7 @@ export class ItemDetailWindowScene extends Phaser.Scene {
       );
 
     const baseX = 350;
-    const baseY = -150;
+    const baseY = 0;
     const rowHeight = 100;
 
     this.renderPanel(baseX, baseY, 300, 400, this.container);
@@ -98,16 +119,15 @@ export class ItemDetailWindowScene extends Phaser.Scene {
     otherItems.forEach((item, index) => {
       if (!this.container) throw new Error(INVALID_STATE);
 
-      const row = rowHeight * index;
+      const rowX = baseX + 10;
+      const rowY = rowHeight * index + 10;
 
       const bg = this.makeBackground(baseX, baseY);
 
-      bg.x = baseX;
-      bg.y = row;
+      bg.x = rowX;
+      bg.y = rowY;
 
-      bg.setInteractive();
-
-      var rect = new Phaser.Geom.Rectangle(0, baseY, 300, 80);
+      var rect = new Phaser.Geom.Rectangle(0, 0, 300, 80);
       bg.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
 
       bg.on('pointerdown', () => {
@@ -116,9 +136,9 @@ export class ItemDetailWindowScene extends Phaser.Scene {
 
       this.container.add(bg);
 
-      this.itemIcon(baseX + 20, baseY + row, item, 50, this.container);
+      this.itemIcon(rowX, rowY, item, 50, this.container);
 
-      this.write(baseX + 100, baseY + 50 + row, item.name, this.container);
+      this.write(baseX + 100, 50 + rowY, item.name, this.container);
     });
   }
 

@@ -12,7 +12,6 @@ export class UnitDetailsBarScene extends Phaser.Scene {
   colWidth = 100;
   rowHeight = 30;
   chara: Chara | null = null;
-  selectedSlot: ItemSlot | null = null;
   container: Container | null = null;
   itemDetail: ItemDetailWindowScene | null = null;
 
@@ -36,6 +35,11 @@ export class UnitDetailsBarScene extends Phaser.Scene {
   clearChildren() {
     this.container?.destroy();
     this.container = this.add.container(10, 520);
+  }
+
+  renderBgLayer() {
+    
+
   }
 
   render(unitId: string) {
@@ -115,8 +119,9 @@ export class UnitDetailsBarScene extends Phaser.Scene {
       icon.on('pointerdown', () => {
         console.log(`clicked1!!`, slotId);
 
+
         this.itemDetail?.render(slot.id, unit.id, () => this.render(unit.id));
-        this.selectedSlot = slotId;
+
         //this.renderItemDetails()
       });
 
