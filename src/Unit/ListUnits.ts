@@ -73,8 +73,8 @@ export class ListUnitsScene extends Phaser.Scene {
       key,
       this,
       unit,
-      50 + x * 130,
-      150 + y * 120,
+      100 + x * 120,
+      100 + y * 110,
       0.6,
       true,
     );
