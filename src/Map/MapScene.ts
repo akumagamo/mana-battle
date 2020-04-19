@@ -2,7 +2,13 @@ import * as Phaser from 'phaser';
 import {Chara} from '../Chara/Chara';
 import {preload} from '../preload';
 import {Squad} from '../Squad/Model';
-import {addUnitToSquad, getUnits, getUnit} from '../DB';
+import {
+  addUnitToSquad,
+  getUnits,
+  getUnit,
+  getSquad,
+  getSquadLeader,
+} from '../DB';
 import UnitListScene from '../Unit/UnitListScene';
 import {Unit} from '../Unit/Model';
 import BoardScene, {BOARD_SCENE_KEY} from '../Board/InteractiveBoardScene';
@@ -14,8 +20,32 @@ const cellSize = 100;
 
 const boardPadding = 100;
 
+const Map: MapBoard = {
+  cells: [
+    [0, 0, 0, 1, 1, 1],
+    [0, 1, 0, 1, 0, 1],
+    [0, 1, 0, 0, 0, 1],
+    [0, 0, 0, 1, 1, 1],
+  ],
+  forces: [
+    {id: '0', name: 'player', squads: [{id: '0', x: 1, y: 1}]},
+    {id: '1', name: 'CPU', squads: [{id: '3', x: 3, y: 2}]},
+  ],
+};
+
+type MapBoard = {
+  cells: number[][];
+  forces: MapForce[];
+};
+type MapForce = {id: string; name: string; squads: MapSquad[]};
+type MapSquad = {
+  id: string;
+  x: number;
+  y: number;
+};
+
 export class MapScene extends Phaser.Scene {
-  units: Chara[] = [];
+  squads: Chara[] = [];
 
   selectedUnit: string | null = null;
 
@@ -25,30 +55,32 @@ export class MapScene extends Phaser.Scene {
 
   preload = preload;
 
-  renderMap(container:Container) {
-    console.log(`MapScene - renderMap`)
+  getPos(x:number,y:number){
 
-    const map = [
-      [0, 0, 0, 1, 1, 1],
-      [0, 1, 0, 1, 0, 1],
-      [0, 1, 0, 0, 0, 1],
-      [0, 0, 0, 1, 1, 1],
-    ];
+  return{
 
-    map.forEach((arr, col) =>
+         x : boardPadding + x * cellSize,
+         y : boardPadding + y * cellSize
+  }
+
+  }
+
+  renderMap(container: Container) {
+    console.log(`MapScene - renderMap`);
+
+    Map.cells.forEach((arr, col) =>
       arr.forEach((n, row) => {
-        const x = boardPadding + row * cellSize;
-        const y = boardPadding + col * cellSize;
+        const {x,y} = this.getPos(row,col)
         const tile = this.add.image(x, y, 'panel');
 
         tile.setInteractive();
         tile.on('pointerdown', () => {
           if (this.selectedUnit) {
-            this.moveUnit(this.selectedUnit, x, y);
+            this.moveUnit(this.selectedUnit, row, col);
           }
         });
 
-        container.add(tile)
+        container.add(tile);
 
         if (n === 1) tile.setTint(0xdeaa87);
 
@@ -57,18 +89,31 @@ export class MapScene extends Phaser.Scene {
       }),
     );
   }
-  renderUnits(container:Container) {
-    console.log(`MapScene - renderUnits`)
-    const unit = getUnit('0');
+  renderUnits(container: Container) {
+    console.log(`MapScene - renderUnits`);
 
-    if (!unit) return;
+    Map.forces.forEach((force) => {
+      force.squads.forEach((sqd) => this.renderSquad(container, sqd));
+    });
+  }
 
-    const chara = new Chara('chara' + unit.id, this, unit, 300, 300, 0.5, true);
+  renderSquad(container: Container, squad: MapSquad) {
+    const leader = getSquadLeader(squad.id);
+    if (!leader) return;
 
-    if(chara.container)
-      container.add(chara.container)
+    const chara = new Chara(
+      'chara' + leader.id,
+      this,
+      leader,
+      boardPadding + squad.x * cellSize,
+      boardPadding + squad.y * cellSize,
+      0.5,
+      true,
+    );
 
-    this.units.push(chara);
+    if (chara.container) container.add(chara.container);
+
+    this.squads.push(chara);
 
     chara.onClick((c: Chara) => {
       console.log(`selected`, c);
@@ -76,13 +121,12 @@ export class MapScene extends Phaser.Scene {
     });
   }
 
-  renderUI(container:Container) {
-    console.log(`MapScene - renderUI`)
+  renderUI(container: Container) {
+    console.log(`MapScene - renderUI`);
     button(1100, 50, 'Return to Title', this.add.container(0, 0), this, () => {
-      this.units.forEach((c) => this.scene.remove('chara' + c.unit.id));
-      container.destroy()
-      this.units = []
-      //this.units.forEach((c) => c.container?.destroy());
+      this.squads.forEach((c) => this.scene.remove('chara' + c.unit.id));
+      container.destroy();
+      this.squads = [];
 
       this.scene.transition({
         target: 'TitleScene',
@@ -92,24 +136,29 @@ export class MapScene extends Phaser.Scene {
     });
   }
   create() {
-    console.log(`MapScene - create`)
-    const container = this.add.container(0,0)
+    console.log(`MapScene - create`);
+    const container = this.add.container(0, 0);
     this.renderMap(container);
     this.renderUnits(container);
     this.renderUI(container);
   }
 
-  moveUnit(unitId: string, x: number, y: number) {
-    console.log(`MapScene - moveUnit`)
-    const chara = this.units.find((c) => c.unit.id === unitId);
+  moveUnit(unitId: string, row: number, col: number) {
+    console.log(`MapScene - moveUnit`);
+    const chara = this.squads.find((c) => c.unit.id === unitId);
 
     if (!chara) throw new Error(INVALID_STATE);
+
+    const {x,y} = this.getPos(row,col)
 
     this.tweens.add({
       targets: chara.container,
       x: x,
       y: y,
       duration: 500,
+      onComplete: () => {
+        console.log(`combat!`);
+      },
     });
   }
 }

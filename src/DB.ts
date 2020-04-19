@@ -14,11 +14,27 @@ export const getSquads = (): SquadMap => get('squads');
 export const getSquad = (id: string): Squad | undefined =>
   Object.values(getSquads()).find((squad) => squad.id === id);
 
+export const getSquadMembers = (id: string): Unit[] => {
+  const squad = getSquad(id);
+
+  if (!squad) return [];
+
+  return Object.values(squad.members)
+    .map((unit) => getUnit(unit.id))
+    .filter((a) => a) as Unit[];
+};
+
+export const getSquadLeader = (id: string): Unit | undefined => {
+  const members = getSquadMembers(id);
+
+  return members.find((unit) => unit.id === id);
+};
+
 export const getUnits = (): UnitMap => get('units');
 
 export const getItems = (): ItemMap => get('items');
 export const getItem = (id: string): Item | undefined => getItems()[id];
-export const getItemList = ():Item[] =>Object.values(getItems())
+export const getItemList = (): Item[] => Object.values(getItems());
 
 export const getItemTypes = (): ItemTypeSlots => itemTypeSlots;
 
