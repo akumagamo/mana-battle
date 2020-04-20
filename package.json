@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@types/jest": "^25.1.4",
+    "easystarjs": "^0.4.3",
     "jest": "^25.1.0",
     "phaser": "^3.22.0"
   }
