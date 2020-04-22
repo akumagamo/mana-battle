@@ -20,5 +20,6 @@ export default  (
   btn.on('pointerdown', () => {
     onClick();
   });
+  return btn
 };
 
