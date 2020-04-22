@@ -8,6 +8,7 @@ import {
   getUnit,
   getSquad,
   getSquadLeader,
+  saveSquad,
 } from '../DB';
 import UnitListScene from '../Unit/UnitListScene';
 import {Unit} from '../Unit/Model';
@@ -37,7 +38,7 @@ const Map: MapBoard = {
     {id: '1', name: 'CPU', squads: [{id: '3', x: 3, y: 2}]},
   ],
 };
-
+type Coordinate = {x: number; y: number};
 type MapBoard = {
   cells: number[][];
   forces: MapForce[];
@@ -49,12 +50,14 @@ type MapSquad = {
   y: number;
 };
 
+type MapTile = {x: number; y: number; type: number; tile: Image};
+
 export class MapScene extends Phaser.Scene {
   squads: Chara[] = [];
 
-  tiles: {x: number; y: number; type: number; tile: Image}[] = [];
+  tiles: MapTile[] = [];
   selectedUnit: string | null = null;
-  selectedDestination : {x:number,y:number} | null = null;
+  selectedDestination: {x: number; y: number} | null = null;
 
   constructor() {
     super('MapScene');
@@ -69,7 +72,7 @@ export class MapScene extends Phaser.Scene {
     };
   }
 
-  renderMap(container: Container, uiContainer:Container) {
+  renderMap(container: Container, uiContainer: Container) {
     console.log(`MapScene - renderMap`);
 
     Map.cells.forEach((arr, col) =>
@@ -80,7 +83,7 @@ export class MapScene extends Phaser.Scene {
         tile.setInteractive();
         tile.on('pointerdown', () => {
           if (this.selectedUnit) {
-            this.selectTile(uiContainer,this.selectedUnit, row, col);
+            this.selectTile(uiContainer, this.selectedUnit, row, col);
           }
         });
 
@@ -100,63 +103,77 @@ export class MapScene extends Phaser.Scene {
       }),
     );
   }
-  renderUnits(container: Container, uiContainer:Container) {
+  renderUnits(container: Container, uiContainer: Container) {
     console.log(`MapScene - renderUnits`);
 
     Map.forces.forEach((force) => {
-      force.squads.forEach((sqd) => this.renderSquad(container,uiContainer, sqd));
+      force.squads.forEach((sqd) =>
+        this.renderSquad(container, uiContainer, sqd),
+      );
     });
   }
 
-  renderSquad(container: Container, uiContainer:Container, squad: MapSquad) {
+  getCharaPosition({x, y}: {x: number; y: number}) {
+    return {
+      x: boardPadding + x * cellSize,
+      y: boardPadding + y * cellSize - 10,
+    };
+  }
+
+  renderSquad(container: Container, uiContainer: Container, squad: MapSquad) {
     const leader = getSquadLeader(squad.id);
     if (!leader) return;
 
-    const chara = new Chara(
-      'chara' + leader.id,
-      this,
-      leader,
-      boardPadding + squad.x * cellSize,
-      boardPadding + squad.y * cellSize,
-      0.5,
-      true,
-    );
+    const {x, y} = this.getCharaPosition(squad);
+
+    const chara = new Chara('chara' + leader.id, this, leader, x, y, 0.5, true);
 
     if (chara.container) container.add(chara.container);
 
     this.squads.push(chara);
 
     chara.onClick((c: Chara) => {
-      this.selectedUnit = chara.unit.id;
+      this.selectedUnit = c.unit.id;
+
+      console.log(squad);
+
+      const cells = this.tilesInRange(squad.x, squad.y, 3).filter(
+        (tile) => tile.type === 0,
+      );
+
+      cells.forEach((cell, index) => {
+        if (index > 0)
+          this.findPath(squad, cell).then((path) => {
+            if (path.length <= 3 + 1) {
+              cell.tile.setTint(0x99ff99);
+            }
+          });
+      });
 
       this.refreshUI(uiContainer);
-
-
     });
   }
 
-  refreshUI(container:Container){
-
+  refreshUI(container: Container) {
     container.destroy();
 
-    this.renderUI(this.add.container(0,0))
-
+    this.renderUI(this.add.container(0, 0));
   }
 
   renderUI(container: Container) {
     console.log(`MapScene - renderUI`);
 
-    container.add(panel(0, 600, 1280, 120, container, this))
+    container.add(panel(0, 600, 1280, 120, container, this));
 
-    if(this.selectedUnit){
-      const unit = getUnit(this.selectedUnit)
-     if(unit){
-        text(10, 610, unit.name, container, this)
+    if (this.selectedUnit) {
+      const unit = getUnit(this.selectedUnit);
+      if (unit) {
+        text(10, 610, unit.name, container, this);
       }
     }
 
-    if (this.selectedDestination){
-      button(1100, 610, 'Confirm',container,this, ()=>{})
+    if (this.selectedDestination) {
+      button(1100, 610, 'Confirm', container, this, () => {});
     }
 
     button(1100, 50, 'Return to Title', this.add.container(0, 0), this, () => {
@@ -175,55 +192,83 @@ export class MapScene extends Phaser.Scene {
   create() {
     console.log(`MapScene - create`);
     const container = this.add.container(0, 0);
-    const uiContainer = this.add.container(0,0)
+    const uiContainer = this.add.container(0, 0);
     this.renderMap(container, uiContainer);
     this.renderUnits(container, uiContainer);
     this.renderUI(uiContainer);
   }
 
-  selectTile(uiContainer:Container, unitId: string, row: number, col: number) {
+  tilesInRange(x: number, y: number, range: number) {
+    const abs = (coord: number, tileCoord: number) =>
+      Math.abs(coord - tileCoord);
+
+    const getDistance = (tile: MapTile) => abs(x, tile.x) + abs(y, tile.y);
+
+    return this.tiles.filter((tile) => getDistance(tile) <= range);
+  }
+
+  selectTile(uiContainer: Container, unitId: string, x: number, y: number) {
     console.log(`MapScene - selectTile`);
     const chara = this.squads.find((c) => c.unit.id === unitId);
     const force = Map.forces.find((force) => force.id === '0');
 
     if (!chara || !force) throw new Error(INVALID_STATE);
 
-    const charaPos = force.squads.find(
-      (squad) => squad.id === chara.unit.squad,
-    );
+    const squad = force.squads.find((squad) => squad.id === chara.unit.squad);
 
-    if (!charaPos) throw new Error(INVALID_STATE);
-
-    easystar.setGrid(Map.cells);
-    easystar.setAcceptableTiles([0]);
+    if (!squad) throw new Error(INVALID_STATE);
 
     this.tiles.forEach((tile) =>
       tile.type === 0 ? tile.tile.clearTint() : null,
     );
 
-    easystar.findPath(charaPos.x, charaPos.y, row, col, (path) => {
-      const tweens = path.map((pos, index) => {
-        if (index === 0) return;
+    this.findPath(squad, {x, y}).then((path) => this.moveUnit(chara, path));
+
+    squad.x = x;
+    squad.y = y;
+  }
+
+  moveUnit = (chara: Chara, path: Coordinate[]) => {
+    const tweens = path
+      .filter((_, index) => index > 0)
+      .map((pos, index) => {
         const tile = this.getTileAt(pos.x, pos.y);
 
         tile.tile.setTint(0x5555cc);
         const target = this.getPos(pos.x, pos.y);
-        return ({
+        return {
           targets: chara.container,
           x: target.x,
           y: target.y,
           duration: 500,
-        });
-      }).filter(a=>a) as object[];
+          onComplete:
+            index === path.length - 2
+              ? () => {
+                  path.forEach((p) =>
+                    this.getTileAt(p.x, p.y).tile.clearTint(),
+                  );
+                }
+              : null,
+        };
+      });
 
-      this.tweens.timeline({tweens})
+    this.tweens.timeline({tweens});
+  };
 
+  findPath = (
+    origin: Coordinate,
+    target: Coordinate,
+  ): Promise<Coordinate[]> => {
+    easystar.setGrid(Map.cells);
+    easystar.setAcceptableTiles([0]);
+
+    return new Promise((resolve) => {
+      easystar.findPath(origin.x, origin.y, target.x, target.y, (path) => {
+        resolve(path);
+      });
+      easystar.calculate();
     });
-    easystar.calculate();
-
-
-
-  }
+  };
   getTileAt(x: number, y: number) {
     const tile = this.tiles.find((tile) => tile.x === x && tile.y === y);
 
