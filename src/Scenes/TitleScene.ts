@@ -42,6 +42,10 @@ export default class TitleScene extends Phaser.Scene {
       this.scene.start('MapScene');
     });
 
+    button(20, 250, 'Combat', container, this, () => {
+      this.scene.start('CombatScene');
+    });
+
     button(20, 600, 'Erase Data', container, this, () => {
       defaultData();
       alert('Data erased!');

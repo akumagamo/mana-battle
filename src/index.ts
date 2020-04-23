@@ -5,6 +5,7 @@ import {EditSquadScene} from './Squad/EditSquadScene';
 import {ListSquadsScene} from './Squad/ListSquadsScene';
 import {ListUnitsScene} from './Unit/ListUnits';
 import { MapScene } from './Map/MapScene';
+import CombatScene from './Combat/CombatScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -20,7 +21,8 @@ const config: Phaser.Types.Core.GameConfig = {
     EditSquadScene,
     ListSquadsScene,
     ListUnitsScene,
-    MapScene
+    MapScene,
+    CombatScene
   ],
 };
 
