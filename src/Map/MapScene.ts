@@ -80,7 +80,7 @@ export class MapScene extends Phaser.Scene {
   squads: Chara[] = [];
 
   tiles: MapTile[] = [];
-  selectedUnit: string | null = null;
+  selectedSquad: string | null = null;
 
   constructor() {
     super('MapScene');
@@ -105,8 +105,8 @@ export class MapScene extends Phaser.Scene {
 
         tile.setInteractive();
         tile.on('pointerdown', () => {
-          if (this.selectedUnit) {
-            this.selectTile(uiContainer, this.selectedUnit, row, col);
+          if (this.selectedSquad) {
+            this.selectTile(uiContainer, this.selectedSquad, row, col);
           }
         });
 
@@ -169,7 +169,7 @@ export class MapScene extends Phaser.Scene {
 
     chara.onClick((c: Chara) => {
       if (force.id === PLAYER_FORCE) {
-        this.selectedUnit = c.unit.id;
+        this.selectedSquad = c.unit.squad;
 
         const cells = this.tilesInRange(squad.x, squad.y, SQUAD_MOVE_RANGE)
           .filter((tile) => tile.type === 0)
@@ -190,12 +190,22 @@ export class MapScene extends Phaser.Scene {
           .filter((force) => force.id === PLAYER_FORCE)
           .forEach((force) =>
             force.squads
-              .filter((force) => force.id === this.selectedUnit)
+              .filter((force) => force.id === this.selectedSquad)
               .forEach((playerSquad) => {
                 const distance = this.getDistance(playerSquad, squad);
 
                 if (distance === 1) {
                   console.log(`attack!!`, squad);
+
+                  this.scene.transition({
+                    target: 'CombatScene',
+                    duration: 0,
+                    moveBelow: true,
+                    data: {
+                      top: chara.unit.squad,
+                      bottom: this.selectedSquad,
+                    },
+                  });
                 }
               }),
           );
@@ -223,10 +233,10 @@ export class MapScene extends Phaser.Scene {
       ),
     );
 
-    if (this.selectedUnit) {
-      const unit = getUnit(this.selectedUnit);
-      if (unit) {
-        text(10, 610, unit.name, container, this);
+    if (this.selectedSquad) {
+      const squad = getSquad(this.selectedSquad);
+      if (squad) {
+        text(10, 610, squad.name, container, this);
       }
     }
 

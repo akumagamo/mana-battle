@@ -21,15 +21,15 @@ export default class CombatScene extends Phaser.Scene {
     super('CombatScene');
   }
   preload = preload
-  create() {
-    const combatants = ['0', '1'];
+  create(data:{top:string, bottom:string}) {
+    const combatants = [data.top, data.bottom];
 
-    combatants.forEach((id, index) => {
+    combatants.forEach(id => {
       const members = DB.getSquadMembers(id);
 
       const squad = DB.getSquad(id);
 
-      const isTopSquad = index === 0;
+      const isTopSquad = id === data.top;
 
       if (!squad) throw new Error(INVALID_STATE);
 
