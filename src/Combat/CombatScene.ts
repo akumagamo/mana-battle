@@ -7,24 +7,24 @@ import {INVALID_STATE} from '../errors';
 import {SCREEN_WIDTH, SCREEN_HEIGHT} from '../constants';
 import {Unit} from '../Unit/Model';
 
-const TOP_SQUAD_OFFSET_X = 400;
-const TOP_SQUAD_OFFSET_Y = 50;
-
-const BOTTOM_SQUAD_OFFSET_X = 600;
-const BOTTOM_SQUAD_OFFSET_Y = 350;
-
 const COMBAT_CHARA_SCALE = 1;
 
 export default class CombatScene extends Phaser.Scene {
   units: Chara[] = [];
+  top: string = '';
+  bottom: string = '';
   constructor() {
     super('CombatScene');
   }
-  preload = preload
-  create(data:{top:string, bottom:string}) {
+  preload = preload;
+
+  // LIFECYCLE METHODS
+  create(data: {top: string; bottom: string}) {
+    this.top = data.top;
+    this.bottom = data.bottom;
     const combatants = [data.top, data.bottom];
 
-    combatants.forEach(id => {
+    combatants.forEach((id) => {
       const members = DB.getSquadMembers(id);
 
       const squad = DB.getSquad(id);
@@ -52,24 +52,28 @@ export default class CombatScene extends Phaser.Scene {
         })
         .forEach((unit) => {
           const coords = getBoardCoords(unit);
-          const {x, y} = cartesianToIsometricBattle(coords.x, coords.y);
-
-          const offsetX = isTopSquad
-            ? TOP_SQUAD_OFFSET_X
-            : BOTTOM_SQUAD_OFFSET_X;
-          const offsetY = isTopSquad
-            ? TOP_SQUAD_OFFSET_Y
-            : BOTTOM_SQUAD_OFFSET_Y;
+          const {x, y} = cartesianToIsometricBattle(
+            isTopSquad,
+            coords.x,
+            coords.y,
+          );
 
           const chara = new Chara(
             `combat-chara-${unit.id}`,
             this,
             unit,
-            x +  offsetX,
-            y +  offsetY,
+            x,
+            y,
             COMBAT_CHARA_SCALE,
-            isTopSquad
+            isTopSquad,
           );
+
+          chara.onClick(() => {
+            this.moveUnit(
+              this.units[0],
+              this.units.find((un) => un.unit.id === unit.id) as Chara,
+            );
+          });
 
           this.units.push(chara);
         });
@@ -90,5 +94,32 @@ export default class CombatScene extends Phaser.Scene {
       chara.container?.destroy();
       this.scene.remove(chara);
     });
+  }
+
+  // UNIT METHODS
+
+  moveUnit(unit: Chara, target: Chara) {
+    const targetIsTop = this.top === target.unit.squad;
+
+    if (!target.container) throw new Error(INVALID_STATE);
+
+    const targetSquadPos = DB.getSquadMember(target.unit.id);
+
+    const {x, y} = cartesianToIsometricBattle(
+      targetIsTop,
+
+
+      targetIsTop ? targetSquadPos.x + 1 : targetSquadPos.x - 1,
+       targetSquadPos.y ,
+    );
+
+    const config = {
+      targets: unit.container,
+      x: x,
+      y: y,
+      duration: 1000,
+    };
+    console.log(config);
+    this.tweens.add(config);
   }
 }

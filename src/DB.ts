@@ -24,6 +24,18 @@ export const getSquadMembers = (id: string): Unit[] => {
     .filter((a) => a) as Unit[];
 };
 
+export const getSquadMember = (id: string): SquadMember => {
+
+  const unit  = getUnit(id)
+  if(!unit || ! unit.squad) throw new Error(INVALID_STATE)
+  const squad = getSquad(unit.squad);
+
+  if(!squad) throw new Error(INVALID_STATE)
+
+  return Object.values(squad.members)
+    .find((unit) => (unit.id) === id) as SquadMember
+};
+
 export const getSquadLeader = (id: string): Unit | undefined => {
   const members = getSquadMembers(id);
 
