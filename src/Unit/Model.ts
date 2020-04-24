@@ -29,6 +29,7 @@ export interface Unit {
   squad: string | null;
   lvl: number;
   hp: number;
+  currentHp: number;
   exp: number;
   str: number;
   agi: number;

@@ -21,6 +21,7 @@ export function fromJSON(n: number): Unit {
     squad: null,
     lvl: 11,
     hp: 100,
+    currentHp: 100,
     exp: 99,
     str: 11,
     agi: 12,
