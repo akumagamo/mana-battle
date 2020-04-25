@@ -30,7 +30,7 @@ export function cartesianToIsometricBattle(
   const TOP_SQUAD_OFFSET_X = 400;
   const TOP_SQUAD_OFFSET_Y = 50;
 
-  const BOTTOM_SQUAD_OFFSET_X = 600;
+  const BOTTOM_SQUAD_OFFSET_X = 800;
   const BOTTOM_SQUAD_OFFSET_Y = 350;
 
   var tx = (x - y) * tileWidth;

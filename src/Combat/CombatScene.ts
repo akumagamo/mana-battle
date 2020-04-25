@@ -8,6 +8,14 @@ import {SCREEN_WIDTH, SCREEN_HEIGHT} from '../constants';
 import {Unit} from '../Unit/Model';
 
 const COMBAT_CHARA_SCALE = 1;
+const WALK_DURATION = 1000
+const WALK_FRAMES = 60
+
+const invert = (n: number) => {
+  if (n === 1) return 3;
+  else if (n === 3) return 1;
+  else return n;
+};
 
 export default class CombatScene extends Phaser.Scene {
   units: Chara[] = [];
@@ -35,11 +43,7 @@ export default class CombatScene extends Phaser.Scene {
 
       const getBoardCoords = (unit: Unit) => {
         const {x, y} = squad.members[unit.id];
-        const invert = (n: number) => {
-          if (n === 1) return 3;
-          else if (n === 3) return 1;
-          else return n;
-        };
+
         return {
           x: isTopSquad ? x : invert(x),
           y: isTopSquad ? y : invert(y),
@@ -107,19 +111,31 @@ export default class CombatScene extends Phaser.Scene {
 
     const {x, y} = cartesianToIsometricBattle(
       targetIsTop,
-
-
-      targetIsTop ? targetSquadPos.x + 1 : targetSquadPos.x - 1,
-       targetSquadPos.y ,
+      targetIsTop ? targetSquadPos.x + 1 : invert(targetSquadPos.x) - 1,
+      targetIsTop ? targetSquadPos.y : invert(targetSquadPos.y),
     );
 
     const config = {
       targets: unit.container,
       x: x,
       y: y,
-      duration: 1000,
+      duration: WALK_DURATION,
     };
     console.log(config);
     this.tweens.add(config);
+
+    // z-sorting for moving character
+    this.time.addEvent({
+      delay: WALK_DURATION / WALK_FRAMES, 
+      callback: () => {
+        // reordering a list of 10 scenes takes about 0.013ms
+        this.units
+          .sort((a, b) =>
+            a.container && b.container ? a.container.y - b.container.y : 0,
+          )
+          .forEach((unit) => this.scene.bringToTop(unit.key));
+      },
+      repeat: WALK_FRAMES,
+    });
   }
 }
