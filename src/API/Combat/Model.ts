@@ -13,8 +13,12 @@ export interface TeamMember {
   y: number;
 }
 
+export interface InitiativeList {
+  [order:number]:string
+}
 export interface Combat {
   teamA: Team;
   teamB: Team;
+  initiativeList: InitiativeList
   totalUnits: number;
 }

@@ -38,4 +38,9 @@ export function preload(this: {
     this.load.image(id, `${PUBLIC_URL}/items/${id}.svg`);
   });
 
+  const props = ['props/grass', 'props/bush', 'props/far_tree_1', 'props/branch'];
+  props.forEach((id: string) => {
+    this.load.image(id, `${PUBLIC_URL}/${id}.svg`);
+  });
+
 }

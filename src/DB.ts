@@ -25,15 +25,15 @@ export const getSquadMembers = (id: string): Unit[] => {
 };
 
 export const getSquadMember = (id: string): SquadMember => {
-
-  const unit  = getUnit(id)
-  if(!unit || ! unit.squad) throw new Error(INVALID_STATE)
+  const unit = getUnit(id);
+  if (!unit || !unit.squad) throw new Error(INVALID_STATE);
   const squad = getSquad(unit.squad);
 
-  if(!squad) throw new Error(INVALID_STATE)
+  if (!squad) throw new Error(INVALID_STATE);
 
-  return Object.values(squad.members)
-    .find((unit) => (unit.id) === id) as SquadMember
+  return Object.values(squad.members).find(
+    (unit) => unit.id === id,
+  ) as SquadMember;
 };
 
 export const getSquadLeader = (id: string): Unit | undefined => {
@@ -45,7 +45,11 @@ export const getSquadLeader = (id: string): Unit | undefined => {
 export const getUnits = (): UnitMap => get('units');
 
 export const getItems = (): ItemMap => get('items');
-export const getItem = (id: string): Item | undefined => getItems()[id];
+export const getItem = (id: string): Item => {
+  const item = getItems()[id];
+  if (!item) throw new Error(INVALID_STATE);
+  return item;
+};
 export const getItemList = (): Item[] => Object.values(getItems());
 
 export const getItemTypes = (): ItemTypeSlots => itemTypeSlots;

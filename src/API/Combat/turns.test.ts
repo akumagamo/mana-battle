@@ -16,13 +16,19 @@ test('Should sort by initiave correctly', () => {
 
 test('Combat should have the expected outcome', () => {
   const units = [
-    {name: 'f1', squad: '1', currentHp: 100},
-    {name: 'f2', squad: '1', currentHp: 100},
-    {name: 'f3', squad: '1', currentHp: 100},
-    {name: 'f4', squad: '2', currentHp: 31},
+    {id: 'f1', squad: '1', currentHp: 100},
+    {id: 'f2', squad: '1', currentHp: 100},
+    {id: 'f3', squad: '1', currentHp: 100},
+    {id: 'f4', squad: '2', currentHp: 31},
   ].map(makeUnit);
 
   const res = runTurn(0, units);
 
-  expect(res.victory).toBe('1');
+  expect(res).toStrictEqual([
+      { type: 'MOVE', source: 'f1', target: 'f4' },
+      { type: 'ATTACK', source: 'f1', target: 'f4' },
+      { type: 'RETURN', target: 'f1'},
+      { type: 'END_TURN' }
+    ]
+);
 });

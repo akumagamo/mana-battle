@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
-import {getSquads} from '../DB';
-import defaultData from '../defaultData';
+import {getSquads, getUnit} from '../DB';
+import defaultData, {randomItem} from '../defaultData';
 
 import {preload} from '../preload';
 import button from '../UI/button';
+import {Chara} from '../Chara/Chara';
 
 export default class TitleScene extends Phaser.Scene {
   constructor() {
@@ -54,5 +55,7 @@ export default class TitleScene extends Phaser.Scene {
     button(220, 600, 'Go Fullscreen', container, this, () => {
       window.document.body.requestFullscreen();
     });
+
+
   }
 }
