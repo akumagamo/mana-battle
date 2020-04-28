@@ -5,6 +5,7 @@ import {
   LEFT_HAND_FRONT_Y,
   RIGHT_HAND_FRONT_Y,
 } from './constants';
+import upAndDown from './upAndDown';
 
 const front = (chara: Chara) => {
   chara.clearAnimations();
@@ -45,37 +46,15 @@ const front = (chara: Chara) => {
 const back = (chara: Chara) => {
   chara.clearAnimations();
 
-  chara.tweens.add({
-    targets: chara.head,
-    y: HEAD_FRONT_Y - 2,
-    duration: 1600,
-    yoyo: true,
-    repeat: -1,
-  });
+  const bounce = upAndDown(chara)
 
-  chara.tweens.add({
-    targets: chara.trunk,
-    y: TRUNK_FRONT_Y + 2,
-    duration: 1600,
-    yoyo: true,
-    repeat: -1,
-  });
+  bounce(chara.head,-2, 1600);
 
-  chara.tweens.add({
-    targets: chara.leftHand,
-    y: LEFT_HAND_FRONT_Y + 8,
-    duration: 1600,
-    yoyo: true,
-    repeat: -1,
-  });
+  bounce(chara.trunk, 2, 1600);
 
-  chara.tweens.add({
-    targets: chara.mainHandContainer,
-    y: RIGHT_HAND_FRONT_Y - 4,
-    duration: 1600,
-    yoyo: true,
-    repeat: -1,
-  });
+  bounce(chara.leftHand, 4, 1600);
+
+  bounce(chara.mainHandContainer, -4, 1600);
 };
 
 export default (chara: Chara) => {

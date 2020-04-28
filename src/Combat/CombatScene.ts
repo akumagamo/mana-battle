@@ -13,7 +13,6 @@ import grass from '../Props/grass';
 const COMBAT_CHARA_SCALE = 1;
 const WALK_DURATION = 500;
 const WALK_FRAMES = 60;
-const ATTACK_DURATION = 200;
 
 const invert = (n: number) => {
   if (n === 1) return 3;
@@ -237,6 +236,7 @@ export default class CombatScene extends Phaser.Scene {
       y: y,
       duration: WALK_DURATION,
       onComplete: () => {
+        console.log(`stand!!`)
         chara.stand();
         onComplete();
       },

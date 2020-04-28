@@ -32,3 +32,5 @@ export const sceneLinkButton = (
   });
   return button;
 };
+
+export const maybeZero = (v:number|undefined|null)=> v ? v : 0

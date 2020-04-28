@@ -1,5 +1,5 @@
 import {Chara} from '../Chara';
-import {LEFT_FOOT_FRONT_X, LEFT_FOOT_FRONT_Y, RIGHT_FOOT_FRONT_Y, RIGHT_FOOT_FRONT_X, LEFT_HAND_FRONT_X, LEFT_HAND_FRONT_Y, TRUNK_FRONT_X, TRUNK_FRONT_Y, HEAD_FRONT_Y, HEAD_FRONT_X, RIGHT_HAND_FRONT_X, RIGHT_HAND_FRONT_Y, RIGHT_HAND_BACK_X, RIGHT_HAND_BACK_Y} from './constants';
+import {LEFT_FOOT_FRONT_X, LEFT_FOOT_FRONT_Y, RIGHT_FOOT_FRONT_Y, RIGHT_FOOT_FRONT_X, LEFT_HAND_FRONT_X, LEFT_HAND_FRONT_Y, TRUNK_FRONT_X, TRUNK_FRONT_Y, HEAD_FRONT_Y, HEAD_FRONT_X, RIGHT_HAND_FRONT_X, RIGHT_HAND_FRONT_Y, RIGHT_HAND_BACK_X, RIGHT_HAND_BACK_Y, LEFT_FOOT_BACK_X, RIGHT_FOOT_BACK_Y, RIGHT_FOOT_BACK_X, LEFT_FOOT_BACK_Y, TRUNK_BACK_X, TRUNK_BACK_Y, HEAD_BACK_X, HEAD_BACK_Y, LEFT_HAND_BACK_Y, LEFT_HAND_BACK_X} from './constants';
 
 function front(scene: Chara) {
   const renderHead = (gx: number, gy: number) => {
@@ -93,28 +93,27 @@ function back(scene: Chara) {
     return hand;
   }
 
-  scene.rightHand = renderHand(35, 55);
-  scene.rightHand.setRotation(-1.9);
-  scene.rightHand.scaleX = scene.rightHand.scaleX * -1;
 
   scene.mainHandContainer = scene.add.container(
     RIGHT_HAND_BACK_X,
     RIGHT_HAND_BACK_Y,
   );
   scene.container?.add(scene.mainHandContainer);
-  scene.mainHandContainer.add(scene.rightHand);
 
-  scene.mainHand = scene.add.image(10, 10, scene.unit.equips.mainHand);
+  scene.mainHand = scene.add.image(-10, 20, scene.unit.equips.mainHand);
   scene.mainHandContainer.add(scene.mainHand);
-  scene.mainHand.setScale(0.2);
+  scene.mainHand.setScale(-0.2, 0.2);
   scene.mainHand.setOrigin(1, 1);
 
-  scene.rightFoot = renderFoot(10, 90);
-  scene.leftFoot = renderFoot(-10, 97);
+  scene.rightHand = renderHand(0, 0);
+  scene.mainHandContainer.add(scene.rightHand);
 
-  scene.trunk = renderTrunk(0, 55);
-  scene.head = renderHead(0, 0);
-  scene.leftHand = renderHand(-30, 60);
+  scene.rightFoot = renderFoot(RIGHT_FOOT_BACK_X, RIGHT_FOOT_BACK_Y);
+  scene.leftFoot = renderFoot(LEFT_FOOT_BACK_X, LEFT_FOOT_BACK_Y);
+
+  scene.trunk = renderTrunk(TRUNK_BACK_X, TRUNK_BACK_Y);
+  scene.head = renderHead(HEAD_BACK_X, HEAD_BACK_Y);
+  scene.leftHand = renderHand(LEFT_HAND_BACK_X, LEFT_HAND_BACK_Y);
 }
 
 export default (chara: Chara) => {
