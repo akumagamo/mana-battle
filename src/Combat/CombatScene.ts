@@ -213,7 +213,6 @@ export default class CombatScene extends Phaser.Scene {
     const source = this.getChara(sourceId)
     const target = this.getChara(targetId)
 
-
     return new Promise((resolve) => {
 
       source.attack(resolve)
@@ -238,7 +237,7 @@ export default class CombatScene extends Phaser.Scene {
       y: y,
       duration: WALK_DURATION,
       onComplete: () => {
-        chara.standFront();
+        chara.stand();
         onComplete();
       },
     });
