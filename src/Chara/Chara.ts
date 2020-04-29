@@ -160,12 +160,24 @@ export class Chara extends Phaser.Scene {
     stand(this);
   }
 
-  attack(onComplete: () => void) {
+  attack( onComplete: () => void) {
     attack(this, onComplete);
   }
 
-  flinch() {
-    flinch(this);
+  flinch( damage:number, isKilled:boolean) {
+    flinch(this, damage, isKilled);
+  }
+
+  die(){
+
+    console.log(`die!!`)
+
+    this.tweens.add({
+      targets:this.container,
+      alpha: 0,
+      duration: 1000
+    })
+
   }
 
   run() {

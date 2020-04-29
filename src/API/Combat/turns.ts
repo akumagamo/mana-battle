@@ -7,27 +7,43 @@ export const initiativeList = (units: Unit[]) => {
   return units.sort((a, b) => sortInitiative(b) - sortInitiative(a));
 };
 
-
 export type Move = {type: 'MOVE'; source: string; target: string};
-export type Return = {type: 'RETURN'; target: string; };
-export type Attack = {type: 'ATTACK'; source: string; target: string};
+export type Return = {type: 'RETURN'; target: string};
+export type Attack = {
+  type: 'ATTACK';
+  source: string;
+  target: string;
+  damage: number;
+  updatedTarget: Unit;
+};
 export type Victory = {type: 'VICTORY'; target: string};
 export type EndTurn = {type: 'END_TURN'};
 export type RestartTurns = {type: 'RESTART_TURNS'};
 
 export type Command = Move | Attack | Victory | EndTurn | RestartTurns | Return;
 
+export const runCombat = (units: Unit[]): Command[] => {
+  const unitList = initiativeList(units);
+
+  return runTurn(0, unitList, []);
+};
+
 /**
  * @param {number} turnNumber The current turn (starts at 0)
- * @param {Unit[]} units The units engaged in combat. Already sorted by initiative
+ * @param {Unit[]} units The units engaged in combat
  * */
-export const runTurn = (turnNumber: number, units: Unit[]): Command[] => {
-
-  const isLastActor = units.length - 1 === turnNumber;
+export const runTurn = (
+  turnNumber: number,
+  units: Unit[],
+  commands: Command[],
+): Command[] => {
 
   const current = units[turnNumber];
+  const isLastActor = units.length - 1 === turnNumber;
 
-  const commands: Command[] = [];
+    const nextTurn = isLastActor ? 0 : turnNumber + 1;
+
+  if (current.currentHp < 1) return runTurn(nextTurn,units,commands);
 
   if (!current.squad) throw new Error(INVALID_STATE);
 
@@ -35,18 +51,44 @@ export const runTurn = (turnNumber: number, units: Unit[]): Command[] => {
 
   if (!target) throw new Error(INVALID_STATE);
 
-  commands.push({type: 'MOVE', source: current.id, target: target.id});
-  commands.push({type: 'ATTACK', source: current.id, target: target.id});
+  const updatedUnits = units.map((unit) => {
+    const newHp = unit.currentHp - 22;
+    const currentHp = newHp < 1 ? 0 : newHp;
 
-  commands.push({type: 'RETURN', target: current.id});
+    return unit.id === target.id ? {...unit, currentHp} : unit;
+  });
 
-  if (endCombatCondition(current, units))
-    commands.push({type: 'VICTORY', target: current.squad});
+  const updatedTarget = updatedUnits.find(u=>u.id === target.id)
 
-  if (isLastActor) commands.push({type: 'RESTART_TURNS'});
-  else commands.push({type: 'END_TURN'});
+  if(!updatedTarget) throw new Error(INVALID_STATE)
 
-  return commands;
+  const move: Command[] = [
+    {type: 'MOVE', source: current.id, target: target.id},
+  ];
+  const attack: Command[] = [
+    {
+      type: 'ATTACK',
+      source: current.id,
+      target: target.id,
+      damage: 22,
+      updatedTarget,
+    },
+  ];
+
+  const returnCmd: Command[] = [{type: 'RETURN', target: current.id}];
+
+  const turnCommands: Command[] = commands
+    .concat(move)
+    .concat(attack)
+    .concat(returnCmd);
+
+  const victory: Victory = {type: 'VICTORY', target: current.squad};
+
+  if (endCombatCondition(current, updatedUnits)) {
+    return turnCommands.concat([victory]);
+  } else {
+    return runTurn(nextTurn, updatedUnits, turnCommands);
+  }
 };
 
 function endCombatCondition(current: Unit, units: Unit[]) {

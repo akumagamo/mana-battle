@@ -5,8 +5,6 @@ import {
   LEFT_HAND_FRONT_X,
   RIGHT_HAND_FRONT_X,
   CHARA_WRAPPER_Y,
-  LEFT_FOOT_BACK_X,
-  RIGHT_FOOT_BACK_X,
 } from './constants';
 import {maybeZero} from '../../utils';
 import upAndDown from './upAndDown';

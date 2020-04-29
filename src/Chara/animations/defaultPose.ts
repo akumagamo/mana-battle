@@ -39,6 +39,13 @@ export default (chara: Chara) => {
     throw new Error(INVALID_STATE);
   }
 
+  chara.head.rotation = 0;
+  chara.leftFoot.rotation = 0;
+  chara.leftHand.rotation = 0;
+  chara.rightFoot.rotation = 0;
+  chara.mainHandContainer.rotation = 0;
+  chara.trunk.rotation = 0;
+
   if (chara.front) {
     chara.charaWrapper.x = CHARA_WRAPPER_X;
     chara.charaWrapper.y = CHARA_WRAPPER_Y;

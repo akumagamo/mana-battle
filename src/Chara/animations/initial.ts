@@ -39,19 +39,21 @@ function front(scene: Chara) {
   scene.trunk = renderTrunk(TRUNK_FRONT_X, TRUNK_FRONT_Y);
   scene.head = renderHead(HEAD_FRONT_X, HEAD_FRONT_Y);
 
-  scene.rightHand = renderHand(0, 4, 1);
-  scene.rightHand.setRotation(-1.9);
+
   scene.mainHandContainer = scene.add.container(
     RIGHT_HAND_FRONT_X,
     RIGHT_HAND_FRONT_Y,
   );
-  scene.container?.add(scene.mainHandContainer);
-  scene.mainHandContainer.add(scene.rightHand);
-
   scene.mainHand = scene.add.image(10, 10, scene.unit.equips.mainHand);
   scene.mainHandContainer.add(scene.mainHand);
   scene.mainHand.setScale(0.2);
   scene.mainHand.setOrigin(1, 1);
+
+  scene.rightHand = renderHand(-2, 0, 1);
+  scene.rightHand.rotation = -2.2
+  scene.container?.add(scene.mainHandContainer);
+  scene.mainHandContainer.add(scene.rightHand);
+
 }
 function back(scene: Chara) {
   function renderHead(gx: number, gy: number) {
@@ -109,7 +111,9 @@ function back(scene: Chara) {
   scene.mainHandContainer.add(scene.rightHand);
 
   scene.rightFoot = renderFoot(RIGHT_FOOT_BACK_X, RIGHT_FOOT_BACK_Y);
+  scene.rightFoot.scaleY = -1
   scene.leftFoot = renderFoot(LEFT_FOOT_BACK_X, LEFT_FOOT_BACK_Y);
+  scene.leftFoot.scaleY = -1
 
   scene.trunk = renderTrunk(TRUNK_BACK_X, TRUNK_BACK_Y);
   scene.head = renderHead(HEAD_BACK_X, HEAD_BACK_Y);

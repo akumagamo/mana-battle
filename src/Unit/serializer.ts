@@ -1,6 +1,7 @@
 import { Unit } from './Model';
 import { maleNames } from '../constants/names';
 import { randomItem, classes } from '../defaultData';
+import {random} from '../utils';
 /**
  * @todo replace with reading data from the database (JSON) and generating a valid unit
  * @param n
@@ -23,12 +24,12 @@ export function fromJSON(n: number): Unit {
     hp: 100,
     currentHp: 100,
     exp: 99,
-    str: 11,
-    agi: 12,
-    dex: 13,
-    vit: 14,
-    int: 15,
-    wis: 16,
+    str: random(10,200),
+    agi: random(10, 200),
+    dex: random(10,200),
+    vit: random(10,200),
+    int: random(10,200),
+    wis: random(10,200),
     style: {
       head: randomItem([1, 2, 3]),
       trunk: randomItem([1, 2, 3, 4])

@@ -17,4 +17,6 @@ export default (chara: Chara, onComplete: () => void) => {
       onComplete();
     },
   });
+
+  
 };

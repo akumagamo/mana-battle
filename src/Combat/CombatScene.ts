@@ -6,7 +6,7 @@ import {cartesianToIsometricBattle} from '../utils/isometric';
 import {INVALID_STATE} from '../errors';
 import {SCREEN_WIDTH, SCREEN_HEIGHT} from '../constants';
 import {Unit} from '../Unit/Model';
-import {runTurn, Command} from '../API/Combat/turns';
+import {runTurn, Command, runCombat} from '../API/Combat/turns';
 import branch from '../Props/branch';
 import grass from '../Props/grass';
 
@@ -43,6 +43,16 @@ export default class CombatScene extends Phaser.Scene {
     super('CombatScene');
   }
   preload = preload;
+
+  updateUnit(unit: Unit) {
+    this.units = this.units.map((u) => {
+      if (u.unit.id === unit.id) {
+        u.unit = unit;
+      }
+
+      return u;
+    });
+  }
 
   // LIFECYCLE METHODS
   create(data: {top: string; bottom: string}) {
@@ -107,12 +117,10 @@ export default class CombatScene extends Phaser.Scene {
   // COMBAT FLOW METHODS
 
   turn() {
-    const commands = runTurn(
-      this.currentTurn,
-      this.units.map((u) => u.unit),
+    const commands = runCombat(
+      this.units.map((u) => u.unit)
     );
-    console.log(this.units.map((u) => u.unit));
-    console.log(`===============`, this.currentTurn, `=============`);
+    console.log(`>>>`,commands)
     this.execute(commands);
   }
 
@@ -135,7 +143,9 @@ export default class CombatScene extends Phaser.Scene {
     if (cmd.type === 'MOVE') {
       this.moveUnit(cmd.source, cmd.target).then(step);
     } else if (cmd.type === 'ATTACK') {
-      this.attack(cmd.source, cmd.target).then(step);
+      this.attack(cmd.source, cmd.target, cmd.damage, cmd.updatedTarget).then(
+        step,
+      );
     } else if (cmd.type === 'RETURN') {
       this.return(cmd.target).then(step);
     } else if (cmd.type === 'END_TURN') {
@@ -161,8 +171,8 @@ export default class CombatScene extends Phaser.Scene {
     const unit = this.getChara(sourceId);
     const target = this.getChara(targetId);
 
-    unit.clearAnimations()
-    unit.run()
+    unit.clearAnimations();
+    unit.run();
 
     const targetIsTop = this.top === target.unit.squad;
 
@@ -201,28 +211,32 @@ export default class CombatScene extends Phaser.Scene {
     };
 
     return new Promise((resolve) => {
-      
       this.time.addEvent(timeEvents);
       this.tweens.add(config(resolve));
     });
   }
 
-  attack(sourceId: string, targetId: string) {
+  attack(
+    sourceId: string,
+    targetId: string,
+    damage: number,
+    updatedTarget: Unit,
+  ) {
+    this.updateUnit(updatedTarget);
 
-    const source = this.getChara(sourceId)
-    const target = this.getChara(targetId)
+    const source = this.getChara(sourceId);
+    const target = this.getChara(targetId);
 
     return new Promise((resolve) => {
-
-      source.attack(resolve)
-      target.flinch()
+      source.attack(resolve);
+      target.flinch(damage, updatedTarget.currentHp === 0);
     });
   }
 
   return(id: string) {
     const chara = this.getChara(id);
-    chara.clearAnimations()
-    chara.run()
+    chara.clearAnimations();
+    chara.run();
     const coords = getBoardCoords(this.top)(chara.unit);
     const {x, y} = cartesianToIsometricBattle(
       this.top === chara.unit.squad,
@@ -236,7 +250,7 @@ export default class CombatScene extends Phaser.Scene {
       y: y,
       duration: WALK_DURATION,
       onComplete: () => {
-        console.log(`stand!!`)
+        console.log(`stand!!`);
         chara.stand();
         onComplete();
       },
