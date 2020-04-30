@@ -1,4 +1,4 @@
-import {initiativeList, runTurn, runCombat} from './turns';
+import {initiativeList, runCombat} from './turns';
 import {makeUnit} from '../Units/mock';
 
 test('Should sort by initiave correctly', () => {
@@ -24,6 +24,8 @@ test('Combat should have the expected outcome', () => {
 
   const res = runCombat(units);
 
-  console.log(res);
+  const last = res.reverse()[0]
+
+  expect(last.type).toBe( "VICTORY")
   
 });

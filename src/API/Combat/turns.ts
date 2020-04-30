@@ -37,13 +37,12 @@ export const runTurn = (
   units: Unit[],
   commands: Command[],
 ): Command[] => {
-
   const current = units[turnNumber];
   const isLastActor = units.length - 1 === turnNumber;
 
-    const nextTurn = isLastActor ? 0 : turnNumber + 1;
+  const nextTurn = isLastActor ? 0 : turnNumber + 1;
 
-  if (current.currentHp < 1) return runTurn(nextTurn,units,commands);
+  if (current.currentHp < 1) return runTurn(nextTurn, units, commands);
 
   if (!current.squad) throw new Error(INVALID_STATE);
 
@@ -58,9 +57,9 @@ export const runTurn = (
     return unit.id === target.id ? {...unit, currentHp} : unit;
   });
 
-  const updatedTarget = updatedUnits.find(u=>u.id === target.id)
+  const updatedTarget = updatedUnits.find((u) => u.id === target.id);
 
-  if(!updatedTarget) throw new Error(INVALID_STATE)
+  if (!updatedTarget) throw new Error(INVALID_STATE);
 
   const move: Command[] = [
     {type: 'MOVE', source: current.id, target: target.id},
