@@ -44,9 +44,9 @@ const boardPadding = 100;
 const Map: MapBoard = {
   cells: [
     [0, 0, 0, 0, 0, 1, 0, 1, 1, 1],
-    [0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+    [0, 0, 2, 2, 0, 1, 2, 1, 0, 1],
+    [0, 0, 2, 2, 0, 1, 2, 0, 0, 1],
+    [0, 0, 0, 2, 0, 0, 0, 1, 1, 1],
   ],
   forces: [
     {id: PLAYER_FORCE, name: 'Player', squads: [{id: '0', x: 0, y: 0}]},
@@ -101,7 +101,21 @@ export class MapScene extends Phaser.Scene {
     Map.cells.forEach((arr, col) =>
       arr.forEach((n, row) => {
         const {x, y} = this.getPos(row, col);
-        const tile = this.add.image(x, y, 'panel');
+      
+        const makeTile = () =>{
+
+        if (n === 1) 
+      return this.add.image(x, y, 'tiles/mountain')
+          else if (n === 0)
+
+      return this.add.image(x, y, 'tiles/grass')
+          else
+
+      return this.add.image(x, y, 'tiles/woods')
+
+        }
+
+        const tile=makeTile()
 
         tile.setInteractive();
         tile.on('pointerdown', () => {
@@ -111,8 +125,6 @@ export class MapScene extends Phaser.Scene {
         });
 
         container.add(tile);
-
-        if (n === 1) tile.setTint(MOUNTAIN_TINT);
 
         tile.displayWidth = cellSize;
         tile.displayHeight = cellSize;
@@ -305,6 +317,7 @@ export class MapScene extends Phaser.Scene {
           x: target.x,
           y: target.y,
           duration: SQUAD_MOVE_DURATION,
+          ease: "Cubic",
           onComplete: index === path.length - 2 ? endCallback() : null,
         };
       });
