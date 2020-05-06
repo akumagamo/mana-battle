@@ -33,20 +33,26 @@ const BOTTOM_PANEL_Y = 600;
 const BOTTOM_PANEL_WIDTH = 1280;
 const BOTTOM_PANEL_HEIGHT = 120;
 
-const MOUNTAIN_TINT = 0xdeaa87;
-
 const easystar = new easyStar.js();
 
 const cellSize = 100;
 
-const boardPadding = 100;
+const boardPadding = 50;
+
+// 0 -> grass
+// 1 -> mountain1
+// 2-> mountain2
+// 3-> woods
 
 const Map: MapBoard = {
   cells: [
-    [0, 0, 0, 0, 0, 1, 0, 1, 1, 1],
-    [0, 0, 2, 2, 0, 1, 2, 1, 0, 1],
-    [0, 0, 2, 2, 0, 1, 2, 0, 0, 1],
-    [0, 0, 0, 2, 0, 0, 0, 1, 1, 1],
+    [0, 0, 0, 0, 0, 2, 0, 2, 2, 1, 0, 0, 0, ],
+    [0, 0, 9, 2, 0, 1, 9, 1, 0, 2, 0, 0, 3, ],
+    [2, 0, 0, 9, 0, 2, 9, 0, 0, 2, 2, 0, 0, ],
+    [9, 1, 0, 0, 0, 0, 0, 2, 1, 2, 9, 1, 0, ],
+    [0, 0, 0, 0, 0, 2, 0, 2, 2, 1, 0, 0, 0, ],
+    [0, 0, 9, 2, 0, 1, 9, 1, 0, 2, 0, 0, 9, ],
+    
   ],
   forces: [
     {id: PLAYER_FORCE, name: 'Player', squads: [{id: '0', x: 0, y: 0}]},
@@ -101,21 +107,16 @@ export class MapScene extends Phaser.Scene {
     Map.cells.forEach((arr, col) =>
       arr.forEach((n, row) => {
         const {x, y} = this.getPos(row, col);
-      
-        const makeTile = () =>{
 
-        if (n === 1) 
-      return this.add.image(x, y, 'tiles/mountain')
-          else if (n === 0)
+        const makeTile = () => {
+          if (n === 1) return this.add.image(x, y, 'tiles/mountain1');
+          else if (n === 2) return this.add.image(x, y, 'tiles/mountain2');
+          else if (n === 0) return this.add.image(x, y, 'tiles/grass');
+          else if (n === 9) return this.add.image(x, y, 'tiles/woods');
+          else return this.add.image(x, y, 'tiles/grass');
+        };
 
-      return this.add.image(x, y, 'tiles/grass')
-          else
-
-      return this.add.image(x, y, 'tiles/woods')
-
-        }
-
-        const tile=makeTile()
+        const tile = makeTile();
 
         tile.setInteractive();
         tile.on('pointerdown', () => {
@@ -317,7 +318,7 @@ export class MapScene extends Phaser.Scene {
           x: target.x,
           y: target.y,
           duration: SQUAD_MOVE_DURATION,
-          ease: "Cubic",
+          ease: 'Cubic',
           onComplete: index === path.length - 2 ? endCallback() : null,
         };
       });
