@@ -35,7 +35,16 @@ export function preload(this: {
     'baldar_armor', 'baldar_shield','baldar_sword',
   ];
   items.forEach((id: string) => {
-    this.load.image(id, `${PUBLIC_URL}/items/${id}.svg`);
+    this.load.image(id, `${PUBLIC_URL}/items/${id}.png`);
+  });
+
+  const equips = [
+    'equips/iron_sword',
+    'equips/steel_sword',
+    'equips/baldar_sword',
+  ];
+  equips.forEach((id: string) => {
+    this.load.image(id, `${PUBLIC_URL}/${id}.svg`);
   });
 
   const props = ['props/grass', 'props/bush', 'props/far_tree_1', 'props/branch'];
@@ -43,7 +52,14 @@ export function preload(this: {
     this.load.image(id, `${PUBLIC_URL}/${id}.svg`);
   });
 
-  const tiles = ['tiles/grass', 'tiles/woods', 'tiles/mountain1', 'tiles/mountain2'];
+  const tiles = ['tiles/grass', 'tiles/woods', 
+    'tiles/mountain1', 'tiles/mountain2',
+'tiles/mountain3', 'tiles/mountain4',
+
+'tiles/mountain5', 'tiles/mountain6',
+'tiles/mountain7', 'tiles/mountain8',
+
+  ];
   tiles.forEach((id: string) => {
     this.load.image(id, `${PUBLIC_URL}/${id}.svg`);
   });

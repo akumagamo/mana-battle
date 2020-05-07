@@ -39,20 +39,24 @@ const cellSize = 100;
 
 const boardPadding = 50;
 
-// 0 -> grass
-// 1 -> mountain1
-// 2-> mountain2
+// 0-> grass
+// 5-> mountain1
+// 6-> mountain2
+// 7
+// 8
 // 3-> woods
+// 
+
+const walkableTiles = [10]
 
 const Map: MapBoard = {
   cells: [
-    [0, 0, 0, 0, 0, 2, 0, 2, 2, 1, 0, 0, 0, ],
-    [0, 0, 9, 2, 0, 1, 9, 1, 0, 2, 0, 0, 3, ],
-    [2, 0, 0, 9, 0, 2, 9, 0, 0, 2, 2, 0, 0, ],
-    [9, 1, 0, 0, 0, 0, 0, 2, 1, 2, 9, 1, 0, ],
-    [0, 0, 0, 0, 0, 2, 0, 2, 2, 1, 0, 0, 0, ],
-    [0, 0, 9, 2, 0, 1, 9, 1, 0, 2, 0, 0, 9, ],
-    
+    [10, 11, 10, 10, 10, 10, 10, 10, 27, 22, 22, 22, 22],
+    [10, 11, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 11],
+    [10, 11, 10, 10, 10, 10, 10, 24, 20, 25, 10, 10, 11],
+    [10, 10, 10, 10, 10, 10, 10, 23, 11, 21, 10, 10, 11],
+    [10, 11, 10, 10, 10, 10, 10, 27, 22, 26, 10, 10, 11],
+    [11, 11, 11, 11, 11, 10, 10, 10, 10, 10, 10, 11, 11],
   ],
   forces: [
     {id: PLAYER_FORCE, name: 'Player', squads: [{id: '0', x: 0, y: 0}]},
@@ -109,10 +113,16 @@ export class MapScene extends Phaser.Scene {
         const {x, y} = this.getPos(row, col);
 
         const makeTile = () => {
-          if (n === 1) return this.add.image(x, y, 'tiles/mountain1');
-          else if (n === 2) return this.add.image(x, y, 'tiles/mountain2');
-          else if (n === 0) return this.add.image(x, y, 'tiles/grass');
-          else if (n === 9) return this.add.image(x, y, 'tiles/woods');
+          if (n === 10) return this.add.image(x, y, 'tiles/grass');
+          else if (n === 11) return this.add.image(x, y, 'tiles/woods');
+          else if (n === 20) return this.add.image(x, y, 'tiles/mountain1');
+          else if (n === 21) return this.add.image(x, y, 'tiles/mountain2');
+          else if (n === 22) return this.add.image(x, y, 'tiles/mountain3');
+          else if (n === 23) return this.add.image(x, y, 'tiles/mountain4');
+          else if (n === 24) return this.add.image(x, y, 'tiles/mountain5');
+          else if (n === 25) return this.add.image(x, y, 'tiles/mountain6');
+          else if (n === 26) return this.add.image(x, y, 'tiles/mountain7');
+          else if (n === 27) return this.add.image(x, y, 'tiles/mountain8');
           else return this.add.image(x, y, 'tiles/grass');
         };
 
@@ -185,7 +195,7 @@ export class MapScene extends Phaser.Scene {
         this.selectedSquad = c.unit.squad;
 
         const cells = this.tilesInRange(squad.x, squad.y, SQUAD_MOVE_RANGE)
-          .filter((tile) => tile.type === 0)
+          .filter((tile) => walkableTiles.indexOf( tile.type) > -1 )
           .filter((tile) => !this.isEnemyInTile(tile));
 
         cells.forEach((cell, index) => {
@@ -295,7 +305,7 @@ export class MapScene extends Phaser.Scene {
     if (!squad) throw new Error(INVALID_STATE);
 
     this.tiles.forEach((tile) =>
-      tile.type === 0 ? tile.tile.clearTint() : null,
+      walkableTiles.indexOf(tile.type) > -1 ? tile.tile.clearTint() : null,
     );
 
     this.findPath(squad, {x, y}).then((path) => this.moveUnit(chara, path));
@@ -354,7 +364,7 @@ export class MapScene extends Phaser.Scene {
     console.log(cells, Map.cells);
 
     easystar.setGrid(cells);
-    easystar.setAcceptableTiles([0]);
+    easystar.setAcceptableTiles(walkableTiles);
 
     return new Promise((resolve) => {
       easystar.findPath(origin.x, origin.y, target.x, target.y, (path) => {

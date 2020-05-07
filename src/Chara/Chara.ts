@@ -1,12 +1,9 @@
 import * as Phaser from 'phaser';
 
-import {Unit, AnimatedUnit} from '../Unit/Model';
+import {Unit} from '../Unit/Model';
 import {Container, Pointer, Image} from '../Models';
-import {INVALID_STATE} from '../errors';
-import {getItem} from '../DB';
 import run from './animations/run';
 
-import {RIGHT_HAND_FRONT_X, RIGHT_HAND_FRONT_Y, CHARA_WRAPPER_X} from './animations/constants';
 import defaultPose from './animations/defaultPose';
 import stand from './animations/stand';
 import flinch from './animations/flinch';

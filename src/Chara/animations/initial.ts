@@ -44,7 +44,7 @@ function front(scene: Chara) {
     RIGHT_HAND_FRONT_X,
     RIGHT_HAND_FRONT_Y,
   );
-  scene.mainHand = scene.add.image(10, 10, scene.unit.equips.mainHand);
+  scene.mainHand = scene.add.image(10, 10, `equips/${scene.unit.equips.mainHand}`);
   scene.mainHandContainer.add(scene.mainHand);
   scene.mainHand.setScale(0.2);
   scene.mainHand.setOrigin(1, 1);
@@ -102,7 +102,7 @@ function back(scene: Chara) {
   );
   scene.container?.add(scene.mainHandContainer);
 
-  scene.mainHand = scene.add.image(-10, 20, scene.unit.equips.mainHand);
+  scene.mainHand = scene.add.image(-10, 20, `equips/${scene.unit.equips.mainHand}`);
   scene.mainHandContainer.add(scene.mainHand);
   scene.mainHand.setScale(-0.2, 0.2);
   scene.mainHand.setOrigin(1, 1);
