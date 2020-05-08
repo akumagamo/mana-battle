@@ -1,18 +1,7 @@
 import * as Phaser from 'phaser';
 import {Chara} from '../Chara/Chara';
 import {preload} from '../preload';
-import {Squad} from '../Squad/Model';
-import {
-  addUnitToSquad,
-  getUnits,
-  getUnit,
-  getSquad,
-  getSquadLeader,
-  saveSquad,
-} from '../DB';
-import UnitListScene from '../Unit/UnitListScene';
-import {Unit} from '../Unit/Model';
-import BoardScene, {BOARD_SCENE_KEY} from '../Board/InteractiveBoardScene';
+import {getSquad, getSquadLeader} from '../DB';
 import {INVALID_STATE} from '../errors';
 import button from '../UI/button';
 import {Container, Image} from '../Models';
@@ -45,9 +34,9 @@ const boardPadding = 50;
 // 7
 // 8
 // 3-> woods
-// 
+//
 
-const walkableTiles = [10]
+const walkableTiles = [10];
 
 const Map: MapBoard = {
   cells: [
@@ -59,16 +48,20 @@ const Map: MapBoard = {
     [11, 11, 11, 11, 11, 10, 10, 10, 10, 10, 10, 11, 11],
   ],
   forces: [
-    {id: PLAYER_FORCE, name: 'Player', squads: [{id: '0', x: 0, y: 0}]},
+    {
+      id: PLAYER_FORCE,
+      name: 'Player',
+      squads: [{id: '0', x: 0, y: 0, moves: 5, remainingMoves: 5}],
+    },
     {
       id: '1',
       name: 'CPU',
       squads: [
-        {id: '2', x: 3, y: 2},
-        {id: '3', x: 3, y: 1},
-        {id: '4', x: 4, y: 2},
-        {id: '5', x: 4, y: 1},
-        {id: '6', x: 3, y: 0},
+        {id: '2', x: 3, y: 2, moves: 5, remainingMoves: 5},
+        {id: '3', x: 3, y: 1, moves: 5, remainingMoves: 5},
+        {id: '4', x: 4, y: 2, moves: 5, remainingMoves: 5},
+        {id: '5', x: 4, y: 1, moves: 5, remainingMoves: 5},
+        {id: '6', x: 3, y: 0, moves: 5, remainingMoves: 5},
       ],
     },
   ],
@@ -83,15 +76,36 @@ type MapSquad = {
   id: string;
   x: number;
   y: number;
+  moves: number;
+  remainingMoves: number;
 };
 
-type MapTile = {x: number; y: number; type: number; tile: Image};
+type MapTile = {
+  x: number;
+  y: number;
+  type: number;
+  tile: Image;
+  distance: number;
+};
 export class MapScene extends Phaser.Scene {
   squads: Chara[] = [];
 
   tiles: MapTile[] = [];
   selectedSquad: string | null = null;
+  currentForce: string = PLAYER_FORCE;
 
+  getForce(id: string) {
+    const force = Map.forces.find((force) => force.id === id);
+    if (!force) throw new Error(INVALID_STATE);
+    return force;
+  }
+  getForceSquad(force: MapForce, id: string) {
+    const squad = force.squads.find((f) => f.id === id);
+
+    if (!squad) throw new Error(INVALID_STATE);
+
+    return squad;
+  }
   constructor() {
     super('MapScene');
   }
@@ -132,6 +146,27 @@ export class MapScene extends Phaser.Scene {
         tile.on('pointerdown', () => {
           if (this.selectedSquad) {
             this.selectTile(uiContainer, this.selectedSquad, row, col);
+
+            //refactor this whole stuff below (repeats a lot of this.selectTile)
+            const chara = this.squads.find(
+              (c) => c.unit.id === this.selectedSquad,
+            );
+            const force = Map.forces.find((force) => force.id === PLAYER_FORCE);
+
+            if (!chara || !force) throw new Error(INVALID_STATE);
+
+            const squad = force.squads.find(
+              (squad) => squad.id === chara.unit.squad,
+            );
+
+            if (!chara || !force || !squad) throw new Error(INVALID_STATE);
+
+            const thisTile = this.tiles.find((t) => t.x === row && t.y === col);
+
+            if (!thisTile) throw new Error(INVALID_STATE);
+
+            squad.remainingMoves = squad.remainingMoves - thisTile.distance;
+            this.refreshUI(uiContainer)
           }
         });
 
@@ -145,6 +180,7 @@ export class MapScene extends Phaser.Scene {
           y: col,
           type: n,
           tile: tile,
+          distance: 0,
         });
       }),
     );
@@ -191,18 +227,28 @@ export class MapScene extends Phaser.Scene {
     this.squads.push(chara);
 
     chara.onClick((c: Chara) => {
+      if (!c.unit.squad) throw new Error(INVALID_STATE);
+      const sqd = this.getForceSquad(
+        this.getForce(this.currentForce),
+        c.unit.squad,
+      );
+
+      console.log(`>>>`, sqd);
       if (force.id === PLAYER_FORCE) {
         this.selectedSquad = c.unit.squad;
 
-        const cells = this.tilesInRange(squad.x, squad.y, SQUAD_MOVE_RANGE)
-          .filter((tile) => walkableTiles.indexOf( tile.type) > -1 )
+        const range = sqd.remainingMoves;
+
+        const cells = this.tilesInRange(sqd.x, sqd.y, range)
+          .filter((tile) => walkableTiles.indexOf(tile.type) > -1)
           .filter((tile) => !this.isEnemyInTile(tile));
 
         cells.forEach((cell, index) => {
           if (index > 0)
-            this.findPath(squad, cell).then((path) => {
-              if (path && path.length <= SQUAD_MOVE_RANGE + 1) {
+            this.findPath(sqd, cell).then((path) => {
+              if (path && path.length <= range) {
                 cell.tile.setTint(WALKABLE_CELL_TINT);
+                cell.distance = path.length;
               }
             });
         });
@@ -215,10 +261,10 @@ export class MapScene extends Phaser.Scene {
             force.squads
               .filter((force) => force.id === this.selectedSquad)
               .forEach((playerSquad) => {
-                const distance = this.getDistance(playerSquad, squad);
+                const distance = this.getDistance(playerSquad, sqd);
 
                 if (distance === 1) {
-                  console.log(`attack!!`, squad);
+                  console.log(`attack!!`, sqd);
 
                   this.scene.transition({
                     target: 'CombatScene',
@@ -257,10 +303,14 @@ export class MapScene extends Phaser.Scene {
     );
 
     if (this.selectedSquad) {
+      const force = this.getForce(this.currentForce);
+
       const squad = getSquad(this.selectedSquad);
-      if (squad) {
-        text(10, 610, squad.name, container, this);
-      }
+      const forceSquad = this.getForceSquad(force, this.selectedSquad);
+
+      text(20, 610, squad.name, container, this);
+
+      text(1000, 610, `${forceSquad.remainingMoves} moves`, container, this);
     }
 
     button(1100, 50, 'Return to Title', this.add.container(0, 0), this, () => {
@@ -283,6 +333,47 @@ export class MapScene extends Phaser.Scene {
     this.renderMap(container, uiContainer);
     this.renderUnits(container, uiContainer);
     this.renderUI(uiContainer);
+
+    this.runTurn();
+  }
+
+  runTurn() {
+    const force = this.getForce(this.currentForce);
+
+    const title = this.add.text(-200, 500, `${force.name} Turn`);
+
+    const timeline = this.tweens.createTimeline();
+    timeline.add({
+      targets: title,
+      x: 700,
+      ease: 'Bounce',
+      duration: 500,
+    });
+    timeline.add({
+      targets: title,
+      x: 800,
+      duration: 1500,
+    });
+    timeline.add({
+      targets: title,
+      x: 1700,
+      duration: 500,
+    });
+
+    timeline.play();
+
+    this.refreshMoves(force);
+  }
+
+  refreshMoves(force: MapForce) {
+    const updatedSquads = force.squads.map((squad) => ({
+      ...squad,
+      remainingMoves: squad.moves,
+    }));
+
+    Map.forces = Map.forces.map((f) =>
+      f.id === force.id ? {...f, squads: updatedSquads} : f,
+    );
   }
 
   tilesInRange(x: number, y: number, range: number) {
@@ -360,8 +451,6 @@ export class MapScene extends Phaser.Scene {
     enemies.forEach((sqd) => {
       cells[sqd.y][sqd.x] = 1;
     });
-
-    console.log(cells, Map.cells);
 
     easystar.setGrid(cells);
     easystar.setAcceptableTiles(walkableTiles);

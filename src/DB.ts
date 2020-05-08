@@ -11,13 +11,14 @@ const set = (str: string, data: any) =>
 
 export const getSquads = (): SquadMap => get('squads');
 
-export const getSquad = (id: string): Squad | undefined =>
-  Object.values(getSquads()).find((squad) => squad.id === id);
+export const getSquad = (id: string): Squad => {
+  const squad = Object.values(getSquads()).find((squad) => squad.id === id);
+  if (!squad) throw new Error(INVALID_STATE);
+  return squad;
+};
 
 export const getSquadMembers = (id: string): Unit[] => {
   const squad = getSquad(id);
-
-  if (!squad) return [];
 
   return Object.values(squad.members)
     .map((unit) => getUnit(unit.id))
@@ -29,17 +30,18 @@ export const getSquadMember = (id: string): SquadMember => {
   if (!unit || !unit.squad) throw new Error(INVALID_STATE);
   const squad = getSquad(unit.squad);
 
-  if (!squad) throw new Error(INVALID_STATE);
-
   return Object.values(squad.members).find(
     (unit) => unit.id === id,
   ) as SquadMember;
 };
 
-export const getSquadLeader = (id: string): Unit | undefined => {
+export const getSquadLeader = (id: string): Unit => {
   const members = getSquadMembers(id);
 
-  return members.find((unit) => unit.id === id);
+  const unit = members.find((unit) => unit.id === id);
+
+  if (!unit) throw new Error(INVALID_STATE);
+  return unit;
 };
 
 export const getUnits = (): UnitMap => get('units');
@@ -54,7 +56,13 @@ export const getItemList = (): Item[] => Object.values(getItems());
 
 export const getItemTypes = (): ItemTypeSlots => itemTypeSlots;
 
-export const getUnit = (id: string): Unit | undefined => getUnits()[id];
+export const getUnit = (id: string): Unit => {
+  const unit = getUnits()[id];
+
+  if (!unit) throw new Error(INVALID_STATE);
+
+  return unit;
+};
 
 export const saveSquads = (squads: SquadMap) => set('squads', squads);
 
