@@ -55,7 +55,7 @@ function makeItem(acc: Item[], itemData: any): Item[] {
     else return acc;
   };
   const itemModifierList = Object.entries(itemData).filter(
-    ([k]) => ['name', 'type', 'description'].indexOf(k) < 0
+    ([k]) => !['name', 'type', 'description'].includes(k) 
   );
 
   const itemModifiers: ItemModifiers = (itemModifierList as [

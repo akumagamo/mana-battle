@@ -65,11 +65,18 @@ const Map: MapBoard = {
       ],
     },
   ],
+
+  cities: [
+    {id: 'a1', name: 'Arabella', x: 1, y: 1, force: PLAYER_FORCE},
+
+    {id: 'm1', name: 'Marqueze', x: 3, y: 1, force: '1'},
+  ],
 };
 type Coordinate = {x: number; y: number};
 type MapBoard = {
   cells: number[][];
   forces: MapForce[];
+  cities: MapCity[];
 };
 type MapForce = {id: string; name: string; squads: MapSquad[]};
 type MapSquad = {
@@ -78,6 +85,13 @@ type MapSquad = {
   y: number;
   moves: number;
   remainingMoves: number;
+};
+type MapCity = {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+  force: string | null;
 };
 
 type MapTile = {
@@ -127,6 +141,7 @@ export class MapScene extends Phaser.Scene {
         const {x, y} = this.getPos(row, col);
 
         const makeTile = () => {
+          //TODO: refactor, this is bad and ugly
           if (n === 10) return this.add.image(x, y, 'tiles/grass');
           else if (n === 11) return this.add.image(x, y, 'tiles/woods');
           else if (n === 20) return this.add.image(x, y, 'tiles/mountain1');
@@ -143,32 +158,6 @@ export class MapScene extends Phaser.Scene {
         const tile = makeTile();
 
         tile.setInteractive();
-        tile.on('pointerdown', () => {
-          if (this.selectedSquad) {
-            this.selectTile(uiContainer, this.selectedSquad, row, col);
-
-            //refactor this whole stuff below (repeats a lot of this.selectTile)
-            const chara = this.squads.find(
-              (c) => c.unit.id === this.selectedSquad,
-            );
-            const force = Map.forces.find((force) => force.id === PLAYER_FORCE);
-
-            if (!chara || !force) throw new Error(INVALID_STATE);
-
-            const squad = force.squads.find(
-              (squad) => squad.id === chara.unit.squad,
-            );
-
-            if (!chara || !force || !squad) throw new Error(INVALID_STATE);
-
-            const thisTile = this.tiles.find((t) => t.x === row && t.y === col);
-
-            if (!thisTile) throw new Error(INVALID_STATE);
-
-            squad.remainingMoves = squad.remainingMoves - thisTile.distance;
-            this.refreshUI(uiContainer)
-          }
-        });
 
         container.add(tile);
 
@@ -184,6 +173,39 @@ export class MapScene extends Phaser.Scene {
         });
       }),
     );
+  }
+  makeInteractive(uiContainer: Container, cell: MapTile) {
+    cell.tile.on('pointerdown', () => {
+      if (this.selectedSquad) {
+        this.selectTile(uiContainer, this.selectedSquad, cell.x, cell.y);
+
+        //refactor this whole stuff below (repeats a lot of this.selectTile)
+        const chara = this.squads.find((c) => c.unit.id === this.selectedSquad);
+        const force = Map.forces.find((force) => force.id === PLAYER_FORCE);
+
+        if (!chara || !force) throw new Error(INVALID_STATE);
+
+        const squad = force.squads.find(
+          (squad) => squad.id === chara.unit.squad,
+        );
+
+        if (!chara || !force || !squad) throw new Error(INVALID_STATE);
+
+        //TODO: necessary?
+        const thisTile = this.tiles.find(
+          (t) => t.x === cell.x && t.y === cell.y,
+        );
+
+        if (!thisTile) throw new Error(INVALID_STATE);
+
+        squad.remainingMoves = squad.remainingMoves - thisTile.distance;
+        this.refreshUI(uiContainer);
+        this.clearAllTileEvents();
+      }
+    });
+  }
+  clearAllTileEvents() {
+    this.tiles.forEach((tile) => tile.tile.removeAllListeners());
   }
   renderUnits(container: Container, uiContainer: Container) {
     console.log(`MapScene - renderUnits`);
@@ -233,24 +255,29 @@ export class MapScene extends Phaser.Scene {
         c.unit.squad,
       );
 
-      console.log(`>>>`, sqd);
       if (force.id === PLAYER_FORCE) {
         this.selectedSquad = c.unit.squad;
 
+        if (sqd.remainingMoves < 1) {
+          console.info('No move points remaining for', sqd);
+          return;
+        }
+
         const range = sqd.remainingMoves;
 
-        const cells = this.tilesInRange(sqd.x, sqd.y, range)
-          .filter((tile) => walkableTiles.indexOf(tile.type) > -1)
-          .filter((tile) => !this.isEnemyInTile(tile));
+        const cells = this.tilesInRange(sqd.x, sqd.y, range + 2)
+          .filter((tile) => walkableTiles.includes(tile.type))
+          .filter((tile) => !this.isEnemyInTile(tile))
+          .filter((tile) => tile.x !== sqd.x || tile.y !== sqd.y);
 
-        cells.forEach((cell, index) => {
-          if (index > 0)
-            this.findPath(sqd, cell).then((path) => {
-              if (path && path.length <= range) {
-                cell.tile.setTint(WALKABLE_CELL_TINT);
-                cell.distance = path.length;
-              }
-            });
+        cells.forEach((cell) => {
+          this.findPath(sqd, cell).then((path) => {
+            if (path && path.length <= range + 1) {
+              cell.tile.setTint(WALKABLE_CELL_TINT);
+              cell.distance = path.length - 1;
+              this.makeInteractive(uiContainer, cell);
+            }
+          });
         });
 
         this.refreshUI(uiContainer);
@@ -396,7 +423,7 @@ export class MapScene extends Phaser.Scene {
     if (!squad) throw new Error(INVALID_STATE);
 
     this.tiles.forEach((tile) =>
-      walkableTiles.indexOf(tile.type) > -1 ? tile.tile.clearTint() : null,
+      walkableTiles.includes(tile.type) ? tile.tile.clearTint() : null,
     );
 
     this.findPath(squad, {x, y}).then((path) => this.moveUnit(chara, path));
