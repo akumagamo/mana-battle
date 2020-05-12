@@ -25,8 +25,6 @@ jobs:
     - name: Install deps
       run: yarn
       
-
-
     - name: Test
       run: yarn test
 
@@ -34,11 +32,12 @@ jobs:
       run: yarn deploy
 
     - name: Copy Assets
-      run: cp -r assets/ dist/assets/
+      run: mkdir dist/assets && cp -r assets/ dist/assets/
 
     - name: Publish 🚀
       uses: JamesIves/github-pages-deploy-action@releases/v3
       with:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        BRANCH: gh-pages
+        REPOSITORY_NAME: lfarroco/mana_public
+        BRANCH: master
         FOLDER: dist
