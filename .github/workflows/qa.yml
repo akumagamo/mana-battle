@@ -33,7 +33,7 @@ jobs:
 
     - name: Copy Assets
       run: mkdir -p dist/assets && cp -r assets/ dist/assets/
-
+    
     - name: Publish 🚀
       uses: JamesIves/github-pages-deploy-action@releases/v3
       with:
