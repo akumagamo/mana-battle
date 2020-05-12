@@ -28,8 +28,11 @@ jobs:
     - name: Test
       run: yarn test
 
-    - name: Deploy
+    - name: Build :gear:
       run: yarn deploy
+
+    - name: Create Assets dir
+      run: touch ./dist/assets
 
     - name: Copy Assets
       run: cp -r ./assets ./dist/assets
