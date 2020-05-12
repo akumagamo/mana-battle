@@ -32,9 +32,7 @@ jobs:
       run: yarn deploy
 
     - name: Copy Assets
-    - shell: bash
-      run: |
-          cp -r ./assets ./dist/assets
+      run: cp -r ./assets ./dist/assets
 
     - name: Publish 🚀
       uses: JamesIves/github-pages-deploy-action@releases/v3
