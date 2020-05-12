@@ -6,6 +6,7 @@ import {addUnitToSquad} from '../DB';
 import UnitListScene from '../Unit/UnitListScene';
 import {Unit} from '../Unit/Model';
 import BoardScene, {BOARD_SCENE_KEY} from '../Board/InteractiveBoardScene';
+import button from '../UI/button';
 
 export class EditSquadScene extends Phaser.Scene {
   unitListScene: UnitListScene | null = null;
@@ -26,7 +27,6 @@ export class EditSquadScene extends Phaser.Scene {
     this.renderUnitList();
 
     this.renderReturnBtn();
-    console.log(`btn`);
   }
 
   renderBoard(squad: Squad) {
@@ -35,9 +35,10 @@ export class EditSquadScene extends Phaser.Scene {
   }
 
   renderUnitList() {
-    this.unitListScene = new UnitListScene(50,40);
+    this.unitListScene = new UnitListScene(50, 40);
     this.unitListScene.onDrag = (unit, x, y) => this.onDragFromList(unit, x, y);
-    this.unitListScene.onDragEnd = (unit, x, y, chara) => this.onDragEndFromList(unit, x, y, chara);
+    this.unitListScene.onDragEnd = (unit, x, y, chara) =>
+      this.onDragEndFromList(unit, x, y, chara);
     this.scene.add('UnitListScene', this.unitListScene, true);
   }
 
@@ -112,9 +113,7 @@ export class EditSquadScene extends Phaser.Scene {
   renderReturnBtn() {
     console.log('rendering return btn');
 
-    const btn = this.add.text(1100, 100, 'Return to title');
-    btn.setInteractive();
-    btn.on('pointerdown', () => {
+    button(1100, 100, 'Return to title', this.add.container(0, 0), this, () => {
       this.scene.transition({
         target: 'TitleScene',
         duration: 0,
@@ -123,19 +122,27 @@ export class EditSquadScene extends Phaser.Scene {
 
       this.destroyChildren();
     });
-    const list = this.add.text(1100, 200, 'Return to list');
-    list.setInteractive();
-    list.on('pointerdown', () => {
 
+    button(1100, 200, 'Return to List', this.add.container(0, 0), this, () => {
       this.destroyChildren();
-
       this.scene.transition({
         target: 'ListSquadsScene',
         duration: 0,
         moveBelow: true,
       });
-
     });
+
+    // const list = this.add.text(1100, 200, 'Return to list');
+    // list.setInteractive();
+    // list.on('pointerdown', () => {
+    //   this.destroyChildren();
+
+    //   this.scene.transition({
+    //     target: 'ListSquadsScene',
+    //     duration: 0,
+    //     moveBelow: true,
+    //   });
+    // });
 
     console.log(`done`);
   }

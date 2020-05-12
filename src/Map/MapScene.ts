@@ -177,30 +177,7 @@ export class MapScene extends Phaser.Scene {
   makeInteractive(uiContainer: Container, cell: MapTile) {
     cell.tile.on('pointerdown', () => {
       if (this.selectedSquad) {
-        this.selectTile(uiContainer, this.selectedSquad, cell.x, cell.y);
-
-        //refactor this whole stuff below (repeats a lot of this.selectTile)
-        const chara = this.squads.find((c) => c.unit.id === this.selectedSquad);
-        const force = Map.forces.find((force) => force.id === PLAYER_FORCE);
-
-        if (!chara || !force) throw new Error(INVALID_STATE);
-
-        const squad = force.squads.find(
-          (squad) => squad.id === chara.unit.squad,
-        );
-
-        if (!chara || !force || !squad) throw new Error(INVALID_STATE);
-
-        //TODO: necessary?
-        const thisTile = this.tiles.find(
-          (t) => t.x === cell.x && t.y === cell.y,
-        );
-
-        if (!thisTile) throw new Error(INVALID_STATE);
-
-        squad.remainingMoves = squad.remainingMoves - thisTile.distance;
-        this.refreshUI(uiContainer);
-        this.clearAllTileEvents();
+        this.selectTile(uiContainer, this.selectedSquad, cell);
       }
     });
   }
@@ -411,7 +388,11 @@ export class MapScene extends Phaser.Scene {
     return Math.abs(target.x - source.x) + Math.abs(target.y - source.y);
   }
 
-  selectTile(uiContainer: Container, unitId: string, x: number, y: number) {
+  selectTile(
+    uiContainer: Container,
+    unitId: string,
+    {x, y, distance}: MapTile,
+  ) {
     console.log(`MapScene - selectTile`);
     const chara = this.squads.find((c) => c.unit.id === unitId);
     const force = Map.forces.find((force) => force.id === PLAYER_FORCE);
@@ -431,6 +412,10 @@ export class MapScene extends Phaser.Scene {
     // FIXME: local state mutation
     squad.x = x;
     squad.y = y;
+
+    squad.remainingMoves = squad.remainingMoves - distance;
+    this.refreshUI(uiContainer);
+    this.clearAllTileEvents();
   }
 
   moveUnit = (chara: Chara, path: Coordinate[]) => {

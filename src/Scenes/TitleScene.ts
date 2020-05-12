@@ -1,10 +1,9 @@
 import Phaser from 'phaser';
-import {getSquads, getUnit} from '../DB';
-import defaultData, {randomItem} from '../defaultData';
-
+import {getSquads} from '../DB';
+import defaultData from '../defaultData';
 import {preload} from '../preload';
 import button from '../UI/button';
-import {Chara} from '../Chara/Chara';
+import plains from '../Backgrounds/plains';
 
 export default class TitleScene extends Phaser.Scene {
   constructor() {
@@ -12,11 +11,9 @@ export default class TitleScene extends Phaser.Scene {
   }
   preload = preload;
   create() {
-    // dynamic creation of scenes
-    //
-    this.add.image(0, 0, 'backgrounds/squad_edit');
+    plains(this);
 
-    const container = this.add.container(0,0);
+    const container = this.add.container(0, 0);
 
     button(20, 50, 'List Units', container, this, () => {
       this.scene.transition({
@@ -44,7 +41,7 @@ export default class TitleScene extends Phaser.Scene {
     });
 
     button(20, 250, 'Combat', container, this, () => {
-      this.scene.start('CombatScene',{top:"0",bottom:"3"});
+      this.scene.start('CombatScene', {top: '0', bottom: '3'});
     });
 
     button(20, 600, 'Erase Data', container, this, () => {
@@ -55,7 +52,5 @@ export default class TitleScene extends Phaser.Scene {
     button(220, 600, 'Go Fullscreen', container, this, () => {
       window.document.body.requestFullscreen();
     });
-
-
   }
 }

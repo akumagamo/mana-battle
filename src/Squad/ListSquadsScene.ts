@@ -4,10 +4,11 @@ import {Squad} from '../Squad/Model';
 import * as api from '../DB';
 import BoardScene from '../Board/StaticBoardScene';
 import {Container, Pointer, Image, Text} from '../Models';
+import button from '../UI/button';
 
 export class ListSquadsScene extends Phaser.Scene {
   boardScenes: BoardScene[] = [];
-  controls: (Image|Text)[] = [];
+  controls: (Image | Text)[] = [];
   selectedSquadInfo: Container | null = null;
   page: number = 0;
   itemsPerPage: number = 9;
@@ -52,29 +53,23 @@ export class ListSquadsScene extends Phaser.Scene {
   renderSelectSquadInfo(squad: Squad) {
     if (this.selectedSquadInfo) this.selectedSquadInfo.destroy();
 
+    this.selectedSquadInfo?.destroy();
     this.selectedSquadInfo = this.add.container(0, 0);
-    this.selectedSquadInfo.name = squad.id
+    this.selectedSquadInfo.name = squad.id;
 
     const squadLeader = this.add.text(10, 680, squad.name);
     this.selectedSquadInfo.add(squadLeader);
 
-    const editBtn = this.add.text(1100, 350, 'Edit');
-    editBtn.setInteractive();
-    editBtn.on(`pointerdown`, () => {
+    button(1100, 350, 'Edit', this.selectedSquadInfo, this, () => {
       this.editSquad(squad);
     });
-    this.selectedSquadInfo.add(editBtn);
 
-    const removeSquadBtn = this.add.text(1100, 400, 'Disband Squad');
-    removeSquadBtn .setInteractive();
-    removeSquadBtn .on('pointerdown', () => {
-      if(this.selectedSquadInfo){
-        api.disbandSquad(this.selectedSquadInfo.name)
+    button(1100, 400, 'Disband Squad', this.selectedSquadInfo, this, () => {
+      if (this.selectedSquadInfo) {
+        api.disbandSquad(this.selectedSquadInfo.name);
         this.refresh();
       }
     });
-    this.selectedSquadInfo.add(removeSquadBtn);
-
   }
 
   renderBoard(squad: Squad, x: number, y: number) {
@@ -87,11 +82,8 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   renderControls() {
-    const returnBtn = this.add.text(1100, 10, 'Return to title');
-    returnBtn.setInteractive();
-    returnBtn.on('pointerdown', () => {
+    button(1100, 10, 'Return to Title', this.add.container(0, 0), this, () => {
       this.removeChildren();
-
       this.scene.transition({
         target: 'TitleScene',
         duration: 0,
@@ -99,11 +91,7 @@ export class ListSquadsScene extends Phaser.Scene {
       });
     });
 
-    this.controls.push(returnBtn)
-
-    const createSquadBtn = this.add.text(1100, 600, 'Create Squad');
-    createSquadBtn.setInteractive();
-    createSquadBtn.on('pointerdown', () => {
+    button(1100, 600, 'Create Squad', this.add.container(0, 0), this, () => {
       this.removeChildren();
 
       const squads = Object.keys(api.getSquads());
@@ -121,8 +109,6 @@ export class ListSquadsScene extends Phaser.Scene {
         },
       });
     });
-
-    this.controls.push(createSquadBtn)
 
     this.renderNavigation();
   }
@@ -143,7 +129,7 @@ export class ListSquadsScene extends Phaser.Scene {
       });
     }
 
-    this.controls.push(prev)
+    this.controls.push(prev);
 
     const next = this.add.image(500, 630, 'arrow_right');
 
@@ -160,13 +146,10 @@ export class ListSquadsScene extends Phaser.Scene {
       next.setAlpha(0.5);
     }
 
-    this.controls.push(next)
-
-
-
+    this.controls.push(next);
   }
 
-  refresh(){
+  refresh() {
     this.removeChildren();
     this.renderSquadList();
     this.renderControls();
