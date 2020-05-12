@@ -24,18 +24,23 @@ jobs:
 
     - name: Install deps
       run: yarn
+      
+
 
     - name: Test
       run: yarn test
 
     - name: Build
       run: yarn deploy
+      
+    - name: List
+      run: ls -l
 
     - name: Create Assets dir
-      run: mkdir ./dist/assets
+      run: mkdir dist && mkdir dist/assets
 
     - name: Copy Assets
-      run: cp -r ./assets ./dist/assets
+      run: cp -r assets/ dist/assets/
 
     - name: Publish 🚀
       uses: JamesIves/github-pages-deploy-action@releases/v3
