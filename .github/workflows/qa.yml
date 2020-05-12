@@ -34,7 +34,7 @@ jobs:
       run: yarn deploy
 
     - name: Copy Assets
-      run: cp -r assets/ dist/
+      run: cp -r assets/ dist/assets/
 
     - name: Publish 🚀
       uses: JamesIves/github-pages-deploy-action@releases/v3
