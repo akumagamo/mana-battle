@@ -18,7 +18,7 @@ module.exports = {
     vendor: ['phaser'],
   },
   output: {
-    path: path.resolve(__dirname, 'build'),
+    path: path.resolve(__dirname, 'dist'),
     publicPath: './',
     filename: 'js/bundle.js',
   },
