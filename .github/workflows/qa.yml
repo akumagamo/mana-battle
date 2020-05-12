@@ -32,19 +32,13 @@ jobs:
 
     - name: Build
       run: yarn deploy
-      
-    - name: List
-      run: ls -l
-
-    - name: Create Assets dir
-      run: mkdir dist && mkdir dist/assets
 
     - name: Copy Assets
-      run: cp -r assets/ dist/assets/
+      run: cp -r assets/ dist/
 
     - name: Publish 🚀
       uses: JamesIves/github-pages-deploy-action@releases/v3
       with:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        BRANCH: gh-pages # The branch the action should deploy to.
-        FOLDER: dist # The folder the action should deploy.
+        BRANCH: gh-pages
+        FOLDER: dist
