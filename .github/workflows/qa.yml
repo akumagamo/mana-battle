@@ -32,14 +32,9 @@ jobs:
       run: yarn deploy
 
     - name: Copy Assets
-      uses: andstor/copycat-action@v3
-      with:
-        personal_token: ${{ secrets.PERSONAL_TOKEN }}
-        src_path: /assets
-        dst_path: /dist/assets  
-        dst_owner: lfarroco
-        dst_repo_name: mana-phaser  
-        dst_branch_name: gh-pages
+    - shell: bash
+      run: |
+          cp -r ./assets ./dist/assets
 
     - name: Publish 🚀
       uses: JamesIves/github-pages-deploy-action@releases/v3
