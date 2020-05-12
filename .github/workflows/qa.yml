@@ -28,7 +28,7 @@ jobs:
     - name: Test
       run: yarn test
 
-    - name: Build :gear:
+    - name: Build
       run: yarn deploy
 
     - name: Create Assets dir
