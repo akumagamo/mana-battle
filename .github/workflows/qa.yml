@@ -24,21 +24,20 @@ jobs:
 
     - name: Install deps
       run: yarn
-
+      
     - name: Test
       run: yarn test
 
-    - name: Deploy
+    - name: Build
       run: yarn deploy
 
     - name: Copy Assets
-    - shell: bash
-      run: |
-          cp -r ./assets ./dist/assets
-
-    - name: Publish 🚀
-      uses: JamesIves/github-pages-deploy-action@releases/v3
+      run: mkdir dist/assets && cp -r assets/ dist/assets/
+    
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
       with:
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        BRANCH: gh-pages # The branch the action should deploy to.
-        FOLDER: dist # The folder the action should deploy.
+        deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+        external_repository: lfarroco/mana_public
+        publish_branch: gh-pages
+        publish_dir: ./dist
