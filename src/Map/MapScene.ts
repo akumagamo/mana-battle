@@ -57,11 +57,8 @@ const Map: MapBoard = {
       id: '1',
       name: 'CPU',
       squads: [
-        {id: '2', x: 3, y: 2, moves: 5, remainingMoves: 5},
-        {id: '3', x: 3, y: 1, moves: 5, remainingMoves: 5},
-        {id: '4', x: 4, y: 2, moves: 5, remainingMoves: 5},
-        {id: '5', x: 4, y: 1, moves: 5, remainingMoves: 5},
-        {id: '6', x: 3, y: 0, moves: 5, remainingMoves: 5},
+        {id: '1', x: 0, y: 3, moves: 5, remainingMoves: 5},
+        {id: '2', x: 3, y: 1, moves: 5, remainingMoves: 5},
       ],
     },
   ],

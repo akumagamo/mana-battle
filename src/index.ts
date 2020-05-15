@@ -6,6 +6,7 @@ import {ListSquadsScene} from './Squad/ListSquadsScene';
 import {ListUnitsScene} from './Unit/ListUnits';
 import {MapScene} from './Map/MapScene';
 import CombatScene from './Combat/CombatScene';
+import defaultData from './defaultData';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -26,6 +27,19 @@ const config: Phaser.Types.Core.GameConfig = {
   ],
 };
 
-const game = new Phaser.Game(config);
+const getTimeout = () => {
+  if (localStorage.getItem('player') === null) {
+    defaultData(true);
+    // TODO: improve this
+    // Forcing a small delay to allow writing data
+    // We can improve this by checking if all keys are available
+    return 50;
+  } else {
+    return 0;
+  }
+};
 
-game.scale.lockOrientation(Phaser.Scale.PORTRAIT);
+setTimeout(() => {
+  const game = new Phaser.Game(config);
+  game.scale.lockOrientation(Phaser.Scale.PORTRAIT);
+}, getTimeout());

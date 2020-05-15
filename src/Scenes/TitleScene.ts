@@ -45,7 +45,7 @@ export default class TitleScene extends Phaser.Scene {
     });
 
     button(20, 600, 'Erase Data', container, this, () => {
-      defaultData();
+      defaultData(true);
       alert('Data erased!');
     });
 

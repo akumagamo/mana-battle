@@ -1,4 +1,4 @@
-import { UnitClass, Unit, UnitMap } from './Unit/Model';
+import {UnitClass, Unit, UnitMap} from './Unit/Model';
 import {
   Item,
   ItemType,
@@ -8,17 +8,14 @@ import {
   ItemModifiers,
   ItemSlot,
   ItemMap,
-  ItemTypeSlots
+  ItemTypeSlots,
 } from './Item/Model';
 import itemsJSON from './constants/items.json';
-import { idfy } from './utils/idfy';
-import { fromJSON } from './Unit/serializer';
-import { indexById } from './utils';
-import { SquadMap } from './Squad/Model';
-import { Player } from './Player/Model';
-
-// cleans up data on boot
-const OVERRIDE = true;
+import {idfy} from './utils/idfy';
+import {fromJSON} from './Unit/serializer';
+import {indexById} from './utils';
+import {SquadMap} from './Squad/Model';
+import {Player} from './Player/Model';
 
 export const classes: UnitClass[] = ['fighter', 'apprentice'];
 
@@ -26,7 +23,7 @@ export const randomItem = (items: any[]) =>
   items[Math.floor(Math.random() * items.length)];
 
 export var units: UnitMap = indexById(
-  Array.from({ length: 70 }, (x, i) => i).map(unitJSON => fromJSON(unitJSON))
+  Array.from({length: 70}, (_, i) => i).map((unitJSON) => fromJSON(unitJSON)),
 );
 
 function squad(n: number, leader: Unit) {
@@ -37,8 +34,8 @@ function squad(n: number, leader: Unit) {
     name: leader.name,
     emblem: 'Emoji',
     members: {
-      [leader.id]: { id: leader.id, leader: true, x: 2, y: 2 }
-    }
+      [leader.id]: {id: leader.id, leader: true, x: 2, y: 2},
+    },
   };
 }
 
@@ -46,21 +43,21 @@ export var squads: SquadMap = {};
 for (var j = 0; j < 15; j++) squads[j.toString()] = squad(j, units[j]);
 
 function makeItem(acc: Item[], itemData: any): Item[] {
-  const { type, name } = itemData;
+  const {type, name} = itemData;
 
   const modifierList = Object.keys(modifiers) as Modifier[];
 
   const reduceModifiers = (acc: ItemModifiers, [k, v]: [Modifier, string]) => {
-    if (modifierList.includes(k)) return { ...acc, [k]: parseInt(v) };
+    if (modifierList.includes(k)) return {...acc, [k]: parseInt(v)};
     else return acc;
   };
   const itemModifierList = Object.entries(itemData).filter(
-    ([k]) => !['name', 'type', 'description'].includes(k) 
+    ([k]) => !['name', 'type', 'description'].includes(k),
   );
 
   const itemModifiers: ItemModifiers = (itemModifierList as [
     Modifier,
-    string
+    string,
   ][]).reduce(reduceModifiers, modifiers);
 
   const slot: ItemSlot = itemTypeSlots[type as ItemType];
@@ -74,8 +71,8 @@ function makeItem(acc: Item[], itemData: any): Item[] {
         type: type,
         slot: slot,
         description: itemData.description,
-        modifiers: itemModifiers
-      }
+        modifiers: itemModifiers,
+      },
     ]);
 }
 
@@ -87,31 +84,31 @@ export var player: Player = {
   gold: 100,
   iventory: {
     iron_sword: 2,
-    steel_sword: 1
-  }
+    steel_sword: 1,
+  },
 };
 
 const data: [
   string,
-  UnitMap | SquadMap | ItemMap | ItemTypeSlots | Player
+  UnitMap | SquadMap | ItemMap | ItemTypeSlots | Player,
 ][] = [
   ['units', units],
   ['squads', squads],
   ['items', items],
   ['itemTypes', itemTypeSlots],
-  ['player', player]
+  ['player', player],
 ];
 
 export const clearDB = () => {
-  data.forEach(([k, v]) => {
-    localStorage.setItem(k, JSON.stringify(v));
-  });
-  alert('db cleared!');
+  defaultData(true);
+  alert('Data Cleared!');
 };
 
-export default () => {
+const defaultData = (override: boolean) => {
   data.forEach(([k, v]) => {
-    if (localStorage.getItem(k) === null || OVERRIDE)
+    if (localStorage.getItem(k) === null || override)
       localStorage.setItem(k, JSON.stringify(v));
   });
 };
+
+export default defaultData;
