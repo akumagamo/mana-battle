@@ -1,5 +1,4 @@
 import * as Phaser from 'phaser';
-import {preload} from '../preload';
 import * as api from '../DB';
 import {Container} from '../Models';
 import {Chara} from '../Chara/Chara';
@@ -19,8 +18,6 @@ export class UnitDetailsBarScene extends Phaser.Scene {
     super('UnitDetailsBarScene');
   }
 
-  preload = preload;
-
   create() {
     this.itemDetail = new ItemDetailWindowScene();
     this.scene.add('item-detail', this.itemDetail, true);
@@ -37,10 +34,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
     this.container = this.add.container(10, 520);
   }
 
-  renderBgLayer() {
-    
-
-  }
+  renderBgLayer() {}
 
   render(unitId: string) {
     this.clearChildren();
@@ -118,7 +112,6 @@ export class UnitDetailsBarScene extends Phaser.Scene {
       icon.setInteractive();
       icon.on('pointerdown', () => {
         console.log(`clicked1!!`, slotId);
-
 
         this.itemDetail?.render(slot.id, unit.id, () => this.render(unit.id));
 

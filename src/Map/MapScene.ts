@@ -1,6 +1,5 @@
 import * as Phaser from 'phaser';
 import {Chara} from '../Chara/Chara';
-import {preload} from '../preload';
 import {getSquad, getSquadLeader} from '../DB';
 import {INVALID_STATE} from '../errors';
 import button from '../UI/button';
@@ -120,8 +119,6 @@ export class MapScene extends Phaser.Scene {
   constructor() {
     super('MapScene');
   }
-
-  preload = preload;
 
   getPos(x: number, y: number) {
     return {

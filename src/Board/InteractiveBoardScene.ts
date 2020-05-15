@@ -1,7 +1,6 @@
 import * as Phaser from 'phaser';
 import {Chara} from '../Chara/Chara';
 import {Image} from '../Models';
-import {preload} from '../preload';
 import {SquadMember, Squad} from '../Squad/Model';
 import {cartesianToIsometric} from '../utils/isometric';
 import {getUnit, changeSquadMemberPosition} from '../DB';
@@ -26,8 +25,6 @@ export default class BoardScene extends Phaser.Scene {
     super(BOARD_SCENE_KEY);
     console.log(`boardScene constructor`);
   }
-
-  preload = preload;
 
   create() {
     this.tiles = this.placeTiles({
@@ -178,7 +175,6 @@ export default class BoardScene extends Phaser.Scene {
     const chara = new Chara(key, this, unit, x, y, 1, true);
 
     chara.enableDrag(this.onUnitDrag.bind(this), this.onUnitDragEnd.bind(this));
-
 
     return chara;
   }

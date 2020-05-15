@@ -1,5 +1,4 @@
 import * as Phaser from 'phaser';
-import {preload} from '../preload';
 import * as api from '../DB';
 import {Text} from '../Models';
 import {Chara} from '../Chara/Chara';
@@ -18,10 +17,7 @@ export class ListUnitsScene extends Phaser.Scene {
     super('ListUnitsScene');
   }
 
-  preload = preload;
-
   create() {
-
     this.detailsBar = new UnitDetailsBarScene();
     this.renderUnitsList();
 
@@ -30,7 +26,7 @@ export class ListUnitsScene extends Phaser.Scene {
     button(1120, 20, 'Back to Title', this.add.container(0, 0), this, () => {
       this.removeChildren();
 
-      this.scene.remove('UnitDetailsBarScene')
+      this.scene.remove('UnitDetailsBarScene');
 
       this.scene.transition({
         target: 'TitleScene',

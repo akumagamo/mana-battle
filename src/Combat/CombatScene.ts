@@ -1,5 +1,4 @@
 import * as Phaser from 'phaser';
-import {preload} from '../preload';
 import {Chara} from '../Chara/Chara';
 import * as DB from '../DB';
 import {cartesianToIsometricBattle} from '../utils/isometric';
@@ -40,7 +39,6 @@ export default class CombatScene extends Phaser.Scene {
   constructor() {
     super('CombatScene');
   }
-  preload = preload;
 
   updateUnit(unit: Unit) {
     this.units = this.units.map((u) => {

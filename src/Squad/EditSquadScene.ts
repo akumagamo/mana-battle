@@ -1,6 +1,5 @@
 import * as Phaser from 'phaser';
 import {Chara} from '../Chara/Chara';
-import {preload} from '../preload';
 import {Squad} from '../Squad/Model';
 import {addUnitToSquad} from '../DB';
 import UnitListScene from '../Unit/UnitListScene';
@@ -16,8 +15,6 @@ export class EditSquadScene extends Phaser.Scene {
     super('EditSquadScene');
     console.log('EditSquadScene constructor. this:', this);
   }
-
-  preload = preload;
 
   create({squad}: {squad: Squad}) {
     this.add.image(0, 0, 'backgrounds/squad_edit');

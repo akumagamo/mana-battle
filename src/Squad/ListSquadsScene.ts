@@ -1,5 +1,4 @@
 import * as Phaser from 'phaser';
-import {preload} from '../preload';
 import {Squad} from '../Squad/Model';
 import * as api from '../DB';
 import BoardScene from '../Board/StaticBoardScene';
@@ -16,8 +15,6 @@ export class ListSquadsScene extends Phaser.Scene {
   constructor() {
     super('ListSquadsScene');
   }
-
-  preload = preload;
 
   create() {
     this.renderSquadList();

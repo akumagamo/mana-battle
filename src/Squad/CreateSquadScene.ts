@@ -1,11 +1,6 @@
 import * as Phaser from 'phaser';
-import {Chara} from '../Chara/Chara';
-import {preload} from '../preload';
-import {Squad} from '../Squad/Model';
-import {addUnitToSquad} from '../DB';
 import UnitListScene from '../Unit/UnitListScene';
 import {Unit} from '../Unit/Model';
-import BoardScene, {BOARD_SCENE_KEY} from '../Board/InteractiveBoardScene';
 
 export class CreateSquadScene extends Phaser.Scene {
   unitListScene: UnitListScene | null = null;
@@ -13,8 +8,6 @@ export class CreateSquadScene extends Phaser.Scene {
   constructor() {
     super('CreateSquadScene');
   }
-
-  preload = preload;
 
   create() {
     this.add.image(0, 0, 'backgrounds/squad_edit');
@@ -25,10 +18,10 @@ export class CreateSquadScene extends Phaser.Scene {
     console.log(`btn`);
   }
 
-
   renderUnitList() {
-    this.unitListScene = new UnitListScene(100,40);
-    this.unitListScene.onUnitClick = (unit:Unit)=>console.log(`hello from crete scene`,unit)
+    this.unitListScene = new UnitListScene(100, 40);
+    this.unitListScene.onUnitClick = (unit: Unit) =>
+      console.log(`hello from crete scene`, unit);
     this.scene.add('UnitListScene', this.unitListScene, true);
   }
 
@@ -38,7 +31,6 @@ export class CreateSquadScene extends Phaser.Scene {
     const btn = this.add.text(1100, 100, 'Return to title');
     btn.setInteractive();
     btn.on('pointerdown', () => {
-
       this.destroyChildren();
 
       this.scene.transition({
@@ -46,12 +38,10 @@ export class CreateSquadScene extends Phaser.Scene {
         duration: 0,
         moveBelow: true,
       });
-
     });
     const list = this.add.text(1100, 200, 'Return to list');
     list.setInteractive();
     list.on('pointerdown', () => {
-
       this.destroyChildren();
 
       this.scene.transition({
@@ -59,7 +49,6 @@ export class CreateSquadScene extends Phaser.Scene {
         duration: 0,
         moveBelow: true,
       });
-
     });
 
     console.log(`done`);

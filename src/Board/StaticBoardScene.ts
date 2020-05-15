@@ -1,12 +1,10 @@
 import * as Phaser from 'phaser';
 import {Chara} from '../Chara/Chara';
-import {preload} from '../preload';
 import {SquadMember, Squad} from '../Squad/Model';
 import {cartesianToIsometric} from '../utils/isometric';
-import {getUnit, changeSquadMemberPosition} from '../DB';
-import {Unit} from '../Unit/Model';
+import {getUnit} from '../DB';
 import {BoardTile} from './Model';
-import {Container, Graphics} from '../Models';
+import {Graphics} from '../Models';
 
 const BOARD_WIDTH = 250;
 const BOARD_HEIGHT = 150;
@@ -28,8 +26,6 @@ export default class StaticBoardScene extends Phaser.Scene {
     super(makeId(squad));
   }
 
-  preload = preload;
-
   create() {
     this.tiles = this.placeTiles({
       mapWidth: 3,
@@ -37,15 +33,14 @@ export default class StaticBoardScene extends Phaser.Scene {
     });
     this.placeUnits();
 
-
     // DEBUG DRAG CONTAINER
     this.makeOverlay();
   }
 
-  destroy(parentScene:Phaser.Scene) {
+  destroy(parentScene: Phaser.Scene) {
     // For some reason, this.scene returns null after the scene is recreated...
     // so I am passing the "parent" scene as a reference
-    console.log(`lets remove a board`, this)
+    console.log(`lets remove a board`, this);
     this.tiles.forEach((tile) => tile.sprite.destroy());
 
     this.unitList.forEach((chara) => {
@@ -53,7 +48,7 @@ export default class StaticBoardScene extends Phaser.Scene {
       parentScene.scene.remove(key);
     });
 
-    console.log(`removing board scene`, this.scene.key)
+    console.log(`removing board scene`, this.scene.key);
     parentScene.scene.remove(makeId(this.squad));
   }
 
@@ -170,7 +165,6 @@ export default class StaticBoardScene extends Phaser.Scene {
   }
 }
 
-function makeId(squad:Squad){
-return `static-squad-${squad.id}`
-
+function makeId(squad: Squad) {
+  return `static-squad-${squad.id}`;
 }

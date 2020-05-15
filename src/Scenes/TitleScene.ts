@@ -3,7 +3,6 @@ import {getSquads} from '../DB';
 import defaultData from '../defaultData';
 import {preload} from '../preload';
 import button from '../UI/button';
-import plains from '../Backgrounds/plains';
 
 export default class TitleScene extends Phaser.Scene {
   constructor() {
@@ -11,8 +10,6 @@ export default class TitleScene extends Phaser.Scene {
   }
   preload = preload;
   create() {
-    plains(this);
-
     const container = this.add.container(0, 0);
 
     button(20, 50, 'List Units', container, this, () => {
