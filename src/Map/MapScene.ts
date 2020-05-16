@@ -168,10 +168,10 @@ export class MapScene extends Phaser.Scene {
       }),
     );
   }
-  makeInteractive(uiContainer: Container, cell: MapTile) {
+  makeInteractive(container: Container, uiContainer: Container, cell: MapTile) {
     cell.tile.on('pointerdown', () => {
       if (this.selectedSquad) {
-        this.selectTile(uiContainer, this.selectedSquad, cell);
+        this.selectTile(container, uiContainer, this.selectedSquad, cell);
       }
     });
   }
@@ -246,12 +246,12 @@ export class MapScene extends Phaser.Scene {
             if (path && path.length <= range + 1) {
               cell.tile.setTint(WALKABLE_CELL_TINT);
               cell.distance = path.length - 1;
-              this.makeInteractive(uiContainer, cell);
+              this.makeInteractive(container, uiContainer, cell);
             }
           });
         });
 
-        this.refreshUI(uiContainer);
+        this.refreshUI(container, uiContainer);
       } else {
         Map.forces
           .filter((force) => force.id === PLAYER_FORCE)
@@ -280,22 +280,22 @@ export class MapScene extends Phaser.Scene {
     });
   }
 
-  refreshUI(container: Container) {
-    container.destroy();
-
-    this.renderUI(this.add.container(0, 0));
+  refreshUI(container: Container, uiContainer: Container) {
+    this.renderUI(container, uiContainer);
   }
 
-  renderUI(container: Container) {
+  renderUI(container: Container, uiContainer: Container) {
     console.log(`MapScene - renderUI`);
 
-    container.add(
+    uiContainer.removeAll();
+
+    uiContainer.add(
       panel(
         BOTTOM_PANEL_X,
         BOTTOM_PANEL_Y,
         BOTTOM_PANEL_WIDTH,
         BOTTOM_PANEL_HEIGHT,
-        container,
+        uiContainer,
         this,
       ),
     );
@@ -306,14 +306,14 @@ export class MapScene extends Phaser.Scene {
       const squad = getSquad(this.selectedSquad);
       const forceSquad = this.getForceSquad(force, this.selectedSquad);
 
-      text(20, 610, squad.name, container, this);
+      text(20, 610, squad.name, uiContainer, this);
 
-      text(1000, 610, `${forceSquad.remainingMoves} moves`, container, this);
+      text(1000, 610, `${forceSquad.remainingMoves} moves`, uiContainer, this);
     }
 
-    button(1100, 50, 'Return to Title', this.add.container(0, 0), this, () => {
-      this.squads.forEach((c) => this.scene.remove('chara' + c.unit.id));
-      container.destroy();
+    button(1100, 50, 'Return to Title', uiContainer, this, () => {
+      container.removeAll();
+      this.squads.forEach((c) => this.scene.remove(c.scene.key));
       this.squads = [];
       this.tiles = [];
 
@@ -330,7 +330,7 @@ export class MapScene extends Phaser.Scene {
     const uiContainer = this.add.container(0, 0);
     this.renderMap(container, uiContainer);
     this.renderUnits(container, uiContainer);
-    this.renderUI(uiContainer);
+    this.renderUI(container, uiContainer);
 
     this.runTurn();
   }
@@ -383,6 +383,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   selectTile(
+    container: Container,
     uiContainer: Container,
     unitId: string,
     {x, y, distance}: MapTile,
@@ -408,7 +409,7 @@ export class MapScene extends Phaser.Scene {
     squad.y = y;
 
     squad.remainingMoves = squad.remainingMoves - distance;
-    this.refreshUI(uiContainer);
+    this.refreshUI(container, uiContainer);
     this.clearAllTileEvents();
   }
 
