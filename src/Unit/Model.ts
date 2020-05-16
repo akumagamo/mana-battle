@@ -1,8 +1,8 @@
-import { Modifier, ItemSlot, ItemMap } from '../Item/Model';
-import { sum } from '../utils/math';
-import { Container } from '../Models';
+import {Modifier, ItemSlot, ItemMap} from '../Item/Model';
+import {sum} from '../utils/math';
+import {Container} from '../Models';
 
-export type UnitMap = { [x: string]: Unit };
+export type UnitMap = {[x: string]: Unit};
 
 export type Stat = 'str' | 'agi' | 'dex' | 'vit' | 'int' | 'wis';
 
@@ -15,7 +15,7 @@ export type Elem =
   | 'shadow'
   | 'neutral';
 
-export type UnitClass = 'fighter' | 'apprentice' | 'archer';
+export type UnitClass = 'fighter' | 'apprentice' | 'archer' | 'knight';
 export type Movement = 'plain' | 'mountain' | 'sky' | 'forest';
 
 /**
@@ -61,12 +61,12 @@ export type AnimatedUnit = Unit & Animated;
 
 export const makeAnimatedUnit: (
   scene: Phaser.Scene,
-  unit: Unit
+  unit: Unit,
 ) => AnimatedUnit = (scene: Phaser.Scene, unit: Unit) => {
   return {
     ...unit,
     container: scene.add.container(0, 0),
-    tweens: []
+    tweens: [],
   };
 };
 
@@ -74,7 +74,7 @@ function getItemModifier({
   unit,
   stat,
   items,
-  slot
+  slot,
 }: {
   unit: Unit;
   stat: Modifier;
@@ -100,8 +100,8 @@ const equipKeys: ItemSlot[] = ['mainHand', 'offHand', 'chest', 'ornament'];
 export function getActualStat(stat: Stat, items: ItemMap, unit: Unit) {
   const value = unit[stat];
 
-  const values = equipKeys.map(equip =>
-    getItemModifier({ unit, stat, items, slot: equip })
+  const values = equipKeys.map((equip) =>
+    getItemModifier({unit, stat, items, slot: equip}),
   );
 
   return value + values.reduce(sum, 0);
@@ -109,7 +109,7 @@ export function getActualStat(stat: Stat, items: ItemMap, unit: Unit) {
 
 export function getUnitsWithoutSquad(map: UnitMap) {
   return Object.values(map).reduce(
-    (acc, curr) => (curr.squad ? acc : { ...acc, [curr.id]: curr }),
-    {} as UnitMap
+    (acc, curr) => (curr.squad ? acc : {...acc, [curr.id]: curr}),
+    {} as UnitMap,
   );
 }

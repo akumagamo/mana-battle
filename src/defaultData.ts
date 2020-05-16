@@ -17,7 +17,7 @@ import {indexById} from './utils';
 import {SquadMap} from './Squad/Model';
 import {Player} from './Player/Model';
 
-export const classes: UnitClass[] = ['fighter', 'apprentice'];
+export const classes: UnitClass[] = ['fighter', 'knight'];
 
 export const randomItem = (items: any[]) =>
   items[Math.floor(Math.random() * items.length)];

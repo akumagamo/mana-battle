@@ -1,9 +1,38 @@
 import {Chara} from '../Chara';
-import {LEFT_FOOT_FRONT_X, LEFT_FOOT_FRONT_Y, RIGHT_FOOT_FRONT_Y, RIGHT_FOOT_FRONT_X, LEFT_HAND_FRONT_X, LEFT_HAND_FRONT_Y, TRUNK_FRONT_X, TRUNK_FRONT_Y, HEAD_FRONT_Y, HEAD_FRONT_X, RIGHT_HAND_FRONT_X, RIGHT_HAND_FRONT_Y, RIGHT_HAND_BACK_X, RIGHT_HAND_BACK_Y, LEFT_FOOT_BACK_X, RIGHT_FOOT_BACK_Y, RIGHT_FOOT_BACK_X, LEFT_FOOT_BACK_Y, TRUNK_BACK_X, TRUNK_BACK_Y, HEAD_BACK_X, HEAD_BACK_Y, LEFT_HAND_BACK_Y, LEFT_HAND_BACK_X} from './constants';
+import {
+  LEFT_FOOT_FRONT_X,
+  LEFT_FOOT_FRONT_Y,
+  RIGHT_FOOT_FRONT_Y,
+  RIGHT_FOOT_FRONT_X,
+  LEFT_HAND_FRONT_X,
+  LEFT_HAND_FRONT_Y,
+  TRUNK_FRONT_X,
+  TRUNK_FRONT_Y,
+  HEAD_FRONT_Y,
+  HEAD_FRONT_X,
+  RIGHT_HAND_FRONT_X,
+  RIGHT_HAND_FRONT_Y,
+  RIGHT_HAND_BACK_X,
+  RIGHT_HAND_BACK_Y,
+  LEFT_FOOT_BACK_X,
+  RIGHT_FOOT_BACK_Y,
+  RIGHT_FOOT_BACK_X,
+  LEFT_FOOT_BACK_Y,
+  TRUNK_BACK_X,
+  TRUNK_BACK_Y,
+  HEAD_BACK_X,
+  HEAD_BACK_Y,
+  LEFT_HAND_BACK_Y,
+  LEFT_HAND_BACK_X,
+} from './constants';
 
 function front(scene: Chara) {
   const renderHead = (gx: number, gy: number) => {
-    const head = scene.add.image(gx, gy, 'head' + scene.unit.style.head.toString());
+    const head = scene.add.image(
+      gx,
+      gy,
+      'head' + scene.unit.style.head.toString(),
+    );
     scene.container?.add(head);
     return head;
   };
@@ -14,12 +43,8 @@ function front(scene: Chara) {
     return foot;
   };
 
-  const renderTrunk = (trunkX: number, trunkY: number) => {
-    const trunk = scene.add.image(
-      trunkX,
-      trunkY,
-      'trunk' + scene.unit.style.trunk.toString(),
-    );
+  const renderTrunk = (class_: string, trunkX: number, trunkY: number) => {
+    const trunk = scene.add.image(trunkX, trunkY, `trunk_${class_}`);
 
     scene.container?.add(trunk);
 
@@ -36,24 +61,26 @@ function front(scene: Chara) {
   scene.leftFoot = renderFoot(LEFT_FOOT_FRONT_X, LEFT_FOOT_FRONT_Y);
   scene.rightFoot = renderFoot(RIGHT_FOOT_FRONT_X, RIGHT_FOOT_FRONT_Y);
   scene.leftHand = renderHand(LEFT_HAND_FRONT_X, LEFT_HAND_FRONT_Y, -1);
-  scene.trunk = renderTrunk(TRUNK_FRONT_X, TRUNK_FRONT_Y);
+  scene.trunk = renderTrunk(scene.unit.class, TRUNK_FRONT_X, TRUNK_FRONT_Y);
   scene.head = renderHead(HEAD_FRONT_X, HEAD_FRONT_Y);
-
 
   scene.mainHandContainer = scene.add.container(
     RIGHT_HAND_FRONT_X,
     RIGHT_HAND_FRONT_Y,
   );
-  scene.mainHand = scene.add.image(10, 10, `equips/${scene.unit.equips.mainHand}`);
+  scene.mainHand = scene.add.image(
+    10,
+    10,
+    `equips/${scene.unit.equips.mainHand}`,
+  );
   scene.mainHandContainer.add(scene.mainHand);
   scene.mainHand.setScale(0.2);
   scene.mainHand.setOrigin(1, 1);
 
   scene.rightHand = renderHand(-2, 0, 1);
-  scene.rightHand.rotation = -2.2
+  scene.rightHand.rotation = -2.2;
   scene.container?.add(scene.mainHandContainer);
   scene.mainHandContainer.add(scene.rightHand);
-
 }
 function back(scene: Chara) {
   function renderHead(gx: number, gy: number) {
@@ -76,12 +103,8 @@ function back(scene: Chara) {
     return foot;
   }
 
-  function renderTrunk(trunkX: number, trunkY: number) {
-    const trunk = scene.add.image(
-      trunkX,
-      trunkY,
-      'back_trunk' + scene.unit.style.trunk.toString(),
-    );
+  function renderTrunk(class_: string, trunkX: number, trunkY: number) {
+    const trunk = scene.add.image(trunkX, trunkY, `trunk_back_${class_}`);
 
     scene.container?.add(trunk);
 
@@ -95,14 +118,17 @@ function back(scene: Chara) {
     return hand;
   }
 
-
   scene.mainHandContainer = scene.add.container(
     RIGHT_HAND_BACK_X,
     RIGHT_HAND_BACK_Y,
   );
   scene.container?.add(scene.mainHandContainer);
 
-  scene.mainHand = scene.add.image(-10, 20, `equips/${scene.unit.equips.mainHand}`);
+  scene.mainHand = scene.add.image(
+    -10,
+    20,
+    `equips/${scene.unit.equips.mainHand}`,
+  );
   scene.mainHandContainer.add(scene.mainHand);
   scene.mainHand.setScale(-0.2, 0.2);
   scene.mainHand.setOrigin(1, 1);
@@ -111,11 +137,11 @@ function back(scene: Chara) {
   scene.mainHandContainer.add(scene.rightHand);
 
   scene.rightFoot = renderFoot(RIGHT_FOOT_BACK_X, RIGHT_FOOT_BACK_Y);
-  scene.rightFoot.scaleY = -1
+  scene.rightFoot.scaleY = -1;
   scene.leftFoot = renderFoot(LEFT_FOOT_BACK_X, LEFT_FOOT_BACK_Y);
-  scene.leftFoot.scaleY = -1
+  scene.leftFoot.scaleY = -1;
 
-  scene.trunk = renderTrunk(TRUNK_BACK_X, TRUNK_BACK_Y);
+  scene.trunk = renderTrunk(scene.unit.class, TRUNK_BACK_X, TRUNK_BACK_Y);
   scene.head = renderHead(HEAD_BACK_X, HEAD_BACK_Y);
   scene.leftHand = renderHand(LEFT_HAND_BACK_X, LEFT_HAND_BACK_Y);
 }
