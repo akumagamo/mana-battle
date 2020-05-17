@@ -15,7 +15,12 @@ export type Elem =
   | 'shadow'
   | 'neutral';
 
-export type UnitClass = 'fighter' | 'apprentice' | 'archer' | 'knight';
+export type UnitClass =
+  | 'fighter'
+  | 'apprentice'
+  | 'archer'
+  | 'knight'
+  | 'wizard';
 export type Movement = 'plain' | 'mountain' | 'sky' | 'forest';
 
 /**

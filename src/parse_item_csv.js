@@ -1,14 +1,15 @@
-const csvFilePath = './constants/items.csv';
 const csv = require('csvtojson');
 const fs = require('fs');
+
+const csvFilePath = './constants/items.csv';
 
 console.log('Converting Items JSON...');
 csv()
   .fromFile(csvFilePath)
-  .then(jsonObj => {
+  .then((jsonObj) => {
     fs.writeFileSync(
       './constants/items.json',
-      JSON.stringify(jsonObj, null, 2)
+      JSON.stringify(jsonObj, null, 2),
     );
     console.log('Items converted!');
   });

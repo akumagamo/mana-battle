@@ -27,7 +27,7 @@ export function preload(this: {
     this.load.image('back_head' + n.toString(), PUBLIC_URL + '/back_head.svg');
   });
 
-  const classes = ['fighter', 'knight'];
+  const classes = ['fighter', 'knight', 'wizard'];
 
   classes.forEach((class_) => {
     this.load.image(`trunk_${class_}`, `${PUBLIC_URL}/trunk_${class_}.svg`);
@@ -53,6 +53,7 @@ export function preload(this: {
     'baldar_armor',
     'baldar_shield',
     'baldar_sword',
+    'oaken_staff',
   ];
   items.forEach((id: string) => {
     this.load.image(id, `${PUBLIC_URL}/items/${id}.png`);
@@ -62,6 +63,7 @@ export function preload(this: {
     'equips/iron_sword',
     'equips/steel_sword',
     'equips/baldar_sword',
+    'equips/oaken_staff',
   ];
   equips.forEach((id: string) => {
     this.load.image(id, `${PUBLIC_URL}/${id}.svg`);

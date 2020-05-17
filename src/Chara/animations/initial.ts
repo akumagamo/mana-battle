@@ -68,14 +68,22 @@ function front(scene: Chara) {
     RIGHT_HAND_FRONT_X,
     RIGHT_HAND_FRONT_Y,
   );
+
+  console.log(scene.unit.equips.mainHand);
   scene.mainHand = scene.add.image(
     10,
     10,
     `equips/${scene.unit.equips.mainHand}`,
   );
   scene.mainHandContainer.add(scene.mainHand);
-  scene.mainHand.setScale(0.2);
-  scene.mainHand.setOrigin(1, 1);
+
+  if (scene.unit.equips.mainHand === 'oaken_staff') {
+    scene.mainHand.setScale(0.3);
+    scene.mainHand.setOrigin(0.7, 0.7);
+  } else {
+    scene.mainHand.setScale(0.2);
+    scene.mainHand.setOrigin(1, 1);
+  }
 
   scene.rightHand = renderHand(-2, 0, 1);
   scene.rightHand.rotation = -2.2;

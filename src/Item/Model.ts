@@ -25,7 +25,7 @@ export type Modifier =
   | 'res_shadow';
 
 /**this is a map to ensure that all types are present */
-export const modifiers: { [x in Modifier]: number } = {
+export const modifiers: {[x in Modifier]: number} = {
   str: 0,
   agi: 0,
   dex: 0,
@@ -41,7 +41,7 @@ export const modifiers: { [x in Modifier]: number } = {
   res_earth: 0,
   res_wind: 0,
   res_light: 0,
-  res_shadow: 0
+  res_shadow: 0,
 };
 
 /**
@@ -53,6 +53,7 @@ export const modifiers: { [x in Modifier]: number } = {
 export type ItemType =
   | 'accessory'
   | 'sword'
+  | 'staff'
   | 'axe'
   | 'robe'
   | 'light_armor'
@@ -60,14 +61,15 @@ export type ItemType =
 
 export type ItemSlot = 'mainHand' | 'offHand' | 'chest' | 'ornament';
 
-export type ItemTypeSlots = { [x in ItemType]: ItemSlot };
+export type ItemTypeSlots = {[x in ItemType]: ItemSlot};
 export const itemTypeSlots: ItemTypeSlots = {
   accessory: 'ornament',
   sword: 'mainHand',
   axe: 'mainHand',
   robe: 'chest',
   light_armor: 'chest',
-  shield: 'offHand'
+  shield: 'offHand',
+  staff: 'mainHand',
 };
 
 type BaseItem = {
