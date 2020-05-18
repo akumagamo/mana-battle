@@ -73,6 +73,7 @@ export class ListUnitsScene extends Phaser.Scene {
       100 + y * 110,
       0.6,
       true,
+      false,
     );
 
     chara.onClick((unit: Chara) => {

@@ -79,7 +79,8 @@ function front(scene: Chara) {
 
   if (scene.unit.equips.mainHand === 'oaken_staff') {
     scene.mainHand.setScale(0.3);
-    scene.mainHand.setOrigin(0.7, 0.7);
+    scene.mainHand.setOrigin(0.45, 0.7);
+    scene.mainHand.setRotation(-0.2);
   } else {
     scene.mainHand.setScale(0.2);
     scene.mainHand.setOrigin(1, 1);

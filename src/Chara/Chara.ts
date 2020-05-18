@@ -36,6 +36,7 @@ export class Chara extends Phaser.Scene {
     public cy: number,
     public scaleSizing: number, // todo: rename
     public front: boolean,
+    public animated: boolean = true,
   ) {
     super(key);
 
@@ -43,7 +44,6 @@ export class Chara extends Phaser.Scene {
     return this;
   }
   create() {
-
     //the unit has two wrappers to allow multiple tweens at once
     this.charaWrapper = this.add.container(0, 0);
 
@@ -53,8 +53,9 @@ export class Chara extends Phaser.Scene {
 
     this.container.setDepth(this.cy);
 
-    initial(this)
-    this.stand()
+    initial(this);
+
+    if (this.animated) this.stand();
 
     this.maybeRenderInsignea();
 
@@ -157,24 +158,22 @@ export class Chara extends Phaser.Scene {
     stand(this);
   }
 
-  attack( onComplete: () => void) {
+  attack(onComplete: () => void) {
     attack(this, onComplete);
   }
 
-  flinch( damage:number, isKilled:boolean) {
+  flinch(damage: number, isKilled: boolean) {
     flinch(this, damage, isKilled);
   }
 
-  die(){
-
-    console.log(`die!!`)
+  die() {
+    console.log(`die!!`);
 
     this.tweens.add({
-      targets:this.container,
+      targets: this.container,
       alpha: 0,
-      duration: 1000
-    })
-
+      duration: 1000,
+    });
   }
 
   run() {
