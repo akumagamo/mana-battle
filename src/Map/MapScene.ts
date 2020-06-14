@@ -8,6 +8,7 @@ import * as easyStar from 'easystarjs';
 import panel from '../UI/panel';
 import text from '../UI/text';
 import {identity} from '../utils/functional';
+import {getPossibleMoves} from './api';
 
 const PLAYER_FORCE = '0';
 const WALKABLE_CELL_TINT = 0x99ff99;
@@ -28,36 +29,35 @@ const cellSize = 100;
 const boardPadding = 50;
 
 // 0-> grass
-// 5-> mountain1
-// 6-> mountain2
-// 7
-// 8
-// 3-> woods
+// 1-> woods
+// 2-> mountain
 //
 
 const walkableTiles = [10];
 
 const Map: MapBoard = {
   cells: [
-    [10, 11, 10, 10, 10, 10, 10, 10, 27, 22, 22, 22, 22],
-    [10, 11, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 11],
-    [10, 11, 10, 10, 10, 10, 10, 24, 20, 25, 10, 10, 11],
-    [10, 10, 10, 10, 10, 10, 10, 23, 11, 21, 10, 10, 11],
-    [10, 11, 10, 10, 10, 10, 10, 27, 22, 26, 10, 10, 11],
-    [11, 11, 11, 11, 11, 10, 10, 10, 10, 10, 10, 11, 11],
+    [0, 1, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2],
+    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 1, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 2, 1, 2, 0, 0, 1],
+    [0, 1, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 1],
+    [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1],
   ],
   forces: [
     {
       id: PLAYER_FORCE,
       name: 'Player',
-      squads: [{id: '0', x: 0, y: 0, moves: 5, remainingMoves: 5}],
+      units: [
+        {id: '0', x: 0, y: 0, moves: 5, remainingMoves: 5, validMoves: []},
+      ],
     },
     {
       id: '1',
       name: 'CPU',
-      squads: [
-        {id: '1', x: 0, y: 3, moves: 5, remainingMoves: 5},
-        {id: '2', x: 3, y: 1, moves: 5, remainingMoves: 5},
+      units: [
+        {id: '1', x: 0, y: 3, moves: 5, remainingMoves: 5, validMoves: []},
+        {id: '2', x: 3, y: 1, moves: 5, remainingMoves: 5, validMoves: []},
       ],
     },
   ],
@@ -68,19 +68,20 @@ const Map: MapBoard = {
     {id: 'm1', name: 'Marqueze', x: 3, y: 1, force: '1'},
   ],
 };
-type Coordinate = {x: number; y: number};
+export type Vector = {x: number; y: number};
 type MapBoard = {
   cells: number[][];
   forces: MapForce[];
   cities: MapCity[];
 };
-type MapForce = {id: string; name: string; squads: MapSquad[]};
-type MapSquad = {
+type MapForce = {id: string; name: string; units: MapUnit[]};
+type MapUnit = {
   id: string;
   x: number;
   y: number;
   moves: number;
   remainingMoves: number;
+  validMoves: Vector[];
 };
 type MapCity = {
   id: string;
@@ -95,14 +96,52 @@ type MapTile = {
   y: number;
   type: number;
   tile: Image;
-  distance: number;
+  distance: number; // this assumes a single source... but the distance varies
 };
 export class MapScene extends Phaser.Scene {
-  squads: Chara[] = [];
-
+  units: Chara[] = [];
   tiles: MapTile[] = [];
-  selectedSquad: string | null = null;
+  selectedUnit: string | null = null;
   currentForce: string = PLAYER_FORCE;
+
+  getValidMoves() {
+    const units = getPossibleMoves({
+      units: Map.forces
+        .map((f) =>
+          f.units.map((u) => ({
+            id: u.id,
+            range: u.moves,
+            force: f.id,
+            pos: {x: u.x, y: u.y},
+            validSteps: [],
+          })),
+        )
+        .flat(),
+      forces: Map.forces.map((f) => ({
+        id: f.id,
+        units: f.units.map((u) => u.id),
+      })),
+      width: 14,
+      height: 6,
+      walkableCells: [0],
+      grid: Map.cells.map((col) => col.map((cell) => (cell === 0 ? 0 : 1))),
+      currentForce: PLAYER_FORCE,
+    });
+
+    let force = Map.forces.find((f) => f.id === this.currentForce);
+
+    if (!force) throw new Error(INVALID_STATE);
+
+    force.units.forEach((u) => {
+      // @ts-ignore
+      const resultUnit = units.find((unit) => unit.id === u.id);
+
+      console.log(`...`, resultUnit);
+      if (!resultUnit) throw new Error(INVALID_STATE);
+
+      u.validMoves = resultUnit.validSteps;
+    });
+  }
 
   getForce(id: string) {
     const force = Map.forces.find((force) => force.id === id);
@@ -110,7 +149,7 @@ export class MapScene extends Phaser.Scene {
     return force;
   }
   getForceSquad(force: MapForce, id: string) {
-    const squad = force.squads.find((f) => f.id === id);
+    const squad = force.units.find((f) => f.id === id);
 
     if (!squad) throw new Error(INVALID_STATE);
 
@@ -120,7 +159,7 @@ export class MapScene extends Phaser.Scene {
     super('MapScene');
   }
 
-  getPos(x: number, y: number) {
+  getPos({x, y}: Vector) {
     return {
       x: boardPadding + x * cellSize,
       y: boardPadding + y * cellSize,
@@ -132,20 +171,13 @@ export class MapScene extends Phaser.Scene {
 
     Map.cells.forEach((arr, col) =>
       arr.forEach((n, row) => {
-        const {x, y} = this.getPos(row, col);
+        const {x, y} = this.getPos({x: row, y: col});
 
         const makeTile = () => {
           //TODO: refactor, this is bad and ugly
-          if (n === 10) return this.add.image(x, y, 'tiles/grass');
-          else if (n === 11) return this.add.image(x, y, 'tiles/woods');
-          else if (n === 20) return this.add.image(x, y, 'tiles/mountain1');
-          else if (n === 21) return this.add.image(x, y, 'tiles/mountain2');
-          else if (n === 22) return this.add.image(x, y, 'tiles/mountain3');
-          else if (n === 23) return this.add.image(x, y, 'tiles/mountain4');
-          else if (n === 24) return this.add.image(x, y, 'tiles/mountain5');
-          else if (n === 25) return this.add.image(x, y, 'tiles/mountain6');
-          else if (n === 26) return this.add.image(x, y, 'tiles/mountain7');
-          else if (n === 27) return this.add.image(x, y, 'tiles/mountain8');
+          if (n === 0) return this.add.image(x, y, 'tiles/grass');
+          else if (n === 1) return this.add.image(x, y, 'tiles/woods');
+          else if (n === 2) return this.add.image(x, y, 'tiles/mountain');
           else return this.add.image(x, y, 'tiles/grass');
         };
 
@@ -170,8 +202,8 @@ export class MapScene extends Phaser.Scene {
   }
   makeInteractive(container: Container, uiContainer: Container, cell: MapTile) {
     cell.tile.on('pointerdown', () => {
-      if (this.selectedSquad) {
-        this.selectTile(container, uiContainer, this.selectedSquad, cell);
+      if (this.selectedUnit) {
+        this.selectTile(container, uiContainer, this.selectedUnit, cell);
       }
     });
   }
@@ -182,28 +214,28 @@ export class MapScene extends Phaser.Scene {
     console.log(`MapScene - renderUnits`);
 
     Map.forces.forEach((force) => {
-      force.squads.forEach((sqd) =>
-        this.renderSquad(force, container, uiContainer, sqd),
+      force.units.forEach((unit) =>
+        this.renderUnit(force, container, uiContainer, unit),
       );
     });
   }
 
   getCharaPosition({x, y}: {x: number; y: number}) {
-    const pos = this.getPos(x, y);
+    const pos = this.getPos({x, y});
 
     return {...pos, y: pos.y + CHARA_VERTICAL_OFFSET};
   }
 
-  renderSquad(
+  renderUnit(
     force: MapForce,
     container: Container,
     uiContainer: Container,
-    squad: MapSquad,
+    unit: MapUnit,
   ) {
-    const leader = getSquadLeader(squad.id);
+    const leader = getSquadLeader(unit.id);
     if (!leader) return;
 
-    const {x, y} = this.getCharaPosition(squad);
+    const {x, y} = this.getCharaPosition(unit);
 
     const chara = new Chara(
       'chara' + leader.id,
@@ -217,7 +249,7 @@ export class MapScene extends Phaser.Scene {
 
     if (chara.container) container.add(chara.container);
 
-    this.squads.push(chara);
+    this.units.push(chara);
 
     chara.onClick((c: Chara) => {
       if (!c.unit.squad) throw new Error(INVALID_STATE);
@@ -227,7 +259,7 @@ export class MapScene extends Phaser.Scene {
       );
 
       if (force.id === PLAYER_FORCE) {
-        this.selectedSquad = c.unit.squad;
+        this.selectedUnit = c.unit.squad;
 
         if (sqd.remainingMoves < 1) {
           console.info('No move points remaining for', sqd);
@@ -240,14 +272,9 @@ export class MapScene extends Phaser.Scene {
           .filter((tile) => walkableTiles.includes(tile.type))
           .filter((tile) => !this.isEnemyInTile(tile))
           .filter((tile) => tile.x !== sqd.x || tile.y !== sqd.y);
-
         cells.forEach((cell) => {
-          this.findPath(sqd, cell).then((path) => {
-            if (path && path.length <= range + 1) {
-              cell.tile.setTint(WALKABLE_CELL_TINT);
-              cell.distance = path.length - 1;
-              this.makeInteractive(container, uiContainer, cell);
-            }
+          this.findPath(sqd, cell, range).then((path) => {
+            this.makeCellClickable(cell, path, container, uiContainer);
           });
         });
 
@@ -256,8 +283,8 @@ export class MapScene extends Phaser.Scene {
         Map.forces
           .filter((force) => force.id === PLAYER_FORCE)
           .forEach((force) =>
-            force.squads
-              .filter((force) => force.id === this.selectedSquad)
+            force.units
+              .filter((force) => force.id === this.selectedUnit)
               .forEach((playerSquad) => {
                 const distance = this.getDistance(playerSquad, sqd);
 
@@ -270,7 +297,7 @@ export class MapScene extends Phaser.Scene {
                     moveBelow: true,
                     data: {
                       top: chara.unit.squad,
-                      bottom: this.selectedSquad,
+                      bottom: this.selectedUnit,
                     },
                   });
                 }
@@ -278,6 +305,17 @@ export class MapScene extends Phaser.Scene {
           );
       }
     });
+  }
+
+  private makeCellClickable(
+    cell: MapTile,
+    path: Vector[],
+    container: Phaser.GameObjects.Container,
+    uiContainer: Phaser.GameObjects.Container,
+  ) {
+    cell.tile.setTint(WALKABLE_CELL_TINT);
+    cell.distance = path.length - 1;
+    this.makeInteractive(container, uiContainer, cell);
   }
 
   refreshUI(container: Container, uiContainer: Container) {
@@ -300,11 +338,11 @@ export class MapScene extends Phaser.Scene {
       ),
     );
 
-    if (this.selectedSquad) {
+    if (this.selectedUnit) {
       const force = this.getForce(this.currentForce);
 
-      const squad = getSquad(this.selectedSquad);
-      const forceSquad = this.getForceSquad(force, this.selectedSquad);
+      const squad = getSquad(this.selectedUnit);
+      const forceSquad = this.getForceSquad(force, this.selectedUnit);
 
       text(20, 610, squad.name, uiContainer, this);
 
@@ -313,8 +351,8 @@ export class MapScene extends Phaser.Scene {
 
     button(1100, 50, 'Return to Title', uiContainer, this, () => {
       container.removeAll();
-      this.squads.forEach((c) => this.scene.remove(c.scene.key));
-      this.squads = [];
+      this.units.forEach((c) => this.scene.remove(c.scene.key));
+      this.units = [];
       this.tiles = [];
 
       this.scene.transition({
@@ -360,17 +398,19 @@ export class MapScene extends Phaser.Scene {
 
     timeline.play();
 
+    this.getValidMoves();
+
     this.refreshMoves(force);
   }
 
   refreshMoves(force: MapForce) {
-    const updatedSquads = force.squads.map((squad) => ({
+    const updatedSquads = force.units.map((squad) => ({
       ...squad,
       remainingMoves: squad.moves,
     }));
 
     Map.forces = Map.forces.map((f) =>
-      f.id === force.id ? {...f, squads: updatedSquads} : f,
+      f.id === force.id ? {...f, units: updatedSquads} : f,
     );
   }
 
@@ -378,7 +418,7 @@ export class MapScene extends Phaser.Scene {
     return this.tiles.filter((tile) => this.getDistance({x, y}, tile) <= range);
   }
 
-  getDistance(source: Coordinate, target: Coordinate) {
+  getDistance(source: Vector, target: Vector) {
     return Math.abs(target.x - source.x) + Math.abs(target.y - source.y);
   }
 
@@ -389,12 +429,12 @@ export class MapScene extends Phaser.Scene {
     {x, y, distance}: MapTile,
   ) {
     console.log(`MapScene - selectTile`);
-    const chara = this.squads.find((c) => c.unit.id === unitId);
+    const chara = this.units.find((c) => c.unit.id === unitId);
     const force = Map.forces.find((force) => force.id === PLAYER_FORCE);
 
     if (!chara || !force) throw new Error(INVALID_STATE);
 
-    const squad = force.squads.find((squad) => squad.id === chara.unit.squad);
+    const squad = force.units.find((squad) => squad.id === chara.unit.squad);
 
     if (!squad) throw new Error(INVALID_STATE);
 
@@ -402,7 +442,9 @@ export class MapScene extends Phaser.Scene {
       walkableTiles.includes(tile.type) ? tile.tile.clearTint() : null,
     );
 
-    this.findPath(squad, {x, y}).then((path) => this.moveUnit(chara, path));
+    this.findPath(squad, {x, y}, Infinity).then((path) =>
+      this.moveUnit(chara, path),
+    );
 
     // FIXME: local state mutation
     squad.x = x;
@@ -413,7 +455,7 @@ export class MapScene extends Phaser.Scene {
     this.clearAllTileEvents();
   }
 
-  moveUnit = (chara: Chara, path: Coordinate[]) => {
+  moveUnit = (chara: Chara, path: Vector[]) => {
     const endCallback = () => {
       path.forEach((p) => this.getTileAt(p.x, p.y).tile.clearTint());
     };
@@ -434,7 +476,7 @@ export class MapScene extends Phaser.Scene {
     this.tweens.timeline({tweens});
   };
 
-  isEnemyInTile(tile: Coordinate) {
+  isEnemyInTile(tile: Vector) {
     const enemies = this.getEnemies();
 
     return enemies.some((enemy) => enemy.x === tile.x && enemy.y === tile.y);
@@ -443,14 +485,15 @@ export class MapScene extends Phaser.Scene {
   getEnemies() {
     return Map.forces
       .filter((force) => force.id !== PLAYER_FORCE)
-      .map((force) => force.squads)
+      .map((force) => force.units)
       .flat();
   }
 
   findPath = (
-    origin: Coordinate,
-    target: Coordinate,
-  ): Promise<Coordinate[]> => {
+    origin: Vector,
+    target: Vector,
+    range: number,
+  ): Promise<Vector[]> => {
     let cells = Map.cells.map((row) => row.map(identity));
 
     const enemies = this.getEnemies();
@@ -462,9 +505,10 @@ export class MapScene extends Phaser.Scene {
     easystar.setGrid(cells);
     easystar.setAcceptableTiles(walkableTiles);
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       easystar.findPath(origin.x, origin.y, target.x, target.y, (path) => {
-        resolve(path);
+        if (path && path.length <= range + 1) resolve(path);
+        else reject();
       });
       easystar.calculate();
     });
