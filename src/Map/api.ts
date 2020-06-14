@@ -42,14 +42,9 @@ export const getPossibleMoves = ({
 }: TurnManager) => {
   const force = S.find((f) => f.id === currentForce)(forces);
 
-  const getUnit = (unitId: UnitId) => {
-    const unit = units.find((u) => u.id === unitId);
+  const getUnit = (unitId: UnitId) => S.find((u) => u.id === unitId)(units);
 
-    if (!unit) throw new Error(INVALID_STATE);
-    return unit;
-  };
-
-  const getUnits = (list: UnitId[]) => R.map(getUnit, list);
+  const getUnits = S.pipe([S.map(getUnit), S.justs]);
 
   const enemyVectors = S.pipe([
     S.map((f) => f.units),
@@ -69,12 +64,8 @@ export const getPossibleMoves = ({
   const finder = new PF.AStarFinder();
 
   const getUnitValidSteps = ({pos: {x, y}, range}: MapUnit) => {
-    const xs = R.range(x - range, x + range + 1);
-    const ys = R.range(y - range, y + range + 1);
-
-    const getVectors: (xs: number[]) => (ys: number[]) => Vector[] = S.lift2(
-      makeVector,
-    );
+    const xs = S.range(x - range)(x + range + 1);
+    const ys = S.range(y - range)(y + range + 1);
 
     const isValid = (vec: Vector) =>
       vec.x >= 0 && vec.x < width && vec.y >= 0 && vec.y < height;
@@ -86,26 +77,34 @@ export const getPossibleMoves = ({
 
     const vecFromTuple = ([x, y]: number[]) => ({x, y});
 
-    return R.pipe(
-      () => getVectors(xs)(ys),
+    const uniq = S.reduce((ns) => (n) => (S.elem(n)(ns) ? ns : ns.concat([n])))(
+      [],
+    );
+
+    return S.pipe([
+      ({xs, ys}) => S.lift2(makeVector)(xs)(ys),
       S.filter(isValid),
       S.filter(isInRange),
       S.filter(isWalkable),
       S.map((vec) => finder.findPath(x, y, vec.x, vec.y, pfGrid.clone())),
       S.filter((list) => list.length <= range + 1),
-      R.chain(R.map(vecFromTuple)),
-      R.uniq,
+      S.chain(S.map(vecFromTuple)),
+      uniq,
       S.reject((vec) => S.equals(isEnemyHere(vec))(S.Just(true))),
       S.reject(S.equals({x, y})),
-    )();
+    ])({xs, ys});
   };
 
-  return R.pipe(
-    R.map(S.prop('units')),
-    R.chain(getUnits),
-    S.map((unit) => ({
-      ...unit,
-      validSteps: getUnitValidSteps(unit),
-    })),
-  )(force);
+  const result = S.pipe([
+    S.map(S.prop('units')),
+    S.map(getUnits),
+    S.map(
+      S.map((unit) => ({
+        ...unit,
+        validSteps: getUnitValidSteps(unit),
+      })),
+    ),
+  ])(force);
+
+  return S.fromMaybe([])(result);
 };
