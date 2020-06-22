@@ -1,7 +1,6 @@
 // @ts-nocheck
 
 import {getPossibleMoves} from './api';
-import R from 'ramda';
 import S from 'sanctuary';
 const defaultParams = {
   currentForce: 'a',
@@ -28,12 +27,12 @@ const defaultParams = {
 test('Get moves in straight line', () => {
   const cells = getPossibleMoves(defaultParams);
 
-  expect(
-    R.equals(cells[0].validSteps, [
-      {x: 0, y: 1},
-      {x: 0, y: 2},
-    ]),
-  );
+  const steps = cells[0].validSteps;
+  const expected = [
+    {x: 0, y: 1},
+    {x: 0, y: 2},
+  ];
+  expect(steps).toEqual(expected);
 });
 
 test('Make a turn', () => {
@@ -46,14 +45,12 @@ test('Make a turn', () => {
   };
   const cells = getPossibleMoves(longerRange);
 
-  expect(
-    R.equals(cells[0].validSteps, [
-      {x: 0, y: 1},
-      {x: 0, y: 2},
-      {x: 0, y: 3},
-      {x: 1, y: 3},
-    ]),
-  ).toBe(true);
+  expect(cells[0].validSteps).toEqual([
+    {x: 0, y: 1},
+    {x: 0, y: 2},
+    {x: 0, y: 3},
+    {x: 1, y: 3},
+  ]);
 });
 
 test('Get moves in blocked path ', () => {
@@ -73,12 +70,10 @@ test('Get moves in blocked path ', () => {
   };
   const cells = getPossibleMoves(path);
 
-  expect(
-    R.equals(cells[0].validSteps, [
-      {x: 0, y: 1},
-      {x: 0, y: 2},
-    ]),
-  ).toBe(true);
+  expect(cells[0].validSteps).toEqual([
+    {x: 0, y: 1},
+    {x: 0, y: 2},
+  ]);
 });
 
 test('Get moves in forked path ', () => {
@@ -97,18 +92,16 @@ test('Get moves in forked path ', () => {
     ),
   };
   const cells = getPossibleMoves(path);
-  expect(
-    R.equals(cells[0].validSteps, [
-      {x: 0, y: 1},
-      {x: 0, y: 2},
-      {x: 0, y: 3},
-      {x: 1, y: 1},
-      {x: 1, y: 3},
-      {x: 2, y: 1},
-      {x: 2, y: 2},
-      {x: 3, y: 1},
-    ]),
-  ).toBe(true);
+  expect(cells[0].validSteps).toEqual([
+    {x: 0, y: 1},
+    {x: 0, y: 2},
+    {x: 0, y: 3},
+    {x: 1, y: 1},
+    {x: 1, y: 3},
+    {x: 2, y: 1},
+    {x: 2, y: 2},
+    {x: 3, y: 1},
+  ]);
 });
 
 test('Enemy blocks path', () => {
@@ -119,9 +112,9 @@ test('Enemy blocks path', () => {
       .map((unit) => (unit.id === 'b1' ? {...unit, pos: {x: 0, y: 3}} : unit)),
   };
   const cells = getPossibleMoves(path);
-  const result = S.equals(cells[0].validSteps)([
+  const expected = [
     {x: 0, y: 1},
     {x: 0, y: 2},
-  ]);
-  expect(result).toBe(true);
+  ];
+  expect(cells[0].validSteps).toEqual(expected);
 });

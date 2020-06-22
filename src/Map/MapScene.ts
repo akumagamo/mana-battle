@@ -9,11 +9,12 @@ import panel from '../UI/panel';
 import text from '../UI/text';
 import {identity} from '../utils/functional';
 import {getPossibleMoves} from './api';
+import {Vector} from './Models';
+import {randomItem} from '../defaultData';
 
 const PLAYER_FORCE = 'PLAYER_FORCE';
 const CPU_FORCE = 'CPU_FORCE';
 const WALKABLE_CELL_TINT = 0x0d4e2b;
-const SQUAD_MOVE_RANGE = 3;
 const SQUAD_MOVE_DURATION = 500;
 const CHARA_MAP_SCALE = 0.5;
 const CHARA_VERTICAL_OFFSET = -10;
@@ -29,12 +30,13 @@ const cellSize = 100;
 
 const boardPadding = 50;
 
-// 0-> grass
-// 1-> woods
-// 2-> mountain
-//
-
 const walkableTiles = [0];
+
+const tileMap: {[x in CellNumber]: string} = {
+  0: 'grass',
+  1: 'woods',
+  2: 'mountain',
+};
 
 const Map: MapBoard = {
   cells: [
@@ -50,28 +52,29 @@ const Map: MapBoard = {
       id: PLAYER_FORCE,
       name: 'Player',
       units: [
-        {id: '0', x: 0, y: 0, range: 5, validMoves: [], force: PLAYER_FORCE},
+        {id: '0', x: 0, y: 0, range: 5, validSteps: [], force: PLAYER_FORCE},
+
+        {id: '1', x: 3, y: 2, range: 5, validSteps: [], force: PLAYER_FORCE},
       ],
     },
     {
       id: CPU_FORCE,
       name: 'CPU',
       units: [
-        {id: '1', x: 0, y: 3, range: 5, validMoves: [], force: CPU_FORCE},
-        {id: '2', x: 3, y: 1, range: 5, validMoves: [], force: CPU_FORCE},
+        {id: '2', x: 0, y: 3, range: 5, validSteps: [], force: CPU_FORCE},
+        {id: '3', x: 3, y: 1, range: 5, validSteps: [], force: CPU_FORCE},
       ],
     },
   ],
 
   cities: [
     {id: 'a1', name: 'Arabella', x: 1, y: 1, force: PLAYER_FORCE},
-
     {id: 'm1', name: 'Marqueze', x: 3, y: 1, force: CPU_FORCE},
   ],
 };
-export type Vector = {x: number; y: number};
+type CellNumber = 0 | 1 | 2;
 type MapBoard = {
-  cells: number[][];
+  cells: CellNumber[][];
   forces: MapForce[];
   cities: MapCity[];
 };
@@ -81,7 +84,7 @@ type MapUnit = {
   x: number;
   y: number;
   range: number;
-  validMoves: Vector[];
+  validSteps: Vector[];
   force: string;
 };
 type MapCity = {
@@ -101,8 +104,36 @@ type MapTile = {
 export class MapScene extends Phaser.Scene {
   units: Chara[] = [];
   tiles: MapTile[] = [];
+  mapContainer: null | Container = null;
+  uiContainer: null | Container = null;
+
   selectedUnit: string | null = null;
   currentForce: string = PLAYER_FORCE;
+  /** Units that the player moved this turn*/
+  movedUnits: string[] = [];
+
+  // ----- Phaser --------------------
+  constructor() {
+    super('MapScene');
+  }
+  create() {
+    this.mapContainer = this.add.container(0, 0);
+    this.uiContainer = this.add.container(0, 0);
+
+    this.renderMap();
+    this.renderUnits();
+    this.renderUI();
+
+    this.runTurn();
+  }
+
+  // ------ Internals ----------------
+
+  getContainers() {
+    if (!this.mapContainer || !this.uiContainer) throw new Error(INVALID_STATE);
+
+    return {container: this.mapContainer, uiContainer: this.uiContainer};
+  }
 
   tileAt(x: number, y: number) {
     const tile = this.tiles.find((t) => t.x === x && t.y === y);
@@ -110,41 +141,20 @@ export class MapScene extends Phaser.Scene {
     return tile;
   }
   getValidMoves() {
-    const units = getPossibleMoves({
-      units: Map.forces
-        .map((f) =>
-          f.units.map((u) => ({
-            id: u.id,
-            range: u.range,
-            force: f.id,
-            pos: {x: u.x, y: u.y},
-            validSteps: [],
-          })),
-        )
-        .flat(),
-      forces: Map.forces.map((f) => ({
-        id: f.id,
-        units: f.units.map((u) => u.id),
-      })),
-      width: 14,
-      height: 6,
-      walkableCells: [0],
-      grid: Map.cells.map((col) => col.map((cell) => (cell === 0 ? 0 : 1))),
-      currentForce: PLAYER_FORCE,
-    });
+    const moveList: MapUnit[] = getPossibleMoves(
+      formatDataForApi(this.currentForce),
+    );
 
     let force = Map.forces.find((f) => f.id === this.currentForce);
 
     if (!force) throw new Error(INVALID_STATE);
 
     force.units.forEach((u) => {
-      // @ts-ignore
-      const resultUnit = units.find((unit) => unit.id === u.id);
+      const resultUnit = moveList.find((unit) => unit.id === u.id);
 
       if (!resultUnit) throw new Error(INVALID_STATE);
 
-      // @ts-ignore
-      u.validMoves = resultUnit.validSteps;
+      u.validSteps = resultUnit.validSteps;
     });
   }
 
@@ -153,15 +163,16 @@ export class MapScene extends Phaser.Scene {
     if (!force) throw new Error(INVALID_STATE);
     return force;
   }
+
+  getCurrentForce() {
+    return this.getForce(this.currentForce);
+  }
   getForceUnit(force: MapForce, id: string) {
     const unit = force.units.find((f) => f.id === id);
 
     if (!unit) throw new Error(INVALID_STATE);
 
     return unit;
-  }
-  constructor() {
-    super('MapScene');
   }
 
   getPos({x, y}: Vector) {
@@ -171,17 +182,14 @@ export class MapScene extends Phaser.Scene {
     };
   }
 
-  renderMap(container: Container, uiContainer: Container) {
+  renderMap() {
+    const {container} = this.getContainers();
     Map.cells.forEach((arr, col) =>
       arr.forEach((n, row) => {
         const {x, y} = this.getPos({x: row, y: col});
 
         const makeTile = () => {
-          //TODO: refactor, this is bad and ugly
-          if (n === 0) return this.add.image(x, y, 'tiles/grass');
-          else if (n === 1) return this.add.image(x, y, 'tiles/woods');
-          else if (n === 2) return this.add.image(x, y, 'tiles/mountain');
-          else return this.add.image(x, y, 'tiles/grass');
+          return this.add.image(x, y, `tiles/${tileMap[n]}`);
         };
 
         const tile = makeTile();
@@ -202,43 +210,37 @@ export class MapScene extends Phaser.Scene {
       }),
     );
   }
-  makeInteractive(container: Container, uiContainer: Container, cell: MapTile) {
+  makeInteractive(cell: MapTile) {
     cell.tile.on('pointerdown', () => {
       if (this.selectedUnit) {
-        this.selectTile(container, uiContainer, this.selectedUnit, cell);
+        this.selectTile(this.selectedUnit, cell, () => this.checkTurnEnd());
+        this.clearAllTileEvents();
       }
     });
   }
   clearAllTileEvents() {
     this.tiles.forEach((tile) => tile.tile.removeAllListeners());
   }
-  renderUnits(container: Container, uiContainer: Container) {
+  renderUnits() {
     Map.forces.forEach((force) => {
-      force.units.forEach((unit) =>
-        this.renderUnit(force, container, uiContainer, unit),
-      );
+      force.units.forEach((unit) => this.renderUnit(force, unit));
     });
   }
 
-  getCharaPosition({x, y}: {x: number; y: number}) {
+  getCellPositionOnScreen({x, y}: {x: number; y: number}) {
     const pos = this.getPos({x, y});
 
     return {...pos, y: pos.y + CHARA_VERTICAL_OFFSET};
   }
 
-  renderUnit(
-    force: MapForce,
-    container: Container,
-    uiContainer: Container,
-    unit: MapUnit,
-  ) {
+  renderUnit(force: MapForce, unit: MapUnit) {
+    const {container, uiContainer} = this.getContainers();
     const leader = getSquadLeader(unit.id);
-    if (!leader) return;
 
-    const {x, y} = this.getCharaPosition(unit);
+    const {x, y} = this.getCellPositionOnScreen(unit);
 
     const chara = new Chara(
-      'chara' + leader.id,
+      `unit-${unit.id}`,
       this,
       leader,
       x,
@@ -253,64 +255,57 @@ export class MapScene extends Phaser.Scene {
 
     chara.onClick((c: Chara) => {
       if (unit.force === PLAYER_FORCE) {
-        this.selectedUnit = unit.id;
-
-        const cells = unit.validMoves.forEach((cell) => {
-          this.findPath(unit, cell).then((path) => {
-            this.makeCellClickable(
-              this.tileAt(cell.x, cell.y),
-              path,
-              container,
-              uiContainer,
-            );
-          });
-        });
-
-        this.refreshUI(container, uiContainer);
+        this.handleClickOnOwnUnit(unit);
       } else {
-        Map.forces
-          .filter((force) => force.id === PLAYER_FORCE)
-          .forEach((force) =>
-            force.units
-              .filter((force) => force.id === this.selectedUnit)
-              .forEach((playerSquad) => {
-                const distance = this.getDistance(playerSquad, unit);
-
-                console.log(distance);
-                if (distance === 1) {
-                  console.log(`attack!!`, unit);
-
-                  this.scene.transition({
-                    target: 'CombatScene',
-                    duration: 0,
-                    moveBelow: true,
-                    data: {
-                      top: chara.unit.squad,
-                      bottom: this.selectedUnit,
-                    },
-                  });
-                }
-              }),
-          );
+        this.handleClickOnEnemyUnit(unit, c);
       }
     });
   }
 
-  private makeCellClickable(
-    cell: MapTile,
-    path: Vector[],
-    container: Phaser.GameObjects.Container,
-    uiContainer: Phaser.GameObjects.Container,
-  ) {
+  handleClickOnOwnUnit(unit: MapUnit) {
+    this.selectedUnit = unit.id;
+
+    unit.validSteps.forEach((cell) =>
+      this.makeCellClickable(this.tileAt(cell.x, cell.y)),
+    );
+
+    this.renderUI();
+  }
+
+  handleClickOnEnemyUnit(unit: MapUnit, chara: Chara) {
+    this.selectedUnit = unit.id;
+    this.renderUI();
+
+    Map.forces
+      .filter((force) => force.id === PLAYER_FORCE)
+      .forEach((force) =>
+        force.units
+          .filter((force) => force.id === this.selectedUnit)
+          .forEach((playerSquad) => {
+            const distance = this.getDistance(playerSquad, unit);
+
+            if (distance === 1) {
+              this.scene.transition({
+                target: 'CombatScene',
+                duration: 0,
+                moveBelow: true,
+                data: {
+                  top: chara.unit.squad,
+                  bottom: this.selectedUnit,
+                },
+              });
+            }
+          }),
+      );
+  }
+
+  private makeCellClickable(cell: MapTile) {
     cell.tile.setTint(WALKABLE_CELL_TINT);
-    this.makeInteractive(container, uiContainer, cell);
+    this.makeInteractive(cell);
   }
 
-  refreshUI(container: Container, uiContainer: Container) {
-    this.renderUI(container, uiContainer);
-  }
-
-  renderUI(container: Container, uiContainer: Container) {
+  renderUI() {
+    const {container, uiContainer} = this.getContainers();
     uiContainer.removeAll();
 
     uiContainer.add(
@@ -337,6 +332,7 @@ export class MapScene extends Phaser.Scene {
 
     button(1100, 50, 'Return to Title', uiContainer, this, () => {
       container.removeAll();
+      uiContainer.removeAll();
       this.units.forEach((c) => this.scene.remove(c.scene.key));
       this.units = [];
       this.tiles = [];
@@ -348,19 +344,55 @@ export class MapScene extends Phaser.Scene {
       });
     });
   }
-  create() {
-    const container = this.add.container(0, 0);
-    const uiContainer = this.add.container(0, 0);
-    this.renderMap(container, uiContainer);
-    this.renderUnits(container, uiContainer);
-    this.renderUI(container, uiContainer);
 
-    this.runTurn();
+  switchForce() {
+    const force = Map.forces.find((force) => force.id !== this.currentForce);
+    if (!force) throw new Error(INVALID_STATE);
+    this.currentForce = force.id;
   }
 
   runTurn() {
     const force = this.getForce(this.currentForce);
 
+    this.showTurnTitle(force);
+
+    this.getValidMoves();
+
+    if (force.id === CPU_FORCE) {
+      this.runAiActions(force);
+    }
+  }
+
+  runAiActions(force: MapForce) {
+    const runAi = (currentTurn: number) => {
+      const unit = force.units[currentTurn];
+      if (!unit) throw new Error(INVALID_STATE);
+
+      this.selectedUnit = unit.id;
+      this.renderUI();
+
+      const {x, y} = randomItem(unit.validSteps);
+
+      const tile = this.getTileAt(x, y);
+      this.selectTile(unit.id, tile, () => {
+        if (currentTurn === force.units.length - 1) {
+          this.endTurn();
+        } else {
+          runAi(currentTurn + 1);
+        }
+      });
+    };
+
+    runAi(0);
+  }
+
+  checkTurnEnd() {
+    const force = this.getCurrentForce();
+
+    if (this.movedUnits.length === force.units.length) this.endTurn();
+  }
+
+  showTurnTitle(force: MapForce) {
     const title = this.add.text(-200, 500, `${force.name} Turn`);
 
     const timeline = this.tweens.createTimeline();
@@ -382,8 +414,6 @@ export class MapScene extends Phaser.Scene {
     });
 
     timeline.play();
-
-    this.getValidMoves();
   }
 
   tilesInRange(x: number, y: number, range: number) {
@@ -394,14 +424,10 @@ export class MapScene extends Phaser.Scene {
     return Math.abs(target.x - source.x) + Math.abs(target.y - source.y);
   }
 
-  selectTile(
-    container: Container,
-    uiContainer: Container,
-    unitId: string,
-    {x, y}: MapTile,
-  ) {
+  selectTile(unitId: string, {x, y}: MapTile, onMoveComplete: Function) {
+    const {container, uiContainer} = this.getContainers();
     const chara = this.units.find((c) => c.unit.id === unitId);
-    const force = Map.forces.find((force) => force.id === PLAYER_FORCE);
+    const force = Map.forces.find((force) => force.id === this.currentForce);
 
     if (!chara || !force) throw new Error(INVALID_STATE);
 
@@ -413,35 +439,57 @@ export class MapScene extends Phaser.Scene {
       walkableTiles.includes(tile.type) ? tile.tile.clearTint() : null,
     );
 
-    this.findPath(squad, {x, y}).then((path) => this.moveUnit(chara, path));
+    this.movedUnits.push(unitId);
+
+    this.findPath(squad, {x, y}).then((path) =>
+      this.moveUnit(chara, path, onMoveComplete),
+    );
 
     // FIXME: local state mutation
     squad.x = x;
     squad.y = y;
 
-    this.refreshUI(container, uiContainer);
-    this.clearAllTileEvents();
+    this.renderUI();
   }
 
-  moveUnit = (chara: Chara, path: Vector[]) => {
+  endTurn() {
+    this.movedUnits = [];
+    this.units.forEach((u) => u.container?.setAlpha(1));
+    this.switchForce();
+    this.runTurn();
+  }
+
+  moveUnit = (chara: Chara, path: Vector[], onMoveComplete: Function) => {
     const endCallback = () => {
       path.forEach((p) => this.getTileAt(p.x, p.y).tile.clearTint());
+
+      onMoveComplete();
     };
+
     const tweens = path
       .filter((_, index) => index > 0)
-      .map((pos, index) => {
-        const target = this.getCharaPosition(pos);
+      .map((pos) => {
+        const target = this.getCellPositionOnScreen(pos);
         return {
           targets: chara.container,
           x: target.x,
           y: target.y,
           duration: SQUAD_MOVE_DURATION,
           ease: 'Cubic',
-          onComplete: index === path.length - 2 ? endCallback() : null,
         };
-      });
+      })
+      .concat([
+        {
+          targets: chara.container,
+          duration: 200,
 
-    this.tweens.timeline({tweens});
+          // @ts-ignore
+          alpha: 0.2,
+          onComplete: endCallback.bind(this),
+        },
+      ]);
+
+    return this.tweens.timeline({tweens});
   };
 
   isEnemyInTile(tile: Vector) {
@@ -452,11 +500,12 @@ export class MapScene extends Phaser.Scene {
 
   getEnemies() {
     return Map.forces
-      .filter((force) => force.id !== PLAYER_FORCE)
+      .filter((force) => force.id !== this.currentForce)
       .map((force) => force.units)
       .flat();
   }
 
+  // todo: remove this, api should provide valid cells
   findPath = (origin: Vector, target: Vector): Promise<Vector[]> => {
     let cells = Map.cells.map((row) => row.map(identity));
 
@@ -485,3 +534,25 @@ export class MapScene extends Phaser.Scene {
     return tile;
   }
 }
+const formatDataForApi = (currentForce: string) => ({
+  units: Map.forces
+    .map((f) =>
+      f.units.map((u) => ({
+        id: u.id,
+        range: u.range,
+        force: f.id,
+        pos: {x: u.x, y: u.y},
+        validSteps: [],
+      })),
+    )
+    .flat(),
+  forces: Map.forces.map((f) => ({
+    id: f.id,
+    units: f.units.map((u) => u.id),
+  })),
+  width: 14,
+  height: 6,
+  walkableCells: [0],
+  grid: Map.cells.map((col) => col.map((cell) => (cell === 0 ? 0 : 1))),
+  currentForce: currentForce,
+});

@@ -19,8 +19,9 @@ import {Player} from './Player/Model';
 
 export const classes: UnitClass[] = ['fighter', 'knight', 'wizard'];
 
-export const randomItem = (items: any[]) =>
-  items[Math.floor(Math.random() * items.length)];
+export function randomItem<T>(items: Array<T>): T {
+  return items[Math.floor(Math.random() * items.length)];
+}
 
 export var units: UnitMap = indexById(
   Array.from({length: 70}, (_, i) => i).map((unitJSON) => fromJSON(unitJSON)),
