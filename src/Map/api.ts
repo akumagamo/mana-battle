@@ -10,14 +10,7 @@ import S, {
   reject,
   find,
 } from 'sanctuary';
-import {
-  Vector,
-  TurnManager,
-  MapForce,
-  MapUnit,
-  UnitId,
-  ForceId,
-} from './Models';
+import {Vector, TurnManager, MapForce, MapUnit} from './Models';
 
 const getBy = (attr: string) => (target: any) =>
   find((el: any) => equals(prop(attr)(el))(target));
@@ -48,28 +41,22 @@ export const getPossibleMoves = ({
     forces,
   );
 
-  /**   getUnit :: UnitId -> Maybe Force */
-  const getUnit = (unitId: UnitId) => byId(unitId)(units);
+  const getUnits = pipe([map((unitId) => byId(unitId)(units)), S.justs]);
 
-  const getUnits = pipe([map(getUnit), S.justs]);
+  /**   getVectors :: Force -> Array Vector */
+  const getVectors = pipe([
+    prop('units'), // Array UnitId
+    getUnits, // Array Unit
+    map(prop('pos')), // Array Vector
+  ]);
 
-  /**   enemyVectors :: Maybe Array Vector */
-  const enemyVectors = pipe([
-    () => enemyForce, // Maybe Force
-    map(prop('units')), // Maybe Array UnitId
-    map(getUnits), // Maybe Array Unit
-    map_(prop('pos')), // Maybe Array Vector
-  ])(null);
+  const enemyVectors = map(getVectors)(enemyForce);
 
-  // @ts-ignore
-  const isEnemyHere = (vec: Vector) => map(S.any(equals(vec)))(enemyVectors);
+  const isEnemyHere = (vec: Vector) => map(S.elem(vec))(enemyVectors);
 
   // Marks enemy-occupied cells as "walls"
-  const updatedGrid = grid.map((row: number[], y: number) =>
-    row.map((cell: number, x: number) =>
-      equals(isEnemyHere({x, y}))(S.Just(true)) ? 1 : cell,
-    ),
-  );
+  // @ts-ignore
+  const updatedGrid = blockVectorsInGrid(grid)(S.fromMaybe([])(enemyVectors));
 
   const getUnitValidSteps = ({pos: {x, y}, range}: MapUnit) => {
     const xs = S.range(x - range)(x + range + 1);
@@ -117,6 +104,12 @@ export const getPossibleMoves = ({
 
   // @ts-ignore
   return S.fromMaybe([])(result);
+};
+
+export const blockVectorsInGrid = (grid: number[][]) => (vectors: Vector[]) => {
+  return grid.map((row: number[], y: number) =>
+    row.map((cell: number, x: number) => (S.elem({x, y})(vectors) ? 1 : cell)),
+  );
 };
 
 export const getPathTo = (grid: number[][]) => (source: Vector) => (
