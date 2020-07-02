@@ -23,7 +23,8 @@ const uniq = S.reduce((ns: any[]) => (n: any) =>
 
 const makeVector = (x: number) => (y: number) => ({x, y});
 
-const map_ = pipe([map, map]);
+const getDistance = (vec1: Vector) => (vec2: Vector) =>
+  Math.abs(vec1.x - vec2.x) + Math.abs(vec1.y - vec2.y);
 
 export const getPossibleMoves = ({
   units,
@@ -56,7 +57,10 @@ export const getPossibleMoves = ({
 
   // Marks enemy-occupied cells as "walls"
   // @ts-ignore
-  const updatedGrid = blockVectorsInGrid(grid)(S.fromMaybe([])(enemyVectors));
+  const updatedGrid: number[][] = blockVectorsInGrid(grid)(
+    // @ts-ignore
+    S.fromMaybe([])(enemyVectors),
+  );
 
   const getUnitValidSteps = ({pos: {x, y}, range}: MapUnit) => {
     const xs = S.range(x - range)(x + range + 1);
@@ -65,8 +69,8 @@ export const getPossibleMoves = ({
     const isInBoard = (vec: Vector) =>
       vec.x >= 0 && vec.x < width && vec.y >= 0 && vec.y < height;
 
-    const isInRange = (vec: Vector) =>
-      Math.abs(vec.x - x) + Math.abs(vec.y - y) <= range;
+    const isInRange = (range: number) => (vec: Vector) =>
+      getDistance({x, y})(vec) <= range;
 
     const isWalkable = ({x, y}: Vector) => walkableCells.includes(grid[y][x]);
 
@@ -82,7 +86,7 @@ export const getPossibleMoves = ({
     return pipe([
       ({xs, ys}) => lift2(makeVector)(xs)(ys),
       filter(isInBoard),
-      filter(isInRange),
+      filter(isInRange(range)),
       filter(isWalkable),
       map(pathFinder),
       filter(pathInRange),
@@ -93,23 +97,52 @@ export const getPossibleMoves = ({
     ])({xs, ys});
   };
 
-  const result = pipe([
-    map(prop('units')),
-    map(getUnits),
-    map_((unit: MapUnit) => ({
-      ...unit,
-      validSteps: getUnitValidSteps(unit),
-    })),
-  ])(force);
+  // TODO: it makes no sense to return a maybe because the force should be a parameter
+  return map(
+    pipe([
+      prop('units'),
+      getUnits,
+      map((unit: MapUnit) => {
+        const steps = getUnitValidSteps(unit);
 
-  // @ts-ignore
-  return S.fromMaybe([])(result);
+        return {
+          ...unit,
+          validSteps: steps,
+          enemiesInRange: pipe([
+            filter((u: MapUnit) => unit.force !== u.force),
+            filter((enemy: MapUnit) =>
+              S.any(
+                (step: Vector) =>
+                  getDistance(step)(enemy.pos) === 1 &&
+                  getPathTo(grid)(unit.pos)(enemy.pos).length <= unit.range,
+              )(steps),
+            ),
+          ])(units),
+        };
+      }),
+    ]),
+  )(force);
 };
 
 export const blockVectorsInGrid = (grid: number[][]) => (vectors: Vector[]) => {
-  return grid.map((row: number[], y: number) =>
-    row.map((cell: number, x: number) => (S.elem({x, y})(vectors) ? 1 : cell)),
-  );
+  const zipMe = (list: any[]) =>
+    S.pipe([prop('length'), S.range(0), S.zip(list)])(list);
+
+  const ypairs = zipMe(grid);
+
+  return map((pair: any) => {
+    const xs: number[] = S.fst(pair);
+    const y = S.snd(pair);
+
+    const xpairs = zipMe(xs);
+
+    return map((xpair: any) => {
+      const cell = S.fst(xpair);
+      const x = S.snd(xpair);
+
+      return S.elem({x, y})(vectors) ? 1 : cell;
+    })(xpairs);
+  })(ypairs);
 };
 
 export const getPathTo = (grid: number[][]) => (source: Vector) => (

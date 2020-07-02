@@ -9,6 +9,7 @@ export type MapUnit = {
   range: number;
   force: ForceId;
   validSteps: Vector[];
+  enemiesInRange: MapUnit[];
 };
 export type MapForce = {
   id: ForceId;
