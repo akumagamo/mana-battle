@@ -130,6 +130,12 @@ export const blockVectorsInGrid = (grid: number[][]) => (vectors: Vector[]) => {
 
   const ypairs = zipMe(grid);
 
+  const z = S.duplicate([1])
+  const za = S.duplicate(S.Just(1))
+  const p = S.Pair(1)(2)
+  const d = S.duplicate(S.Pair("a")(2))
+  const v = S.duplicate( d )
+
   return map((pair: any) => {
     const xs: number[] = S.fst(pair);
     const y = S.snd(pair);
