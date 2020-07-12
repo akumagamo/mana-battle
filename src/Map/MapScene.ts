@@ -198,15 +198,16 @@ export class MapScene extends Phaser.Scene {
     return force;
   }
 
+  getUnit(id: string) {
+    const findUnitInForce = (f: MapForce) =>
+      S.find((u: MapUnit) => u.id === id)(f.units);
+    const unit = S.justs(S.map(findUnitInForce)(Map.forces));
+
+    return S.head(unit);
+  }
+
   getCurrentForce() {
     return this.getForce(this.currentForce);
-  }
-  getForceUnit(force: MapForce, id: string) {
-    const unit = force.units.find((f) => f.id === id);
-
-    if (!unit) throw new Error(INVALID_STATE);
-
-    return unit;
   }
 
   getPos({x, y}: Vector) {
@@ -254,6 +255,9 @@ export class MapScene extends Phaser.Scene {
   }
   clearAllTileEvents() {
     this.tiles.forEach((tile) => tile.tile.removeAllListeners());
+  }
+  clearAllTileTint() {
+    this.tiles.forEach((tile) => tile.tile.clearTint());
   }
   renderUnits() {
     Map.forces.forEach((force) => {
@@ -311,30 +315,53 @@ export class MapScene extends Phaser.Scene {
   }
 
   handleClickOnEnemyUnit(unit: MapUnit, chara: Chara) {
-    this.selectedUnit = unit.id;
-    this.renderUI();
+    if (!this.selectedUnit) return;
 
-    Map.forces
-      .filter((force) => force.id === PLAYER_FORCE)
-      .forEach((force) =>
-        force.units
-          .filter((force) => force.id === this.selectedUnit)
-          .forEach((playerSquad) => {
-            const distance = this.getDistance(playerSquad.pos, unit.pos);
+    this.clearAllTileEvents();
+    this.clearAllTileTint();
 
-            if (distance === 1) {
-              this.scene.transition({
-                target: 'CombatScene',
-                duration: 0,
-                moveBelow: true,
-                data: {
-                  top: chara.unit.squad,
-                  bottom: this.selectedUnit,
-                },
-              });
-            }
-          }),
-      );
+    const current = this.getUnit(this.selectedUnit);
+    const enemyIsInRange = S.map((u: MapUnit) =>
+      S.any((e: MapUnit) => e.id === unit.id)(u.enemiesInRange),
+    )(current);
+
+    if (S.equals(enemyIsInRange)(S.Just(true))) {
+      S.map((u: MapUnit) => {
+        this.findPath(u.pos, {x: unit.pos.x, y: unit.pos.y}, unit.id).then(
+          (path) => {
+            const alliedChara = this.charas.find((c) => c.unit.id === u.id);
+
+            if (alliedChara)
+              this.moveUnit(alliedChara, path.slice(0, -1), attack);
+          },
+        );
+        const attack = () => {
+          this.turnOff();
+
+          this.scene.transition({
+            target: 'CombatScene',
+            duration: 0,
+            moveBelow: true,
+            data: {
+              top: chara.unit.squad,
+              bottom: this.selectedUnit,
+            },
+          });
+        };
+      })(current);
+    } else {
+      this.selectedUnit = unit.id;
+      this.renderUI();
+    }
+  }
+
+  turnOff() {
+    this.mapContainer?.destroy();
+    this.uiContainer?.destroy();
+    this.charas.forEach((chara) => {
+      chara.container?.destroy();
+      this.scene.remove(chara);
+    });
   }
 
   private makeCellClickable(cell: MapTile) {
@@ -358,14 +385,13 @@ export class MapScene extends Phaser.Scene {
     );
 
     if (this.selectedUnit) {
-      const force = this.getForce(this.currentForce);
-
       const squad = getSquad(this.selectedUnit);
-      const forceSquad = this.getForceUnit(force, this.selectedUnit);
+      const unit = this.getUnit(this.selectedUnit);
 
-      text(20, 610, squad.name, uiContainer, this);
-
-      text(1000, 610, `${forceSquad.range} cells`, uiContainer, this);
+      S.map((u: MapUnit) => {
+        text(20, 610, squad.name, uiContainer, this);
+        text(1000, 610, `${u.range} cells`, uiContainer, this);
+      })(unit);
     }
 
     button(1100, 50, 'Return to Title', uiContainer, this, () => {
@@ -478,7 +504,7 @@ export class MapScene extends Phaser.Scene {
 
     this.movedUnits.push(unitId);
 
-    this.findPath(squad.pos, {x, y}).then((path) =>
+    this.findPath(squad.pos, {x, y}, null).then((path) =>
       this.moveUnit(chara, path, onMoveComplete),
     );
 
@@ -543,12 +569,20 @@ export class MapScene extends Phaser.Scene {
   }
 
   // todo: remove this, api should provide valid cells
-  findPath = (origin: Vector, target: Vector): Promise<Vector[]> => {
+  findPath = (
+    origin: Vector,
+    target: Vector,
+    toEnemy: string | null,
+  ): Promise<Vector[]> => {
     let cells = Map.cells.map((row) => row.map(identity));
 
     const enemies = this.getEnemies();
 
     enemies.forEach((sqd) => {
+      if (toEnemy) {
+        if (toEnemy === sqd.id) return;
+      }
+
       cells[sqd.pos.y][sqd.pos.x] = 1;
     });
 

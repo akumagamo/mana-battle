@@ -60,7 +60,6 @@ export class EditSquadScene extends Phaser.Scene {
           unit.x === boardSprite.boardX && unit.y === boardSprite.boardY,
       );
 
-      console.log(`xxx unit to replace`, unitToReplace);
       boardScene.squad = updatedSquad;
 
       //remove dragged unit chara

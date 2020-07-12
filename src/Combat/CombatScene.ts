@@ -145,6 +145,13 @@ export default class CombatScene extends Phaser.Scene {
       this.turn();
     } else if (cmd.type === 'VICTORY') {
       console.log('Winning Team:', cmd.target);
+
+
+      this.scene.start(
+         'MapScene'
+      );
+
+      this.destroy();
     } else console.error(`Unknown command:`, cmd);
   }
 
