@@ -292,6 +292,9 @@ export class MapScene extends Phaser.Scene {
     this.charas.push(chara);
 
     chara.onClick((c: Chara) => {
+      this.clearAllTileEvents();
+      this.clearAllTileTint();
+
       if (unit.force === PLAYER_FORCE) {
         this.handleClickOnOwnUnit(unit);
       } else {
@@ -316,9 +319,6 @@ export class MapScene extends Phaser.Scene {
 
   handleClickOnEnemyUnit(unit: MapUnit, chara: Chara) {
     if (!this.selectedUnit) return;
-
-    this.clearAllTileEvents();
-    this.clearAllTileTint();
 
     const current = this.getUnit(this.selectedUnit);
     const enemyIsInRange = S.map((u: MapUnit) =>
