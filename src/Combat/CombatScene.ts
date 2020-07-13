@@ -109,7 +109,6 @@ export default class CombatScene extends Phaser.Scene {
 
   turn() {
     const commands = runCombat(this.units.map((u) => u.unit));
-    console.log(`>>>`, commands);
     this.execute(commands);
   }
 
@@ -143,13 +142,18 @@ export default class CombatScene extends Phaser.Scene {
     } else if (cmd.type === 'RESTART_TURNS') {
       this.currentTurn = 0;
       this.turn();
+    } else if (cmd.type === 'END_COMBAT') {
+      this.scene.start('MapScene', []);
+      this.destroy();
     } else if (cmd.type === 'VICTORY') {
       console.log('Winning Team:', cmd.target);
-
-
-      this.scene.start(
-         'MapScene'
-      );
+      this.scene.start('MapScene', [
+        // REMOVE LOSING TEAM
+        {
+          type: 'DESTROY_TEAM',
+          target: cmd.target === this.top ? this.bottom : this.top,
+        },
+      ]);
 
       this.destroy();
     } else console.error(`Unknown command:`, cmd);

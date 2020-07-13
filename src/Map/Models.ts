@@ -10,6 +10,7 @@ export type MapUnit = {
   force: ForceId;
   validSteps: Vector[];
   enemiesInRange: MapUnit[];
+  status: "alive" | "defeated";
 };
 export type MapForce = {
   id: ForceId;

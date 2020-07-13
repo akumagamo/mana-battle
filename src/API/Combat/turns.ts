@@ -1,9 +1,10 @@
+import S from 'sanctuary';
 import {Unit} from '../../Unit/Model';
 import {INVALID_STATE} from '../../errors';
 
-const sortInitiative = (unit: Unit) => unit.agi + unit.dex;
+const sortInitiative = (unit: TurnUnit) => unit.unit.agi + unit.unit.dex;
 
-export const initiativeList = (units: Unit[]) => {
+export const initiativeList = (units: TurnUnit[]) => {
   return units.sort((a, b) => sortInitiative(b) - sortInitiative(a));
 };
 
@@ -15,18 +16,33 @@ export type Attack = {
   target: string;
   damage: number;
   updatedTarget: Unit;
+  updatedSource: Unit;
 };
 export type Victory = {type: 'VICTORY'; target: string};
+export type EndCombat = {type: 'END_COMBAT'};
 export type EndTurn = {type: 'END_TURN'};
 export type RestartTurns = {type: 'RESTART_TURNS'};
 
-export type Command = Move | Attack | Victory | EndTurn | RestartTurns | Return;
+export type Command =
+  | Move
+  | Attack
+  | Victory
+  | EndTurn
+  | RestartTurns
+  | Return
+  | EndCombat;
 
 export const runCombat = (units: Unit[]): Command[] => {
-  const unitList = initiativeList(units);
+  const turnUnits: TurnUnit[] = units.map((unit) => ({
+    unit,
+    remainingAttacks: 2,
+  }));
+  const unitList = initiativeList(turnUnits);
 
   return runTurn(0, unitList, []);
 };
+
+type TurnUnit = {unit: Unit; remainingAttacks: number};
 
 /**
  * @param {number} turnNumber The current turn (starts at 0)
@@ -34,7 +50,7 @@ export const runCombat = (units: Unit[]): Command[] => {
  * */
 export const runTurn = (
   turnNumber: number,
-  units: Unit[],
+  units: TurnUnit[],
   commands: Command[],
 ): Command[] => {
   const current = units[turnNumber];
@@ -42,60 +58,90 @@ export const runTurn = (
 
   const nextTurn = isLastActor ? 0 : turnNumber + 1;
 
-  if (current.currentHp < 1) return runTurn(nextTurn, units, commands);
+  if (current.unit.currentHp < 1) return runTurn(nextTurn, units, commands);
 
-  if (!current.squad) throw new Error(INVALID_STATE);
+  if (!current.unit.squad) throw new Error(INVALID_STATE);
 
-  const target = getTarget(current, units);
+  const target = getTarget(current.unit, units);
 
   if (!target) throw new Error(INVALID_STATE);
 
-  const updatedUnits = units.map((unit) => {
-    const newHp = unit.currentHp - 22;
-    const currentHp = newHp < 1 ? 0 : newHp;
+  const updatedUnits = units
+    .map((unit) => {
+      const newHp = unit.unit.currentHp - 22;
+      const currentHp = newHp < 1 ? 0 : newHp;
 
-    return unit.id === target.id ? {...unit, currentHp} : unit;
-  });
+      return unit.unit.id === target.id
+        ? {
+            remainingAttacks: unit.remainingAttacks,
+            unit: {...unit.unit, currentHp},
+          }
+        : unit;
+    })
+    .map((unit) => {
+      return unit.unit.id === current.unit.id
+        ? {remainingAttacks: unit.remainingAttacks - 1, unit: {...unit.unit}}
+        : unit;
+    });
 
-  const updatedTarget = updatedUnits.find((u) => u.id === target.id);
+  const updatedTarget = updatedUnits.find((u) => u.unit.id === target.id);
 
-  if (!updatedTarget) throw new Error(INVALID_STATE);
+  const updatedSource = updatedUnits.find((u) => u.unit.id === current.unit.id);
+
+  if (!updatedTarget || !updatedSource) throw new Error(INVALID_STATE);
 
   const move: Command[] = [
-    {type: 'MOVE', source: current.id, target: target.id},
+    {type: 'MOVE', source: current.unit.id, target: target.id},
   ];
   const attack: Command[] = [
     {
       type: 'ATTACK',
-      source: current.id,
+      source: current.unit.id,
       target: target.id,
       damage: 22,
-      updatedTarget,
+      updatedTarget: updatedTarget.unit,
+      updatedSource: updatedSource.unit,
     },
   ];
 
-  const returnCmd: Command[] = [{type: 'RETURN', target: current.id}];
+  const returnCmd: Command[] = [{type: 'RETURN', target: current.unit.id}];
 
   const turnCommands: Command[] = commands
     .concat(move)
     .concat(attack)
     .concat(returnCmd);
 
-  const victory: Victory = {type: 'VICTORY', target: current.squad};
+  const {squad} = current.unit;
 
-  if (endCombatCondition(current, updatedUnits)) {
-    return turnCommands.concat([victory]);
+  const victory: () => Victory = () => ({type: 'VICTORY', target: squad});
+
+  const endCombat: () => EndCombat = () => ({type: 'END_COMBAT'});
+
+  if (isVictory(current, updatedUnits)) {
+    return turnCommands.concat([victory()]);
+  } else if (noAttacksRemaining(updatedUnits)) {
+    return turnCommands.concat([endCombat()]);
   } else {
     return runTurn(nextTurn, updatedUnits, turnCommands);
   }
 };
+function isVictory(current: TurnUnit, units: TurnUnit[]) {
+  const teamDefeated = S.pipe([
+    S.map(S.prop('unit')),
+    S.filter(isFromAnotherSquad(current.unit)),
+    S.all((e: Unit) => !isAlive(e)),
+  ])(units);
 
-function endCombatCondition(current: Unit, units: Unit[]) {
-  return units.filter(isFromAnotherSquad(current)).every((e) => !isAlive(e));
+  return teamDefeated;
 }
 
-export function getTarget(current: Unit, units: Unit[]) {
+function noAttacksRemaining(units: TurnUnit[]) {
+  return S.all((u: TurnUnit) => u.remainingAttacks < 1)(units);
+}
+
+export function getTarget(current: Unit, units: TurnUnit[]) {
   return units
+    .map((u) => u.unit)
     .filter(isFromAnotherSquad(current))
     .filter(isAlive)
     .sort((a, b) => a.currentHp - b.currentHp)[0];
@@ -109,9 +155,4 @@ function isFromAnotherSquad(current: Unit) {
   return function(unit: Unit) {
     return current.squad !== unit.squad;
   };
-}
-
-function damageUnit(unit: Unit, dmg: number) {
-  unit.currentHp = unit.currentHp - dmg;
-  if (unit.currentHp < 0) unit.currentHp = 0;
 }

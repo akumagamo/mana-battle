@@ -81,6 +81,7 @@ export const getPossibleMoves = ({
     const pathInRange = (list: Vector[]) => list.length <= range + 1;
 
     const isEnemyInVector = (vec: Vector) =>
+      //@ts-ignore
       equals(isEnemyHere(vec))(S.Just(true));
 
     return pipe([
@@ -129,12 +130,6 @@ export const blockVectorsInGrid = (grid: number[][]) => (vectors: Vector[]) => {
     S.pipe([prop('length'), S.range(0), S.zip(list)])(list);
 
   const ypairs = zipMe(grid);
-
-  const z = S.duplicate([1])
-  const za = S.duplicate(S.Just(1))
-  const p = S.Pair(1)(2)
-  const d = S.duplicate(S.Pair("a")(2))
-  const v = S.duplicate( d )
 
   return map((pair: any) => {
     const xs: number[] = S.fst(pair);

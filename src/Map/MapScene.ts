@@ -62,6 +62,7 @@ const Map: MapBoard = {
             y: 0,
           },
           range: 5,
+          status: 'alive',
           validSteps: [],
           enemiesInRange: [],
           force: PLAYER_FORCE,
@@ -76,6 +77,7 @@ const Map: MapBoard = {
           range: 5,
           validSteps: [],
           enemiesInRange: [],
+          status: 'alive',
           force: PLAYER_FORCE,
         },
       ],
@@ -90,6 +92,7 @@ const Map: MapBoard = {
           range: 5,
           validSteps: [],
           enemiesInRange: [],
+          status: 'alive',
           force: CPU_FORCE,
         },
         {
@@ -98,6 +101,7 @@ const Map: MapBoard = {
           range: 5,
           validSteps: [],
           enemiesInRange: [],
+          status: 'alive',
           force: CPU_FORCE,
         },
       ],
@@ -131,6 +135,10 @@ type MapTile = {
   type: number;
   tile: Image;
 };
+type MapCommands = {
+  type: 'DESTROY_TEAM';
+  target: string;
+};
 export class MapScene extends Phaser.Scene {
   charas: Chara[] = [];
   tiles: MapTile[] = [];
@@ -146,7 +154,18 @@ export class MapScene extends Phaser.Scene {
   constructor() {
     super('MapScene');
   }
-  create() {
+
+  // Mutate data before kicking off the scene
+  create(data: MapCommands[]) {
+    data.forEach((cmd) => {
+      if (cmd.type === 'DESTROY_TEAM') {
+        S.map((u: MapUnit) => {
+          u.status = 'defeated';
+        })(this.getUnit(cmd.target));
+      }
+    });
+
+    console.log(`CREATE`, data);
     this.mapContainer = this.add.container(0, 0);
     this.uiContainer = this.add.container(0, 0);
 
@@ -261,7 +280,9 @@ export class MapScene extends Phaser.Scene {
   }
   renderUnits() {
     Map.forces.forEach((force) => {
-      force.units.forEach((unit) => this.renderUnit(unit));
+      force.units
+        .filter((u) => u.status === 'alive')
+        .forEach((unit) => this.renderUnit(unit));
     });
   }
 
@@ -327,12 +348,21 @@ export class MapScene extends Phaser.Scene {
 
     if (S.equals(enemyIsInRange)(S.Just(true))) {
       S.map((u: MapUnit) => {
+        // TODO: the path should be contained in `enemiesInRange`
+        // this should not be computed in the UI layer
         this.findPath(u.pos, {x: unit.pos.x, y: unit.pos.y}, unit.id).then(
           (path) => {
             const alliedChara = this.charas.find((c) => c.unit.id === u.id);
 
-            if (alliedChara)
-              this.moveUnit(alliedChara, path.slice(0, -1), attack);
+            if (alliedChara) {
+              const target = path.slice(0, -1);
+              this.moveUnit(alliedChara, target, attack);
+
+              // TODO: IO, move to API
+              S.map((u: MapUnit) => {
+                u.pos = target.reverse()[0];
+              })(current);
+            }
           },
         );
         const attack = () => {
@@ -609,10 +639,8 @@ const formatDataForApi = (currentForce: string) => ({
   units: Map.forces
     .map((f) =>
       f.units.map((u) => ({
-        id: u.id,
-        range: u.range,
+        ...u,
         force: f.id,
-        pos: {x: u.pos.x, y: u.pos.y},
         validSteps: [],
         enemiesInRange: [],
       })),

@@ -34,7 +34,7 @@ export default class TitleScene extends Phaser.Scene {
     });
 
     button(20, 200, 'Map', container, this, () => {
-      this.scene.start('MapScene');
+      this.scene.start('MapScene', []);
     });
 
     button(20, 250, 'Combat', container, this, () => {
