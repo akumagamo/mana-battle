@@ -1,6 +1,6 @@
 import * as PF from 'pathfinding';
 import S from 'sanctuary';
-import {Vector, TurnManager, Force, MapUnit} from './Model';
+import {Vector, TurnManager, MapUnit} from './Model';
 import {MapState} from './Model';
 
 const getBy = (attr: string) => <A>(target: A) =>
@@ -52,7 +52,7 @@ export const getPossibleMoves = ({
 
   const enemyVectors = S.map(getVectors)(enemyUnits);
 
-  const isEnemyHere = (vec: Vector) => (S.elem(vec))(enemyVectors);
+  const isEnemyHere = (vec: Vector) => S.elem(vec)(enemyVectors);
 
   // Marks enemy-occupied cells as "walls"
   // @ts-ignore
@@ -78,7 +78,7 @@ export const getPossibleMoves = ({
 
     const isEnemyInVector = (vec: Vector) =>
       //@ts-ignore
-      S.equals(isEnemyHere(vec))((true));
+      S.equals(isEnemyHere(vec))(true);
 
     return S.pipe([
       ({xs, ys}) => S.lift2(makeVector)(xs)(ys),
@@ -114,6 +114,10 @@ export const getPossibleMoves = ({
                   getPathTo(grid)(unit.pos)(enemy.pos).length <= unit.range,
               )(steps),
             ),
+            S.map((enemy: MapUnit) => ({
+              enemy: enemy.id,
+              steps: (getPathTo(grid)(unit.pos)(enemy.pos)).slice(0,-1).map(([x,y])=>makeVector(x)(y)),
+            })),
           ])(units),
         };
       }),

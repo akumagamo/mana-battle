@@ -33,7 +33,7 @@ export type MapUnit = {
   range: number;
   force: ForceId;
   validSteps: Vector[];
-  enemiesInRange: MapUnit[];
+  enemiesInRange: {enemy: string, steps: Vector[]}[];
   status: "alive" | "defeated";
 };
 

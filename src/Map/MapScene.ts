@@ -4,10 +4,8 @@ import {getSquad, getSquadLeader} from '../DB';
 import {INVALID_STATE} from '../errors';
 import button from '../UI/button';
 import {Container, Image} from '../Models';
-import * as easyStar from 'easystarjs';
 import panel from '../UI/panel';
 import text from '../UI/text';
-import {identity} from '../utils/functional';
 import {
   getPossibleMoves,
   unitsFromForce as getUnitsFromForce,
@@ -30,7 +28,6 @@ const BOTTOM_PANEL_Y = 600;
 const BOTTOM_PANEL_WIDTH = 1280;
 const BOTTOM_PANEL_HEIGHT = 120;
 
-const easystar = new easyStar.js();
 
 const cellSize = 100;
 
@@ -68,10 +65,8 @@ export class MapScene extends Phaser.Scene {
     super('MapScene');
   }
 
-  updateState(state:MapState){
-
-        this.state = state;
-
+  updateState(state: MapState) {
+    this.state = state;
   }
   // Mutate data before kicking off the scene
   create(data: MapCommands[]) {
@@ -81,7 +76,7 @@ export class MapScene extends Phaser.Scene {
           u.status = 'defeated';
         })(this.getUnit(cmd.target));
       } else if (cmd.type === 'UPDATE_STATE') {
-        this.updateState(cmd.target)
+        this.updateState(cmd.target);
       }
     });
 
@@ -249,8 +244,11 @@ export class MapScene extends Phaser.Scene {
       this.makeCellClickable(this.tileAt(cell.x, cell.y)),
     );
 
-    unit.enemiesInRange.forEach((cell) => {
-      this.tileAt(cell.pos.x, cell.pos.y).tile.setTint(0xff0000);
+    unit.enemiesInRange.forEach(({enemy}) => {
+      const e = this.getUnit(enemy);
+      S.map((e_: MapUnit) => {
+        this.tileAt(e_.pos.x, e_.pos.y).tile.setTint(0xff0000);
+      })(e);
     });
 
     this.renderUI();
@@ -260,29 +258,16 @@ export class MapScene extends Phaser.Scene {
     if (!this.selectedUnit) return;
 
     const current = this.getUnit(this.selectedUnit);
-    const enemyIsInRange = S.map((u: MapUnit) =>
-      S.any((e: MapUnit) => e.id === unit.id)(u.enemiesInRange),
-    )(current);
 
-    if (S.equals(enemyIsInRange)(S.Just(true))) {
-      S.map((u: MapUnit) => {
-        // TODO: the path should be contained in `enemiesInRange`
-        // this should not be computed in the UI layer
-        this.findPath(u.pos, {x: unit.pos.x, y: unit.pos.y}, unit.id).then(
-          (path) => {
-            const alliedChara = this.charas.find((c) => c.unit.id === u.id);
+    S.map((curr: MapUnit) => {
 
-            if (alliedChara) {
-              const target = path.slice(0, -1);
-              this.moveUnit(alliedChara, target, attack);
-
-              // TODO: IO, move to API
-              S.map((u: MapUnit) => {
-                u.pos = target.reverse()[0];
-              })(current);
-            }
-          },
+        const enemy = S.find((e: any) => e.enemy === unit.id)(
+          curr.enemiesInRange,
         );
+      if (!S.equals(enemy)(S.Nothing)) {
+        const alliedChara = this.charas.find((c) => c.unit.id === curr.id);
+
+        if (!alliedChara) return;
         const attack = () => {
           this.turnOff();
 
@@ -296,11 +281,22 @@ export class MapScene extends Phaser.Scene {
             },
           });
         };
-      })(current);
-    } else {
-      this.selectedUnit = unit.id;
-      this.renderUI();
-    }
+
+
+        S.map((e: any) => {
+          const target = e.steps;
+          this.moveUnit(alliedChara, target, attack);
+
+          // TODO: IO, move to API
+          S.map((u: MapUnit) => {
+            u.pos = target.reverse()[0];
+          })(current);
+        })(enemy);
+      } else {
+        this.selectedUnit = unit.id;
+        this.renderUI();
+      }
+    })(current);
   }
 
   turnOff() {
@@ -524,37 +520,6 @@ export class MapScene extends Phaser.Scene {
     return this.state?.units.filter((unit) => unit.force !== this.currentForce);
   }
 
-  // todo: remove this, api should provide valid cells
-  findPath = (
-    origin: Vector,
-    target: Vector,
-    toEnemy: string | null,
-  ): Promise<Vector[]> => {
-    if (!this.state) throw new Error(INVALID_STATE);
-
-    let cells = this.state.cells.map((row) => row.map(identity));
-
-    const enemies = this.getEnemies();
-
-    enemies.forEach((sqd) => {
-      if (toEnemy) {
-        if (toEnemy === sqd.id) return;
-      }
-
-      cells[sqd.pos.y][sqd.pos.x] = 1;
-    });
-
-    easystar.setGrid(cells);
-    easystar.setAcceptableTiles(walkableTiles);
-
-    return new Promise((resolve, reject) => {
-      easystar.findPath(origin.x, origin.y, target.x, target.y, (path) => {
-        if (path) resolve(path);
-        else reject();
-      });
-      easystar.calculate();
-    });
-  };
   getTileAt(x: number, y: number) {
     const tile = this.tiles.find((tile) => tile.x === x && tile.y === y);
 
