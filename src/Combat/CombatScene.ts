@@ -34,6 +34,7 @@ export default class CombatScene extends Phaser.Scene {
   units: Chara[] = [];
   top = '';
   bottom = '';
+  conflictId = '';
   currentTurn = 0;
 
   constructor() {
@@ -51,11 +52,12 @@ export default class CombatScene extends Phaser.Scene {
   }
 
   // LIFECYCLE METHODS
-  create(data: {top: string; bottom: string}) {
+  create(data: {top: string; bottom: string; conflictId: string}) {
     plains(this);
 
     this.top = data.top;
     this.bottom = data.bottom;
+    this.conflictId = data.conflictId;
     const combatants = [data.top, data.bottom];
 
     combatants.forEach((id) => {
@@ -143,8 +145,17 @@ export default class CombatScene extends Phaser.Scene {
       this.currentTurn = 0;
       this.turn();
     } else if (cmd.type === 'END_COMBAT') {
-      this.scene.start('MapScene', []);
-      this.destroy();
+      this.retreatUnits().then((updatedUnits: Unit[]) => {
+        this.scene.start(
+          'MapScene',
+          updatedUnits.map((u) => ({
+            type: 'UPDATE_UNIT',
+            target: u,
+            conflictId: this.conflictId,
+          })),
+        );
+        this.destroy();
+      });
     } else if (cmd.type === 'VICTORY') {
       console.log('Winning Team:', cmd.target);
       this.scene.start('MapScene', [
@@ -213,6 +224,42 @@ export default class CombatScene extends Phaser.Scene {
     return new Promise((resolve) => {
       this.time.addEvent(timeEvents);
       this.tweens.add(config(resolve));
+    });
+  }
+
+  retreatUnits() {
+    this.units.forEach((chara) => {
+      chara.clearAnimations();
+      chara.run();
+
+      const charaIsTop = this.top === chara.unit.squad;
+
+      const getTargetPos = () => {
+        if (!chara.container) throw new Error(INVALID_STATE);
+        if (charaIsTop) {
+          return {x: chara.container.x - 200, y: chara.container.y - 200};
+        } else return {x: chara.container.x + 200, y: chara.container.y + 200};
+      };
+
+      const {x, y} = getTargetPos();
+
+      const config = {
+        targets: chara.container,
+        x,
+        y,
+        duration: 1000,
+      };
+
+      this.tweens.add(config);
+    });
+
+    return new Promise((resolve: (u: Unit[]) => void) => {
+      const timeEvents = {
+        delay: 1000,
+        callback: () => resolve(this.units.map((u) => u.unit)),
+      };
+
+      this.time.addEvent(timeEvents);
     });
   }
 

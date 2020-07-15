@@ -1,21 +1,14 @@
 import * as PF from 'pathfinding';
-import S, {
-  lift2,
-  prop,
-  equals,
-  pipe,
-  chain,
-  map,
-  filter,
-  reject,
-  find,
-} from 'sanctuary';
-import {Vector, TurnManager, MapForce, MapUnit} from './Models';
+import S from 'sanctuary';
+import {Vector, TurnManager, Force, MapUnit} from './Model';
+import {MapState} from './Model';
 
-const getBy = (attr: string) => (target: any) =>
-  find((el: any) => equals(prop(attr)(el))(target));
+const getBy = (attr: string) => <A>(target: A) =>
+  S.find((el: any) => S.equals(S.prop(attr)(el))(target));
 
 const byId = getBy('id');
+
+export const findById = <A>(list: A[]) => (id: string) => getBy('id')(id)(list);
 
 const uniq = S.reduce((ns: any[]) => (n: any) =>
   S.elem(n)(ns) ? ns : ns.concat([n]),
@@ -25,6 +18,18 @@ const makeVector = (x: number) => (y: number) => ({x, y});
 
 const getDistance = (vec1: Vector) => (vec2: Vector) =>
   Math.abs(vec1.x - vec2.x) + Math.abs(vec1.y - vec2.y);
+
+export const unitsFromForce = (state: MapState) => (id: string) =>
+  S.filter((u: MapUnit) => u.force === id)(state.units);
+
+export const getUnit = (state: MapState) => (id: string) =>
+  findById(state.units)(id);
+
+export const getForce = (state: MapState) => (id: string) =>
+  findById(state.forces)(id);
+
+export const getEntities = <A>(entityList: A[]) => (idList: string) =>
+  S.pipe([S.map((id: string) => findById(entityList)(id)), S.justs])(idList);
 
 export const getPossibleMoves = ({
   units,
@@ -37,30 +42,21 @@ export const getPossibleMoves = ({
 }: TurnManager) => {
   /**   force :: Maybe Force */
   const force = byId(currentForce)(forces);
-  /**   enemyForce :: Maybe Force */
-  const enemyForce = find((force: MapForce) => force.id !== currentForce)(
-    forces,
-  );
 
-  const getUnits = pipe([map((unitId) => byId(unitId)(units)), S.justs]);
+  const enemyUnits = S.filter((u: MapUnit) => u.force !== currentForce)(units);
 
-  /**   getVectors :: Force -> Array Vector */
-  const getVectors = pipe([
-    prop('units'), // Array UnitId
-    getUnits, // Array Unit
-    map(prop('pos')), // Array Vector
-  ]);
+  const getUnits = S.pipe([S.map((unitId) => byId(unitId)(units)), S.justs]);
 
-  const enemyVectors = map(getVectors)(enemyForce);
+  /**   getVectors :: MapUnit -> Vector */
+  const getVectors = S.prop('pos'); // Vector
 
-  const isEnemyHere = (vec: Vector) => map(S.elem(vec))(enemyVectors);
+  const enemyVectors = S.map(getVectors)(enemyUnits);
+
+  const isEnemyHere = (vec: Vector) => (S.elem(vec))(enemyVectors);
 
   // Marks enemy-occupied cells as "walls"
   // @ts-ignore
-  const updatedGrid: number[][] = blockVectorsInGrid(grid)(
-    // @ts-ignore
-    S.fromMaybe([])(enemyVectors),
-  );
+  const updatedGrid: number[][] = blockVectorsInGrid(grid)(enemyVectors);
 
   const getUnitValidSteps = ({pos: {x, y}, range}: MapUnit) => {
     const xs = S.range(x - range)(x + range + 1);
@@ -82,36 +78,36 @@ export const getPossibleMoves = ({
 
     const isEnemyInVector = (vec: Vector) =>
       //@ts-ignore
-      equals(isEnemyHere(vec))(S.Just(true));
+      S.equals(isEnemyHere(vec))((true));
 
-    return pipe([
-      ({xs, ys}) => lift2(makeVector)(xs)(ys),
-      filter(isInBoard),
-      filter(isInRange(range)),
-      filter(isWalkable),
-      map(pathFinder),
-      filter(pathInRange),
-      chain(map(vecFromTuple)),
+    return S.pipe([
+      ({xs, ys}) => S.lift2(makeVector)(xs)(ys),
+      S.filter(isInBoard),
+      S.filter(isInRange(range)),
+      S.filter(isWalkable),
+      S.map(pathFinder),
+      S.filter(pathInRange),
+      S.chain(S.map(vecFromTuple)),
       uniq,
-      reject(isEnemyInVector),
-      reject(equals({x, y})),
+      S.reject(isEnemyInVector),
+      S.reject(S.equals({x, y})),
     ])({xs, ys});
   };
 
   // TODO: it makes no sense to return a maybe because the force should be a parameter
-  return map(
-    pipe([
-      prop('units'),
+  return S.map(
+    S.pipe([
+      S.prop('units'),
       getUnits,
-      map((unit: MapUnit) => {
+      S.map((unit: MapUnit) => {
         const steps = getUnitValidSteps(unit);
 
         return {
           ...unit,
           validSteps: steps,
-          enemiesInRange: pipe([
-            filter((u: MapUnit) => unit.force !== u.force),
-            filter((enemy: MapUnit) =>
+          enemiesInRange: S.pipe([
+            S.filter((u: MapUnit) => unit.force !== u.force),
+            S.filter((enemy: MapUnit) =>
               S.any(
                 (step: Vector) =>
                   getDistance(step)(enemy.pos) === 1 &&
@@ -125,19 +121,23 @@ export const getPossibleMoves = ({
   )(force);
 };
 
+// TODO: creating an indexed list of lists
+// By knowing the width and height of the grid
+// Zip the first level with a range (max is height)
+// For each elem, zip with another range (max is width)
 export const blockVectorsInGrid = (grid: number[][]) => (vectors: Vector[]) => {
   const zipMe = (list: any[]) =>
-    S.pipe([prop('length'), S.range(0), S.zip(list)])(list);
+    S.pipe([S.prop('length'), S.range(0), S.zip(list)])(list);
 
   const ypairs = zipMe(grid);
 
-  return map((pair: any) => {
+  return S.map((pair: any) => {
     const xs: number[] = S.fst(pair);
     const y = S.snd(pair);
 
     const xpairs = zipMe(xs);
 
-    return map((xpair: any) => {
+    return S.map((xpair: any) => {
       const cell = S.fst(xpair);
       const x = S.snd(xpair);
 

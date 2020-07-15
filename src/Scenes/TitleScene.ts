@@ -3,6 +3,7 @@ import {getSquads} from '../DB';
 import defaultData from '../defaultData';
 import {preload} from '../preload';
 import button from '../UI/button';
+import {initialMapState} from '../API/Map/mocks';
 
 export default class TitleScene extends Phaser.Scene {
   constructor() {
@@ -34,7 +35,9 @@ export default class TitleScene extends Phaser.Scene {
     });
 
     button(20, 200, 'Map', container, this, () => {
-      this.scene.start('MapScene', []);
+      this.scene.start('MapScene', [
+        {type: 'UPDATE_STATE', target: initialMapState},
+      ]);
     });
 
     button(20, 250, 'Combat', container, this, () => {

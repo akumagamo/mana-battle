@@ -8,15 +8,18 @@ import * as easyStar from 'easystarjs';
 import panel from '../UI/panel';
 import text from '../UI/text';
 import {identity} from '../utils/functional';
-import {getPossibleMoves} from './api';
-import {Vector, MapUnit} from './Models';
+import {
+  getPossibleMoves,
+  unitsFromForce as getUnitsFromForce,
+  getUnit,
+} from '../API/Map/api';
+import {Vector, MapUnit, MapState, Force} from '../API/Map/Model';
 import {randomItem} from '../defaultData';
 import S from 'sanctuary';
+import {PLAYER_FORCE, tileMap, CPU_FORCE} from '../API/Map/mocks';
 
 // TODO: error when clicking on enemy unit
 
-const PLAYER_FORCE = 'PLAYER_FORCE';
-const CPU_FORCE = 'CPU_FORCE';
 const WALKABLE_CELL_TINT = 0x0d4e2b;
 const SQUAD_MOVE_DURATION = 500;
 const CHARA_MAP_SCALE = 0.5;
@@ -35,115 +38,25 @@ const boardPadding = 50;
 
 const walkableTiles = [0];
 
-const tileMap: {[x in CellNumber]: string} = {
-  0: 'grass',
-  1: 'woods',
-  2: 'mountain',
-};
-
-const Map: MapBoard = {
-  cells: [
-    [0, 1, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2],
-    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 1, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 2, 1, 2, 0, 0, 1],
-    [0, 1, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 1],
-    [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1],
-  ],
-  forces: [
-    {
-      id: PLAYER_FORCE,
-      name: 'Player',
-      units: [
-        {
-          id: '0',
-          pos: {
-            x: 0,
-            y: 0,
-          },
-          range: 5,
-          status: 'alive',
-          validSteps: [],
-          enemiesInRange: [],
-          force: PLAYER_FORCE,
-        },
-
-        {
-          id: '1',
-          pos: {
-            x: 3,
-            y: 2,
-          },
-          range: 5,
-          validSteps: [],
-          enemiesInRange: [],
-          status: 'alive',
-          force: PLAYER_FORCE,
-        },
-      ],
-    },
-    {
-      id: CPU_FORCE,
-      name: 'CPU',
-      units: [
-        {
-          id: '2',
-          pos: {x: 0, y: 3},
-          range: 5,
-          validSteps: [],
-          enemiesInRange: [],
-          status: 'alive',
-          force: CPU_FORCE,
-        },
-        {
-          id: '3',
-          pos: {x: 3, y: 1},
-          range: 5,
-          validSteps: [],
-          enemiesInRange: [],
-          status: 'alive',
-          force: CPU_FORCE,
-        },
-      ],
-    },
-  ],
-
-  cities: [
-    {id: 'a1', name: 'Arabella', x: 1, y: 1, force: PLAYER_FORCE},
-    {id: 'm1', name: 'Marqueze', x: 3, y: 1, force: CPU_FORCE},
-  ],
-};
-type CellNumber = 0 | 1 | 2;
-type MapBoard = {
-  cells: CellNumber[][];
-  forces: MapForce[];
-  cities: MapCity[];
-};
-type MapForce = {id: string; name: string; units: MapUnit[]};
-
-type MapCity = {
-  id: string;
-  name: string;
-  x: number;
-  y: number;
-  force: string | null;
-};
-
 type MapTile = {
   x: number;
   y: number;
   type: number;
   tile: Image;
 };
-type MapCommands = {
-  type: 'DESTROY_TEAM';
-  target: string;
-};
+
+type MapCommands =
+  | {type: 'UPDATE_STATE'; target: MapState}
+  | {
+      type: 'DESTROY_TEAM';
+      target: string;
+    };
 export class MapScene extends Phaser.Scene {
   charas: Chara[] = [];
   tiles: MapTile[] = [];
   mapContainer: null | Container = null;
   uiContainer: null | Container = null;
+  state: MapState | null = null;
 
   selectedUnit: string | null = null;
   currentForce: string = PLAYER_FORCE;
@@ -155,6 +68,11 @@ export class MapScene extends Phaser.Scene {
     super('MapScene');
   }
 
+  updateState(state:MapState){
+
+        this.state = state;
+
+  }
   // Mutate data before kicking off the scene
   create(data: MapCommands[]) {
     data.forEach((cmd) => {
@@ -162,6 +80,8 @@ export class MapScene extends Phaser.Scene {
         S.map((u: MapUnit) => {
           u.status = 'defeated';
         })(this.getUnit(cmd.target));
+      } else if (cmd.type === 'UPDATE_STATE') {
+        this.updateState(cmd.target)
       }
     });
 
@@ -189,40 +109,40 @@ export class MapScene extends Phaser.Scene {
     if (!tile) throw new Error(INVALID_STATE);
     return tile;
   }
+
   setValidMoves() {
-    const moveList = getPossibleMoves(formatDataForApi(this.currentForce));
+    if (!this.state) throw new Error(INVALID_STATE);
 
-    let force = S.find((f: MapForce) => f.id === this.currentForce)(Map.forces);
+    const moveList = getPossibleMoves(
+      formatDataForApi(this.state)(this.currentForce),
+    );
 
-    S.map((f: MapForce) =>
-      f.units.forEach((u) => {
-        const resultUnit = S.chain(S.find((unit: MapUnit) => unit.id === u.id))(
-          // @ts-ignore
-          moveList,
-        );
+    const units = getUnitsFromForce(this.state)(this.currentForce);
 
-        const moves = S.map(S.prop('validSteps'))(resultUnit);
-        const enemies = S.map(S.prop('enemiesInRange'))(resultUnit);
+    units.forEach((u) => {
+      const resultUnit = S.chain(S.find((unit: MapUnit) => unit.id === u.id))(
         // @ts-ignore
-        u.validSteps = S.fromMaybe([])(moves);
-        // @ts-ignore
-        u.enemiesInRange = S.fromMaybe([])(enemies);
-      }),
-    )(force);
+        moveList,
+      );
+
+      const moves = S.map(S.prop('validSteps'))(resultUnit);
+      const enemies = S.map(S.prop('enemiesInRange'))(resultUnit);
+      // @ts-ignore
+      u.validSteps = S.fromMaybe([])(moves);
+      // @ts-ignore
+      u.enemiesInRange = S.fromMaybe([])(enemies);
+    });
   }
 
   getForce(id: string) {
-    const force = Map.forces.find((force) => force.id === id);
+    const force = this.state?.forces.find((force) => force.id === id);
     if (!force) throw new Error(INVALID_STATE);
     return force;
   }
 
   getUnit(id: string) {
-    const findUnitInForce = (f: MapForce) =>
-      S.find((u: MapUnit) => u.id === id)(f.units);
-    const unit = S.justs(S.map(findUnitInForce)(Map.forces));
-
-    return S.head(unit);
+    if (!this.state) throw new Error(INVALID_STATE);
+    return getUnit(this.state)(id);
   }
 
   getCurrentForce() {
@@ -238,7 +158,7 @@ export class MapScene extends Phaser.Scene {
 
   renderMap() {
     const {container} = this.getContainers();
-    Map.cells.forEach((arr, col) =>
+    this.state?.cells.forEach((arr, col) =>
       arr.forEach((n, row) => {
         const {x, y} = this.getPos({x: row, y: col});
 
@@ -279,11 +199,9 @@ export class MapScene extends Phaser.Scene {
     this.tiles.forEach((tile) => tile.tile.clearTint());
   }
   renderUnits() {
-    Map.forces.forEach((force) => {
-      force.units
-        .filter((u) => u.status === 'alive')
-        .forEach((unit) => this.renderUnit(unit));
-    });
+    this.state?.units
+      .filter((u) => u.status === 'alive')
+      .forEach((unit) => this.renderUnit(unit));
   }
 
   getCellPositionOnScreen({x, y}: {x: number; y: number}) {
@@ -440,7 +358,10 @@ export class MapScene extends Phaser.Scene {
   }
 
   switchForce() {
-    const force = Map.forces.find((force) => force.id !== this.currentForce);
+    // TODO: change this, as this works for just 2 forces in state
+    const force = this.state?.forces.find(
+      (force) => force.id !== this.currentForce,
+    );
     if (!force) throw new Error(INVALID_STATE);
     this.currentForce = force.id;
   }
@@ -453,13 +374,17 @@ export class MapScene extends Phaser.Scene {
     this.setValidMoves();
 
     if (force.id === CPU_FORCE) {
-      this.runAiActions(force);
+      this.runAiActions(force.id);
     }
   }
 
-  runAiActions(force: MapForce) {
+  runAiActions(forceId: string) {
+    if (!this.state) throw new Error(INVALID_STATE);
+
+    const units = getUnitsFromForce(this.state)(forceId);
+
     const runAi = (currentTurn: number) => {
-      const unit = force.units[currentTurn];
+      const unit = units[currentTurn];
       if (!unit) throw new Error(INVALID_STATE);
 
       this.selectedUnit = unit.id;
@@ -469,7 +394,7 @@ export class MapScene extends Phaser.Scene {
 
       const tile = this.getTileAt(x, y);
       this.selectTile(unit.id, tile, () => {
-        if (currentTurn === force.units.length - 1) {
+        if (currentTurn === units.length - 1) {
           this.endTurn();
         } else {
           runAi(currentTurn + 1);
@@ -486,7 +411,7 @@ export class MapScene extends Phaser.Scene {
     if (this.movedUnits.length === force.units.length) this.endTurn();
   }
 
-  showTurnTitle(force: MapForce) {
+  showTurnTitle(force: Force) {
     const title = this.add.text(-200, 500, `${force.name} Turn`);
 
     const timeline = this.tweens.createTimeline();
@@ -520,11 +445,13 @@ export class MapScene extends Phaser.Scene {
 
   selectTile(unitId: string, {x, y}: MapTile, onMoveComplete: Function) {
     const chara = this.charas.find((c) => c.unit.id === unitId);
-    const force = Map.forces.find((force) => force.id === this.currentForce);
+    const force = this.getCurrentForce();
 
     if (!chara || !force) throw new Error(INVALID_STATE);
 
-    const squad = force.units.find((squad) => squad.id === chara.unit.squad);
+    const squad = this.state?.units.find(
+      (unit) => unit.id === chara.unit.squad,
+    );
 
     if (!squad) throw new Error(INVALID_STATE);
 
@@ -592,10 +519,9 @@ export class MapScene extends Phaser.Scene {
   }
 
   getEnemies() {
-    return Map.forces
-      .filter((force) => force.id !== this.currentForce)
-      .map((force) => force.units)
-      .flat();
+    if (!this.state) throw new Error(INVALID_STATE);
+
+    return this.state?.units.filter((unit) => unit.force !== this.currentForce);
   }
 
   // todo: remove this, api should provide valid cells
@@ -604,7 +530,9 @@ export class MapScene extends Phaser.Scene {
     target: Vector,
     toEnemy: string | null,
   ): Promise<Vector[]> => {
-    let cells = Map.cells.map((row) => row.map(identity));
+    if (!this.state) throw new Error(INVALID_STATE);
+
+    let cells = this.state.cells.map((row) => row.map(identity));
 
     const enemies = this.getEnemies();
 
@@ -635,24 +563,12 @@ export class MapScene extends Phaser.Scene {
     return tile;
   }
 }
-const formatDataForApi = (currentForce: string) => ({
-  units: Map.forces
-    .map((f) =>
-      f.units.map((u) => ({
-        ...u,
-        force: f.id,
-        validSteps: [],
-        enemiesInRange: [],
-      })),
-    )
-    .flat(),
-  forces: Map.forces.map((f) => ({
-    id: f.id,
-    units: f.units.map((u) => u.id),
-  })),
+const formatDataForApi = (state: MapState) => (currentForce: string) => ({
+  units: state.units,
+  forces: state.forces,
   width: 14,
   height: 6,
   walkableCells: [0],
-  grid: Map.cells.map((col) => col.map((cell) => (cell === 0 ? 0 : 1))),
+  grid: state.cells.map((col) => col.map((cell) => (cell === 0 ? 0 : 1))),
   currentForce: currentForce,
 });
