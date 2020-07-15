@@ -32,7 +32,7 @@ export type MapUnit = {
   pos: Vector;
   range: number;
   force: ForceId;
-  validSteps: Vector[];
+  validSteps: {target: Vector, steps: Vector[]}[];
   enemiesInRange: {enemy: string, steps: Vector[]}[];
   status: "alive" | "defeated";
 };

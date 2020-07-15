@@ -28,7 +28,6 @@ const BOTTOM_PANEL_Y = 600;
 const BOTTOM_PANEL_WIDTH = 1280;
 const BOTTOM_PANEL_HEIGHT = 120;
 
-
 const cellSize = 100;
 
 const boardPadding = 50;
@@ -241,7 +240,7 @@ export class MapScene extends Phaser.Scene {
     this.selectedUnit = unit.id;
 
     unit.validSteps.forEach((cell) =>
-      this.makeCellClickable(this.tileAt(cell.x, cell.y)),
+      this.makeCellClickable(this.tileAt(cell.target.x, cell.target.y)),
     );
 
     unit.enemiesInRange.forEach(({enemy}) => {
@@ -260,10 +259,9 @@ export class MapScene extends Phaser.Scene {
     const current = this.getUnit(this.selectedUnit);
 
     S.map((curr: MapUnit) => {
-
-        const enemy = S.find((e: any) => e.enemy === unit.id)(
-          curr.enemiesInRange,
-        );
+      const enemy = S.find((e: any) => e.enemy === unit.id)(
+        curr.enemiesInRange,
+      );
       if (!S.equals(enemy)(S.Nothing)) {
         const alliedChara = this.charas.find((c) => c.unit.id === curr.id);
 
@@ -281,7 +279,6 @@ export class MapScene extends Phaser.Scene {
             },
           });
         };
-
 
         S.map((e: any) => {
           const target = e.steps;
@@ -386,7 +383,7 @@ export class MapScene extends Phaser.Scene {
       this.selectedUnit = unit.id;
       this.renderUI();
 
-      const {x, y} = randomItem(unit.validSteps);
+      const {x, y} = randomItem(unit.validSteps).target;
 
       const tile = this.getTileAt(x, y);
       this.selectTile(unit.id, tile, () => {
@@ -457,9 +454,17 @@ export class MapScene extends Phaser.Scene {
 
     this.movedUnits.push(unitId);
 
-    this.findPath(squad.pos, {x, y}, null).then((path) =>
-      this.moveUnit(chara, path, onMoveComplete),
-    );
+    const maybeUnit = this.getUnit(unitId);
+
+    S.map((unit: MapUnit) => {
+      const maybePath = S.find((step: any) => S.equals(step.target)({x, y}))(
+        unit.validSteps,
+      );
+
+      S.map((step: any) => {
+        this.moveUnit(chara, step.steps, onMoveComplete);
+      })(maybePath);
+    })(maybeUnit);
 
     // FIXME: local state mutation
     squad.pos.x = x;

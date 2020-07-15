@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import {getPossibleMoves} from './api';
-import S, {Just, map} from 'sanctuary';
+import {Just, map} from 'sanctuary';
 const defaultParams = {
   currentForce: 'a',
   forces: [
@@ -27,7 +27,7 @@ const defaultParams = {
 test('Get moves in straight line', () => {
   const cells = getPossibleMoves(defaultParams);
 
-  const lens = map((c) => c[0].validSteps);
+  const lens = map((c) => c[0].validSteps.map(t=>t.target));
 
   const expected = Just([
     {x: 0, y: 1},
@@ -46,7 +46,7 @@ test('Make a turn', () => {
   };
   const cells = getPossibleMoves(longerRange);
 
-  const lens = map((c) => c[0].validSteps);
+  const lens = map((c) => c[0].validSteps.map(t=>t.target));
 
   const expected = Just([
     {x: 0, y: 1},
@@ -75,7 +75,7 @@ test('Get moves in blocked path ', () => {
   };
   const cells = getPossibleMoves(path);
 
-  const lens = map((c) => c[0].validSteps);
+  const lens = map((c) => c[0].validSteps.map(t=>t.target));
   const expected = Just([
     {x: 0, y: 1},
     {x: 0, y: 2},
@@ -112,7 +112,7 @@ test('Get moves in forked path ', () => {
     {x: 3, y: 1},
   ]);
 
-  const lens = map((c) => c[0].validSteps);
+  const lens = map((c) => c[0].validSteps.map(t=>t.target));
   expect(lens(cells)).toEqual(expected);
 });
 
@@ -126,8 +126,42 @@ test('Enemy blocks path', () => {
   const maybeCells = getPossibleMoves(path);
 
   const expected = Just([
-    {x: 0, y: 1},
-    {x: 0, y: 2},
+    {
+      steps: [
+        {
+          x: 0,
+          y: 0,
+        },
+        {
+          x: 0,
+          y: 1,
+        },
+      ],
+      target: {
+        x: 0,
+        y: 1,
+      },
+    },
+    {
+      steps: [
+        {
+          x: 0,
+          y: 0,
+        },
+        {
+          x: 0,
+          y: 1,
+        },
+        {
+          x: 0,
+          y: 2,
+        },
+      ],
+      target: {
+        x: 0,
+        y: 2,
+      },
+    },
   ]);
 
   const lens = map((c) => c[0].validSteps);

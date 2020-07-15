@@ -58,7 +58,9 @@ export const getPossibleMoves = ({
   // @ts-ignore
   const updatedGrid: number[][] = blockVectorsInGrid(grid)(enemyVectors);
 
-  const getUnitValidSteps = ({pos: {x, y}, range}: MapUnit) => {
+  type Step = {target:Vector, steps:Vector[]}
+
+  const getUnitValidSteps = ({pos: {x, y}, range}: MapUnit): Step[] => {
     const xs = S.range(x - range)(x + range + 1);
     const ys = S.range(y - range)(y + range + 1);
 
@@ -91,6 +93,10 @@ export const getPossibleMoves = ({
       uniq,
       S.reject(isEnemyInVector),
       S.reject(S.equals({x, y})),
+      S.map((vec:Vector)=> ({
+          target: vec,
+          steps: S.map(([x,y]:number[])=>makeVector(x)(y))( getPathTo(updatedGrid)({x,y})(vec))
+      }))
     ])({xs, ys});
   };
 
@@ -102,6 +108,8 @@ export const getPossibleMoves = ({
       S.map((unit: MapUnit) => {
         const steps = getUnitValidSteps(unit);
 
+        const targets = S.map((step:Step)=>step.target) (steps) 
+
         return {
           ...unit,
           validSteps: steps,
@@ -112,7 +120,7 @@ export const getPossibleMoves = ({
                 (step: Vector) =>
                   getDistance(step)(enemy.pos) === 1 &&
                   getPathTo(grid)(unit.pos)(enemy.pos).length <= unit.range,
-              )(steps),
+              )( targets ),
             ),
             S.map((enemy: MapUnit) => ({
               enemy: enemy.id,
