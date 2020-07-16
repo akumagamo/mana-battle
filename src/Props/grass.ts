@@ -13,4 +13,6 @@ export default (scene: Phaser.Scene) => ({x, y}: {x: number; y: number}) => {
     yoyo: true,
     ease: 'Bounce',
   });
+
+  return grass
 };

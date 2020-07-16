@@ -6,6 +6,7 @@ import {INVALID_STATE} from '../errors';
 import {Unit} from '../Unit/Model';
 import {Command, runCombat} from '../API/Combat/turns';
 import plains from '../Backgrounds/plains';
+import {Container} from '../Models';
 
 const COMBAT_CHARA_SCALE = 1;
 const WALK_DURATION = 500;
@@ -36,6 +37,7 @@ export default class CombatScene extends Phaser.Scene {
   bottom = '';
   conflictId = '';
   currentTurn = 0;
+  container: Container | null = null  
 
   constructor() {
     super('CombatScene');
@@ -53,7 +55,12 @@ export default class CombatScene extends Phaser.Scene {
 
   // LIFECYCLE METHODS
   create(data: {top: string; bottom: string; conflictId: string}) {
-    plains(this);
+
+    if(this.container) this.container.destroy()
+    
+    this.container = this.add.container(0,0)
+
+    plains(this, this.container);
 
     this.top = data.top;
     this.bottom = data.bottom;
@@ -96,15 +103,17 @@ export default class CombatScene extends Phaser.Scene {
     }, 1000);
   }
 
-  destroy() {
+  turnOff() {
     this.removeChildren();
-    this.scene.remove(this);
+    this.container?.destroy()
+    this.scene.stop();
   }
   removeChildren() {
     this.units.forEach((chara) => {
       chara.container?.destroy();
       this.scene.remove(chara);
     });
+    this.units = []
   }
 
   // COMBAT FLOW METHODS
@@ -150,11 +159,10 @@ export default class CombatScene extends Phaser.Scene {
           'MapScene',
           updatedUnits.map((u) => ({
             type: 'UPDATE_UNIT',
-            target: u,
-            conflictId: this.conflictId,
+            target: u
           })),
         );
-        this.destroy();
+        this.turnOff();
       });
     } else if (cmd.type === 'VICTORY') {
       console.log('Winning Team:', cmd.target);
@@ -166,7 +174,7 @@ export default class CombatScene extends Phaser.Scene {
         },
       ]);
 
-      this.destroy();
+      this.turnOff();
     } else console.error(`Unknown command:`, cmd);
   }
 

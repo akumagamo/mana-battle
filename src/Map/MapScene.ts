@@ -303,6 +303,13 @@ export class MapScene extends Phaser.Scene {
       chara.container?.destroy();
       this.scene.remove(chara);
     });
+    this.charas = []
+    this.tiles.forEach(tile=>{
+
+      tile.tile.destroy()
+
+    })
+    this.tiles = []
   }
 
   private makeCellClickable(cell: MapTile) {

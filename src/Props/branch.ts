@@ -12,7 +12,7 @@ export default (scene: Phaser.Scene) => (
     {x: x - 60 * scale, y: y + 20, scale: scale * 0.4},
   ];
 
-  positions.forEach((pos) => {
+  return positions.map((pos) => {
     const branch = scene.add.image(pos.x, pos.y, 'props/branch');
     const scale = pos.scale * 0.3;
 
@@ -30,5 +30,7 @@ export default (scene: Phaser.Scene) => (
       scaleX: scale + scale / 10,
       ease: 'Bounce',
     });
+
+    return branch
   });
 };
