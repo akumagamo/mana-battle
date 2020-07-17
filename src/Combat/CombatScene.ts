@@ -12,7 +12,7 @@ const COMBAT_CHARA_SCALE = 1;
 const WALK_DURATION = 500;
 const WALK_FRAMES = 60;
 
-const invert = (n: number) => {
+const invertBoard = (n: number) => {
   if (n === 1) return 3;
   else if (n === 3) return 1;
   else return n;
@@ -26,13 +26,13 @@ const getBoardCoords = (topSquadId: string) => (unit: Unit) => {
   const {x, y} = squad.members[unit.id];
 
   return {
-    x: squad.id === topSquadId ? x : invert(x),
-    y: squad.id === topSquadId ? y : invert(y),
+    x: squad.id === topSquadId ? x : invertBoard(x),
+    y: squad.id === topSquadId ? y : invertBoard(y),
   };
 };
 
 export default class CombatScene extends Phaser.Scene {
-  units: Chara[] = [];
+  charas: Chara[] = [];
   top = '';
   bottom = '';
   conflictId = '';
@@ -44,7 +44,7 @@ export default class CombatScene extends Phaser.Scene {
   }
 
   updateUnit(unit: Unit) {
-    this.units = this.units.map((u) => {
+    this.charas = this.charas.map((u) => {
       if (u.unit.id === unit.id) {
         u.unit = unit;
       }
@@ -94,7 +94,7 @@ export default class CombatScene extends Phaser.Scene {
             isTopSquad,
           );
 
-          this.units.push(chara);
+          this.charas.push(chara);
         });
     });
 
@@ -109,17 +109,17 @@ export default class CombatScene extends Phaser.Scene {
     this.scene.stop();
   }
   removeChildren() {
-    this.units.forEach((chara) => {
+    this.charas.forEach((chara) => {
       chara.container?.destroy();
       this.scene.remove(chara);
     });
-    this.units = []
+    this.charas = []
   }
 
   // COMBAT FLOW METHODS
 
   turn() {
-    const commands = runCombat(this.units.map((u) => u.unit));
+    const commands = runCombat(this.charas.map((u) => u.unit));
     this.execute(commands);
   }
 
@@ -181,7 +181,7 @@ export default class CombatScene extends Phaser.Scene {
   // UNIT METHODS
 
   getChara(id: string) {
-    const chara = this.units.find((u) => u.unit.id === id);
+    const chara = this.charas.find((u) => u.unit.id === id);
     if (!chara || !chara.container) throw new Error(INVALID_STATE);
     return chara;
   }
@@ -201,8 +201,8 @@ export default class CombatScene extends Phaser.Scene {
 
     const {x, y} = cartesianToIsometricBattle(
       targetIsTop,
-      targetIsTop ? targetSquadPos.x + 1 : invert(targetSquadPos.x) - 1,
-      targetIsTop ? targetSquadPos.y : invert(targetSquadPos.y),
+      targetIsTop ? targetSquadPos.x + 1 : invertBoard(targetSquadPos.x) - 1,
+      targetIsTop ? targetSquadPos.y : invertBoard(targetSquadPos.y),
     );
 
     const config = (onComplete: () => void) => ({
@@ -220,7 +220,7 @@ export default class CombatScene extends Phaser.Scene {
       delay: WALK_DURATION / WALK_FRAMES,
       callback: () => {
         // reordering a list of 10 scenes takes about 0.013ms
-        this.units
+        this.charas
           .sort((a, b) =>
             a.container && b.container ? a.container.y - b.container.y : 0,
           )
@@ -236,7 +236,7 @@ export default class CombatScene extends Phaser.Scene {
   }
 
   retreatUnits() {
-    this.units.forEach((chara) => {
+    this.charas.forEach((chara) => {
       chara.clearAnimations();
       chara.run();
 
@@ -264,7 +264,7 @@ export default class CombatScene extends Phaser.Scene {
     return new Promise((resolve: (u: Unit[]) => void) => {
       const timeEvents = {
         delay: 1000,
-        callback: () => resolve(this.units.map((u) => u.unit)),
+        callback: () => resolve(this.charas.map((u) => u.unit)),
       };
 
       this.time.addEvent(timeEvents);

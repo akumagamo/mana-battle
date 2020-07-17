@@ -16,8 +16,6 @@ import {randomItem} from '../defaultData';
 import S from 'sanctuary';
 import {PLAYER_FORCE, tileMap, CPU_FORCE} from '../API/Map/mocks';
 
-// TODO: error when clicking on enemy unit
-
 const WALKABLE_CELL_TINT = 0x0d4e2b;
 const SQUAD_MOVE_DURATION = 500;
 const CHARA_MAP_SCALE = 0.5;
@@ -71,9 +69,11 @@ export class MapScene extends Phaser.Scene {
   create(data: MapCommands[]) {
     data.forEach((cmd) => {
       if (cmd.type === 'DESTROY_TEAM') {
+        const unit = this.getUnit(cmd.target);
+        // Update unit
         S.map((u: MapUnit) => {
           u.status = 'defeated';
-        })(this.getUnit(cmd.target));
+        })(unit);
       } else if (cmd.type === 'UPDATE_STATE') {
         this.updateState(cmd.target);
       }
@@ -137,6 +137,21 @@ export class MapScene extends Phaser.Scene {
   getUnit(id: string) {
     if (!this.state) throw new Error(INVALID_STATE);
     return getUnit(this.state)(id);
+  }
+
+  getDefeatedForces(): string[] {
+    if (!this.state) throw new Error(INVALID_STATE);
+    return this.state.forces
+      .map((f) => f.id)
+      .reduce((xs, x) => {
+        if (!this.state) throw new Error(INVALID_STATE);
+        const allDefeated = this.state.units
+          .filter((u) => u.force === x)
+          .every((u) => u.status === 'defeated');
+
+        if (allDefeated) return xs.concat([x]);
+        else return xs;
+      }, [] as string[]);
   }
 
   getCurrentForce() {
@@ -303,13 +318,11 @@ export class MapScene extends Phaser.Scene {
       chara.container?.destroy();
       this.scene.remove(chara);
     });
-    this.charas = []
-    this.tiles.forEach(tile=>{
-
-      tile.tile.destroy()
-
-    })
-    this.tiles = []
+    this.charas = [];
+    this.tiles.forEach((tile) => {
+      tile.tile.destroy();
+    });
+    this.tiles = [];
   }
 
   private makeCellClickable(cell: MapTile) {
@@ -367,6 +380,12 @@ export class MapScene extends Phaser.Scene {
   }
 
   runTurn() {
+    // One side won last turn?
+    const defeatedForces = this.getDefeatedForces();
+
+    if (defeatedForces.includes(PLAYER_FORCE)) console.log(`player loses!`);
+    if (defeatedForces.includes(CPU_FORCE)) console.log(`player wins!`);
+
     const force = this.getForce(this.currentForce);
 
     this.showTurnTitle(force);
@@ -381,7 +400,9 @@ export class MapScene extends Phaser.Scene {
   runAiActions(forceId: string) {
     if (!this.state) throw new Error(INVALID_STATE);
 
-    const units = getUnitsFromForce(this.state)(forceId);
+    const units_ = getUnitsFromForce(this.state)(forceId);
+
+    const units = units_.filter((u) => u.status === 'alive');
 
     const runAi = (currentTurn: number) => {
       const unit = units[currentTurn];
@@ -541,7 +562,7 @@ export class MapScene extends Phaser.Scene {
   }
 }
 const formatDataForApi = (state: MapState) => (currentForce: string) => ({
-  units: state.units,
+  units: state.units.filter((u) => u.status === 'alive'),
   forces: state.forces,
   width: 14,
   height: 6,
