@@ -51,6 +51,7 @@ type MapTile = {
 
 type MapCommands =
   | {type: 'UPDATE_STATE'; target: MapState}
+  | {type: 'UPDATE_UNIT_POS'; id: string; pos: Vector}
   | {
       type: 'DESTROY_TEAM';
       target: string;
@@ -68,16 +69,20 @@ type MapCommands =
   | {type: 'CLEAR_TILES_TINTING'}
   | {type: 'SHOW_UNIT_PANEL'; unit: MapUnit}
   | {type: 'SHOW_CLICKABLE_CELLS'; unit: MapUnit}
+  | {type: 'HIGHLIGHT_CELL'; pos: Vector}
   | {type: 'CLOSE_ACTION_PANEL'};
 
 export class MapScene extends Phaser.Scene {
   charas: Chara[] = [];
   tiles: MapTile[] = [];
-  mapContainer: null | Container = null;
-  uiContainer: null | Container = null;
-  actionWindowContainer: null | Container = null;
-  state: MapState | null = null;
 
+  // Containers can't be created in the constructor, so we are casting the types here
+  // TODO: consider receive containers from parent or pass them around in functions
+  mapContainer:  Container = {} as Container;
+  uiContainer:  Container = {} as Container;
+
+  actionWindowContainer: null | Container = null;
+  state: MapState = {} as MapState;
   selectedUnit: string | null = null;
   currentForce: string = PLAYER_FORCE;
   /** Units that the player moved this turn*/
@@ -99,6 +104,10 @@ export class MapScene extends Phaser.Scene {
         })(unit);
       } else if (cmd.type === 'UPDATE_STATE') {
         this.updateState(cmd.target);
+      } else if (cmd.type === 'UPDATE_UNIT_POS') {
+          this.state.units = this.state.units.map((unit) =>
+            unit.id === cmd.id ? {...unit, pos: cmd.pos} : unit,
+          );
       } else if (cmd.type === 'CLICK_CELL') {
         S.map<MapUnit, void>((unit) => {
           this.selectTile(unit, cmd.cell, () => this.checkTurnEnd()); // TODO: remove this callback
@@ -115,6 +124,10 @@ export class MapScene extends Phaser.Scene {
         this.showUnitPanel(cmd.unit);
       } else if (cmd.type === 'SHOW_CLICKABLE_CELLS') {
         this.showClickableCellsForUnit(cmd.unit);
+      } else if (cmd.type === 'HIGHLIGHT_CELL') {
+        const {x, y} = cmd.pos;
+        const mapTile = this.tileAt(x, y);
+        mapTile.tile.setTint(SELECTED_TILE_TINT);
       } else if (cmd.type === 'CLOSE_ACTION_PANEL') {
         this.closeActionWindow();
       }
@@ -124,11 +137,10 @@ export class MapScene extends Phaser.Scene {
   updateState(state: MapState) {
     this.state = state;
   }
-  // Mutate data before kicking off the scene
+
   create(data: MapCommands[]) {
     this.signal(data);
 
-    console.log(`CREATE`, data);
     this.mapContainer = this.add.container(0, 0);
     this.uiContainer = this.add.container(0, 0);
     this.actionWindowContainer = this.add.container(0, 0);
@@ -143,7 +155,6 @@ export class MapScene extends Phaser.Scene {
   // ------ Internals ----------------
 
   getContainers() {
-    if (!this.mapContainer || !this.uiContainer) throw new Error(INVALID_STATE);
 
     return {container: this.mapContainer, uiContainer: this.uiContainer};
   }
@@ -155,7 +166,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   setValidMoves() {
-    if (!this.state) throw new Error(INVALID_STATE);
 
     const moveList = getPossibleMoves(
       formatDataForApi(this.state)(this.currentForce),
@@ -191,16 +201,13 @@ export class MapScene extends Phaser.Scene {
   }
 
   getUnit(id: string) {
-    if (!this.state) return S.Nothing;
     return getUnit(this.state)(id);
   }
 
   getDefeatedForces(): string[] {
-    if (!this.state) throw new Error(INVALID_STATE);
     return this.state.forces
       .map((f) => f.id)
       .reduce((xs, x) => {
-        if (!this.state) throw new Error(INVALID_STATE);
         const allDefeated = this.state.units
           .filter((u) => u.force === x)
           .every((u) => u.status === 'defeated');
@@ -223,7 +230,7 @@ export class MapScene extends Phaser.Scene {
 
   renderMap() {
     const {container} = this.getContainers();
-    this.state?.cells.forEach((arr, col) =>
+    this.state.cells.forEach((arr, col) =>
       arr.forEach((n, row) => {
         const {x, y} = this.getPos({x: row, y: col});
 
@@ -261,7 +268,7 @@ export class MapScene extends Phaser.Scene {
     this.tiles.forEach((tile) => tile.tile.clearTint());
   }
   renderUnits() {
-    this.state?.units
+    this.state.units
       .filter((u) => u.status === 'alive')
       .forEach((unit) => this.renderUnit(unit));
   }
@@ -292,7 +299,7 @@ export class MapScene extends Phaser.Scene {
 
     this.charas.push(chara);
 
-    chara.onClick((c: Chara) => {
+    chara.onClick((_: Chara) => {
       this.signal([
         {
           type: 'CLICK_UNIT',
@@ -303,7 +310,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   clickUnit(unit: MapUnit) {
-
     if (unit.force === PLAYER_FORCE) {
       this.handleClickOnOwnUnit(unit);
     } else {
@@ -330,10 +336,14 @@ export class MapScene extends Phaser.Scene {
   }
 
   handleClickOnOwnUnit(unit: MapUnit) {
-    this.signal([
-      {type: 'SHOW_UNIT_PANEL', unit},
-      {type: 'SHOW_CLICKABLE_CELLS', unit},
-    ]);
+    if (this.movedUnits.includes(unit.id))
+      this.signal([{type: 'CLEAR_TILES'}, {type: 'SHOW_UNIT_PANEL', unit}]);
+    else
+      this.signal([
+        {type: 'CLEAR_TILES'},
+        {type: 'SHOW_UNIT_PANEL', unit},
+        {type: 'SHOW_CLICKABLE_CELLS', unit},
+      ]);
   }
 
   handleClickOnEnemyUnit(enemyUnit: MapUnit) {
@@ -344,14 +354,27 @@ export class MapScene extends Phaser.Scene {
     } else {
       S.map<MapUnit, void>((selectedUnit) => {
         S.map<Chara, void>((chara_) => {
+          const isInRange = S.elem(enemyUnit.id)(
+            S.map<EnemyInRange, string>((e) => e.enemy)(
+              selectedUnit.enemiesInRange,
+            ),
+          );
 
-          const isInRange = S.elem(enemyUnit.id)(S.map<EnemyInRange,string>(e=>e.enemy)(selectedUnit.enemiesInRange))
-
-           if (selectedUnit.force === PLAYER_FORCE && isInRange) {
+          if (
+            selectedUnit.force === PLAYER_FORCE &&
+            isInRange &&
+            !this.movedUnits.includes(selectedUnit.id)
+          ) {
             this.showEnemyUnitMenu(enemyUnit, chara_, selectedUnit);
-            this.signal([{type: 'SHOW_CLICKABLE_CELLS', unit: selectedUnit}]);
+            this.signal([
+              {type: 'CLEAR_TILES'},
+              {type: 'SHOW_CLICKABLE_CELLS', unit: selectedUnit},
+            ]);
           } else {
-            this.signal([{type: 'SHOW_UNIT_PANEL', unit: enemyUnit}]);
+            this.signal([
+              {type: 'CLEAR_TILES'},
+              {type: 'SHOW_UNIT_PANEL', unit: enemyUnit},
+            ]);
           }
         })(this.getChara(enemyUnit.id));
       })(maybeSelectedUnit);
@@ -424,8 +447,8 @@ export class MapScene extends Phaser.Scene {
     }
   }
   turnOff() {
-    this.mapContainer?.destroy();
-    this.uiContainer?.destroy();
+    this.mapContainer.destroy();
+    this.uiContainer.destroy();
     this.charas.forEach((chara) => {
       chara.container?.destroy();
       this.scene.remove(chara);
@@ -510,7 +533,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   runAiActions(forceId: string) {
-    if (!this.state) throw new Error(INVALID_STATE);
 
     const units_ = getUnitsFromForce(this.state)(forceId);
 
@@ -585,21 +607,14 @@ export class MapScene extends Phaser.Scene {
     this.actionWindowContainer?.destroy();
   }
   selectTile(unit: MapUnit, mapTile: MapTile, onMoveComplete: Function) {
-    // Destroy existing window
-    // Clear all tiles
-    // Repaint tiles
-    // hightlight selected
-    // show menu
 
     const {tile} = mapTile;
 
-    if (!this.mapContainer) return;
-
-    this.closeActionWindow();
-
-    this.signal([{type: 'SHOW_CLICKABLE_CELLS', unit}]);
-
-    tile.setTint(SELECTED_TILE_TINT);
+    this.signal([
+      {type: 'CLOSE_ACTION_PANEL'},
+      {type: 'SHOW_CLICKABLE_CELLS', unit},
+      {type: 'HIGHLIGHT_CELL', pos: {x: mapTile.x, y: mapTile.y}},
+    ]);
 
     this.actionWindow(tile.x, tile.y, 100, 120, [
       {
@@ -613,8 +628,10 @@ export class MapScene extends Phaser.Scene {
       {
         title: 'Cancel',
         action: () => {
-          this.closeActionWindow();
-          this.signal([{type: 'SHOW_CLICKABLE_CELLS', unit}]);
+          this.signal([
+            {type: 'CLOSE_ACTION_PANEL'},
+            {type: 'SHOW_CLICKABLE_CELLS', unit},
+          ]);
         },
       },
     ]);
@@ -646,7 +663,7 @@ export class MapScene extends Phaser.Scene {
 
     if (!chara || !force) throw new Error(INVALID_STATE);
 
-    const squad = this.state?.units.find(
+    const squad = this.state.units.find(
       (unit) => unit.id === chara.unit.squad,
     );
 
@@ -670,9 +687,7 @@ export class MapScene extends Phaser.Scene {
       })(maybePath);
     })(maybeUnit);
 
-    // FIXME: local state mutation
-    squad.pos.x = x;
-    squad.pos.y = y;
+    this.signal([{type: 'UPDATE_UNIT_POS', id: squad.id, pos: {x, y}}]);
 
     this.renderUI();
   }
@@ -717,15 +732,14 @@ export class MapScene extends Phaser.Scene {
   };
 
   isEnemyInTile(tile: Vector) {
-    const enemies = this.getEnemies();
-
-    return enemies.some(({pos: {x, y}}) => x === tile.x && y === tile.y);
+    return this.getEnemies().some(
+      ({pos: {x, y}}) => x === tile.x && y === tile.y,
+    );
   }
 
   getEnemies() {
-    if (!this.state) throw new Error(INVALID_STATE);
 
-    return this.state?.units.filter((unit) => unit.force !== this.currentForce);
+    return this.state.units.filter((unit) => unit.force !== this.currentForce);
   }
 
   getTileAt(x: number, y: number) {
