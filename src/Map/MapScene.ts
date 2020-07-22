@@ -25,7 +25,7 @@ import {PLAYER_FORCE, tileMap, CPU_FORCE} from '../API/Map/mocks';
 
 const WALKABLE_CELL_TINT = 0x88aa88;
 const ENEMY_IN_CELL_TINT = 0xff2222;
-const SELECTED_TILE_TINT = 0xffffff;
+const SELECTED_TILE_TINT = 0x9955aa;
 
 const SQUAD_MOVE_DURATION = 500;
 const CHARA_MAP_SCALE = 0.5;
@@ -77,9 +77,9 @@ export class MapScene extends Phaser.Scene {
   tiles: MapTile[] = [];
 
   // Containers can't be created in the constructor, so we are casting the types here
-  // TODO: consider receive containers from parent or pass them around in functions
-  mapContainer:  Container = {} as Container;
-  uiContainer:  Container = {} as Container;
+  // TODO: consider receiving containers from parent or pass them around in functions
+  mapContainer: Container = {} as Container;
+  uiContainer: Container = {} as Container;
 
   actionWindowContainer: null | Container = null;
   state: MapState = {} as MapState;
@@ -105,9 +105,9 @@ export class MapScene extends Phaser.Scene {
       } else if (cmd.type === 'UPDATE_STATE') {
         this.updateState(cmd.target);
       } else if (cmd.type === 'UPDATE_UNIT_POS') {
-          this.state.units = this.state.units.map((unit) =>
-            unit.id === cmd.id ? {...unit, pos: cmd.pos} : unit,
-          );
+        this.state.units = this.state.units.map((unit) =>
+          unit.id === cmd.id ? {...unit, pos: cmd.pos} : unit,
+        );
       } else if (cmd.type === 'CLICK_CELL') {
         S.map<MapUnit, void>((unit) => {
           this.selectTile(unit, cmd.cell, () => this.checkTurnEnd()); // TODO: remove this callback
@@ -155,7 +155,6 @@ export class MapScene extends Phaser.Scene {
   // ------ Internals ----------------
 
   getContainers() {
-
     return {container: this.mapContainer, uiContainer: this.uiContainer};
   }
 
@@ -166,7 +165,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   setValidMoves() {
-
     const moveList = getPossibleMoves(
       formatDataForApi(this.state)(this.currentForce),
     );
@@ -387,25 +385,28 @@ export class MapScene extends Phaser.Scene {
   }
 
   showEnemyUnitMenu(unit: MapUnit, chara: Chara, selectedAlly: MapUnit) {
-    const lineHeight = 50;
-    const paddingTop = 20;
-    const height = (n: number) => paddingTop + lineHeight * n;
     this.closeActionWindow();
-    this.actionWindowContainer = this.add.container(
-      chara.container?.x,
-      chara.container?.y,
-    );
-    const bg = panel(0, 0, 100, 180, this.actionWindowContainer, this);
-    this.actionWindowContainer.add(bg);
-    button(20, height(0), 'Attack', this.actionWindowContainer, this, () => {
-      this.moveToEnemyUnit(unit, chara, selectedAlly);
-    });
-    button(20, height(1), 'View', this.actionWindowContainer, this, () => {
-      console.log(unit);
-    });
-    button(20, height(2), 'Cancel', this.actionWindowContainer, this, () => {
-      this.closeActionWindow();
-    });
+
+    this.actionWindow(chara.container?.x || 0, chara.container?.y || 0, [
+      {
+        title: 'Attack',
+        action: () => {
+          this.moveToEnemyUnit(unit, chara, selectedAlly);
+        },
+      },
+      {
+        title: 'View',
+        action: () => {
+          console.log(unit);
+        },
+      },
+      {
+        title: 'Cancel',
+        action: () => {
+          this.closeActionWindow();
+        },
+      },
+    ]);
   }
 
   moveToEnemyUnit(enemyUnit: MapUnit, chara: Chara, selectedAlly: MapUnit) {
@@ -533,7 +534,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   runAiActions(forceId: string) {
-
     const units_ = getUnitsFromForce(this.state)(forceId);
 
     const units = units_.filter((u) => u.status === 'alive');
@@ -606,8 +606,8 @@ export class MapScene extends Phaser.Scene {
   closeActionWindow() {
     this.actionWindowContainer?.destroy();
   }
-  selectTile(unit: MapUnit, mapTile: MapTile, onMoveComplete: Function) {
 
+  selectTile(unit: MapUnit, mapTile: MapTile, onMoveComplete: Function) {
     const {tile} = mapTile;
 
     this.signal([
@@ -616,10 +616,11 @@ export class MapScene extends Phaser.Scene {
       {type: 'HIGHLIGHT_CELL', pos: {x: mapTile.x, y: mapTile.y}},
     ]);
 
-    this.actionWindow(tile.x, tile.y, 100, 120, [
+    this.actionWindow(tile.x, tile.y, [
       {
         title: 'Move',
         action: () => {
+          //TODO: convert to data
           this.moveToTile(unit.id, mapTile, onMoveComplete);
           this.actionWindowContainer?.destroy();
           tile.clearTint();
@@ -640,17 +641,26 @@ export class MapScene extends Phaser.Scene {
   actionWindow(
     x: number,
     y: number,
-    width: number,
-    height: number,
     actions: {title: string; action: () => void}[],
   ) {
     if (this.actionWindowContainer) this.actionWindowContainer.destroy();
     this.actionWindowContainer = this.add.container(x, y);
-    const bg = panel(0, 0, width, height, this.actionWindowContainer, this);
-    this.actionWindowContainer.add(bg);
-    actions.forEach(({title, action}, index) => {
-      if (this.actionWindowContainer)
-        button(20, index * 50, title, this.actionWindowContainer, this, action);
+    const btns = actions.map(({title, action}, index) => {
+      if (!this.actionWindowContainer) throw new Error(INVALID_STATE);
+      return button(
+        20,
+        index * 50,
+        title,
+        this.actionWindowContainer,
+        this,
+        action,
+      );
+    });
+
+    const largest = btns.sort((a, b) => b.displayWidth - a.displayWidth)[0]
+      .displayWidth;
+    btns.forEach((btn) => {
+      btn.setDisplaySize(largest, btn.displayHeight);
     });
   }
 
@@ -663,9 +673,7 @@ export class MapScene extends Phaser.Scene {
 
     if (!chara || !force) throw new Error(INVALID_STATE);
 
-    const squad = this.state.units.find(
-      (unit) => unit.id === chara.unit.squad,
-    );
+    const squad = this.state.units.find((unit) => unit.id === chara.unit.squad);
 
     if (!squad) throw new Error(INVALID_STATE);
 
@@ -738,7 +746,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   getEnemies() {
-
     return this.state.units.filter((unit) => unit.force !== this.currentForce);
   }
 
