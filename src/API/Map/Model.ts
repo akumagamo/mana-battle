@@ -26,14 +26,15 @@ export type City = {
 };
 
 export type Vector = {x: number; y: number};
-
+export type ValidStep = {target: Vector, steps: Vector[]}
+export type EnemyInRange = {enemy: string, steps: Vector[]}
 export type MapUnit = {
   id: UnitId;
   pos: Vector;
   range: number;
   force: ForceId;
-  validSteps: {target: Vector, steps: Vector[]}[];
-  enemiesInRange: {enemy: string, steps: Vector[]}[];
+  validSteps: ValidStep[];
+  enemiesInRange: EnemyInRange[];
   status: "alive" | "defeated";
 };
 
@@ -46,3 +47,5 @@ export type TurnManager = {
   height: number;
   walkableCells: number[];
 };
+
+export type Step = {target:Vector, steps:Vector[]}

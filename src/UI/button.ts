@@ -1,7 +1,7 @@
 import {Scene} from 'phaser';
 import {Container} from '../Models';
 
-export default  (
+export default (
   x: number,
   y: number,
   text: string,
@@ -9,7 +9,10 @@ export default  (
   scene: Scene,
   onClick: () => void,
 ) => {
-  const text_ = scene.add.text(x, y, text, {color: '#000'});
+  const text_ = scene.add.text(x, y, text, {
+    color: '#000',
+    fontSize: '28px',
+  });
   const btn = scene.add.image(x - 15, y - 10, 'panel');
   btn.setOrigin(0, 0);
   container.add(btn);
@@ -20,6 +23,5 @@ export default  (
   btn.on('pointerdown', () => {
     onClick();
   });
-  return btn
+  return btn;
 };
-

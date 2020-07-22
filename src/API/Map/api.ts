@@ -1,6 +1,6 @@
 import * as PF from 'pathfinding';
 import S from 'sanctuary';
-import {Vector, TurnManager, MapUnit} from './Model';
+import {Vector, TurnManager, MapUnit, Step} from './Model';
 import {MapState} from './Model';
 
 const getBy = (attr: string) => <A>(target: A) =>
@@ -58,7 +58,6 @@ export const getPossibleMoves = ({
   // @ts-ignore
   const updatedGrid: number[][] = blockVectorsInGrid(grid)(enemyVectors);
 
-  type Step = {target:Vector, steps:Vector[]}
 
   const getUnitValidSteps = ({pos: {x, y}, range}: MapUnit): Step[] => {
     const xs = S.range(x - range)(x + range + 1);
@@ -138,24 +137,19 @@ export const getPossibleMoves = ({
 // Zip the first level with a range (max is height)
 // For each elem, zip with another range (max is width)
 export const blockVectorsInGrid = (grid: number[][]) => (vectors: Vector[]) => {
-  const zipMe = (list: any[]) =>
+  const zipMe = <A>(list: A[]) =>
     S.pipe([S.prop('length'), S.range(0), S.zip(list)])(list);
-
-  const ypairs = zipMe(grid);
 
   return S.map((pair: any) => {
     const xs: number[] = S.fst(pair);
     const y = S.snd(pair);
 
-    const xpairs = zipMe(xs);
-
     return S.map((xpair: any) => {
-      const cell = S.fst(xpair);
       const x = S.snd(xpair);
 
-      return S.elem({x, y})(vectors) ? 1 : cell;
-    })(xpairs);
-  })(ypairs);
+      return S.elem({x, y})(vectors) ? 1 : S.fst(xpair);
+    })(zipMe(xs));
+  })(zipMe(grid));
 };
 
 export const getPathTo = (grid: number[][]) => (source: Vector) => (
