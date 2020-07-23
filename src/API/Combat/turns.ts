@@ -68,7 +68,7 @@ export const runTurn = (
 
   const updatedUnits = units
     .map((unit) => {
-      const newHp = unit.unit.currentHp - 22;
+      const newHp = unit.unit.currentHp - Math.random()*100;
       const currentHp = newHp < 1 ? 0 : newHp;
 
       return unit.unit.id === target.id
@@ -98,7 +98,7 @@ export const runTurn = (
       type: 'ATTACK',
       source: current.unit.id,
       target: target.id,
-      damage: 22,
+      damage: Math.floor(Math.random()*1000),
       updatedTarget: updatedTarget.unit,
       updatedSource: updatedSource.unit,
     },

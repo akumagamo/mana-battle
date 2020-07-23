@@ -69,7 +69,6 @@ function front(scene: Chara) {
     RIGHT_HAND_FRONT_Y,
   );
 
-  console.log(scene.unit.equips.mainHand);
   scene.mainHand = scene.add.image(
     10,
     10,

@@ -179,4 +179,41 @@ export class Chara extends Phaser.Scene {
   run() {
     run(this);
   }
+
+  fadeOut(onComplete: Function) {
+    this.container?.iterate(
+      (child: Phaser.GameObjects.Image | Phaser.GameObjects.Container) => {
+        this.tweens.addCounter({
+          from: 255,
+          to: 0,
+          duration: 500,
+          onComplete: () => {
+            this.tweens.add({
+              targets: this.container,
+              alpha: 0,
+              duration: 500,
+              onComplete,
+            });
+          },
+          onUpdate: function(tween) {
+            var value = Math.floor(tween.getValue());
+
+            if (child.type === 'Container') {
+              (child as Phaser.GameObjects.Container).iterate(
+                (grand: Phaser.GameObjects.Image) => {
+                  grand.setTint(
+                    Phaser.Display.Color.GetColor(value, value, value),
+                  );
+                },
+              );
+            } else {
+              (child as Phaser.GameObjects.Image).setTint(
+                Phaser.Display.Color.GetColor(value, value, value),
+              );
+            }
+          },
+        });
+      },
+    );
+  }
 }

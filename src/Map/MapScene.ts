@@ -70,7 +70,9 @@ type MapCommands =
   | {type: 'SHOW_UNIT_PANEL'; unit: MapUnit}
   | {type: 'SHOW_CLICKABLE_CELLS'; unit: MapUnit}
   | {type: 'HIGHLIGHT_CELL'; pos: Vector}
-  | {type: 'CLOSE_ACTION_PANEL'};
+  | {type: 'CLOSE_ACTION_PANEL'}
+  | {type: 'END_UNIT_TURN'}
+  | {type: 'RUN_TURN'};
 
 export class MapScene extends Phaser.Scene {
   charas: Chara[] = [];
@@ -85,7 +87,7 @@ export class MapScene extends Phaser.Scene {
   state: MapState = {} as MapState;
   selectedUnit: string | null = null;
   currentForce: string = PLAYER_FORCE;
-  /** Units that the player moved this turn*/
+  /** Units moved by a force in a given turn */
   movedUnits: string[] = [];
 
   // ----- Phaser --------------------
@@ -97,11 +99,20 @@ export class MapScene extends Phaser.Scene {
     cmds.forEach((cmd) => {
       console.log(`SIGNAL::`, cmd);
       if (cmd.type === 'DESTROY_TEAM') {
-        const unit = this.getUnit(cmd.target);
-        // Update unit
-        S.map<MapUnit, void>((u) => {
-          u.status = 'defeated';
-        })(unit);
+this.unitIO((u) => {
+                u.status = 'defeated';
+                this.movedUnits = S.reject<string>((id) => id === u.id)(
+                  this.movedUnits,
+                );
+              })(cmd.target);
+        const animation = () =>
+          this.charaIO((chara) => {
+            chara.fadeOut(() => { });
+          })(cmd.target);
+        this.time.addEvent({
+          delay: 100,
+          callback: () => animation(),
+        });
       } else if (cmd.type === 'UPDATE_STATE') {
         this.updateState(cmd.target);
       } else if (cmd.type === 'UPDATE_UNIT_POS') {
@@ -130,6 +141,33 @@ export class MapScene extends Phaser.Scene {
         mapTile.tile.setTint(SELECTED_TILE_TINT);
       } else if (cmd.type === 'CLOSE_ACTION_PANEL') {
         this.closeActionWindow();
+      } else if (cmd.type === 'END_UNIT_TURN') {
+        const aliveIds = this.getAliveUnitsFromForce(this.currentForce).map(
+          (u) => u.id,
+        );
+
+        const defeatedForces = this.getDefeatedForces();
+
+        console.log(`defeated::`,defeatedForces)
+
+        if (defeatedForces.includes(PLAYER_FORCE)) {
+          console.log(`player loses!`);
+        } else if (defeatedForces.includes(CPU_FORCE)) {
+          console.log(`player wins!`);
+        } else if (S.equals(aliveIds)(this.movedUnits)) {
+          console.log(`all units moved, finish turn`);
+          this.endTurn();
+        } else if (this.currentForce === CPU_FORCE) {
+          console.log(`ai turn, proceed`);
+          this.time.addEvent({
+            delay: 500,
+            callback: () => this.runAi(this.currentForce),
+          });
+        } else {
+          console.log(`player turn!!`);
+        }
+      } else if (cmd.type === 'RUN_TURN') {
+        this.runTurn();
       }
     });
   }
@@ -139,17 +177,19 @@ export class MapScene extends Phaser.Scene {
   }
 
   create(data: MapCommands[]) {
-    this.signal(data);
+    console.log(`CREATE COMMANDS:`, data);
+    //@ts-ignore
+    window.map = this
 
     this.mapContainer = this.add.container(0, 0);
     this.uiContainer = this.add.container(0, 0);
     this.actionWindowContainer = this.add.container(0, 0);
 
+    this.signal(data);
+
     this.renderMap();
     this.renderUnits();
     this.renderUI();
-
-    this.runTurn();
   }
 
   // ------ Internals ----------------
@@ -201,6 +241,15 @@ export class MapScene extends Phaser.Scene {
   getUnit(id: string) {
     return getUnit(this.state)(id);
   }
+  mapUnit = <A>(fn: (u: MapUnit) => A) => (id: string) =>
+    S.map<MapUnit, A>((unit) => fn(unit))(this.getUnit(id));
+
+  unitIO = (fn: (u: MapUnit) => void) => (id: string) => {
+    S.map<MapUnit, void>((unit) => fn(unit))(this.getUnit(id));
+  };
+  charaIO = (fn: (u: Chara) => void) => (id: string) => {
+    S.map<Chara, void>((unit) => fn(unit))(this.getChara(id));
+  };
 
   getDefeatedForces(): string[] {
     return this.state.forces
@@ -322,10 +371,9 @@ export class MapScene extends Phaser.Scene {
     );
 
     unit.enemiesInRange.forEach(({enemy}) => {
-      const e = this.getUnit(enemy);
-      S.map((e_: MapUnit) => {
-        this.tileAt(e_.pos.x, e_.pos.y).tile.setTint(ENEMY_IN_CELL_TINT);
-      })(e);
+      this.unitIO((e) => {
+        this.tileAt(e.pos.x, e.pos.y).tile.setTint(ENEMY_IN_CELL_TINT);
+      })(enemy);
     });
   }
 
@@ -413,6 +461,7 @@ export class MapScene extends Phaser.Scene {
     const enemy = S.find<EnemyInRange>((e) => e.enemy === enemyUnit.id)(
       selectedAlly.enemiesInRange,
     );
+    this.movedUnits.push(selectedAlly.id);
     if (S.isJust(enemy)) {
       const alliedChara = this.charas.find(
         (c) => c.unit.id === selectedAlly.id,
@@ -422,13 +471,15 @@ export class MapScene extends Phaser.Scene {
       const attack = () => {
         this.turnOff();
 
+        const isPlayer = selectedAlly.force === PLAYER_FORCE;
+
         this.scene.transition({
           target: 'CombatScene',
           duration: 0,
           moveBelow: true,
           data: {
-            top: chara.unit.squad,
-            bottom: this.selectedUnit,
+            top: isPlayer ? enemyUnit.id : selectedAlly.id,
+            bottom: isPlayer ? selectedAlly.id : enemyUnit.id,
           },
         });
       };
@@ -438,9 +489,7 @@ export class MapScene extends Phaser.Scene {
         this.moveUnit(alliedChara, target, attack);
 
         // TODO: IO, move to API
-        S.map((u: MapUnit) => {
-          u.pos = target.reverse()[0];
-        })(selectedAlly);
+        selectedAlly.pos = target.reverse()[0];
       })(enemy);
     } else {
       console.error(`This should be impossible, check logic`);
@@ -483,12 +532,10 @@ export class MapScene extends Phaser.Scene {
 
     if (this.selectedUnit) {
       const squad = getSquad(this.selectedUnit);
-      const unit = this.getUnit(this.selectedUnit);
-
-      S.map((u: MapUnit) => {
+      this.unitIO((unit) => {
         text(20, 610, squad.name, uiContainer, this);
-        text(1000, 610, `${u.range} cells`, uiContainer, this);
-      })(unit);
+        text(1000, 610, `${unit.range} cells`, uiContainer, this);
+      })(this.selectedUnit);
     }
 
     button(1100, 50, 'Return to Title', uiContainer, this, () => {
@@ -516,13 +563,10 @@ export class MapScene extends Phaser.Scene {
   }
 
   runTurn() {
-    // One side won last turn?
-    const defeatedForces = this.getDefeatedForces();
-
-    if (defeatedForces.includes(PLAYER_FORCE)) console.log(`player loses!`);
-    if (defeatedForces.includes(CPU_FORCE)) console.log(`player wins!`);
 
     const force = this.getForce(this.currentForce);
+
+    console.log(this.movedUnits);
 
     this.showTurnTitle(force);
 
@@ -533,31 +577,48 @@ export class MapScene extends Phaser.Scene {
     }
   }
 
-  runAiActions(forceId: string) {
-    const units_ = getUnitsFromForce(this.state)(forceId);
+  getAliveUnitsFromForce(forceId: string) {
+    return getUnitsFromForce(this.state)(forceId).filter(
+      (u) => u.status === 'alive',
+    );
+  }
+  runAi(forceId: string) {
+    const remainingUnits = this.getAliveUnitsFromForce(forceId).filter(
+      (u) => !this.movedUnits.includes(u.id),
+    );
 
-    const units = units_.filter((u) => u.status === 'alive');
+    if (remainingUnits.length < 1) return;
 
-    const runAi = (currentTurn: number) => {
-      const unit = units[currentTurn];
-      if (!unit) throw new Error(INVALID_STATE);
+    const unit = remainingUnits[0];
+    if (!unit) throw new Error(INVALID_STATE);
 
-      this.selectedUnit = unit.id;
-      this.renderUI();
+    this.selectedUnit = unit.id;
+    this.renderUI();
 
+    const maybeEnemiesInRange = S.head(unit.enemiesInRange);
+
+    if (S.isJust(maybeEnemiesInRange)) {
+      S.map<EnemyInRange, void>((eir) => {
+        this.unitIO((enemy) => {
+          const enemyChara = this.getChara(enemy.id);
+
+          S.map<Chara, void>((chara) => {
+            this.moveToEnemyUnit(enemy, chara, unit);
+          })(enemyChara);
+        })(eir.enemy);
+      })(maybeEnemiesInRange);
+    } else {
       const {x, y} = randomItem(unit.validSteps).target;
 
       const tile = this.getTileAt(x, y);
-      this.selectTile(unit, tile, () => {
-        if (currentTurn === units.length - 1) {
-          this.endTurn();
-        } else {
-          runAi(currentTurn + 1);
-        }
-      });
-    };
 
-    runAi(0);
+      this.moveToTile(unit.id, tile, () =>
+        this.signal([{type: 'END_UNIT_TURN'}]),
+      );
+    }
+  }
+  runAiActions(forceId: string) {
+    this.runAi(forceId);
   }
 
   checkTurnEnd() {
@@ -664,6 +725,7 @@ export class MapScene extends Phaser.Scene {
     });
   }
 
+  // TODO: simplify interface
   moveToTile(unitId: string, mapTile: MapTile, onMoveComplete: Function) {
     const {x, y} = mapTile;
 
@@ -683,9 +745,7 @@ export class MapScene extends Phaser.Scene {
 
     this.movedUnits.push(unitId);
 
-    const maybeUnit = this.getUnit(unitId);
-
-    S.map((unit: MapUnit) => {
+    this.unitIO((unit) => {
       const maybePath = S.find((step: any) => S.equals(step.target)({x, y}))(
         unit.validSteps,
       );
@@ -693,7 +753,7 @@ export class MapScene extends Phaser.Scene {
       S.map((step: any) => {
         this.moveUnit(chara, step.steps, onMoveComplete);
       })(maybePath);
-    })(maybeUnit);
+    })(unitId);
 
     this.signal([{type: 'UPDATE_UNIT_POS', id: squad.id, pos: {x, y}}]);
 
@@ -706,6 +766,7 @@ export class MapScene extends Phaser.Scene {
     this.runTurn();
   }
 
+  // TODO: simplify interface (require only ids)
   moveUnit = (chara: Chara, path: Vector[], onMoveComplete: Function) => {
     const endCallback = () => {
       path.forEach((p) => this.getTileAt(p.x, p.y).tile.clearTint());

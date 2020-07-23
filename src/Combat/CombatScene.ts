@@ -37,7 +37,7 @@ export default class CombatScene extends Phaser.Scene {
   bottom = '';
   conflictId = '';
   currentTurn = 0;
-  container: Container | null = null  
+  container: Container | null = null;
 
   constructor() {
     super('CombatScene');
@@ -55,10 +55,9 @@ export default class CombatScene extends Phaser.Scene {
 
   // LIFECYCLE METHODS
   create(data: {top: string; bottom: string; conflictId: string}) {
+    if (this.container) this.container.destroy();
 
-    if(this.container) this.container.destroy()
-    
-    this.container = this.add.container(0,0)
+    this.container = this.add.container(0, 0);
 
     plains(this, this.container);
 
@@ -105,7 +104,7 @@ export default class CombatScene extends Phaser.Scene {
 
   turnOff() {
     this.removeChildren();
-    this.container?.destroy()
+    this.container?.destroy();
     this.scene.stop();
   }
   removeChildren() {
@@ -113,7 +112,7 @@ export default class CombatScene extends Phaser.Scene {
       chara.container?.destroy();
       this.scene.remove(chara);
     });
-    this.charas = []
+    this.charas = [];
   }
 
   // COMBAT FLOW METHODS
@@ -155,13 +154,11 @@ export default class CombatScene extends Phaser.Scene {
       this.turn();
     } else if (cmd.type === 'END_COMBAT') {
       this.retreatUnits().then((updatedUnits: Unit[]) => {
-        this.scene.start(
-          'MapScene',
-          updatedUnits.map((u) => ({
-            type: 'UPDATE_UNIT',
-            target: u
-          })),
-        );
+        const units = updatedUnits.map((u) => ({
+          type: 'UPDATE_UNIT',
+          target: u,
+        }));
+        this.scene.start('MapScene', [...units, {type: 'END_UNIT_TURN'}]);
         this.turnOff();
       });
     } else if (cmd.type === 'VICTORY') {
@@ -172,6 +169,7 @@ export default class CombatScene extends Phaser.Scene {
           type: 'DESTROY_TEAM',
           target: cmd.target === this.top ? this.bottom : this.top,
         },
+        {type: 'END_UNIT_TURN'},
       ]);
 
       this.turnOff();
@@ -305,7 +303,6 @@ export default class CombatScene extends Phaser.Scene {
       y: y,
       duration: WALK_DURATION,
       onComplete: () => {
-        console.log(`stand!!`);
         chara.stand();
         onComplete();
       },
