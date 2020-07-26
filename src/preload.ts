@@ -83,4 +83,9 @@ export function preload(this: {
   tiles.forEach((id: string) => {
     this.load.image(id, `${PUBLIC_URL}/${id}.svg`);
   });
+
+  const structures = ['tiles/city'];
+  structures.forEach((id: string) => {
+    this.load.image(id, `${PUBLIC_URL}/${id}.png`);
+  });
 }

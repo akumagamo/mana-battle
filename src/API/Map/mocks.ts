@@ -1,4 +1,4 @@
-import {MapState, CellNumber} from "./Model";
+import {MapState, CellNumber} from './Model';
 
 export const PLAYER_FORCE = 'PLAYER_FORCE';
 export const CPU_FORCE = 'CPU_FORCE';
@@ -11,12 +11,16 @@ export const tileMap: {[x in CellNumber]: string} = {
 
 export const initialMapState: MapState = {
   cells: [
-    [0, 1, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2],
-    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 1, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 2, 1, 2, 0, 0, 1],
-    [0, 1, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 1],
-    [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1],
+    [0, 1, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, ],
+    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ],
+    [0, 1, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 2, 2, 0, 0, 2, 2, 0, 0, ],
+    [0, 0, 0, 0, 0, 0, 0, 2, 1, 2, 0, 0, 1, 2, 0, 0, 1, 2, 0, 0, ],
+    [0, 1, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 2, 2, 0, 0, 2, 2, 0, 0, ],
+    [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, ],
+    [0, 1, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, ],
+    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ],
+    [0, 1, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 2, 2, 0, 0, 2, 2, 0, 0, ],
+    [0, 0, 0, 0, 0, 0, 0, 2, 1, 2, 0, 0, 1, 2, 0, 0, 1, 2, 0, 0, ],
   ],
   units: [
     {
@@ -46,7 +50,7 @@ export const initialMapState: MapState = {
     },
     {
       id: '2',
-      pos: {x: 0, y: 3},
+      pos: {x: 15, y: 3},
       range: 5,
       validSteps: [],
       enemiesInRange: [],
@@ -55,7 +59,7 @@ export const initialMapState: MapState = {
     },
     {
       id: '3',
-      pos: {x: 3, y: 1},
+      pos: {x: 13, y: 1},
       range: 5,
       validSteps: [],
       enemiesInRange: [],
@@ -78,7 +82,9 @@ export const initialMapState: MapState = {
     },
   ],
   cities: [
-    {id: 'a1', name: 'Arabella', x: 1, y: 1, force: PLAYER_FORCE, type: 'town'},
-    {id: 'm1', name: 'Marqueze', x: 3, y: 1, force: CPU_FORCE, type: 'town'},
+    {id: 'c1', name: 'Arabella', x: 0, y: 1, force: PLAYER_FORCE, type: 'town'},
+    {id: 'c2', name: 'Marqueze', x: 10, y: 1, force: CPU_FORCE, type: 'town'},
+    {id: 'c3', name: 'Bauhaus', x: 9, y: 5, force: CPU_FORCE, type: 'town'},
+    {id: 'c4', name: 'Vila Rica', x: 6, y: 4, force: CPU_FORCE, type: 'town'},
   ],
 };

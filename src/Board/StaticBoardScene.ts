@@ -151,7 +151,7 @@ export default class StaticBoardScene extends Phaser.Scene {
 
   sortUnitsByDepth() {
     this.unitList.forEach((chara) =>
-      chara.container?.setDepth(chara.container?.y),
+      chara.container.setDepth(chara.container?.y),
     );
 
     this.unitList

@@ -11,8 +11,8 @@ import attack from './animations/attack';
 import initial from './animations/initial';
 
 export class Chara extends Phaser.Scene {
-  container: Container | null = null;
-  charaWrapper: Container | null = null;
+  container: Container  = {} as Container;
+  charaWrapper: Container = {} as Container;
 
   //body parts
 
@@ -45,7 +45,7 @@ export class Chara extends Phaser.Scene {
   }
   create() {
     //the unit has two wrappers to allow multiple tweens at once
-    this.charaWrapper = this.add.container(0, 0);
+    this.charaWrapper = this.add.container();
 
     this.container = this.add.container(this.cx, this.cy);
 
@@ -87,14 +87,13 @@ export class Chara extends Phaser.Scene {
   }
 
   private maybeRenderInsignea() {
-    if (this.unit.leader && this.container) {
+    if (this.unit.leader) {
       const insignea = this.add.image(50, 0, 'insignea');
       this.container.add(insignea);
     }
   }
 
   onClick(fn: (chara: Chara) => void) {
-    if (!this.container) return;
 
     this.container.setInteractive();
 
@@ -107,7 +106,6 @@ export class Chara extends Phaser.Scene {
     dragStart: (unit: Unit, x: number, y: number, chara: Chara) => void,
     dragEnd: (unit: Unit, x: number, y: number, chara: Chara) => void,
   ) {
-    if (!this.container) return;
 
     this.container.setInteractive();
     this.input.setDraggable(this.container);
@@ -115,9 +113,7 @@ export class Chara extends Phaser.Scene {
     this.input.on(
       'drag',
       (_pointer: Pointer, obj: Container, x: number, y: number) => {
-        if (this.container) {
           this.container.setDepth(Infinity);
-        }
 
         obj.x = x;
         obj.y = y;
@@ -129,13 +125,11 @@ export class Chara extends Phaser.Scene {
     this.container.on(
       'dragend',
       (_pointer: Pointer, _dragX: number, dragY: number) => {
-        if (this.container) {
           this.container.setDepth(dragY);
-        }
         dragEnd(
           this.unit,
-          this.container?.x || 0,
-          this.container?.y || 0,
+          this.container.x || 0,
+          this.container.y || 0,
           this,
         );
       },
@@ -143,7 +137,7 @@ export class Chara extends Phaser.Scene {
   }
 
   handleClick(fn: (chara: Chara, pointer: Pointer) => void) {
-    this.container?.on('pointerdown', (pointer: Pointer) => {
+    this.container.on('pointerdown', (pointer: Pointer) => {
       fn(this, pointer);
     });
   }
@@ -181,7 +175,8 @@ export class Chara extends Phaser.Scene {
   }
 
   fadeOut(onComplete: Function) {
-    this.container?.iterate(
+
+    this.container.iterate(
       (child: Phaser.GameObjects.Image | Phaser.GameObjects.Container) => {
         this.tweens.addCounter({
           from: 255,

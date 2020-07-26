@@ -16,7 +16,7 @@ export default (chara: Chara, damage: number, isKilled: boolean) => {
 
   dmg.setStroke('#000000',2)
 
-  chara.container?.add(dmg);
+  chara.container.add(dmg);
 
   chara.parent.tweens.add({
     targets: dmg,

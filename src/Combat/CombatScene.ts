@@ -109,7 +109,7 @@ export default class CombatScene extends Phaser.Scene {
   }
   removeChildren() {
     this.charas.forEach((chara) => {
-      chara.container?.destroy();
+      chara.container.destroy();
       this.scene.remove(chara);
     });
     this.charas = [];

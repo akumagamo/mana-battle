@@ -21,7 +21,24 @@ export default (
   btn.displayWidth = text_.width + 30;
   btn.displayHeight = text_.height + 20;
   btn.on('pointerdown', () => {
+    btn.setTint(0x444444);
+    text_.setColor('#ffffff');
+  });
+  btn.on('pointerup', () => {
+    btn.clearTint();
+    text_.setColor('#000000');
     onClick();
   });
+
+  btn.on('pointerover', ()=> {
+    btn.setTint(0x444444);
+    text_.setColor('#ffffff');
+  });
+
+  btn.on('pointerout', ()=> {
+    btn.clearTint();
+    text_.setColor('#000000');
+  });
+
   return btn;
 };

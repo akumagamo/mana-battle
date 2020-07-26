@@ -3,7 +3,7 @@ import {Chara} from '../Chara/Chara';
 import {getSquad, getSquadLeader} from '../DB';
 import {INVALID_STATE} from '../errors';
 import button from '../UI/button';
-import {Container, Image} from '../Models';
+import {Container, Image, Pointer} from '../Models';
 import panel from '../UI/panel';
 import text from '../UI/text';
 import {
@@ -18,23 +18,32 @@ import {
   Force,
   ValidStep,
   EnemyInRange,
+  City,
 } from '../API/Map/Model';
 import {randomItem} from '../defaultData';
 import S from 'sanctuary';
 import {PLAYER_FORCE, tileMap, CPU_FORCE} from '../API/Map/mocks';
+import {SCREEN_WIDTH, SCREEN_HEIGHT} from '../constants';
 
 const WALKABLE_CELL_TINT = 0x88aa88;
 const ENEMY_IN_CELL_TINT = 0xff2222;
 const SELECTED_TILE_TINT = 0x9955aa;
 
 const SQUAD_MOVE_DURATION = 500;
-const CHARA_MAP_SCALE = 0.5;
+const CHARA_MAP_SCALE = 0.45;
 const CHARA_VERTICAL_OFFSET = -10;
+
+const CITY_SCALE = 0.5;
 
 const BOTTOM_PANEL_X = 0;
 const BOTTOM_PANEL_Y = 600;
 const BOTTOM_PANEL_WIDTH = 1280;
 const BOTTOM_PANEL_HEIGHT = 120;
+
+const TILE_DISPLAY_SIZE = 164;
+
+const ALLIED_CITY_TINT = 0x66ff66;
+const ENEMY_CITY_TINT = 0xff6666;
 
 const cellSize = 100;
 
@@ -72,11 +81,14 @@ type MapCommands =
   | {type: 'HIGHLIGHT_CELL'; pos: Vector}
   | {type: 'CLOSE_ACTION_PANEL'}
   | {type: 'END_UNIT_TURN'}
+  | {type: 'CITY_CLICK'; id: string}
+  | {type: 'CAPTURE_CITY'; id: string; force: string}
   | {type: 'RUN_TURN'};
 
 export class MapScene extends Phaser.Scene {
   charas: Chara[] = [];
   tiles: MapTile[] = [];
+  citySprites: Image[] = [];
 
   // Containers can't be created in the constructor, so we are casting the types here
   // TODO: consider receiving containers from parent or pass them around in functions
@@ -85,10 +97,21 @@ export class MapScene extends Phaser.Scene {
 
   actionWindowContainer: null | Container = null;
   state: MapState = {} as MapState;
-  selectedUnit: string | null = null;
+
+  selectedEntity: null | {type: 'city' | 'unit'; id: string} = null;
+
   currentForce: string = PLAYER_FORCE;
   /** Units moved by a force in a given turn */
   movedUnits: string[] = [];
+
+  dragState: null | Vector = null;
+
+  mapX: number = 0;
+  mapY: number = 0;
+  bounds: {x: {min: number; max: number}; y: {min: number; max: number}} = {
+    x: {min: 0, max: 0},
+    y: {min: 0, max: 0},
+  };
 
   // ----- Phaser --------------------
   constructor() {
@@ -99,15 +122,15 @@ export class MapScene extends Phaser.Scene {
     cmds.forEach((cmd) => {
       console.log(`SIGNAL::`, cmd);
       if (cmd.type === 'DESTROY_TEAM') {
-this.unitIO((u) => {
-                u.status = 'defeated';
-                this.movedUnits = S.reject<string>((id) => id === u.id)(
-                  this.movedUnits,
-                );
-              })(cmd.target);
+        this.unitIO((u) => {
+          u.status = 'defeated';
+          this.movedUnits = S.reject<string>((id) => id === u.id)(
+            this.movedUnits,
+          );
+        })(cmd.target);
         const animation = () =>
           this.charaIO((chara) => {
-            chara.fadeOut(() => { });
+            chara.fadeOut(() => {});
           })(cmd.target);
         this.time.addEvent({
           delay: 100,
@@ -148,7 +171,7 @@ this.unitIO((u) => {
 
         const defeatedForces = this.getDefeatedForces();
 
-        console.log(`defeated::`,defeatedForces)
+        console.log(`defeated::`, defeatedForces);
 
         if (defeatedForces.includes(PLAYER_FORCE)) {
           console.log(`player loses!`);
@@ -168,6 +191,25 @@ this.unitIO((u) => {
         }
       } else if (cmd.type === 'RUN_TURN') {
         this.runTurn();
+      } else if (cmd.type === 'CITY_CLICK') {
+        if (this.selectedEntity && this.selectedEntity.type === 'unit')
+          this.cityIO((city) => {
+            this.unitIO((unit) => {
+              if (unit.force === 'PLAYER_FORCE') {
+                this.selectTile(unit, city, () => {});
+              } else {
+                this.setSelectedCity(cmd.id);
+              }
+            })((this.selectedEntity as any).id);
+          })(cmd.id);
+        else this.setSelectedCity(cmd.id);
+
+        this.renderUI();
+      } else if (cmd.type === 'CAPTURE_CITY') {
+        this.state.cities = this.state.cities.map((city) =>
+          city.id === cmd.id ? {...city, force: cmd.force} : city,
+        );
+        this.citySpriteIO((sprite) => sprite.setTint(ALLIED_CITY_TINT))(cmd.id);
       }
     });
   }
@@ -179,17 +221,70 @@ this.unitIO((u) => {
   create(data: MapCommands[]) {
     console.log(`CREATE COMMANDS:`, data);
     //@ts-ignore
-    window.map = this
+    window.map = this;
 
-    this.mapContainer = this.add.container(0, 0);
+    this.mapContainer = this.add.container(this.mapX, this.mapY);
     this.uiContainer = this.add.container(0, 0);
     this.actionWindowContainer = this.add.container(0, 0);
 
     this.signal(data);
 
     this.renderMap();
+    this.renderStructures();
     this.renderUnits();
     this.renderUI();
+
+    this.setWorldBounds();
+    this.makeWorldDraggable();
+  }
+
+  setWorldBounds() {
+    const rows = this.state.cells[0].length;
+    const cols = this.state.cells.length;
+    this.bounds = {
+      x: {min: -1 * (rows * cellSize - SCREEN_WIDTH), max: 0},
+      y: {min: -1 * (cols * cellSize - SCREEN_HEIGHT), max: 0},
+    };
+  }
+
+  makeWorldDraggable() {
+    this.mapContainer.setSize(
+      this.mapContainer.getBounds().width,
+      this.mapContainer.getBounds().height,
+    );
+
+    this.mapContainer.setInteractive();
+
+    this.input.setDraggable(this.mapContainer);
+
+    this.input.on(
+      'drag',
+      (_: Pointer, gameObject: Image, dragX: number, dragY: number) => {
+        const dx = gameObject.x - dragX;
+        const dy = gameObject.y - dragY;
+
+        const mx = this.mapX - dx;
+        const my = this.mapY - dy;
+
+        const {x, y} = this.bounds;
+
+        console.log('x', mx, [x.min, x.max]);
+        console.log('y', my, [y.min, y.max]);
+
+        if (mx < x.max && mx > x.min && my < y.max && my > y.min)
+          this.mapContainer.setPosition(this.mapX - dx, this.mapY - dy);
+      },
+    );
+
+    this.input.on('dragend', () => {
+      this.mapX = this.mapContainer.x;
+      this.mapY = this.mapContainer.y;
+    });
+
+    this.mapContainer.on('pointerdown', (p) => {
+      console.log(`aaa`, p);
+    });
+    console.log(`draggable!`);
   }
 
   // ------ Internals ----------------
@@ -202,6 +297,9 @@ this.unitIO((u) => {
     const tile = this.tiles.find((t) => t.x === x && t.y === y);
     if (!tile) throw new Error(INVALID_STATE);
     return tile;
+  }
+  cityAt(x: number, y: number) {
+    return S.find<City>((c) => c.x === x && c.y === y)(this.state.cities);
   }
 
   setValidMoves() {
@@ -247,6 +345,19 @@ this.unitIO((u) => {
   unitIO = (fn: (u: MapUnit) => void) => (id: string) => {
     S.map<MapUnit, void>((unit) => fn(unit))(this.getUnit(id));
   };
+
+  cityIO = (fn: (u: City) => void) => (id: string) => {
+    S.map<City, void>((unit) => fn(unit))(
+      S.find<City>((c) => c.id === id)(this.state.cities),
+    );
+  };
+
+  citySpriteIO = (fn: (u: Image) => void) => (id: string) => {
+    S.map<Image, void>((unit) => fn(unit))(
+      S.find<Image>((c) => c.name === id)(this.citySprites),
+    );
+  };
+
   charaIO = (fn: (u: Chara) => void) => (id: string) => {
     S.map<Chara, void>((unit) => fn(unit))(this.getChara(id));
   };
@@ -275,6 +386,28 @@ this.unitIO((u) => {
     };
   }
 
+  renderStructures() {
+    this.state.cities.forEach((city) => {
+      const {x, y} = this.getPos({x: city.x, y: city.y});
+
+      const city_ = this.add.image(x, y, `tiles/city`);
+
+      city_.setScale(CITY_SCALE);
+
+      if (city.force === 'PLAYER_FORCE') {
+        city_.setTint(ALLIED_CITY_TINT);
+      } else {
+        city_.setTint(ENEMY_CITY_TINT);
+      }
+      city_.setInteractive();
+      city_.on('pointerup', () =>
+        this.signal([{type: 'CITY_CLICK', id: city.id}]),
+      );
+      this.mapContainer.add(city_);
+      city_.name = city.id;
+      this.citySprites.push(city_);
+    });
+  }
   renderMap() {
     const {container} = this.getContainers();
     this.state.cells.forEach((arr, col) =>
@@ -286,6 +419,8 @@ this.unitIO((u) => {
         tile.setInteractive();
 
         container.add(tile);
+
+        this.input.setDraggable(tile);
 
         tile.displayWidth = cellSize;
         tile.displayHeight = cellSize;
@@ -300,11 +435,12 @@ this.unitIO((u) => {
     );
   }
   getSelectedUnit() {
-    if (this.selectedUnit) return this.getUnit(this.selectedUnit);
-    else return S.Nothing;
+    if (this.selectedEntity && this.selectedEntity.type === 'unit') {
+      return this.getUnit(this.selectedEntity.id);
+    } else return S.Nothing;
   }
   makeInteractive(cell: MapTile) {
-    cell.tile.on('pointerdown', () => {
+    cell.tile.on('pointerup', () => {
       this.signal([{type: 'CLICK_CELL', cell}]);
     });
   }
@@ -342,9 +478,11 @@ this.unitIO((u) => {
       true,
     );
 
-    if (chara.container) container.add(chara.container);
+    container.add(chara.container);
 
     this.charas.push(chara);
+
+    if (this.movedUnits.includes(unit.id)) chara.container.setAlpha(0.5);
 
     chara.onClick((_: Chara) => {
       this.signal([
@@ -428,14 +566,22 @@ this.unitIO((u) => {
   }
 
   showUnitPanel(unit: MapUnit) {
-    this.selectedUnit = unit.id;
+    this.setSelectedUnit(unit.id);
     this.renderUI();
+  }
+
+  setSelectedUnit(id: string) {
+    this.selectedEntity = {type: 'unit', id};
+  }
+
+  setSelectedCity(id: string) {
+    this.selectedEntity = {type: 'city', id};
   }
 
   showEnemyUnitMenu(unit: MapUnit, chara: Chara, selectedAlly: MapUnit) {
     this.closeActionWindow();
 
-    this.actionWindow(chara.container?.x || 0, chara.container?.y || 0, [
+    this.actionWindow(chara.container.x || 0, chara.container.y || 0, [
       {
         title: 'Attack',
         action: () => {
@@ -457,7 +603,7 @@ this.unitIO((u) => {
     ]);
   }
 
-  moveToEnemyUnit(enemyUnit: MapUnit, chara: Chara, selectedAlly: MapUnit) {
+  moveToEnemyUnit(enemyUnit: MapUnit, _: Chara, selectedAlly: MapUnit) {
     const enemy = S.find<EnemyInRange>((e) => e.enemy === enemyUnit.id)(
       selectedAlly.enemiesInRange,
     );
@@ -500,7 +646,7 @@ this.unitIO((u) => {
     this.mapContainer.destroy();
     this.uiContainer.destroy();
     this.charas.forEach((chara) => {
-      chara.container?.destroy();
+      chara.container.destroy();
       this.scene.remove(chara);
     });
     this.charas = [];
@@ -530,15 +676,28 @@ this.unitIO((u) => {
       ),
     );
 
-    if (this.selectedUnit) {
-      const squad = getSquad(this.selectedUnit);
+    //UNIT INFORMATION
+    if (this.selectedEntity && this.selectedEntity.type === 'unit') {
+      const squad = getSquad(this.selectedEntity.id);
       this.unitIO((unit) => {
         text(20, 610, squad.name, uiContainer, this);
         text(1000, 610, `${unit.range} cells`, uiContainer, this);
-      })(this.selectedUnit);
+      })(this.selectedEntity.id);
+    } else if (this.selectedEntity && this.selectedEntity.type === 'city') {
+      this.cityIO((city) => {
+        text(20, 610, city.name, uiContainer, this);
+        if (city.force)
+          text(
+            1000,
+            610,
+            `Controlled by ${this.getForce(city.force).name}`,
+            uiContainer,
+            this,
+          );
+      })(this.selectedEntity.id);
     }
 
-    button(1100, 50, 'Return to Title', uiContainer, this, () => {
+    button(900, 50, 'Return to Title', uiContainer, this, () => {
       container.removeAll();
       uiContainer.removeAll();
       this.charas.forEach((c) => this.scene.remove(c.scene.key));
@@ -563,7 +722,6 @@ this.unitIO((u) => {
   }
 
   runTurn() {
-
     const force = this.getForce(this.currentForce);
 
     console.log(this.movedUnits);
@@ -592,7 +750,7 @@ this.unitIO((u) => {
     const unit = remainingUnits[0];
     if (!unit) throw new Error(INVALID_STATE);
 
-    this.selectedUnit = unit.id;
+    this.setSelectedUnit(unit.id);
     this.renderUI();
 
     const maybeEnemiesInRange = S.head(unit.enemiesInRange);
@@ -668,35 +826,40 @@ this.unitIO((u) => {
     this.actionWindowContainer?.destroy();
   }
 
-  selectTile(unit: MapUnit, mapTile: MapTile, onMoveComplete: Function) {
-    const {tile} = mapTile;
+  selectTile(unit: MapUnit, {x, y}: Vector, onMoveComplete: Function) {
+    const maybeMapTile = S.find<MapTile>(
+      (tile) => tile.x === x && tile.y === y,
+    )(this.tiles);
 
-    this.signal([
-      {type: 'CLOSE_ACTION_PANEL'},
-      {type: 'SHOW_CLICKABLE_CELLS', unit},
-      {type: 'HIGHLIGHT_CELL', pos: {x: mapTile.x, y: mapTile.y}},
-    ]);
+    S.map<MapTile, void>((mapTile) => {
+      const {tile} = mapTile;
+      this.signal([
+        {type: 'CLOSE_ACTION_PANEL'},
+        {type: 'SHOW_CLICKABLE_CELLS', unit},
+        {type: 'HIGHLIGHT_CELL', pos: {x: mapTile.x, y: mapTile.y}},
+      ]);
 
-    this.actionWindow(tile.x, tile.y, [
-      {
-        title: 'Move',
-        action: () => {
-          //TODO: convert to data
-          this.moveToTile(unit.id, mapTile, onMoveComplete);
-          this.actionWindowContainer?.destroy();
-          tile.clearTint();
+      this.actionWindow(tile.x, tile.y, [
+        {
+          title: 'Move',
+          action: () => {
+            //TODO: convert to data
+            this.moveToTile(unit.id, mapTile, onMoveComplete);
+            this.actionWindowContainer?.destroy();
+            tile.clearTint();
+          },
         },
-      },
-      {
-        title: 'Cancel',
-        action: () => {
-          this.signal([
-            {type: 'CLOSE_ACTION_PANEL'},
-            {type: 'SHOW_CLICKABLE_CELLS', unit},
-          ]);
+        {
+          title: 'Cancel',
+          action: () => {
+            this.signal([
+              {type: 'CLOSE_ACTION_PANEL'},
+              {type: 'SHOW_CLICKABLE_CELLS', unit},
+            ]);
+          },
         },
-      },
-    ]);
+      ]);
+    })(maybeMapTile);
   }
 
   actionWindow(
@@ -751,7 +914,15 @@ this.unitIO((u) => {
       );
 
       S.map((step: any) => {
-        this.moveUnit(chara, step.steps, onMoveComplete);
+        this.moveUnit(chara, step.steps, () => {
+          S.map<City, void>((city) => {
+            this.signal([
+              {type: 'CAPTURE_CITY', id: city.id, force: squad.force},
+            ]);
+          })(this.cityAt(x, y));
+
+          onMoveComplete();
+        });
       })(maybePath);
     })(unitId);
 

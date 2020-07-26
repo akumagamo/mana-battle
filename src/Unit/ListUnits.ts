@@ -37,6 +37,7 @@ export class ListUnitsScene extends Phaser.Scene {
   }
 
   renderUnitsList() {
+    // TODO: filter only player units
     const units = Object.values(api.getUnits()).slice(
       this.page * this.itemsPerPage,
       this.page * this.itemsPerPage + this.itemsPerPage,

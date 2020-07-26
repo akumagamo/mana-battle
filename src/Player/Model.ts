@@ -5,4 +5,5 @@ export type Player = {
   iventory: {
     [itemId: string]: number;
   };
+  units: string[];
 };

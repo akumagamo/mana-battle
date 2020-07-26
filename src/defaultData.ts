@@ -16,7 +16,7 @@ import {fromJSON} from './Unit/serializer';
 import {indexById} from './utils';
 import {SquadMap} from './Squad/Model';
 import {Player} from './Player/Model';
-
+import {Range} from 'immutable'
 export const classes: UnitClass[] = ['fighter', 'knight', 'wizard'];
 
 export function randomItem<T>(items: Array<T>): T {
@@ -87,6 +87,7 @@ export var player: Player = {
     iron_sword: 2,
     steel_sword: 1,
   },
+  units: Range(0,10).map(n=>n.toString()).toJS()
 };
 
 const data: [

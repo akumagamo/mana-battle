@@ -223,7 +223,7 @@ export default class BoardScene extends Phaser.Scene {
 
   sortUnitsByDepth() {
     this.unitList.forEach((chara) =>
-      chara.container?.setDepth(chara.container?.y),
+      chara.container.setDepth(chara.container?.y),
     );
 
     this.unitList
