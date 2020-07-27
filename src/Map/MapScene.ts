@@ -92,11 +92,12 @@ export class MapScene extends Phaser.Scene {
 
   // Containers can't be created in the constructor, so we are casting the types here
   // TODO: consider receiving containers from parent or pass them around in functions
-  mapContainer: Container = {} as Container;
-  uiContainer: Container = {} as Container;
+  mapContainer = {} as Container;
+  missionContainer = {} as Container;
+  uiContainer = {} as Container;
 
   actionWindowContainer: null | Container = null;
-  state: MapState = {} as MapState;
+  state = {} as MapState;
 
   selectedEntity: null | {type: 'city' | 'unit'; id: string} = null;
 
@@ -108,10 +109,12 @@ export class MapScene extends Phaser.Scene {
 
   mapX: number = 0;
   mapY: number = 0;
-  bounds: {x: {min: number; max: number}; y: {min: number; max: number}} = {
+  bounds = {
     x: {min: 0, max: 0},
     y: {min: 0, max: 0},
   };
+
+  hasShownVictoryCondition = false;
 
   // ----- Phaser --------------------
   constructor() {
@@ -224,8 +227,9 @@ export class MapScene extends Phaser.Scene {
     window.map = this;
 
     this.mapContainer = this.add.container(this.mapX, this.mapY);
-    this.uiContainer = this.add.container(0, 0);
-    this.actionWindowContainer = this.add.container(0, 0);
+    this.uiContainer = this.add.container();
+    this.missionContainer = this.add.container();
+    this.actionWindowContainer = this.add.container();
 
     this.signal(data);
 
@@ -236,6 +240,197 @@ export class MapScene extends Phaser.Scene {
 
     this.setWorldBounds();
     this.makeWorldDraggable();
+
+    if (!this.hasShownVictoryCondition) {
+      this.showVictoryCondition();
+      this.hasShownVictoryCondition = true;
+    }
+  }
+
+  tween(options: any) {
+    return new Promise((resolve: any) =>
+      this.tweens.add({
+        ...options,
+        onComplete: resolve,
+      }),
+    );
+  }
+  delay(delay: number) {
+    return new Promise((resolve: any) =>
+      this.time.addEvent({
+        delay,
+        callback: resolve,
+      }),
+    );
+  }
+
+  showVictoryCondition() {
+    const title = this.label(SCREEN_WIDTH / 2, 60, 'Victory Condition');
+
+    title.setAlpha(0);
+
+    S.pipe([
+      S.prop('cities'),
+      S.find<City>((c) => c.type === 'castle' && c.force === CPU_FORCE),
+      S.map<City, void>((c) => {
+        this.delay(500)
+          .then(() =>
+            this.tween({
+              targets: title,
+              alpha: 1,
+              duration: 1000,
+            }),
+          )
+          .then(() => this.delay(500))
+          .then(() => this.moveCameraTo(c, 1000))
+          .then(() => {
+            const conquer = this.label(
+              SCREEN_WIDTH / 2,
+              160,
+              'Conquer enemy headquarters',
+            );
+
+            conquer.setAlpha(0);
+            return this.tween({
+              targets: conquer,
+              alpha: 1,
+              duration: 500,
+            });
+          })
+          .then(() => {
+            const pic = this.add.sprite(SCREEN_WIDTH / 2, 350, 'merano');
+            pic.setOrigin(0.5);
+            pic.setDisplaySize(250, 250);
+            const name = this.label(SCREEN_WIDTH / 2, 520, 'Merano Castle');
+
+            pic.setAlpha(0);
+            name.setAlpha(0);
+
+            this.missionContainer.add(pic);
+
+            return this.tween({
+              targets: [pic, name],
+              alpha: 1,
+              duration: 1000,
+            });
+          })
+          .then(() => this.delay(1000))
+          .then(() => {
+            return this.tween({
+              targets: this.missionContainer,
+              alpha: 0,
+              duration: 1000,
+            });
+          })
+          .then(() => {
+            this.missionContainer.destroy();
+            this.missionContainer = this.add.container();
+            const start = this.label(
+              SCREEN_WIDTH / 2,
+              SCREEN_HEIGHT / 2,
+              'Mission Start',
+            );
+            start.setAlpha(0);
+            return this.tween({
+              targets: start,
+              alpha: 1,
+              duration: 1000,
+            });
+          })
+          .then(() => this.delay(1000))
+          .then(() =>
+            this.tween({
+              targets: this.missionContainer,
+              alpha: 0,
+              duration: 1000,
+            }),
+          )
+          .then(() => this.runTurn());
+      }),
+
+      // this.tweens.add({
+      //     this.time.addEvent({
+      //       delay: 3000,
+      //       callback: () => {
+      //         this.tweens.add({
+      //           targets: [pic, name, conquer, title],
+      //           alpha: 0,
+      //           duration: 1000,
+      //           onComplete: () => {
+      //             const start = this.label(
+      //               SCREEN_WIDTH / 2,
+      //               SCREEN_HEIGHT / 2,
+      //               'Mission Start',
+      //             );
+      //             start.setAlpha(0);
+      //             this.tweens.add({
+      //               targets: start,
+      //               alpha: 1,
+      //               duration: 1000,
+      //               onComplete: () => {
+      //                 this.time.addEvent({
+      //                   delay: 500,
+      //                   callback: () => {
+      //                     this.tweens.add({
+      //                       targets: start,
+      //                       alpha: 0,
+      //                       duration: 1000,
+      //                       onComplete: () => {
+      //                         this.runTurn();
+      //                       },
+      //                     });
+      //                   },
+      //                 });
+      //               },
+      //             });
+      //           },
+      //         });
+      //       },
+      //     });
+      //   },
+      // });
+      // },
+      // });
+
+      //             });
+
+      //           });
+
+      //       }),
+    ])(this.state);
+  }
+
+  /**
+   * Moves camera position to a vector in the board. If the position is out of bounds, moves until the limit.
+   */
+  moveCameraTo(vec: Vector, duration: number) {
+    let {x, y} = this.getPos(vec);
+
+    x = x * -1 +  SCREEN_WIDTH / 2;
+
+    y = y * -1 +  SCREEN_HEIGHT / 2;
+
+    const tx = () => {
+      if (x < this.bounds.x.min) return this.bounds.x.min;
+      else if (x > this.bounds.x.max) return this.bounds.x.max;
+      else return x;
+    };
+    const ty = () => {
+      if (y < this.bounds.y.min) return this.bounds.y.min;
+      else if (y > this.bounds.y.max) return this.bounds.y.max;
+      else return y;
+    };
+
+    return new Promise((resolve: any) =>
+      this.tweens.add({
+        targets: this.mapContainer,
+        x: tx(),
+        y: ty(),
+        duration: duration,
+        ease: 'cubic.out',
+        onComplete: resolve,
+      }),
+    );
   }
 
   setWorldBounds() {
@@ -245,6 +440,28 @@ export class MapScene extends Phaser.Scene {
       x: {min: -1 * (rows * cellSize - SCREEN_WIDTH), max: 0},
       y: {min: -1 * (cols * cellSize - SCREEN_HEIGHT), max: 0},
     };
+  }
+  label(x: number, y: number, text: string) {
+    const container = this.add.container();
+    const text_ = this.add.text(x, y, text, {
+      fontSize: '36px',
+      color: '#000',
+    });
+    text_.setOrigin(0.5);
+    panel(
+      text_.x - 20 - text_.width / 2,
+      text_.y - 20 - text_.height / 2,
+      text_.width + 40,
+      text_.height + 40,
+      container,
+      this,
+    );
+
+    container.add(text_);
+
+    this.missionContainer.add(container);
+
+    return container;
   }
 
   makeWorldDraggable() {
@@ -268,9 +485,6 @@ export class MapScene extends Phaser.Scene {
 
         const {x, y} = this.bounds;
 
-        console.log('x', mx, [x.min, x.max]);
-        console.log('y', my, [y.min, y.max]);
-
         if (mx < x.max && mx > x.min && my < y.max && my > y.min)
           this.mapContainer.setPosition(this.mapX - dx, this.mapY - dy);
       },
@@ -280,11 +494,6 @@ export class MapScene extends Phaser.Scene {
       this.mapX = this.mapContainer.x;
       this.mapY = this.mapContainer.y;
     });
-
-    this.mapContainer.on('pointerdown', (p) => {
-      console.log(`aaa`, p);
-    });
-    console.log(`draggable!`);
   }
 
   // ------ Internals ----------------
@@ -309,8 +518,8 @@ export class MapScene extends Phaser.Scene {
 
     const units = getUnitsFromForce(this.state)(this.currentForce);
 
-    units.forEach((u) => {
-      const resultUnit = S.chain(S.find((unit: MapUnit) => unit.id === u.id))(
+    units.forEach((unit_) => {
+      const resultUnit = S.chain(S.find((unit: MapUnit) => unit.id === unit_.id))(
         moveList,
       );
 
@@ -322,10 +531,10 @@ export class MapScene extends Phaser.Scene {
       );
 
       S.map<ValidStep[], void>((steps) => {
-        u.validSteps = steps;
+        unit_.validSteps = steps;
       })(moves);
       S.map<EnemyInRange[], void>((e) => {
-        u.enemiesInRange = e;
+        unit_.enemiesInRange = e;
       })(enemies);
     });
   }
@@ -390,7 +599,7 @@ export class MapScene extends Phaser.Scene {
     this.state.cities.forEach((city) => {
       const {x, y} = this.getPos({x: city.x, y: city.y});
 
-      const city_ = this.add.image(x, y, `tiles/city`);
+      const city_ = this.add.image(x, y, `tiles/${city.type}`);
 
       city_.setScale(CITY_SCALE);
 
@@ -502,8 +711,10 @@ export class MapScene extends Phaser.Scene {
     }
   }
 
-  showClickableCellsForUnit(unit: MapUnit) {
+  showClickableCellsForUnit(un: MapUnit) {
     this.clearTiles();
+    const unit = this.state.units.find(u=>u.id === un.id)
+    if(!unit) return
     unit.validSteps.forEach((cell) =>
       this.makeCellClickable(this.tileAt(cell.target.x, cell.target.y)),
     );
@@ -591,6 +802,7 @@ export class MapScene extends Phaser.Scene {
       {
         title: 'View',
         action: () => {
+          this.moveCameraTo(unit.pos, 500);
           console.log(unit);
         },
       },
@@ -732,6 +944,9 @@ export class MapScene extends Phaser.Scene {
 
     if (force.id === CPU_FORCE) {
       this.runAiActions(force.id);
+    } else {
+      const unit = this.state.units.filter((u) => u.force === PLAYER_FORCE)[0];
+      this.moveCameraTo(unit.pos, 500);
     }
   }
 
@@ -750,6 +965,7 @@ export class MapScene extends Phaser.Scene {
     const unit = remainingUnits[0];
     if (!unit) throw new Error(INVALID_STATE);
 
+    this.moveCameraTo(unit.pos, 200);
     this.setSelectedUnit(unit.id);
     this.renderUI();
 
@@ -770,8 +986,12 @@ export class MapScene extends Phaser.Scene {
 
       const tile = this.getTileAt(x, y);
 
-      this.moveToTile(unit.id, tile, () =>
-        this.signal([{type: 'END_UNIT_TURN'}]),
+      this.moveToTile(unit.id, tile, () =>{
+        this.signal([{type: 'END_UNIT_TURN'}])
+
+    this.setValidMoves();
+
+      }
       );
     }
   }
@@ -781,6 +1001,8 @@ export class MapScene extends Phaser.Scene {
 
   checkTurnEnd() {
     const force = this.getCurrentForce();
+
+    this.setValidMoves();
 
     if (this.movedUnits.length === force.units.length) this.endTurn();
   }
@@ -827,6 +1049,8 @@ export class MapScene extends Phaser.Scene {
   }
 
   selectTile(unit: MapUnit, {x, y}: Vector, onMoveComplete: Function) {
+    if (this.movedUnits.includes(unit.id)) return;
+
     const maybeMapTile = S.find<MapTile>(
       (tile) => tile.x === x && tile.y === y,
     )(this.tiles);

@@ -82,6 +82,9 @@ export const initialMapState: MapState = {
     },
   ],
   cities: [
+
+    {id: 'castle1', name: 'Izabel', x: 5, y: 2, force: PLAYER_FORCE, type: 'castle'},
+    {id: 'castle2', name: 'Madamaxe', x: 10, y:4, force: CPU_FORCE, type: 'castle'},
     {id: 'c1', name: 'Arabella', x: 0, y: 1, force: PLAYER_FORCE, type: 'town'},
     {id: 'c2', name: 'Marqueze', x: 10, y: 1, force: CPU_FORCE, type: 'town'},
     {id: 'c3', name: 'Bauhaus', x: 9, y: 5, force: CPU_FORCE, type: 'town'},

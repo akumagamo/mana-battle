@@ -79,13 +79,25 @@ export function preload(this: {
     this.load.image(id, `${PUBLIC_URL}/${id}.svg`);
   });
 
-  const tiles = ['tiles/grass', 'tiles/woods', 'tiles/mountain'];
+  const tiles = [
+    'tiles/grass',
+    'tiles/woods',
+    'tiles/mountain',
+    'tiles/castle',
+  ];
   tiles.forEach((id: string) => {
     this.load.image(id, `${PUBLIC_URL}/${id}.svg`);
   });
 
-  const structures = ['tiles/city'];
+  const structures = ['tiles/town'];
   structures.forEach((id: string) => {
     this.load.image(id, `${PUBLIC_URL}/${id}.png`);
+  });
+
+  // merano - Alois_Kirnig_-_Forst_Castle_on_the_Adige_near_Merano
+
+  const castles = ['merano']
+  castles.forEach((id: string) => {
+    this.load.image(id, `${PUBLIC_URL}/art/castles/${id}.jpg`);
   });
 }

@@ -37,7 +37,6 @@ export default class TitleScene extends Phaser.Scene {
     button(20, 200, 'Map', container, this, () => {
       this.scene.start('MapScene', [
         {type: 'UPDATE_STATE', target: initialMapState},
-        {type: 'RUN_TURN'},
       ]);
     });
 
