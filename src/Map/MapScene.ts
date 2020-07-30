@@ -40,8 +40,6 @@ const BOTTOM_PANEL_Y = 600;
 const BOTTOM_PANEL_WIDTH = 1280;
 const BOTTOM_PANEL_HEIGHT = 120;
 
-const TILE_DISPLAY_SIZE = 164;
-
 const ALLIED_CITY_TINT = 0x66ff66;
 const ENEMY_CITY_TINT = 0xff6666;
 
@@ -428,7 +426,12 @@ export class MapScene extends Phaser.Scene {
         y: ty(),
         duration: duration,
         ease: 'cubic.out',
-        onComplete: resolve,
+        onComplete: ()=>{
+
+          this.mapX = tx()
+          this.mapY = ty()
+
+          resolve()},
       }),
     );
   }

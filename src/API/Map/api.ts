@@ -2,6 +2,7 @@ import * as PF from 'pathfinding';
 import S from 'sanctuary';
 import {Vector, TurnManager, MapUnit, Step} from './Model';
 import {MapState} from './Model';
+import {Map} from 'immutable';
 
 const getBy = (attr: string) => <A>(target: A) =>
   S.find((el: any) => S.equals(S.prop(attr)(el))(target));
@@ -52,14 +53,16 @@ export const getPossibleMoves = ({
 
   const enemyVectors = S.map(getVectors)(enemyUnits);
 
-  const isEnemyHere = (vec: Vector) => S.elem(vec)(enemyVectors);
+  const enemyIndex = indexVectors(enemyVectors);
+
+  const isEnemyHere = (vec: Vector) => enemyIndex.getIn([vec.y, vec.x], false);
 
   // Marks enemy-occupied cells as "walls"
   // @ts-ignore
-  const updatedGrid: number[][] = blockVectorsInGrid(grid)(enemyVectors);
-
+  const updatedGrid: number[][] = blockVectorsInGrid(grid)(enemyIndex);
 
   const getUnitValidSteps = ({pos: {x, y}, range}: MapUnit): Step[] => {
+    console.time(`getUnitValidSteps`);
     const xs = S.range(x - range)(x + range + 1);
     const ys = S.range(y - range)(y + range + 1);
 
@@ -77,11 +80,7 @@ export const getPossibleMoves = ({
 
     const pathInRange = (list: Vector[]) => list.length <= range + 1;
 
-    const isEnemyInVector = (vec: Vector) =>
-      //@ts-ignore
-      S.equals(isEnemyHere(vec))(true);
-
-    return S.pipe([
+    const res = S.pipe([
       ({xs, ys}) => S.lift2(makeVector)(xs)(ys),
       S.filter(isInBoard),
       S.filter(isInRange(range)),
@@ -90,13 +89,18 @@ export const getPossibleMoves = ({
       S.filter(pathInRange),
       S.chain(S.map(vecFromTuple)),
       uniq,
-      S.reject(isEnemyInVector),
+      S.reject(isEnemyHere),
       S.reject(S.equals({x, y})),
-      S.map((vec:Vector)=> ({
-          target: vec,
-          steps: S.map(([x,y]:number[])=>makeVector(x)(y))( getPathTo(updatedGrid)({x,y})(vec))
-      }))
+      S.map((vec: Vector) => ({
+        target: vec,
+        steps: S.map(([x, y]: number[]) => makeVector(x)(y))(
+          getPathTo(updatedGrid)({x, y})(vec),
+        ),
+      })),
     ])({xs, ys});
+
+    console.timeEnd(`getUnitValidSteps`);
+    return res;
   };
 
   // TODO: it makes no sense to return a maybe because the force should be a parameter
@@ -107,7 +111,7 @@ export const getPossibleMoves = ({
       S.map((unit: MapUnit) => {
         const steps = getUnitValidSteps(unit);
 
-        const targets = S.map((step:Step)=>step.target) (steps) 
+        const targets = S.map((step: Step) => step.target)(steps);
 
         return {
           ...unit,
@@ -119,11 +123,13 @@ export const getPossibleMoves = ({
                 (step: Vector) =>
                   getDistance(step)(enemy.pos) === 1 &&
                   getPathTo(grid)(unit.pos)(enemy.pos).length <= unit.range,
-              )( targets ),
+              )(targets),
             ),
             S.map((enemy: MapUnit) => ({
               enemy: enemy.id,
-              steps: (getPathTo(grid)(unit.pos)(enemy.pos)).slice(0,-1).map(([x,y])=>makeVector(x)(y)),
+              steps: getPathTo(grid)(unit.pos)(enemy.pos)
+                .slice(0, -1)
+                .map(([x, y]) => makeVector(x)(y)),
             })),
           ])(units),
         };
@@ -136,20 +142,21 @@ export const getPossibleMoves = ({
 // By knowing the width and height of the grid
 // Zip the first level with a range (max is height)
 // For each elem, zip with another range (max is width)
-export const blockVectorsInGrid = (grid: number[][]) => (vectors: Vector[]) => {
-  const zipMe = <A>(list: A[]) =>
-    S.pipe([S.prop('length'), S.range(0), S.zip(list)])(list);
+export const blockVectorsInGrid = (grid: number[][]) => (
+  blockIndex: Map<string, Map<string, boolean>>,
+) => {
+  console.time(`blockVectorsInGrid `);
 
-  return S.map((pair: any) => {
-    const xs: number[] = S.fst(pair);
-    const y = S.snd(pair);
+  const res = grid.map((ys, y) =>
+    ys.map((cell, x) => {
+      if (blockIndex.getIn([y, x], false)) return 1;
+      else return cell;
+    }),
+  );
 
-    return S.map((xpair: any) => {
-      const x = S.snd(xpair);
+  console.timeEnd(`blockVectorsInGrid `);
 
-      return S.elem({x, y})(vectors) ? 1 : S.fst(xpair);
-    })(zipMe(xs));
-  })(zipMe(grid));
+  return res;
 };
 
 export const getPathTo = (grid: number[][]) => (source: Vector) => (
@@ -158,5 +165,10 @@ export const getPathTo = (grid: number[][]) => (source: Vector) => (
   const pfGrid = new PF.Grid(grid);
   const finder = new PF.AStarFinder();
 
-  return finder.findPath(source.x, source.y, target.x, target.y, pfGrid);
+  const res = finder.findPath(source.x, source.y, target.x, target.y, pfGrid);
+
+  return res;
 };
+
+const indexVectors = (vectors: Vector[]) =>
+  vectors.reduce((map, vec) => map.setIn([vec.y, vec.x], true), Map());
