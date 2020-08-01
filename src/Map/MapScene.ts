@@ -29,7 +29,9 @@ const WALKABLE_CELL_TINT = 0x88aa88;
 const ENEMY_IN_CELL_TINT = 0xff2222;
 const SELECTED_TILE_TINT = 0x9955aa;
 
-const SQUAD_MOVE_DURATION = 500;
+const SPEED = 4;
+
+const SQUAD_MOVE_DURATION = 500 / SPEED;
 const CHARA_MAP_SCALE = 0.45;
 const CHARA_VERTICAL_OFFSET = -10;
 
@@ -72,12 +74,14 @@ type MapCommands =
       unit: MapUnit;
     }
   | {type: 'CLEAR_TILES'}
+  | {type: 'MOVE_CAMERA_TO'; x: number; y: number; duration: number}
   | {type: 'CLEAR_TILES_EVENTS'}
   | {type: 'CLEAR_TILES_TINTING'}
   | {type: 'SHOW_UNIT_PANEL'; unit: MapUnit}
   | {type: 'SHOW_CLICKABLE_CELLS'; unit: MapUnit}
   | {type: 'HIGHLIGHT_CELL'; pos: Vector}
   | {type: 'CLOSE_ACTION_PANEL'}
+  | {type: 'SELECT_CITY'; id: string}
   | {type: 'END_UNIT_TURN'}
   | {type: 'CITY_CLICK'; id: string}
   | {type: 'CAPTURE_CITY'; id: string; force: string}
@@ -113,6 +117,7 @@ export class MapScene extends Phaser.Scene {
   };
 
   hasShownVictoryCondition = false;
+  dragDisabled = false;
 
   // ----- Phaser --------------------
   constructor() {
@@ -145,10 +150,20 @@ export class MapScene extends Phaser.Scene {
         );
       } else if (cmd.type === 'CLICK_CELL') {
         S.map<MapUnit, void>((unit) => {
-          this.selectTile(unit, cmd.cell, () => this.checkTurnEnd()); // TODO: remove this callback
+          this.showCellMenu(unit, cmd.cell, () => this.checkTurnEnd()); // TODO: remove this callback
         })(this.getSelectedUnit());
       } else if (cmd.type === 'CLICK_UNIT') {
         this.clickUnit(cmd.unit);
+      } else if (cmd.type === 'MOVE_CAMERA_TO') {
+        this.moveCameraTo({x: cmd.x, y: cmd.y}, cmd.duration);
+      } else if (cmd.type === 'SELECT_CITY') {
+        this.signal([{type: 'CLOSE_ACTION_PANEL'}, {type: 'CLEAR_TILES'}]);
+        this.setSelectedCity(cmd.id);
+        this.cityIO((c) => {
+          this.signal([
+            {type: 'MOVE_CAMERA_TO', x: c.x, y: c.y, duration: 500},
+          ]);
+        })(cmd.id);
       } else if (cmd.type === 'CLEAR_TILES') {
         this.clearTiles();
       } else if (cmd.type === 'CLEAR_TILES_EVENTS') {
@@ -197,13 +212,13 @@ export class MapScene extends Phaser.Scene {
           this.cityIO((city) => {
             this.unitIO((unit) => {
               if (unit.force === 'PLAYER_FORCE') {
-                this.selectTile(unit, city, () => {});
-              } else {
-                this.setSelectedCity(cmd.id);
+                this.showCellMenu(unit, city, () => this.checkTurnEnd());
               }
             })((this.selectedEntity as any).id);
           })(cmd.id);
-        else this.setSelectedCity(cmd.id);
+        else {
+          this.signal([{type: 'SELECT_CITY', id: cmd.id}]);
+        }
 
         this.renderUI();
       } else if (cmd.type === 'CAPTURE_CITY') {
@@ -239,10 +254,11 @@ export class MapScene extends Phaser.Scene {
     this.setWorldBounds();
     this.makeWorldDraggable();
 
-    if (!this.hasShownVictoryCondition) {
-      this.showVictoryCondition();
-      this.hasShownVictoryCondition = true;
-    }
+    this.runTurn();
+    // if (!this.hasShownVictoryCondition) {
+    //   this.showVictoryCondition();
+    //   this.hasShownVictoryCondition = true;
+    // }
   }
 
   tween(options: any) {
@@ -404,9 +420,9 @@ export class MapScene extends Phaser.Scene {
   moveCameraTo(vec: Vector, duration: number) {
     let {x, y} = this.getPos(vec);
 
-    x = x * -1 +  SCREEN_WIDTH / 2;
+    x = x * -1 + SCREEN_WIDTH / 2;
 
-    y = y * -1 +  SCREEN_HEIGHT / 2;
+    y = y * -1 + SCREEN_HEIGHT / 2;
 
     const tx = () => {
       if (x < this.bounds.x.min) return this.bounds.x.min;
@@ -426,12 +442,12 @@ export class MapScene extends Phaser.Scene {
         y: ty(),
         duration: duration,
         ease: 'cubic.out',
-        onComplete: ()=>{
+        onComplete: () => {
+          this.mapX = tx();
+          this.mapY = ty();
 
-          this.mapX = tx()
-          this.mapY = ty()
-
-          resolve()},
+          resolve();
+        },
       }),
     );
   }
@@ -480,6 +496,7 @@ export class MapScene extends Phaser.Scene {
     this.input.on(
       'drag',
       (_: Pointer, gameObject: Image, dragX: number, dragY: number) => {
+        if (this.dragDisabled) return;
         const dx = gameObject.x - dragX;
         const dy = gameObject.y - dragY;
 
@@ -490,6 +507,13 @@ export class MapScene extends Phaser.Scene {
 
         if (mx < x.max && mx > x.min && my < y.max && my > y.min)
           this.mapContainer.setPosition(this.mapX - dx, this.mapY - dy);
+        else {
+          // Movement bound to one or two corners
+          const gx = mx > x.max ? x.max : mx < x.min ? x.min : this.mapX - dx;
+          const gy = my > y.max ? y.max : my < y.min ? y.min : this.mapY - dy;
+
+          this.mapContainer.setPosition(gx, gy);
+        }
       },
     );
 
@@ -515,6 +539,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   setValidMoves() {
+    console.log(`SET VALID MOVES`);
     const moveList = getPossibleMoves(
       formatDataForApi(this.state)(this.currentForce),
     );
@@ -522,9 +547,9 @@ export class MapScene extends Phaser.Scene {
     const units = getUnitsFromForce(this.state)(this.currentForce);
 
     units.forEach((unit_) => {
-      const resultUnit = S.chain(S.find((unit: MapUnit) => unit.id === unit_.id))(
-        moveList,
-      );
+      const resultUnit = S.chain(
+        S.find((unit: MapUnit) => unit.id === unit_.id),
+      )(moveList);
 
       const moves = S.map<MapUnit, ValidStep[]>((u) => u.validSteps)(
         resultUnit,
@@ -716,8 +741,8 @@ export class MapScene extends Phaser.Scene {
 
   showClickableCellsForUnit(un: MapUnit) {
     this.clearTiles();
-    const unit = this.state.units.find(u=>u.id === un.id)
-    if(!unit) return
+    const unit = this.state.units.find((u) => u.id === un.id);
+    if (!unit) return;
     unit.validSteps.forEach((cell) =>
       this.makeCellClickable(this.tileAt(cell.target.x, cell.target.y)),
     );
@@ -946,8 +971,10 @@ export class MapScene extends Phaser.Scene {
     this.setValidMoves();
 
     if (force.id === CPU_FORCE) {
+      this.dragDisabled = true;
       this.runAiActions(force.id);
     } else {
+      this.dragDisabled = false;
       const unit = this.state.units.filter((u) => u.force === PLAYER_FORCE)[0];
       this.moveCameraTo(unit.pos, 500);
     }
@@ -989,13 +1016,11 @@ export class MapScene extends Phaser.Scene {
 
       const tile = this.getTileAt(x, y);
 
-      this.moveToTile(unit.id, tile, () =>{
-        this.signal([{type: 'END_UNIT_TURN'}])
+      this.moveToTile(unit.id, tile, () => {
+        this.signal([{type: 'END_UNIT_TURN'}]);
 
-    this.setValidMoves();
-
-      }
-      );
+        this.setValidMoves();
+      });
     }
   }
   runAiActions(forceId: string) {
@@ -1007,7 +1032,9 @@ export class MapScene extends Phaser.Scene {
 
     this.setValidMoves();
 
-    if (this.movedUnits.length === force.units.length) this.endTurn();
+    const aliveUnits = this.getAliveUnitsFromForce(force.id);
+
+    if (this.movedUnits.length === aliveUnits.length) this.endTurn();
   }
 
   showTurnTitle(force: Force) {
@@ -1051,9 +1078,10 @@ export class MapScene extends Phaser.Scene {
     this.actionWindowContainer?.destroy();
   }
 
-  selectTile(unit: MapUnit, {x, y}: Vector, onMoveComplete: Function) {
+  showCellMenu(unit: MapUnit, {x, y}: Vector, onMoveComplete: Function) {
     if (this.movedUnits.includes(unit.id)) return;
 
+    this.dragDisabled = true;
     const maybeMapTile = S.find<MapTile>(
       (tile) => tile.x === x && tile.y === y,
     )(this.tiles);
@@ -1066,27 +1094,69 @@ export class MapScene extends Phaser.Scene {
         {type: 'HIGHLIGHT_CELL', pos: {x: mapTile.x, y: mapTile.y}},
       ]);
 
-      this.actionWindow(tile.x, tile.y, [
-        {
-          title: 'Move',
-          action: () => {
-            //TODO: convert to data
-            this.moveToTile(unit.id, mapTile, onMoveComplete);
-            this.actionWindowContainer?.destroy();
-            tile.clearTint();
-          },
-        },
-        {
-          title: 'Cancel',
-          action: () => {
-            this.signal([
-              {type: 'CLOSE_ACTION_PANEL'},
-              {type: 'SHOW_CLICKABLE_CELLS', unit},
-            ]);
-          },
-        },
-      ]);
+      const moveAction = () => {
+        if (unit.validSteps.some((step) => S.equals(step.target)({x, y})))
+          return [
+            {
+              title: 'Move',
+              action: () => {
+                //TODO: convert to data
+                this.moveToTile(unit.id, mapTile, () => {
+                  this.dragDisabled = false;
+                  onMoveComplete();
+                });
+                this.actionWindowContainer?.destroy();
+                tile.clearTint();
+              },
+            },
+          ];
+        else return [];
+      };
+
+      const viewCityAction = () => {
+        const maybeCity = this.state.cities.find((c) => c.x === x && c.y === y);
+
+        if (maybeCity) {
+          return [
+            {
+              title: 'Select City',
+              action: () => {
+                this.dragDisabled = false;
+                this.signal([{type: 'SELECT_CITY', id: maybeCity.id}]);
+              },
+            },
+          ];
+        } else return [];
+      };
+
+      this.actionWindow(
+        tile.x + this.mapX,
+        tile.y + this.mapY,
+        moveAction()
+          .concat(viewCityAction())
+          .concat([
+            {
+              title: 'Cancel',
+              action: () => {
+                this.dragDisabled = false;
+                this.signal([
+                  {type: 'CLOSE_ACTION_PANEL'},
+                  {type: 'SHOW_CLICKABLE_CELLS', unit},
+                ]);
+              },
+            },
+          ]),
+      );
     })(maybeMapTile);
+  }
+
+  showCityInfo(id: string) {
+    const city = this.state.cities.find((c) => c.id === id);
+
+    const pic = this.add.sprite(SCREEN_WIDTH / 2, 350, 'merano');
+    pic.setOrigin(0.5);
+    pic.setDisplaySize(250, 250);
+    const name = this.label(SCREEN_WIDTH / 2, 520, 'Merano Castle');
   }
 
   actionWindow(
@@ -1143,9 +1213,10 @@ export class MapScene extends Phaser.Scene {
       S.map((step: any) => {
         this.moveUnit(chara, step.steps, () => {
           S.map<City, void>((city) => {
-            this.signal([
-              {type: 'CAPTURE_CITY', id: city.id, force: squad.force},
-            ]);
+            if (city.force !== unit.force)
+              this.signal([
+                {type: 'CAPTURE_CITY', id: city.id, force: squad.force},
+              ]);
           })(this.cityAt(x, y));
 
           onMoveComplete();

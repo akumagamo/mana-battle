@@ -43,8 +43,6 @@ export type TurnManager = {
   units: MapUnit[];
   currentForce: ForceId;
   grid: number[][];
-  width: number;
-  height: number;
   walkableCells: number[];
 };
 

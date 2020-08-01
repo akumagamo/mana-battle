@@ -2,7 +2,7 @@ import * as PF from 'pathfinding';
 import S from 'sanctuary';
 import {Vector, TurnManager, MapUnit, Step} from './Model';
 import {MapState} from './Model';
-import {Map} from 'immutable';
+import {Map, Range} from 'immutable';
 
 const getBy = (attr: string) => <A>(target: A) =>
   S.find((el: any) => S.equals(S.prop(attr)(el))(target));
@@ -32,15 +32,20 @@ export const getForce = (state: MapState) => (id: string) =>
 export const getEntities = <A>(entityList: A[]) => (idList: string) =>
   S.pipe([S.map((id: string) => findById(entityList)(id)), S.justs])(idList);
 
+export const getMovesForUnit = (state: MapState) => (id: string) => {
+  //resume-todo: victory screen: just like wc3!
+};
+
 export const getPossibleMoves = ({
   units,
   forces,
   currentForce,
   grid,
   walkableCells,
-  width,
-  height,
 }: TurnManager) => {
+  const width = grid[0].length;
+  const height = grid.length;
+
   /**   force :: Maybe Force */
   const force = byId(currentForce)(forces);
 
@@ -55,52 +60,42 @@ export const getPossibleMoves = ({
 
   const enemyIndex = indexVectors(enemyVectors);
 
-  const isEnemyHere = (vec: Vector) => enemyIndex.getIn([vec.y, vec.x], false);
-
   // Marks enemy-occupied cells as "walls"
   // @ts-ignore
   const updatedGrid: number[][] = blockVectorsInGrid(grid)(enemyIndex);
 
   const getUnitValidSteps = ({pos: {x, y}, range}: MapUnit): Step[] => {
-    console.time(`getUnitValidSteps`);
-    const xs = S.range(x - range)(x + range + 1);
-    const ys = S.range(y - range)(y + range + 1);
-
-    const isInBoard = (vec: Vector) =>
-      vec.x >= 0 && vec.x < width && vec.y >= 0 && vec.y < height;
+    const xs = Range(x - range - 1, x + range + 1)
+      .filter((n) => n >= 0 && n < width)
+      .toList();
+    const ys = Range(y - range - 1, y + range + 1)
+      .filter((n) => n >= 0 && n < height)
+      .toList();
 
     const isInRange = (range: number) => (vec: Vector) =>
       getDistance({x, y})(vec) <= range;
 
     const isWalkable = ({x, y}: Vector) => walkableCells.includes(grid[y][x]);
 
-    const vecFromTuple = ([x, y]: number[]) => ({x, y});
-
     const pathFinder = getPathTo(updatedGrid)({x, y});
 
-    const pathInRange = (list: Vector[]) => list.length <= range + 1;
+    const pathInRange = <T>(list: T[]) => list.length <= range + 1;
 
-    const res = S.pipe([
-      ({xs, ys}) => S.lift2(makeVector)(xs)(ys),
-      S.filter(isInBoard),
-      S.filter(isInRange(range)),
-      S.filter(isWalkable),
-      S.map(pathFinder),
-      S.filter(pathInRange),
-      S.chain(S.map(vecFromTuple)),
-      uniq,
-      S.reject(isEnemyHere),
-      S.reject(S.equals({x, y})),
-      S.map((vec: Vector) => ({
-        target: vec,
-        steps: S.map(([x, y]: number[]) => makeVector(x)(y))(
-          getPathTo(updatedGrid)({x, y})(vec),
-        ),
-      })),
-    ])({xs, ys});
-
-    console.timeEnd(`getUnitValidSteps`);
-    return res;
+    //@ts-ignore
+    return ys
+      .map((y_) => xs.map((x_) => ({x: x_, y: y_})))
+      .flatten(1)
+      .filter(isInRange(range))
+      .filter(isWalkable)
+      .map(pathFinder)
+      .filter((p) => p.length > 1)
+      .filter(pathInRange)
+      .map((l) => l.map(([x, y]) => ({x, y})))
+      .map((steps: Vector[]) => ({
+        target: steps[steps.length - 1],
+        steps,
+      }))
+      .toJS();
   };
 
   // TODO: it makes no sense to return a maybe because the force should be a parameter
@@ -138,26 +133,14 @@ export const getPossibleMoves = ({
   )(force);
 };
 
-// TODO: creating an indexed list of lists
-// By knowing the width and height of the grid
-// Zip the first level with a range (max is height)
-// For each elem, zip with another range (max is width)
 export const blockVectorsInGrid = (grid: number[][]) => (
   blockIndex: Map<string, Map<string, boolean>>,
-) => {
-  console.time(`blockVectorsInGrid `);
-
-  const res = grid.map((ys, y) =>
+) => grid.map((ys, y) =>
     ys.map((cell, x) => {
       if (blockIndex.getIn([y, x], false)) return 1;
       else return cell;
     }),
   );
-
-  console.timeEnd(`blockVectorsInGrid `);
-
-  return res;
-};
 
 export const getPathTo = (grid: number[][]) => (source: Vector) => (
   target: Vector,
