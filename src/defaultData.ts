@@ -17,6 +17,7 @@ import {indexById} from './utils';
 import {SquadMap} from './Squad/Model';
 import {Player} from './Player/Model';
 import {Range} from 'immutable'
+import {Options} from './Models';
 export const classes: UnitClass[] = ['fighter', 'knight', 'wizard'];
 
 export function randomItem<T>(items: Array<T>): T {
@@ -41,7 +42,7 @@ function squad(n: number, leader: Unit) {
 }
 
 export var squads: SquadMap = {};
-for (var j = 0; j < 15; j++) squads[j.toString()] = squad(j, units[j]);
+for (var j = 0; j < 30; j++) squads[j.toString()] = squad(j, units[j]);
 
 function makeItem(acc: Item[], itemData: any): Item[] {
   const {type, name} = itemData;
@@ -90,15 +91,21 @@ export var player: Player = {
   units: Range(0,10).map(n=>n.toString()).toJS()
 };
 
+const options:Options ={
+  soundEnabled: true,
+  musicEnabled: true
+}
+
 const data: [
   string,
-  UnitMap | SquadMap | ItemMap | ItemTypeSlots | Player,
+  UnitMap | SquadMap | ItemMap | ItemTypeSlots | Player | Options,
 ][] = [
   ['units', units],
   ['squads', squads],
   ['items', items],
   ['itemTypes', itemTypeSlots],
   ['player', player],
+  ['options', options],
 ];
 
 export const clearDB = () => {

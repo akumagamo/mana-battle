@@ -4,6 +4,7 @@ import {Item, itemTypeSlots, ItemTypeSlots, ItemMap} from './Item/Model';
 import {Unit, UnitMap} from './Unit/Model';
 import {removeIdFromMap} from './utils';
 import {INVALID_STATE} from './errors';
+import {Options} from './Models';
 
 const get = (str: string) => JSON.parse(localStorage.getItem(str) || '{}');
 const set = (str: string, data: any) =>
@@ -318,3 +319,9 @@ export const equipItem = (itemId: string, unitId: string) => {
 
   saveUnit(updatedUnit);
 };
+
+
+export const getOptions = ():Options => get('options')
+export const setSoundEnabled = (val:boolean)=>set('options', {...getOptions(), soundEnabled: val }  )
+export const setMusicEnabled = (val:boolean)=>set('options', {...getOptions(), musicEnabled: val }  )
+

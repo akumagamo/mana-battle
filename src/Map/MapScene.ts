@@ -24,6 +24,7 @@ import {randomItem} from '../defaultData';
 import S from 'sanctuary';
 import {PLAYER_FORCE, tileMap, CPU_FORCE} from '../API/Map/mocks';
 import {SCREEN_WIDTH, SCREEN_HEIGHT} from '../constants';
+import BoardScene from '../Board/StaticBoardScene';
 
 const WALKABLE_CELL_TINT = 0x88aa88;
 const ENEMY_IN_CELL_TINT = 0xff2222;
@@ -118,6 +119,8 @@ export class MapScene extends Phaser.Scene {
 
   hasShownVictoryCondition = false;
   dragDisabled = false;
+  cellClickDisabled = false;
+  cityClickDisabled = false;
 
   // ----- Phaser --------------------
   constructor() {
@@ -238,6 +241,14 @@ export class MapScene extends Phaser.Scene {
     console.log(`CREATE COMMANDS:`, data);
     //@ts-ignore
     window.map = this;
+
+
+    this.sound.stopAll()
+    const music = this.sound.add('map1')
+
+    //@ts-ignore
+    music.setVolume(0.3);
+    music.play();
 
     this.mapContainer = this.add.container(this.mapX, this.mapY);
     this.uiContainer = this.add.container();
@@ -632,14 +643,15 @@ export class MapScene extends Phaser.Scene {
       city_.setScale(CITY_SCALE);
 
       if (city.force === 'PLAYER_FORCE') {
-        city_.setTint(ALLIED_CITY_TINT);
+        //city_.setTint(ALLIED_CITY_TINT);
       } else {
-        city_.setTint(ENEMY_CITY_TINT);
+        //city_.setTint(ENEMY_CITY_TINT);
       }
       city_.setInteractive();
-      city_.on('pointerup', () =>
-        this.signal([{type: 'CITY_CLICK', id: city.id}]),
-      );
+      city_.on('pointerup', () => {
+        if (!this.cityClickDisabled)
+          this.signal([{type: 'CITY_CLICK', id: city.id}]);
+      });
       this.mapContainer.add(city_);
       city_.name = city.id;
       this.citySprites.push(city_);
@@ -678,7 +690,7 @@ export class MapScene extends Phaser.Scene {
   }
   makeInteractive(cell: MapTile) {
     cell.tile.on('pointerup', () => {
-      this.signal([{type: 'CLICK_CELL', cell}]);
+      if (!this.cellClickDisabled) this.signal([{type: 'CLICK_CELL', cell}]);
     });
   }
   clearAllTileEvents() {
@@ -922,7 +934,63 @@ export class MapScene extends Phaser.Scene {
       this.unitIO((unit) => {
         text(20, 610, squad.name, uiContainer, this);
         text(1000, 610, `${unit.range} cells`, uiContainer, this);
+
+        button(200, 620, 'Squad Details', this.uiContainer, this, () => {
+          let charaStats = this.add.container(0, 0);
+          panel(50, 50, 1080, 540, this.uiContainer, this);
+          this.disableCellClick();
+          this.disableCityClick();
+          this.dragDisabled = true;
+
+          const boardScene = new BoardScene(squad, 50, -50, 0.7);
+          this.scene.add(`board-squad-${squad.id}`, boardScene, true);
+          boardScene.onUnitClick((chara) => {
+            charaStats.removeAll();
+
+            text(70, 370, chara.unit.name, charaStats, this);
+
+            const lineHeight = 25;
+            const baseLine = 400;
+
+            ['str', 'agi', 'dex', 'int', 'wis', 'vit'].forEach((name, i) => {
+              text(
+                70,
+                baseLine + i * lineHeight,
+                name.toUpperCase(),
+                charaStats,
+                this,
+              );
+              text(
+                130,
+                baseLine + i * lineHeight,
+                (chara.unit as any)[name],
+                charaStats,
+                this,
+              );
+            });
+
+            ['Back Row', 'Middle Row', 'Front Row'].forEach((name, i) => {
+              text(270, baseLine + i * lineHeight, name, charaStats, this);
+              text(500, baseLine + i * lineHeight, '11 x 2', charaStats, this);
+            });
+          });
+
+          button(900, 120, 'Close', this.uiContainer, this, () => {
+            boardScene.destroy(this);
+
+            charaStats.destroy();
+
+            this.dragDisabled = false;
+            // TODO: also enable/disable click on units/cities
+
+            this.enableCellClick();
+            this.enableCityClick();
+            this.renderUI();
+          });
+        });
       })(this.selectedEntity.id);
+
+      //CITY INFORMATION
     } else if (this.selectedEntity && this.selectedEntity.type === 'city') {
       this.cityIO((city) => {
         text(20, 610, city.name, uiContainer, this);
@@ -950,6 +1018,21 @@ export class MapScene extends Phaser.Scene {
         moveBelow: true,
       });
     });
+  }
+
+  disableCellClick() {
+    this.cellClickDisabled = true;
+  }
+
+  enableCellClick() {
+    this.cellClickDisabled = false;
+  }
+  disableCityClick() {
+    this.cityClickDisabled = true;
+  }
+
+  enableCityClick() {
+    this.cityClickDisabled = false;
   }
 
   switchForce() {
@@ -1178,11 +1261,6 @@ export class MapScene extends Phaser.Scene {
       );
     });
 
-    const largest = btns.sort((a, b) => b.displayWidth - a.displayWidth)[0]
-      .displayWidth;
-    btns.forEach((btn) => {
-      btn.setDisplaySize(largest, btn.displayHeight);
-    });
   }
 
   // TODO: simplify interface

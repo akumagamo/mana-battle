@@ -57,6 +57,10 @@ export default class CombatScene extends Phaser.Scene {
   create(data: {top: string; bottom: string; conflictId: string}) {
     if (this.container) this.container.destroy();
 
+
+    this.sound.stopAll()
+    const music = this.sound.add('combat1');
+    music.play();
     this.container = this.add.container(0, 0);
 
     plains(this, this.container);

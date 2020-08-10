@@ -121,7 +121,7 @@ export default class BoardScene extends Phaser.Scene {
 
     this.tiles.map((boardSprite) => boardSprite.sprite.clearTint());
     (this.getChara(unit)?.container?.list as Image[]).map((sprite) =>
-      sprite.clearTint(),
+      sprite.clearTint ? sprite.clearTint() : null,
     );
   };
   private getChara(unit: {id: string}) {

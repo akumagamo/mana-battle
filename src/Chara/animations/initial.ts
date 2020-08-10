@@ -27,12 +27,25 @@ import {
 } from './constants';
 
 function front(scene: Chara) {
+
+const {skinColor, hair, hairColor} = scene.unit.style
+  const renderHair = (gx: number, gy: number) => {
+    const hairSprite = scene.add.image(
+      gx,
+      gy,
+      hair,
+    );
+    hairSprite.setTint(hairColor)
+    scene.container?.add(hairSprite);
+    return hairSprite;
+  };
   const renderHead = (gx: number, gy: number) => {
     const head = scene.add.image(
       gx,
       gy,
       'head' + scene.unit.style.head.toString(),
     );
+    head.setTint(skinColor)
     scene.container?.add(head);
     return head;
   };
@@ -53,6 +66,7 @@ function front(scene: Chara) {
 
   const renderHand = (handX: number, handY: number, scaleX: number) => {
     const hand = scene.add.image(handX, handY, 'hand');
+    hand.setTint(skinColor)
     hand.scaleX = scaleX;
     scene.container?.add(hand);
     return hand;
@@ -63,6 +77,7 @@ function front(scene: Chara) {
   scene.leftHand = renderHand(LEFT_HAND_FRONT_X, LEFT_HAND_FRONT_Y, -1);
   scene.trunk = renderTrunk(scene.unit.class, TRUNK_FRONT_X, TRUNK_FRONT_Y);
   scene.head = renderHead(HEAD_FRONT_X, HEAD_FRONT_Y);
+  scene.hair = renderHair(HEAD_FRONT_X, HEAD_FRONT_Y);
 
   scene.mainHandContainer = scene.add.container(
     RIGHT_HAND_FRONT_X,
@@ -91,12 +106,25 @@ function front(scene: Chara) {
   scene.mainHandContainer.add(scene.rightHand);
 }
 function back(scene: Chara) {
+const {skinColor, hair, hairColor} = scene.unit.style
+  const renderHair = (gx: number, gy: number) => {
+    const hairSprite = scene.add.image(
+      gx,
+      gy,
+      'back_'+hair,
+    );
+    hairSprite.setTint(hairColor)
+    scene.container?.add(hairSprite);
+    return hairSprite;
+  };
+
   function renderHead(gx: number, gy: number) {
     const head = scene.add.image(
       gx,
       gy,
       'back_head' + scene.unit.style.head.toString(),
     );
+    head.setTint(skinColor)
     scene.container?.add(head);
     return head;
   }
@@ -122,6 +150,7 @@ function back(scene: Chara) {
   function renderHand(handX: number, handY: number) {
     const hand = scene.add.image(handX, handY, 'hand');
 
+    hand.setTint(skinColor)
     scene.container?.add(hand);
     return hand;
   }
@@ -141,7 +170,10 @@ function back(scene: Chara) {
   scene.mainHand.setScale(-0.2, 0.2);
   scene.mainHand.setOrigin(1, 1);
 
-  scene.rightHand = renderHand(0, 0);
+  scene.rightHand = renderHand(12, 16);
+  scene.rightHand.setOrigin(0.5)
+  scene.rightHand.setScale(-1,1)
+  scene.rightHand.setRotation(1.6)
   scene.mainHandContainer.add(scene.rightHand);
 
   scene.rightFoot = renderFoot(RIGHT_FOOT_BACK_X, RIGHT_FOOT_BACK_Y);
@@ -151,6 +183,7 @@ function back(scene: Chara) {
 
   scene.trunk = renderTrunk(scene.unit.class, TRUNK_BACK_X, TRUNK_BACK_Y);
   scene.head = renderHead(HEAD_BACK_X, HEAD_BACK_Y);
+  scene.hair = renderHair(HEAD_FRONT_X, HEAD_FRONT_Y);
   scene.leftHand = renderHand(LEFT_HAND_BACK_X, LEFT_HAND_BACK_Y);
 }
 

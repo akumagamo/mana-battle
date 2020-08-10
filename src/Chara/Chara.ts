@@ -11,11 +11,12 @@ import attack from './animations/attack';
 import initial from './animations/initial';
 
 export class Chara extends Phaser.Scene {
-  container: Container  = {} as Container;
+  container: Container = {} as Container;
   charaWrapper: Container = {} as Container;
 
   //body parts
 
+  hair: Image | null = null;
   head: Image | null = null;
   trunk: Image | null = null;
   leftHand: Image | null = null;
@@ -94,7 +95,6 @@ export class Chara extends Phaser.Scene {
   }
 
   onClick(fn: (chara: Chara) => void) {
-
     this.container.setInteractive();
 
     this.container.on('pointerdown', (_pointer: Pointer) => {
@@ -106,14 +106,13 @@ export class Chara extends Phaser.Scene {
     dragStart: (unit: Unit, x: number, y: number, chara: Chara) => void,
     dragEnd: (unit: Unit, x: number, y: number, chara: Chara) => void,
   ) {
-
     this.container.setInteractive();
     this.input.setDraggable(this.container);
 
     this.input.on(
       'drag',
       (_pointer: Pointer, obj: Container, x: number, y: number) => {
-          this.container.setDepth(Infinity);
+        this.container.setDepth(Infinity);
 
         obj.x = x;
         obj.y = y;
@@ -125,13 +124,9 @@ export class Chara extends Phaser.Scene {
     this.container.on(
       'dragend',
       (_pointer: Pointer, _dragX: number, dragY: number) => {
-          this.container.setDepth(dragY);
-        dragEnd(
-          this.unit,
-          this.container.x || 0,
-          this.container.y || 0,
-          this,
-        );
+        console.log(_dragX,dragY)
+        this.container.setDepth(dragY);
+        dragEnd(this.unit, this.container.x || 0, this.container.y || 0, this);
       },
     );
   }
@@ -175,7 +170,6 @@ export class Chara extends Phaser.Scene {
   }
 
   fadeOut(onComplete: Function) {
-
     this.container.iterate(
       (child: Phaser.GameObjects.Image | Phaser.GameObjects.Container) => {
         this.tweens.addCounter({

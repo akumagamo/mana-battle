@@ -6,6 +6,8 @@ export type UnitMap = {[x: string]: Unit};
 
 export type Stat = 'str' | 'agi' | 'dex' | 'vit' | 'int' | 'wis';
 
+export type Gender = 'male' | 'female';
+
 export type Elem =
   | 'fire'
   | 'water'
@@ -30,6 +32,7 @@ export interface Unit {
   id: string;
   name: string;
   class: UnitClass;
+  gender: Gender;
   movement: Movement;
   squad: string | null;
   lvl: number;
@@ -45,6 +48,9 @@ export interface Unit {
   style: {
     head: number;
     trunk: number;
+    skinColor: number;
+    hairColor: number;
+    hair: string;
   };
   equips: {
     [x in ItemSlot]: string;
@@ -118,3 +124,5 @@ export function getUnitsWithoutSquad(map: UnitMap) {
     {} as UnitMap,
   );
 }
+
+export const hairStyles =['dark1', 'long1']

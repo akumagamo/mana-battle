@@ -2,21 +2,27 @@ import * as Phaser from 'phaser';
 import {Squad} from '../Squad/Model';
 import * as api from '../DB';
 import BoardScene from '../Board/StaticBoardScene';
-import {Container, Pointer, Image, Text} from '../Models';
+import {Pointer, Image, Text} from '../Models';
 import button from '../UI/button';
+import panel from '../UI/panel';
+import {SCREEN_WIDTH, SCREEN_HEIGHT} from '../constants';
+import text from '../UI/text';
 
 export class ListSquadsScene extends Phaser.Scene {
   boardScenes: BoardScene[] = [];
   controls: (Image | Text)[] = [];
-  selectedSquadInfo: Container | null = null;
   page: number = 0;
-  itemsPerPage: number = 9;
+  itemsPerPage: number = 16;
 
   constructor() {
     super('ListSquadsScene');
   }
 
   create() {
+
+  const bg = this.add.graphics();
+    bg.fillGradientStyle(0x894245, 0x117c8a, 0x117c8a, 0x000000, 1);
+    bg.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     this.renderSquadList();
     this.renderControls();
   }
@@ -35,7 +41,7 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   formatList(squads: Squad[], accumulator: Squad[][]): Squad[][] {
-    const cols = 3;
+    const cols = 4;
     if (squads.length <= cols) {
       return accumulator.concat([squads]);
     } else {
@@ -48,38 +54,42 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   renderSelectSquadInfo(squad: Squad) {
-    if (this.selectedSquadInfo) this.selectedSquadInfo.destroy();
+    const container = this.add.container(0, 670);
+    const panel_ = panel(0, 0, SCREEN_WIDTH, 100, container, this);
+    container.add([panel_]);
 
-    this.selectedSquadInfo?.destroy();
-    this.selectedSquadInfo = this.add.container(0, 0);
-    this.selectedSquadInfo.name = squad.id;
+    text(10, 10, squad.name, container, this);
 
-    const squadLeader = this.add.text(10, 680, squad.name);
-    this.selectedSquadInfo.add(squadLeader);
-
-    button(1100, 350, 'Edit', this.selectedSquadInfo, this, () => {
+    button(200, 10, 'Edit', container, this, () => {
       this.editSquad(squad);
     });
 
-    button(1100, 400, 'Disband Squad', this.selectedSquadInfo, this, () => {
-      if (this.selectedSquadInfo) {
-        api.disbandSquad(this.selectedSquadInfo.name);
-        this.refresh();
-      }
+    button(1000, 10, 'Disband Squad', container, this, () => {
+      api.disbandSquad(squad.id);
+      container.destroy();
+      this.refresh();
     });
   }
 
   renderBoard(squad: Squad, x: number, y: number) {
-    const boardScene = new BoardScene(squad, x * 320, y * 170, 0.3);
+    const BOARD_X = x * 250;
+    const BOARD_Y = y * 130;
+    const boardScene = new BoardScene(squad, BOARD_X, BOARD_Y, 0.3);
     this.scene.add(`board-squad-${squad.id}`, boardScene, true);
 
-    boardScene.onClick((sqd) => this.renderSelectSquadInfo(sqd));
+    boardScene.onClick((sqd) => {
+      this.boardScenes
+        .filter((scene) => scene.isSelected)
+        .forEach((scene) => scene.deselect());
+      boardScene.select();
+      this.renderSelectSquadInfo(sqd);
+    });
 
     this.boardScenes.push(boardScene);
   }
 
   renderControls() {
-    button(1100, 10, 'Return to Title', this.add.container(0, 0), this, () => {
+    button(1000, 10, 'Return to Title', this.add.container(0, 0), this, () => {
       this.removeChildren();
       this.scene.transition({
         target: 'TitleScene',
@@ -88,7 +98,7 @@ export class ListSquadsScene extends Phaser.Scene {
       });
     });
 
-    button(1100, 600, 'Create Squad', this.add.container(0, 0), this, () => {
+    button(1000, 600, 'Create Squad', this.add.container(0, 0), this, () => {
       this.removeChildren();
 
       const squads = Object.keys(api.getSquads());
@@ -112,9 +122,12 @@ export class ListSquadsScene extends Phaser.Scene {
   renderNavigation() {
     const squads = api.getSquads();
 
+    const NAV_X = 500;
+    const NAV_Y = 620;
+
     const totalSquads = Object.keys(squads).length;
 
-    const prev = this.add.image(400, 630, 'arrow_right');
+    const prev = this.add.image(NAV_X, NAV_Y, 'arrow_right');
     prev.setScale(-1, 1);
 
     if (this.page === 0) {
@@ -128,7 +141,7 @@ export class ListSquadsScene extends Phaser.Scene {
 
     this.controls.push(prev);
 
-    const next = this.add.image(500, 630, 'arrow_right');
+    const next = this.add.image(NAV_X + 100, NAV_Y, 'arrow_right');
 
     const isLastPage =
       totalSquads < this.itemsPerPage ||

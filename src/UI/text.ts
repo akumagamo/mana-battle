@@ -14,6 +14,7 @@ export default (
     typeof str === 'number' ? str.toString() : str,
     {
       color: '#000',
+      fontSize: "24px"
     },
   );
 

@@ -18,5 +18,6 @@ export default (chara: Chara, onComplete: () => void) => {
     },
   });
 
+  chara.sound.add('sword_hit').play()
   
 };

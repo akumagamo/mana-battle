@@ -3,6 +3,7 @@ const PUBLIC_URL = 'assets';
 export function preload(this: {
   load: {
     image: (key: string, path: string) => void;
+    audio: (key: string, path: string) => void;
   };
   preload: () => void;
   create: (this: {preload: () => void; create: () => void}) => void;
@@ -14,11 +15,20 @@ export function preload(this: {
     'foot',
     'head',
     'backgrounds/plain',
+    'backgrounds/sunset',
     'backgrounds/squad_edit',
   ];
 
   images.forEach((str) =>
     this.load.image(str, PUBLIC_URL + '/' + str + '.svg'),
+  );
+  const hairs = [
+    'dark1',
+    'back_dark1',
+    'long1',
+  ];
+  hairs.forEach((str) =>
+    this.load.image(str, PUBLIC_URL + '/hair/' + str + '.svg'),
   );
 
   const numbers = [1, 2, 3, 4];
@@ -84,6 +94,20 @@ export function preload(this: {
     'tiles/woods',
     'tiles/mountain',
     'tiles/castle',
+    'tiles/water',
+    'tiles/beach-r',
+    'tiles/beach-l',
+    'tiles/beach-t',
+    'tiles/beach-b',
+    'tiles/beach-tr',
+    'tiles/beach-tl',
+    'tiles/beach-br',
+    'tiles/beach-bl',
+
+    'tiles/beach-b-and-r',
+    'tiles/beach-t-and-r',
+    'tiles/beach-b-and-l',
+    'tiles/beach-t-and-l',
   ];
   tiles.forEach((id: string) => {
     this.load.image(id, `${PUBLIC_URL}/${id}.svg`);
@@ -100,4 +124,22 @@ export function preload(this: {
   castles.forEach((id: string) => {
     this.load.image(id, `${PUBLIC_URL}/art/castles/${id}.jpg`);
   });
+
+  const bgs = ['abstract_background']
+  bgs.forEach((id: string) => {
+    this.load.image(id, `${PUBLIC_URL}/ui/${id}.jpg`);
+  });
+
+  const mp3s = ['title', 'combat1', 'map1', 'sword_hit']
+  mp3s.forEach((id: string) => {
+    this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
+  });
+
+  const oggs = ['click1']
+  oggs.forEach((id: string) => {
+    this.load.audio(id, `${PUBLIC_URL}/music/${id}.ogg`);
+  });
+
+
+
 }

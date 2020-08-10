@@ -16,7 +16,7 @@ export default class StaticBoardScene extends Phaser.Scene {
   tiles: BoardTile[] = [];
   unitList: Chara[] = [];
   overlay: Graphics | null = null;
-
+  isSelected=  false
   constructor(
     public squad: Squad,
     public x: number,
@@ -24,6 +24,15 @@ export default class StaticBoardScene extends Phaser.Scene {
     public scaleSizing: number,
   ) {
     super(makeId(squad));
+  }
+
+  select(){
+    this.isSelected = true
+          this.tiles.forEach((tile) => tile.sprite.setTint(0x558899));
+  }
+  deselect(){
+    this.isSelected = false
+    this.tiles.forEach(t=>t.sprite.clearTint())
   }
 
   create() {
@@ -34,7 +43,7 @@ export default class StaticBoardScene extends Phaser.Scene {
     this.placeUnits();
 
     // DEBUG DRAG CONTAINER
-    this.makeOverlay();
+    //this.makeOverlay();
   }
 
   destroy(parentScene: Phaser.Scene) {
@@ -60,7 +69,7 @@ export default class StaticBoardScene extends Phaser.Scene {
       BOARD_HEIGHT,
     );
     var graphics = this.add.graphics({
-      //fillStyle: {color: 0x0000ff},
+      fillStyle: {color: 0x0000ff},
     });
 
     graphics.alpha = 0.2;
@@ -70,14 +79,15 @@ export default class StaticBoardScene extends Phaser.Scene {
   }
 
   onClick(fn: (sqd: Squad) => void) {
-    var rect = new Phaser.Geom.Rectangle(
+    var clickZone = this.add.zone(
       this.x + OFFSET_X,
       this.y + OFFSET_Y,
       BOARD_WIDTH,
       BOARD_HEIGHT,
     );
-    this.overlay?.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
-    this.overlay?.on(`pointerdown`, () => {
+    clickZone.setInteractive();
+    clickZone.setOrigin(0);
+    clickZone.on(`pointerup`, () => {
       fn(this.squad);
     });
   }
@@ -126,9 +136,7 @@ export default class StaticBoardScene extends Phaser.Scene {
     if (!unit) throw new Error('Invalid member supplied');
 
     const key = this.makeUnitKey(unit);
-    const chara = new Chara(key, this, unit, x, y, this.scaleSizing, true);
-
-    return chara;
+    return new Chara(key, this, unit, x, y, this.scaleSizing, true, false);
   }
 
   placeUnits() {
@@ -162,6 +170,10 @@ export default class StaticBoardScene extends Phaser.Scene {
     const {x, y} = cartesianToIsometric(squadMember.x, squadMember.y);
 
     return {x, y: y - 230};
+  }
+
+  onUnitClick(fn: (c: Chara) => void) {
+    this.unitList.forEach((chara) => chara.onClick(fn));
   }
 }
 
