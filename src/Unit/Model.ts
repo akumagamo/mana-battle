@@ -125,4 +125,4 @@ export function getUnitsWithoutSquad(map: UnitMap) {
   );
 }
 
-export const hairStyles =['dark1', 'long1']
+export const hairStyles =['dark1', 'long1', 'split', 'long2', 'split2']

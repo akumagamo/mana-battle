@@ -24,11 +24,14 @@ export function preload(this: {
   );
   const hairs = [
     'dark1',
-    'back_dark1',
     'long1',
+    'long2',
+    'split',
+    'split2',
   ];
-  hairs.forEach((str) =>
-    this.load.image(str, PUBLIC_URL + '/hair/' + str + '.svg'),
+  hairs.forEach((str) =>{
+    this.load.image(str, PUBLIC_URL + '/hair/' + str + '.svg');
+    this.load.image('back_'+str, PUBLIC_URL + '/hair/back_' + str + '.svg')}
   );
 
   const numbers = [1, 2, 3, 4];
@@ -125,11 +128,6 @@ export function preload(this: {
     this.load.image(id, `${PUBLIC_URL}/art/castles/${id}.jpg`);
   });
 
-  const bgs = ['abstract_background']
-  bgs.forEach((id: string) => {
-    this.load.image(id, `${PUBLIC_URL}/ui/${id}.jpg`);
-  });
-
   const mp3s = ['title', 'combat1', 'map1', 'sword_hit']
   mp3s.forEach((id: string) => {
     this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
@@ -139,7 +137,5 @@ export function preload(this: {
   oggs.forEach((id: string) => {
     this.load.audio(id, `${PUBLIC_URL}/music/${id}.ogg`);
   });
-
-
 
 }
