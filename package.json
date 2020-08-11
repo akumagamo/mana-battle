@@ -29,6 +29,9 @@
     "webpack": "3.11.0"
   },
   "dependencies": {
+    "@capacitor/android": "2.4.0",
+    "@capacitor/cli": "^2.4.0",
+    "@capacitor/core": "^2.4.0",
     "@types/jest": "^25.1.4",
     "@types/pathfinding": "^0.0.4",
     "@types/sanctuary": "^3.0.2",
