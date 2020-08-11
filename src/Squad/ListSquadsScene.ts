@@ -7,7 +7,7 @@ import button from '../UI/button';
 import panel from '../UI/panel';
 import {SCREEN_WIDTH, SCREEN_HEIGHT} from '../constants';
 import text from '../UI/text';
-
+import S from 'sanctuary';
 export class ListSquadsScene extends Phaser.Scene {
   boardScenes: BoardScene[] = [];
   controls: (Image | Text)[] = [];
@@ -19,20 +19,24 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   create() {
-
-  const bg = this.add.graphics();
+    const bg = this.add.graphics();
     bg.fillGradientStyle(0x894245, 0x117c8a, 0x117c8a, 0x000000, 1);
     bg.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    this.renderSquadList();
+
+    const squads = this.getSquads();
+
+    this.renderSquadList(squads);
     this.renderControls();
+    this.selectSquad(squads[0]);
   }
 
-  renderSquadList() {
-    const squads = Object.values(api.getSquads()).slice(
+  getSquads() {
+    return Object.values(api.getSquads()).slice(
       this.page * this.itemsPerPage,
       this.page * this.itemsPerPage + this.itemsPerPage,
     );
-
+  }
+  renderSquadList(squads:Squad[]) {
     const rows = this.formatList(squads, []);
 
     rows.forEach((row, y) =>
@@ -78,14 +82,29 @@ export class ListSquadsScene extends Phaser.Scene {
     this.scene.add(`board-squad-${squad.id}`, boardScene, true);
 
     boardScene.onClick((sqd) => {
-      this.boardScenes
-        .filter((scene) => scene.isSelected)
-        .forEach((scene) => scene.deselect());
-      boardScene.select();
-      this.renderSelectSquadInfo(sqd);
+      this.selectSquad(sqd);
     });
 
     this.boardScenes.push(boardScene);
+  }
+
+  squadSceneIO(id: string, fn: (board: BoardScene) => void) {
+    const scene = S.find<BoardScene>((e) => e.squad.id === id)(
+      this.boardScenes,
+    );
+
+    S.map<BoardScene, void>((board) => {
+      fn(board);
+    })(scene);
+  }
+  selectSquad(sqd: Squad) {
+    this.squadSceneIO(sqd.id, (squadScene) => {
+      this.renderSelectSquadInfo(sqd);
+      this.boardScenes
+        .filter((scene) => scene.isSelected)
+        .forEach((scene) => scene.deselect());
+      squadScene.select();
+    });
   }
 
   renderControls() {
@@ -160,8 +179,10 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   refresh() {
+
+    const squads = this.getSquads();
     this.removeChildren();
-    this.renderSquadList();
+    this.renderSquadList(squads);
     this.renderControls();
   }
 

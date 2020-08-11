@@ -6,9 +6,10 @@ import {Unit} from './Model';
 import {INVALID_STATE} from '../errors';
 import {ItemSlot} from '../Item/Model';
 import {ItemDetailWindowScene} from '../Item/ItemDetailWindowScene';
+import text from '../UI/text';
 
 export class UnitDetailsBarScene extends Phaser.Scene {
-  colWidth = 100;
+  colWidth = 150;
   rowHeight = 30;
   chara: Chara | null = null;
   container: Container | null = null;
@@ -61,11 +62,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
   }
 
   write = (x: number, y: number, str: string | number) =>
-    this.container?.add(
-      this.add.text(x, y, typeof str === 'number' ? str.toString() : str, {
-        color: '#000',
-      }),
-    );
+    this.container ? text(x, y, str, this.container, this) : null;
 
   col = (x: number, y: number, strs: (string | number)[]) =>
     strs.forEach((str, index) =>
@@ -75,20 +72,24 @@ export class UnitDetailsBarScene extends Phaser.Scene {
   unitStats(unit: Unit) {
     const {str, agi, int, wis, vit, dex} = unit;
 
-    const baseX = 10;
-    const baseY = 10;
+    const baseX = 20;
+    const baseY = 20;
 
     this.write(baseX, baseY, unit.name);
 
-    this.col(baseX + this.colWidth, baseY, ['STR', 'AGI', 'INT']);
-    this.col(baseX + this.colWidth * 2, baseY, [str, agi, int]);
-
-    this.col(baseX + this.colWidth * 3, baseY, ['WIS', 'VIT', 'DEX']);
-    this.col(baseX + this.colWidth * 4, baseY, [wis, vit, dex]);
+    this.col(baseX + this.colWidth, baseY, [
+      'STR',
+      'AGI',
+      'INT',
+      'WIS',
+      'VIT',
+      'DEX',
+    ]);
+    this.col(baseX + this.colWidth * 2, baseY, [str, agi, int, wis, vit, dex]);
   }
 
   unitItems(unit: Unit) {
-    const baseX = 600;
+    const baseX = 700;
     const baseY = 50;
     const iconSize = 64;
     const padding = 10;
@@ -111,19 +112,18 @@ export class UnitDetailsBarScene extends Phaser.Scene {
       icon.displayHeight = iconSize;
       icon.setInteractive();
       icon.on('pointerdown', () => {
-        console.log(`clicked1!!`, slotId);
-
         this.itemDetail?.render(slot.id, unit.id, () => this.render(unit.id));
-
         //this.renderItemDetails()
       });
 
-      const itemName = this.add.text(
-        x + iconSize / 2 + margin + padding,
-        y,
-        slot.name,
-      );
-      this.container?.add(itemName);
+      if (this.container)
+        text(
+          x + iconSize / 2 + margin + padding,
+          y,
+          slot.name,
+          this.container,
+          this,
+        );
 
       this.container?.add(icon);
     };
