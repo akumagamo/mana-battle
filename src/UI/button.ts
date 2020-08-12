@@ -1,5 +1,6 @@
 import {Scene} from 'phaser';
 import {Container} from '../Models';
+import text from './text';
 
 const defaultTextColor = '#ffffff'
 const defaultTextSize = 28
@@ -10,16 +11,14 @@ const activeTextColor = '#ffffff'
 export default (
   x: number,
   y: number,
-  text: string,
+  label: string,
   container: Container,
   scene: Scene,
   onClick: () => void,
 ) => {
-  const text_ = scene.add.text(x, y, text, {
-    color: defaultTextColor,
-    fontSize: `${defaultTextSize.toString()}px`,
-  });
+  const text_ = text(x, y, label, container, scene);
   text_.setShadow(2,2,'#000')
+  text_.setColor('#fff')
 
   const rectX = x - 15;
   const rectY = y - 10;
@@ -50,7 +49,8 @@ export default (
   clickZone.setOrigin(0);
 
   container.add(btn);
-  container.add(text_);
+  container.bringToTop(text_)
+
   container.add(clickZone);
   clickZone.on('pointerdown', () => {
     btn.fillStyle(activeFill);

@@ -8,6 +8,7 @@ export function preload(this: {
   preload: () => void;
   create: (this: {preload: () => void; create: () => void}) => void;
 }) {
+  
   const images = [
     'insignea',
     'tile',
