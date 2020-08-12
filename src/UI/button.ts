@@ -25,6 +25,8 @@ export default (
   const rectWidth = text_.width + 30;
   const rectHeight = text_.height + 20;
 
+
+
   const btn = scene.add.graphics();
 
   const fill = () =>
@@ -38,6 +40,10 @@ export default (
   defaultFill();
   btn.strokeRect(rectX, rectY, rectWidth, rectHeight);
   fill()
+
+  const border = scene.add.graphics();
+  border.lineStyle(1, 0xFFDF00, 0.7);
+  border.strokeRect(rectX-1, rectY-1, rectWidth+1, rectHeight+2);
 
   var clickZone = scene.add.zone(
     rectX,

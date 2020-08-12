@@ -23,10 +23,16 @@ export class ListUnitsScene extends Phaser.Scene {
   }
 
   create() {
-    menu(this)
+    menu(this);
+
+    // TODO: filter only player units
+    const units = Object.values(api.getUnits()).slice(
+      this.page * this.itemsPerPage,
+      this.page * this.itemsPerPage + this.itemsPerPage,
+    );
 
     this.detailsBar = new UnitDetailsBarScene();
-    this.renderUnitsList();
+    this.renderUnitsList(units);
 
     this.scene.add('details-bar', this.detailsBar, true);
 
@@ -41,15 +47,11 @@ export class ListUnitsScene extends Phaser.Scene {
         moveBelow: true,
       });
     });
+
+    this.selectUnit(units[0].id);
   }
 
-  renderUnitsList() {
-    // TODO: filter only player units
-    const units = Object.values(api.getUnits()).slice(
-      this.page * this.itemsPerPage,
-      this.page * this.itemsPerPage + this.itemsPerPage,
-    );
-
+  renderUnitsList(units: Unit[]) {
     const rows = this.formatList(units, []);
 
     rows.forEach((row, y) =>
@@ -80,24 +82,23 @@ export class ListUnitsScene extends Phaser.Scene {
     tile.setScale(0.4);
     const chara = new Chara(key, this, unit, x_, y_, 0.6, true, false);
 
-    const handleClick = () => {
-      this.units.forEach((u) => u.tile.clearTint());
-      const listUnit = this.units.find((u) => u.chara.unit.id === unit.id);
-
-      if (listUnit) {
-        listUnit.tile.setTint(0x333333);
-      }
-      this.renderUnitDetails(chara);
-    };
-
-    chara.onClick(handleClick);
+    chara.onClick(() => this.selectUnit(unit.id));
 
     tile.setInteractive();
-    tile.on('pointerdown', () => {
-      handleClick();
-    });
+    tile.on('pointerdown', () => this.selectUnit(unit.id));
 
     this.units.push({tile, chara});
+  }
+
+  selectUnit(id: string) {
+    this.units.forEach((u) => u.tile.clearTint());
+    const listUnit = this.units.find((u) => u.chara.unit.id === id);
+
+    if (listUnit) {
+      listUnit.tile.setTint(0x333333);
+
+      this.renderUnitDetails(listUnit.chara);
+    }
   }
 
   renderUnitDetails(chara: Chara) {

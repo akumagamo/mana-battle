@@ -32,7 +32,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
 
   clearChildren() {
     this.container?.destroy();
-    this.container = this.add.container(10, 520);
+    this.container = this.add.container(10, 480);
   }
 
   renderBgLayer() {}
@@ -46,7 +46,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
 
     panel.setOrigin(0, 0);
     panel.displayWidth = 1260;
-    panel.displayHeight = 180;
+    panel.displayHeight = 220;
 
     const unit = api.getUnit(unitId);
 
