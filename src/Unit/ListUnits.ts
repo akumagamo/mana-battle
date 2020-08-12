@@ -22,14 +22,19 @@ export class ListUnitsScene extends Phaser.Scene {
     super('ListUnitsScene');
   }
 
+  getUnits(){
+
+// TODO: filter only player units
+    return Object.values(api.getUnits()).slice(
+      this.page * this.itemsPerPage,
+      this.page * this.itemsPerPage + this.itemsPerPage,
+    );
+  }
   create() {
     menu(this);
 
     // TODO: filter only player units
-    const units = Object.values(api.getUnits()).slice(
-      this.page * this.itemsPerPage,
-      this.page * this.itemsPerPage + this.itemsPerPage,
-    );
+    const units = this.getUnits()
 
     this.detailsBar = new UnitDetailsBarScene();
     this.renderUnitsList(units);
@@ -109,7 +114,7 @@ export class ListUnitsScene extends Phaser.Scene {
 
   refresh() {
     this.removeChildren();
-    this.renderUnitsList();
+    this.renderUnitsList(this.getUnits());
   }
 
   nextPage() {
