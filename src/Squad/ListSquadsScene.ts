@@ -5,9 +5,10 @@ import BoardScene from '../Board/StaticBoardScene';
 import {Pointer, Image, Text} from '../Models';
 import button from '../UI/button';
 import panel from '../UI/panel';
-import {SCREEN_WIDTH, SCREEN_HEIGHT} from '../constants';
+import {SCREEN_WIDTH} from '../constants';
 import text from '../UI/text';
 import S from 'sanctuary';
+import menu from '../Backgrounds/menu';
 export class ListSquadsScene extends Phaser.Scene {
   boardScenes: BoardScene[] = [];
   controls: (Image | Text)[] = [];
@@ -19,10 +20,8 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   create() {
-    const bg = this.add.graphics();
-    bg.fillGradientStyle(0x894245, 0x117c8a, 0x117c8a, 0x000000, 1);
-    bg.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
+    menu(this)
     const squads = this.getSquads();
 
     this.renderSquadList(squads);

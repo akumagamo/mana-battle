@@ -1,15 +1,20 @@
 import * as Phaser from 'phaser';
 import * as api from '../DB';
-import {Text} from '../Models';
+import {Text, Image} from '../Models';
 import {Chara} from '../Chara/Chara';
 import {Unit} from './Model';
 import {UnitDetailsBarScene} from './UnitDetailsBarScene';
 import button from '../UI/button';
+import menu from '../Backgrounds/menu';
 
+type ListUnit = {
+  tile: Image;
+  chara: Chara;
+};
 export class ListUnitsScene extends Phaser.Scene {
-  units: Chara[] = [];
+  units: ListUnit[] = [];
   page: number = 0;
-  itemsPerPage: number = 40;
+  itemsPerPage: number = 30;
   unitDetails: Text[] = [];
   detailsBar: UnitDetailsBarScene | null = null;
 
@@ -18,6 +23,8 @@ export class ListUnitsScene extends Phaser.Scene {
   }
 
   create() {
+    menu(this)
+
     this.detailsBar = new UnitDetailsBarScene();
     this.renderUnitsList();
 
@@ -66,22 +73,31 @@ export class ListUnitsScene extends Phaser.Scene {
   renderUnit(unit: Unit, x: number, y: number) {
     const key = `list-chara-${unit.id}`;
 
-    const chara = new Chara(
-      key,
-      this,
-      unit,
-      100 + x * 120,
-      100 + y * 110,
-      0.6,
-      true,
-      false,
-    );
+    const x_ = 100 + x * 120;
+    const y_ = 100 + y * 130;
 
-    chara.onClick((unit: Chara) => {
-      this.renderUnitDetails(unit);
+    const tile = this.add.image(x_ + 2, y_ + 63, 'tile');
+    tile.setScale(0.4);
+    const chara = new Chara(key, this, unit, x_, y_, 0.6, true, false);
+
+    const handleClick = () => {
+      this.units.forEach((u) => u.tile.clearTint());
+      const listUnit = this.units.find((u) => u.chara.unit.id === unit.id);
+
+      if (listUnit) {
+        listUnit.tile.setTint(0x333333);
+      }
+      this.renderUnitDetails(chara);
+    };
+
+    chara.onClick(handleClick);
+
+    tile.setInteractive();
+    tile.on('pointerdown', () => {
+      handleClick();
     });
 
-    this.units.push(chara);
+    this.units.push({tile, chara});
   }
 
   renderUnitDetails(chara: Chara) {
@@ -107,7 +123,8 @@ export class ListUnitsScene extends Phaser.Scene {
 
   removeChildren() {
     this.units.forEach((chara) => {
-      this.scene.remove(`list-chara-${chara.unit.id}`);
+      this.scene.remove(`list-chara-${chara.chara.unit.id}`);
+      chara.tile.destroy();
     });
     this.units = [];
     this.detailsBar?.destroy(this);
