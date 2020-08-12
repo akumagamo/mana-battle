@@ -46,8 +46,6 @@ export interface Unit {
   int: number;
   wis: number;
   style: {
-    head: number;
-    trunk: number;
     skinColor: number;
     hairColor: number;
     hair: string;
@@ -125,4 +123,4 @@ export function getUnitsWithoutSquad(map: UnitMap) {
   );
 }
 
-export const hairStyles =['dark1', 'long1', 'split', 'long2', 'split2']
+export const HAIR_STYLES =['dark1', 'long1', 'split', 'long2', 'split2']

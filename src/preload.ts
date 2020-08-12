@@ -22,23 +22,14 @@ export function preload(this: {
   images.forEach((str) =>
     this.load.image(str, PUBLIC_URL + '/' + str + '.svg'),
   );
-  const hairs = [
-    'dark1',
-    'long1',
-    'long2',
-    'split',
-    'split2',
-  ];
-  hairs.forEach((str) =>{
+  const hairs = ['dark1', 'long1', 'long2', 'split', 'split2'];
+  hairs.forEach((str) => {
     this.load.image(str, PUBLIC_URL + '/hair/' + str + '.svg');
-    this.load.image('back_'+str, PUBLIC_URL + '/hair/back_' + str + '.svg')}
-  );
-
-  const numbers = [1, 2, 3, 4];
-  numbers.forEach((n: number) => {
-    this.load.image('head' + n.toString(), PUBLIC_URL + '/head.svg');
-    this.load.image('back_head' + n.toString(), PUBLIC_URL + '/back_head.svg');
+    this.load.image('back_' + str, PUBLIC_URL + '/hair/back_' + str + '.svg');
   });
+
+  this.load.image('head', PUBLIC_URL + '/head.svg');
+  this.load.image('back_head', PUBLIC_URL + '/back_head.svg');
 
   const classes = ['fighter', 'knight', 'wizard'];
 
@@ -123,19 +114,18 @@ export function preload(this: {
 
   // merano - Alois_Kirnig_-_Forst_Castle_on_the_Adige_near_Merano
 
-  const castles = ['merano']
+  const castles = ['merano'];
   castles.forEach((id: string) => {
     this.load.image(id, `${PUBLIC_URL}/art/castles/${id}.jpg`);
   });
 
-  const mp3s = ['title', 'combat1', 'map1', 'sword_hit']
+  const mp3s = ['title', 'combat1', 'map1', 'sword_hit'];
   mp3s.forEach((id: string) => {
     this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
   });
 
-  const oggs = ['click1']
+  const oggs = ['click1'];
   oggs.forEach((id: string) => {
     this.load.audio(id, `${PUBLIC_URL}/music/${id}.ogg`);
   });
-
 }

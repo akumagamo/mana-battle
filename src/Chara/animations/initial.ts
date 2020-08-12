@@ -43,7 +43,7 @@ const {skinColor, hair, hairColor} = scene.unit.style
     const head = scene.add.image(
       gx,
       gy,
-      'head' + scene.unit.style.head.toString(),
+      'head',
     );
     head.setTint(skinColor)
     scene.container?.add(head);
@@ -122,7 +122,7 @@ const {skinColor, hair, hairColor} = scene.unit.style
     const head = scene.add.image(
       gx,
       gy,
-      'back_head' + scene.unit.style.head.toString(),
+      'back_head',
     );
     head.setTint(skinColor)
     scene.container?.add(head);

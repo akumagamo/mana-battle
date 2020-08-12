@@ -1,4 +1,4 @@
-import {Unit, hairStyles} from './Model';
+import {Unit, HAIR_STYLES} from './Model';
 import {maleNames} from '../constants/names';
 import {randomItem, classes} from '../defaultData';
 import {random} from '../utils';
@@ -33,11 +33,9 @@ export function fromJSON(n: number): Unit {
     int: random(10, 200),
     wis: random(10, 200),
     style: {
-      head: randomItem([1, 2, 3]),
-      trunk: randomItem([1, 2, 3, 4]),
       skinColor: randomItem(SKIN_COLORS),
       hairColor: randomItem(HAIR_COLORS),
-      hair: randomItem(hairStyles)
+      hair: randomItem(HAIR_STYLES)
     },
   };
 }
