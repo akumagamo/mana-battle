@@ -82,9 +82,6 @@ export class Chara extends Phaser.Scene {
     this.container.scale = this.scaleSizing;
 
     this.container.name = this.unit.id;
-
-    const name = this.add.text(0, 100, this.unit.name, {color: '#000'});
-    this.container.add(name);
   }
 
   private maybeRenderInsignea() {

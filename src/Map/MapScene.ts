@@ -239,12 +239,12 @@ export class MapScene extends Phaser.Scene {
 
   create(data: MapCommands[]) {
     console.log(`CREATE COMMANDS:`, data);
-    //@ts-ignore
-    window.map = this;
-
-
-    this.sound.stopAll()
-    const music = this.sound.add('map1')
+    if (process.env.NODE_ENV !== 'production') {
+      //@ts-ignore
+      window.mapScene = this;
+    }
+    this.sound.stopAll();
+    const music = this.sound.add('map1');
 
     //@ts-ignore
     music.setVolume(0.3);
@@ -372,56 +372,6 @@ export class MapScene extends Phaser.Scene {
           )
           .then(() => this.runTurn());
       }),
-
-      // this.tweens.add({
-      //     this.time.addEvent({
-      //       delay: 3000,
-      //       callback: () => {
-      //         this.tweens.add({
-      //           targets: [pic, name, conquer, title],
-      //           alpha: 0,
-      //           duration: 1000,
-      //           onComplete: () => {
-      //             const start = this.label(
-      //               SCREEN_WIDTH / 2,
-      //               SCREEN_HEIGHT / 2,
-      //               'Mission Start',
-      //             );
-      //             start.setAlpha(0);
-      //             this.tweens.add({
-      //               targets: start,
-      //               alpha: 1,
-      //               duration: 1000,
-      //               onComplete: () => {
-      //                 this.time.addEvent({
-      //                   delay: 500,
-      //                   callback: () => {
-      //                     this.tweens.add({
-      //                       targets: start,
-      //                       alpha: 0,
-      //                       duration: 1000,
-      //                       onComplete: () => {
-      //                         this.runTurn();
-      //                       },
-      //                     });
-      //                   },
-      //                 });
-      //               },
-      //             });
-      //           },
-      //         });
-      //       },
-      //     });
-      //   },
-      // });
-      // },
-      // });
-
-      //             });
-
-      //           });
-
-      //       }),
     ])(this.state);
   }
 
@@ -1260,7 +1210,6 @@ export class MapScene extends Phaser.Scene {
         action,
       );
     });
-
   }
 
   // TODO: simplify interface

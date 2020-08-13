@@ -47,9 +47,7 @@ export default class BoardScene extends Phaser.Scene {
 
     this.squad.members = updatedBoard.members;
 
-    console.log(`the received updatedBoard`, updatedBoard);
     //animate updated units
-
     updatedBoard.updatedUnits.forEach((updatedUnit) => {
       this.moveUnitToBoardTile(updatedUnit.id, updatedUnit.x, updatedUnit.y);
     });
@@ -83,8 +81,6 @@ export default class BoardScene extends Phaser.Scene {
   onUnitDragEnd = (unit: Unit, x: number, y: number) => {
     const {squad} = this;
 
-    console.log(`the squad`, squad);
-    console.log(this.tiles, x, y);
     const boardSprite = this.findTileByXY(x, y);
 
     const squadMember = squad.members[unit.id];
@@ -120,9 +116,6 @@ export default class BoardScene extends Phaser.Scene {
     }
 
     this.tiles.map((boardSprite) => boardSprite.sprite.clearTint());
-    (this.getChara(unit)?.container?.list as Image[]).map((sprite) =>
-      sprite.clearTint ? sprite.clearTint() : null,
-    );
   };
   private getChara(unit: {id: string}) {
     return this.unitList.find((chara) => chara.key === this.makeUnitKey(unit));

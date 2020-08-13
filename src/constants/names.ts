@@ -98,5 +98,13 @@ export const maleNames = [
   'Gentar',
   'Feston',
   'Khastan',
-  'Prishnak'
+  'Prishnak',
+
+  'Magnus',
+  'Leia',
+  'Dio',
+  'Asnabel',
+  'Liedel',
+  'Hugo',
+
 ];
