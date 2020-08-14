@@ -18,7 +18,7 @@ import {SquadMap} from './Squad/Model';
 import {Player} from './Player/Model';
 import {Range} from 'immutable'
 import {Options} from './Models';
-export const classes: UnitClass[] = ['fighter', 'knight', 'wizard'];
+export const classes: UnitClass[] = ['fighter', 'knight', 'wizard', 'warlock'];
 
 export function randomItem<T>(items: Array<T>): T {
   return items[Math.floor(Math.random() * items.length)];

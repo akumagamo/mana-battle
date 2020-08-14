@@ -32,7 +32,7 @@ export function preload(this: {
   this.load.image('head', PUBLIC_URL + '/head.svg');
   this.load.image('back_head', PUBLIC_URL + '/back_head.svg');
 
-  const classes = ['fighter', 'knight', 'wizard'];
+  const classes = ['fighter', 'knight', 'wizard', 'warlock'];
 
   classes.forEach((class_) => {
     this.load.image(`trunk_${class_}`, `${PUBLIC_URL}/trunk_${class_}.svg`);
@@ -47,7 +47,7 @@ export function preload(this: {
     this.load.image(id, `${PUBLIC_URL}/ui/${id}.svg`);
   });
 
-  const items = [
+  const itemIcons = [
     'amulet',
     'iron_armor',
     'iron_shield',
@@ -59,16 +59,22 @@ export function preload(this: {
     'baldar_shield',
     'baldar_sword',
     'oaken_staff',
+    'iron_spear',
   ];
-  items.forEach((id: string) => {
+  itemIcons.forEach((id: string) => {
     this.load.image(id, `${PUBLIC_URL}/items/${id}.png`);
   });
 
   const equips = [
     'equips/iron_sword',
+    'equips/iron_spear',
     'equips/steel_sword',
     'equips/baldar_sword',
     'equips/oaken_staff',
+    'equips/iron_helm',
+    'equips/simple_helm',
+    'equips/wiz_hat',
+    'equips/archer_hat',
   ];
   equips.forEach((id: string) => {
     this.load.image(id, `${PUBLIC_URL}/${id}.svg`);

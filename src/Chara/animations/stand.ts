@@ -26,13 +26,24 @@ const front = (chara: Chara) => {
     repeat: -1,
   });
 
-  chara.tweens.add({
-    targets: chara.leftHand,
-    y: LEFT_HAND_FRONT_Y + 8,
-    duration: 1600,
-    yoyo: true,
-    repeat: -1,
-  });
+  //TODO: create weapon->stance type mapping
+  if (chara.unit.equips.mainHand === 'iron_spear') {
+    chara.tweens.add({
+      targets: chara.leftHand,
+      y: LEFT_HAND_FRONT_Y ,
+      duration: 1600,
+      yoyo: true,
+      repeat: -1,
+    });
+  } else {
+    chara.tweens.add({
+      targets: chara.leftHand,
+      y: LEFT_HAND_FRONT_Y + 8,
+      duration: 1600,
+      yoyo: true,
+      repeat: -1,
+    });
+  }
 
   chara.tweens.add({
     targets: chara.mainHandContainer,
@@ -46,9 +57,9 @@ const front = (chara: Chara) => {
 const back = (chara: Chara) => {
   chara.clearAnimations();
 
-  const bounce = upAndDown(chara)
+  const bounce = upAndDown(chara);
 
-  bounce(chara.head,-2, 1600);
+  bounce(chara.head, -2, 1600);
 
   bounce(chara.trunk, 2, 1600);
 

@@ -22,6 +22,7 @@ export type UnitClass =
   | 'apprentice'
   | 'archer'
   | 'knight'
+  | 'warlock'
   | 'wizard';
 export type Movement = 'plain' | 'mountain' | 'sky' | 'forest';
 

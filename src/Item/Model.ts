@@ -53,23 +53,27 @@ export const modifiers: {[x in Modifier]: number} = {
 export type ItemType =
   | 'accessory'
   | 'sword'
+  | 'spear'
   | 'staff'
   | 'axe'
   | 'robe'
   | 'light_armor'
-  | 'shield';
+  | 'shield'
+  | 'helm';
 
-export type ItemSlot = 'mainHand' | 'offHand' | 'chest' | 'ornament';
+export type ItemSlot = 'mainHand' | 'offHand' | 'chest' | 'ornament' | 'head';
 
 export type ItemTypeSlots = {[x in ItemType]: ItemSlot};
 export const itemTypeSlots: ItemTypeSlots = {
   accessory: 'ornament',
   sword: 'mainHand',
+  spear: 'mainHand',
   axe: 'mainHand',
   robe: 'chest',
   light_armor: 'chest',
   shield: 'offHand',
   staff: 'mainHand',
+  helm: 'head',
 };
 
 type BaseItem = {

@@ -2,7 +2,7 @@ export const CHARA_WRAPPER_X = 0;
 export const CHARA_WRAPPER_Y = 0;
 
 export const HEAD_FRONT_X = 0;
-export const HEAD_FRONT_Y = 0;
+export const HEAD_FRONT_Y = -10;
 export const LEFT_FOOT_FRONT_X = 20;
 export const LEFT_FOOT_FRONT_Y = 90;
 export const RIGHT_FOOT_FRONT_X = -10;
@@ -53,14 +53,12 @@ export const SKIN_COLOR_LIGHT = 0xecccab;
 export const SKIN_COLOR_LIGHT_MED = 0xd2996c;
 export const SKIN_COLOR_MED = 0xc37c4d;
 export const SKIN_COLOR_DARK_MED = 0xb66b3e;
-export const SKIN_COLOR_DARK = 0x8e4b33;
-export const SKIN_COLOR_BLACK = 0x5f1c15;
+export const SKIN_COLOR_BLACK  = 0x8e4b33;
 
 export const SKIN_COLORS = [
   SKIN_COLOR_LIGHT,
   SKIN_COLOR_LIGHT_MED,
   SKIN_COLOR_MED,
   SKIN_COLOR_DARK_MED,
-  SKIN_COLOR_DARK,
   SKIN_COLOR_BLACK,
 ];

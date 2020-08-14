@@ -28,6 +28,7 @@ export class Chara extends Phaser.Scene {
 
   //Equips
   mainHand: Image | null = null;
+  hat: Image | null = null;
 
   constructor(
     public key: string,

@@ -18,8 +18,9 @@ export function fromJSON(n: number): Unit {
     equips: {
       ornament: 'amulet',
       chest: 'iron_armor',
-      mainHand: 'iron_sword',
+      mainHand: randomItem(['iron_sword', 'iron_spear', 'oaken_staff']),
       offHand: 'iron_shield',
+      head: randomItem(['none', 'iron_helm', 'simple_helm', 'wiz_hat', 'archer_hat']),
     },
     squad: null,
     lvl: 11,
@@ -35,7 +36,7 @@ export function fromJSON(n: number): Unit {
     style: {
       skinColor: randomItem(SKIN_COLORS),
       hairColor: randomItem(HAIR_COLORS),
-      hair: randomItem(HAIR_STYLES)
+      hair: randomItem(HAIR_STYLES),
     },
   };
 }
