@@ -8,20 +8,16 @@ import {SKIN_COLORS, HAIR_COLORS} from '../Chara/animations/constants';
  * @param n
  */
 export function fromJSON(n: number): Unit {
+
+  const class_ = randomItem(classes)
   return {
     id: n.toString(),
     name: randomItem(maleNames),
-    class: randomItem(classes),
+    class: class_,
     movement: 'plain',
     elem: 'neutral',
     gender: randomItem(['male', 'female']),
-    equips: {
-      ornament: 'amulet',
-      chest: 'iron_armor',
-      mainHand: randomItem(['iron_sword', 'iron_spear', 'oaken_staff']),
-      offHand: 'iron_shield',
-      head: randomItem(['none', 'iron_helm', 'simple_helm', 'wiz_hat', 'archer_hat']),
-    },
+    equips: baseEquips[class_],
     squad: null,
     lvl: 11,
     hp: 100,
@@ -41,6 +37,29 @@ export function fromJSON(n: number): Unit {
   };
 }
 
+const baseEquips ={
+'mage' : {
+      ornament: 'amulet',
+      chest: 'robe',
+      mainHand: 'oaken_staff',
+      offHand: 'none',
+      head: 'wiz_hat',
+    },
+'fighter':{
+      ornament: 'amulet',
+      chest: 'iron_armor',
+      mainHand: 'iron_sword',
+      offHand: 'iron_shield',
+      head: 'iron_helm',
+    },
+'archer':{
+      ornament: 'amulet',
+      chest: 'leather_armor',
+      mainHand: 'bow',
+      offHand: 'none',
+      head:  'archer_hat',
+    }
+}
 export function toJSON(_: Unit) {
   throw new Error('Not implemented.');
 }

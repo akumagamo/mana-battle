@@ -25,9 +25,11 @@ export class Chara extends Phaser.Scene {
   rightFoot: Image | null = null;
 
   mainHandContainer: Container | null = null;
+  offHandContainer: Container | null = null;
 
   //Equips
-  mainHand: Image | null = null;
+  rightHandEquip: Image | null = null;
+  leftHandEquip: Image | null = null;
   hat: Image | null = null;
 
   constructor(

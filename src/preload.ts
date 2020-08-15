@@ -1,3 +1,5 @@
+import {classes} from './defaultData';
+
 const PUBLIC_URL = 'assets';
 
 export function preload(this: {
@@ -31,8 +33,6 @@ export function preload(this: {
 
   this.load.image('head', PUBLIC_URL + '/head.svg');
   this.load.image('back_head', PUBLIC_URL + '/back_head.svg');
-
-  const classes = ['fighter', 'knight', 'wizard', 'warlock'];
 
   classes.forEach((class_) => {
     this.load.image(`trunk_${class_}`, `${PUBLIC_URL}/trunk_${class_}.svg`);
@@ -71,10 +71,18 @@ export function preload(this: {
     'equips/steel_sword',
     'equips/baldar_sword',
     'equips/oaken_staff',
-    'equips/iron_helm',
+    'equips/bow',
+
+
     'equips/simple_helm',
+    'equips/iron_helm',
     'equips/wiz_hat',
     'equips/archer_hat',
+
+    'equips/back_simple_helm',
+    'equips/back_iron_helm',
+    'equips/back_wiz_hat',
+    'equips/back_archer_hat',
   ];
   equips.forEach((id: string) => {
     this.load.image(id, `${PUBLIC_URL}/${id}.svg`);

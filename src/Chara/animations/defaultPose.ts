@@ -31,7 +31,9 @@ export default (chara: Chara) => {
     !chara.head ||
     !chara.trunk ||
     !chara.leftHand ||
+    !chara.rightHand ||
     !chara.mainHandContainer ||
+    !chara.offHandContainer ||
     !chara.leftFoot ||
     !chara.rightFoot ||
     !chara.charaWrapper
@@ -42,8 +44,10 @@ export default (chara: Chara) => {
   chara.head.rotation = 0;
   chara.leftFoot.rotation = 0;
   chara.leftHand.rotation = 0;
+  chara.rightHand.rotation = 0;
   chara.rightFoot.rotation = 0;
   chara.mainHandContainer.rotation = 0;
+  chara.offHandContainer.rotation = 0;
   chara.trunk.rotation = 0;
 
   if (chara.front) {
@@ -55,11 +59,15 @@ export default (chara: Chara) => {
     chara.leftFoot.y = LEFT_FOOT_FRONT_Y;
     chara.rightFoot.x = RIGHT_FOOT_FRONT_X;
     chara.rightFoot.y = RIGHT_FOOT_FRONT_Y;
-    chara.leftHand.x = LEFT_HAND_FRONT_X;
-    chara.leftHand.y = LEFT_HAND_FRONT_Y;
+    chara.leftHand.x = 0;
+    chara.leftHand.y = 0;
+    chara.rightHand.x = 0;
+    chara.rightHand.y = 0;
     chara.mainHandContainer.x = RIGHT_HAND_FRONT_X;
     chara.mainHandContainer.y = RIGHT_HAND_FRONT_Y;
 
+    chara.offHandContainer.x = LEFT_HAND_FRONT_X;
+    chara.offHandContainer.y = LEFT_HAND_FRONT_Y;
 
     // TODO: weapon-> stance type mapping
     if(chara.unit.equips.mainHand === "iron_spear"){
@@ -79,5 +87,7 @@ export default (chara: Chara) => {
     chara.leftHand.y = LEFT_HAND_BACK_Y;
     chara.mainHandContainer.x = RIGHT_HAND_BACK_X;
     chara.mainHandContainer.y = RIGHT_HAND_BACK_Y;
+    chara.offHandContainer.x = LEFT_HAND_BACK_X;
+    chara.offHandContainer.y = LEFT_HAND_BACK_Y;
   }
 };

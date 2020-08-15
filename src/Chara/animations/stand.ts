@@ -29,15 +29,15 @@ const front = (chara: Chara) => {
   //TODO: create weapon->stance type mapping
   if (chara.unit.equips.mainHand === 'iron_spear') {
     chara.tweens.add({
-      targets: chara.leftHand,
-      y: LEFT_HAND_FRONT_Y ,
+      targets: chara.offHandContainer,
+      y: LEFT_HAND_FRONT_Y,
       duration: 1600,
       yoyo: true,
       repeat: -1,
     });
   } else {
     chara.tweens.add({
-      targets: chara.leftHand,
+      targets: chara.offHandContainer,
       y: LEFT_HAND_FRONT_Y + 8,
       duration: 1600,
       yoyo: true,

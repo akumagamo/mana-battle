@@ -11,3 +11,7 @@ Baldar Armor,light_armor,This armor can keep you safe,0,0,8,0,2,0,0,0,0,0,0,0,0,
 Baldar Shield,shield,An unbreakable shield,0,0,9,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 Oaken Staff,staff,A staff given to apprentice wizards,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 Iron Spear,spear,A simple spear made of iron.,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Iron Helm,helm,No different then placing a cooking pot in the head.,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Bow,bow,A small bow.,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Robe,robe,A robe for apprentice mages.,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Leather Armor,light_armor,A simple leather armor.,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0

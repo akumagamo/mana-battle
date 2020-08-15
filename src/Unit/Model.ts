@@ -19,11 +19,9 @@ export type Elem =
 
 export type UnitClass =
   | 'fighter'
-  | 'apprentice'
-  | 'archer'
-  | 'knight'
-  | 'warlock'
-  | 'wizard';
+  | 'mage'
+  | 'archer';
+
 export type Movement = 'plain' | 'mountain' | 'sky' | 'forest';
 
 /**
