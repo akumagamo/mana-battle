@@ -317,19 +317,19 @@ export default class CombatScene extends Phaser.Scene {
 
     if (!source.front) arrow.scaleX = -1;
 
-    this.add.tween({
-      targets: arrow,
-      x: target.container?.x,
-      y: target.container?.y,
-      duration: 250,
-      onComplete: () => {
-        arrow.destroy();
-      },
-    });
-
     return new Promise((resolve) => {
       source.performBowAttack(resolve);
-      target.flinch(damage, updatedTarget.currentHp === 0);
+      this.add.tween({
+        targets: arrow,
+        x: target.container?.x,
+        y: target.container?.y,
+        duration: 250,
+        onComplete: () => {
+          arrow.destroy();
+
+          target.flinch(damage, updatedTarget.currentHp === 0);
+        },
+      });
     });
   }
 

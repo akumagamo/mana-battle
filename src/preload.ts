@@ -135,7 +135,7 @@ export function preload(this: {
     this.load.image(id, `${PUBLIC_URL}/art/castles/${id}.jpg`);
   });
 
-  const mp3s = ['title', 'combat1', 'map1', 'sword_hit'];
+  const mp3s = ['title', 'combat1', 'map1', 'sword_hit', 'arrow_critical'];
   mp3s.forEach((id: string) => {
     this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
   });
