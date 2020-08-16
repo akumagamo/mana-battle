@@ -6,6 +6,7 @@ import UnitListScene from '../Unit/UnitListScene';
 import {Unit} from '../Unit/Model';
 import BoardScene, {BOARD_SCENE_KEY} from '../Board/InteractiveBoardScene';
 import button from '../UI/button';
+import menu from '../Backgrounds/menu';
 
 export class EditSquadScene extends Phaser.Scene {
   unitListScene: UnitListScene | null = null;
@@ -17,7 +18,8 @@ export class EditSquadScene extends Phaser.Scene {
   }
 
   create({squad}: {squad: Squad}) {
-    this.add.image(0, 0, 'backgrounds/squad_edit');
+
+    menu(this)
 
     this.renderBoard(squad);
 

@@ -17,7 +17,7 @@ const uniq = S.reduce((ns: any[]) => (n: any) =>
 
 const makeVector = (x: number) => (y: number) => ({x, y});
 
-const getDistance = (vec1: Vector) => (vec2: Vector) =>
+export const getDistance = (vec1: Vector) => (vec2: Vector) =>
   Math.abs(vec1.x - vec2.x) + Math.abs(vec1.y - vec2.y);
 
 export const unitsFromForce = (state: MapState) => (id: string) =>

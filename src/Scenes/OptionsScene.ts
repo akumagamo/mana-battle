@@ -1,9 +1,7 @@
 import Phaser from 'phaser';
-import {getSquads, setSoundEnabled, getOptions, setMusicEnabled} from '../DB';
-import defaultData from '../defaultData';
+import {setSoundEnabled, getOptions, setMusicEnabled} from '../DB';
 import {preload} from '../preload';
 import button from '../UI/button';
-import {initialMapState} from '../API/Map/mocks';
 import panel from '../UI/panel';
 import text from '../UI/text';
 

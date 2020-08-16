@@ -3,7 +3,6 @@ import {getSquads, getOptions, getUnit} from '../DB';
 import defaultData from '../defaultData';
 import {preload} from '../preload';
 import button from '../UI/button';
-import {initialMapState} from '../API/Map/mocks';
 import {SCREEN_WIDTH, SCREEN_HEIGHT} from '../constants';
 import {Chara} from '../Chara/Chara';
 import {Container} from '../Models';
@@ -78,11 +77,9 @@ export default class TitleScene extends Phaser.Scene {
       this.scene.start('ListSquadsScene');
     });
 
-    button(20, 200, 'Map', this.container, this, () => {
+    button(20, 200, 'Maps', this.container, this, () => {
       this.turnOff();
-      this.scene.start('MapScene', [
-        {type: 'UPDATE_STATE', target: initialMapState},
-      ]);
+      this.scene.start('MapListScene');
     });
 
     button(20, 250, 'Combat', this.container, this, () => {

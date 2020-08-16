@@ -19,10 +19,13 @@ import {
   ValidStep,
   EnemyInRange,
   City,
+  PLAYER_FORCE,
+  CPU_FORCE,
+  translateTiles,
+  tileMap,
 } from '../API/Map/Model';
 import {randomItem} from '../defaultData';
 import S from 'sanctuary';
-import {PLAYER_FORCE, tileMap, CPU_FORCE} from '../API/Map/mocks';
 import {SCREEN_WIDTH, SCREEN_HEIGHT} from '../constants';
 import BoardScene from '../Board/StaticBoardScene';
 
@@ -609,7 +612,7 @@ export class MapScene extends Phaser.Scene {
   }
   renderMap() {
     const {container} = this.getContainers();
-    this.state.cells.forEach((arr, col) =>
+    translateTiles(this.state.cells).forEach((arr, col) =>
       arr.forEach((n, row) => {
         const {x, y} = this.getPos({x: row, y: col});
 

@@ -7,7 +7,8 @@ import run from './animations/run';
 import defaultPose from './animations/defaultPose';
 import stand from './animations/stand';
 import flinch from './animations/flinch';
-import attack from './animations/attack';
+import slash from './animations/slash';
+import bowAttack from './animations/bowAttack';
 import initial from './animations/initial';
 
 export class Chara extends Phaser.Scene {
@@ -147,8 +148,12 @@ export class Chara extends Phaser.Scene {
     stand(this);
   }
 
-  attack(onComplete: () => void) {
-    attack(this, onComplete);
+  performBowAttack(onComplete: ()=>void){
+    bowAttack(this, onComplete)
+  }
+
+  slash(onComplete: () => void) {
+    slash(this, onComplete);
   }
 
   flinch(damage: number, isKilled: boolean) {

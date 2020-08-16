@@ -2,12 +2,15 @@ import Phaser from 'phaser';
 import {preload} from '../preload';
 import button from '../UI/button';
 
-export default class TitleScene extends Phaser.Scene {
+export default class MapListScene extends Phaser.Scene {
   constructor() {
     super('WorldScene');
   }
   preload = preload;
   create() {
+
+
+
     this.cameras.main.setBackgroundColor('#000000');
     const container = this.add.container(300, 100);
 

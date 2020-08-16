@@ -5,6 +5,7 @@ import {Unit, UnitMap} from './Unit/Model';
 import {removeIdFromMap} from './utils';
 import {INVALID_STATE} from './errors';
 import {Options} from './Models';
+import {BattleFieldMap} from './API/Map/Model';
 
 const get = (str: string) => JSON.parse(localStorage.getItem(str) || '{}');
 const set = (str: string, data: any) =>
@@ -324,4 +325,4 @@ export const equipItem = (itemId: string, unitId: string) => {
 export const getOptions = ():Options => get('options')
 export const setSoundEnabled = (val:boolean)=>set('options', {...getOptions(), soundEnabled: val }  )
 export const setMusicEnabled = (val:boolean)=>set('options', {...getOptions(), musicEnabled: val }  )
-
+export const getMaps = ():BattleFieldMap => get('maps')

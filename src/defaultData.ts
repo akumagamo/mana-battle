@@ -18,6 +18,9 @@ import {SquadMap} from './Squad/Model';
 import {Player} from './Player/Model';
 import {Range} from 'immutable'
 import {Options} from './Models';
+import maps from "./maps"
+import {BattleFieldMap} from './API/Map/Model';
+
 export const classes: UnitClass[] = ['fighter', 'mage', 'archer'];
 
 export function randomItem<T>(items: Array<T>): T {
@@ -98,13 +101,14 @@ const options:Options ={
 
 const data: [
   string,
-  UnitMap | SquadMap | ItemMap | ItemTypeSlots | Player | Options,
+  UnitMap | SquadMap | ItemMap | ItemTypeSlots | Player | Options | BattleFieldMap,
 ][] = [
   ['units', units],
   ['squads', squads],
   ['items', items],
   ['itemTypes', itemTypeSlots],
   ['player', player],
+  ['maps', maps],
   ['options', options],
 ];
 

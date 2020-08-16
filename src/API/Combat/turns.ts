@@ -1,6 +1,7 @@
 import S from 'sanctuary';
 import {Unit} from '../../Unit/Model';
 import {INVALID_STATE} from '../../errors';
+import {ItemType} from '../../Item/Model';
 
 const sortInitiative = (unit: TurnUnit) => unit.unit.agi + unit.unit.dex;
 
@@ -10,8 +11,16 @@ export const initiativeList = (units: TurnUnit[]) => {
 
 export type Move = {type: 'MOVE'; source: string; target: string};
 export type Return = {type: 'RETURN'; target: string};
-export type Attack = {
-  type: 'ATTACK';
+export type Slash = {
+  type: 'SLASH';
+  source: string;
+  target: string;
+  damage: number;
+  updatedTarget: Unit;
+  updatedSource: Unit;
+};
+export type UseBow = {
+  type: 'USE_BOW_ATTACK';
   source: string;
   target: string;
   damage: number;
@@ -25,7 +34,8 @@ export type RestartTurns = {type: 'RESTART_TURNS'};
 
 export type Command =
   | Move
-  | Attack
+  | UseBow
+  | Slash
   | Victory
   | EndTurn
   | RestartTurns
@@ -62,13 +72,50 @@ export const runTurn = (
 
   if (!current.unit.squad) throw new Error(INVALID_STATE);
 
+  // Decide on what to do based on the character's class
+  // TODO: multiple conditions
+  // TODO: remove mutation
+
+  let turnCommands: Command[] = [];
+  let updatedUnits;
+  if (current.unit.class === 'archer') {
+    const res = rangedAttackSingleTarget(current, units, commands);
+    turnCommands = res.commands;
+    updatedUnits = res.updatedUnits;
+  } else {
+    const res = meleeAttackSingleTarget(current, units, commands);
+    turnCommands = res.commands;
+    updatedUnits = res.updatedUnits;
+  }
+
+  const {squad} = current.unit;
+
+  const victory: () => Victory = () => ({type: 'VICTORY', target: squad});
+
+  const endCombat: () => EndCombat = () => ({type: 'END_COMBAT'});
+
+  if (isVictory(current, updatedUnits)) {
+    return turnCommands.concat([victory()]);
+  } else if (noAttacksRemaining(updatedUnits)) {
+    return turnCommands.concat([endCombat()]);
+  } else {
+    return runTurn(nextTurn, updatedUnits, turnCommands);
+  }
+};
+
+
+function meleeAttackSingleTarget(
+  current: TurnUnit,
+  units: TurnUnit[],
+  commands: Command[],
+) {
   const target = getTarget(current.unit, units);
 
   if (!target) throw new Error(INVALID_STATE);
 
   const updatedUnits = units
     .map((unit) => {
-      const newHp = unit.unit.currentHp - Math.random()*100;
+      const newHp = unit.unit.currentHp - Math.random() * 100;
       const currentHp = newHp < 1 ? 0 : newHp;
 
       return unit.unit.id === target.id
@@ -93,12 +140,12 @@ export const runTurn = (
   const move: Command[] = [
     {type: 'MOVE', source: current.unit.id, target: target.id},
   ];
-  const attack: Command[] = [
+  const slash: Command[] = [
     {
-      type: 'ATTACK',
+      type: 'SLASH',
       source: current.unit.id,
       target: target.id,
-      damage: Math.floor(Math.random()*1000),
+      damage: Math.floor(Math.random() * 1000),
       updatedTarget: updatedTarget.unit,
       updatedSource: updatedSource.unit,
     },
@@ -106,25 +153,67 @@ export const runTurn = (
 
   const returnCmd: Command[] = [{type: 'RETURN', target: current.unit.id}];
 
-  const turnCommands: Command[] = commands
-    .concat(move)
-    .concat(attack)
-    .concat(returnCmd);
+  return {
+    commands: commands
+      .concat(move)
+      .concat(slash)
+      .concat(returnCmd),
+    updatedUnits,
+  };
+}
+function rangedAttackSingleTarget(
+  current: TurnUnit,
+  units: TurnUnit[],
+  commands: Command[],
+) {
+  const target = getTarget(current.unit, units);
 
-  const {squad} = current.unit;
+  if (!target) throw new Error(INVALID_STATE);
 
-  const victory: () => Victory = () => ({type: 'VICTORY', target: squad});
+  const updatedUnits = units
+    .map((unit) => {
+      const newHp = unit.unit.currentHp - Math.random() * 100;
+      const currentHp = newHp < 1 ? 0 : newHp;
 
-  const endCombat: () => EndCombat = () => ({type: 'END_COMBAT'});
+      return unit.unit.id === target.id
+        ? {
+            remainingAttacks: unit.remainingAttacks,
+            unit: {...unit.unit, currentHp},
+          }
+        : unit;
+    })
+    .map((unit) => {
+      return unit.unit.id === current.unit.id
+        ? {remainingAttacks: unit.remainingAttacks - 1, unit: {...unit.unit}}
+        : unit;
+    });
 
-  if (isVictory(current, updatedUnits)) {
-    return turnCommands.concat([victory()]);
-  } else if (noAttacksRemaining(updatedUnits)) {
-    return turnCommands.concat([endCombat()]);
-  } else {
-    return runTurn(nextTurn, updatedUnits, turnCommands);
-  }
-};
+  const updatedTarget = updatedUnits.find((u) => u.unit.id === target.id);
+
+  const updatedSource = updatedUnits.find((u) => u.unit.id === current.unit.id);
+
+  if (!updatedTarget || !updatedSource) throw new Error(INVALID_STATE);
+
+  const useBow: Command[] = [
+    {
+      type: 'USE_BOW_ATTACK',
+      source: current.unit.id,
+      target: target.id,
+      damage: Math.floor(Math.random() * 1000),
+      updatedTarget: updatedTarget.unit,
+      updatedSource: updatedSource.unit,
+    },
+  ];
+
+  return {
+    commands: commands
+      .concat(useBow)
+      ,
+    updatedUnits,
+  };
+}
+
+
 function isVictory(current: TurnUnit, units: TurnUnit[]) {
   const teamDefeated = S.pipe([
     S.map(S.prop('unit')),
@@ -139,6 +228,7 @@ function noAttacksRemaining(units: TurnUnit[]) {
   return S.all((u: TurnUnit) => u.remainingAttacks < 1)(units);
 }
 
+// TODO: add get closest target option
 export function getTarget(current: Unit, units: TurnUnit[]) {
   return units
     .map((u) => u.unit)

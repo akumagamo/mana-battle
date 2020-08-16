@@ -57,8 +57,7 @@ export default class CombatScene extends Phaser.Scene {
   create(data: {top: string; bottom: string; conflictId: string}) {
     if (this.container) this.container.destroy();
 
-
-    this.sound.stopAll()
+    this.sound.stopAll();
     const music = this.sound.add('combat1');
     music.play();
     this.container = this.add.container(0, 0);
@@ -144,10 +143,17 @@ export default class CombatScene extends Phaser.Scene {
 
     if (cmd.type === 'MOVE') {
       this.moveUnit(cmd.source, cmd.target).then(step);
-    } else if (cmd.type === 'ATTACK') {
-      this.attack(cmd.source, cmd.target, cmd.damage, cmd.updatedTarget).then(
+    } else if (cmd.type === 'SLASH') {
+      this.slash(cmd.source, cmd.target, cmd.damage, cmd.updatedTarget).then(
         step,
       );
+    } else if (cmd.type === 'USE_BOW_ATTACK') {
+      this.bowAttack(
+        cmd.source,
+        cmd.target,
+        cmd.damage,
+        cmd.updatedTarget,
+      ).then(step);
     } else if (cmd.type === 'RETURN') {
       this.return(cmd.target).then(step);
     } else if (cmd.type === 'END_TURN') {
@@ -273,7 +279,7 @@ export default class CombatScene extends Phaser.Scene {
     });
   }
 
-  attack(
+  slash(
     sourceId: string,
     targetId: string,
     damage: number,
@@ -285,7 +291,44 @@ export default class CombatScene extends Phaser.Scene {
     const target = this.getChara(targetId);
 
     return new Promise((resolve) => {
-      source.attack(resolve);
+      source.slash(resolve);
+      target.flinch(damage, updatedTarget.currentHp === 0);
+    });
+  }
+
+  bowAttack(
+    sourceId: string,
+    targetId: string,
+    damage: number,
+    updatedTarget: Unit,
+  ) {
+    this.updateUnit(updatedTarget);
+
+    const source = this.getChara(sourceId);
+    const target = this.getChara(targetId);
+
+    const arrow = this.add.image(
+      source.container?.x,
+      source.container?.y,
+      'arrow',
+    );
+
+    arrow.rotation = 0.5;
+
+    if (!source.front) arrow.scaleX = -1;
+
+    this.add.tween({
+      targets: arrow,
+      x: target.container?.x,
+      y: target.container?.y,
+      duration: 250,
+      onComplete: () => {
+        arrow.destroy();
+      },
+    });
+
+    return new Promise((resolve) => {
+      source.performBowAttack(resolve);
       target.flinch(damage, updatedTarget.currentHp === 0);
     });
   }

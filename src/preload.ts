@@ -17,6 +17,7 @@ export function preload(this: {
     'hand',
     'foot',
     'head',
+    'arrow',
     'backgrounds/plain',
     'backgrounds/sunset',
     'backgrounds/squad_edit',
