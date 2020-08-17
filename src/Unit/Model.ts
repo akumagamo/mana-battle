@@ -17,10 +17,13 @@ export type Elem =
   | 'shadow'
   | 'neutral';
 
-export type UnitClass =
-  | 'fighter'
-  | 'mage'
-  | 'archer';
+export type UnitClass = 'fighter' | 'mage' | 'archer';
+
+export const unitClassLabels: {[x in UnitClass]: string} = {
+  archer: 'Archer',
+  mage: 'Mage',
+  fighter: 'Fighter',
+};
 
 export type Movement = 'plain' | 'mountain' | 'sky' | 'forest';
 
@@ -122,4 +125,4 @@ export function getUnitsWithoutSquad(map: UnitMap) {
   );
 }
 
-export const HAIR_STYLES =['dark1', 'long1', 'split', 'long2', 'split2']
+export const HAIR_STYLES = ['dark1', 'long1', 'split', 'long2', 'split2'];

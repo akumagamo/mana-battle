@@ -2,7 +2,7 @@ import * as Phaser from 'phaser';
 import * as api from '../DB';
 import {Container} from '../Models';
 import {Chara} from '../Chara/Chara';
-import {Unit} from './Model';
+import {Unit, unitClassLabels} from './Model';
 import {INVALID_STATE} from '../errors';
 import {ItemSlot} from '../Item/Model';
 import {ItemDetailWindowScene} from '../Item/ItemDetailWindowScene';
@@ -10,7 +10,7 @@ import text from '../UI/text';
 
 export class UnitDetailsBarScene extends Phaser.Scene {
   colWidth = 150;
-  rowHeight = 30;
+  rowHeight = 40;
   chara: Chara | null = null;
   container: Container | null = null;
   itemDetail: ItemDetailWindowScene | null = null;
@@ -69,28 +69,42 @@ export class UnitDetailsBarScene extends Phaser.Scene {
       this.write(x, y + this.rowHeight * index, str),
     );
 
+  row = (x: number, y: number, strs: (string | number)[]) =>
+    strs.forEach((str, index) => this.write( (x + this.colWidth * index), y, str));
+
   unitStats(unit: Unit) {
-    const {str, agi, int, wis, vit, dex} = unit;
+    const {str, int, dex, lvl, exp, currentHp, hp} = unit;
 
     const baseX = 20;
     const baseY = 20;
 
-    this.write(baseX, baseY, unit.name);
-
-    this.col(baseX + this.colWidth, baseY, [
-      'STR',
-      'AGI',
-      'INT',
-      'WIS',
-      'VIT',
-      'DEX',
+    this.row(baseX, baseY, [
+      unit.name,
+      unitClassLabels[unit.class],
+      `Lvl ${lvl}`,
+      `Exp ${exp}`,
+      "",
+      "",
+      "",
+      `${currentHp} / ${hp} HP`,
     ]);
-    this.col(baseX + this.colWidth * 2, baseY, [str, agi, int, wis, vit, dex]);
+
+
+    this.scene.remove('pic')
+    const pic = new Chara('pic',this,unit,baseX + 80, baseY + 130, 1.3, true, false, true)
+
+    this.container?.add(pic.container)
+
+    this.col(baseX + this.colWidth + 20, baseY + this.rowHeight + 20, [
+      `STR ${str}`,
+      `DEX ${dex}`,
+      `INT ${int}`,
+    ]);
   }
 
   unitItems(unit: Unit) {
     const baseX = 700;
-    const baseY = 50;
+    const baseY = 90;
     const iconSize = 64;
     const padding = 10;
     const margin = 5;

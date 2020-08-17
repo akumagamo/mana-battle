@@ -26,10 +26,15 @@ import {
   LEFT_HAND_BACK_X,
 } from './constants';
 
-function front(chara: Chara) {
+const shouldRenderHair = (chara: Chara) =>
+  !chara.displayHat || chara.unit.equips.head === 'none';
+const shouldRenderHat = (chara: Chara) =>
+  chara.displayHat && chara.unit.equips.head !== 'none';
+
+function front(chara: Chara, headOnly = false) {
   const {skinColor, hair, hairColor} = chara.unit.style;
   const renderHair = (gx: number, gy: number) => {
-    if (chara.unit.equips.head !== 'none') return null;
+    if (!shouldRenderHair(chara)) return null;
     const hairSprite = chara.add.image(gx, gy, hair);
     hairSprite.setTint(hairColor);
     chara.container?.add(hairSprite);
@@ -65,7 +70,7 @@ function front(chara: Chara) {
   };
 
   function renderHat(x: number, y: number) {
-    if (chara.unit.equips.head === 'none') return null;
+    if (!shouldRenderHat(chara)) return null;
 
     const hat = chara.add.image(x, y, `equips/${chara.unit.equips.head}`);
 
@@ -73,13 +78,16 @@ function front(chara: Chara) {
     return hat;
   }
 
+  chara.head = renderHead(HEAD_FRONT_X, HEAD_FRONT_Y);
+  chara.hair = renderHair(HEAD_FRONT_X, HEAD_FRONT_Y);
+  chara.hat = renderHat(HEAD_FRONT_X, HEAD_FRONT_Y);
+
+  if (headOnly) return;
+
   chara.leftFoot = renderFoot(LEFT_FOOT_FRONT_X, LEFT_FOOT_FRONT_Y);
   chara.rightFoot = renderFoot(RIGHT_FOOT_FRONT_X, RIGHT_FOOT_FRONT_Y);
   chara.leftHand = renderHand(0, 0, -1);
   chara.trunk = renderTrunk(chara.unit.class, TRUNK_FRONT_X, TRUNK_FRONT_Y);
-  chara.head = renderHead(HEAD_FRONT_X, HEAD_FRONT_Y);
-  chara.hair = renderHair(HEAD_FRONT_X, HEAD_FRONT_Y);
-  chara.hat = renderHat(HEAD_FRONT_X, HEAD_FRONT_Y);
   chara.rightHand = renderHand(0, 0, 1);
 
   chara.mainHandContainer = chara.add.container(
@@ -112,7 +120,6 @@ function front(chara: Chara) {
     chara.mainHandContainer.add(chara.rightHandEquip);
     chara.mainHandContainer.sendToBack(chara.rightHandEquip);
   } else if (chara.unit.class === 'fighter') {
-
     chara.rightHandEquip = chara.add.image(
       23,
       17,
@@ -136,7 +143,7 @@ function front(chara: Chara) {
     chara.leftHand.setPosition(5, 0);
     chara.offHandContainer.sendToBack(chara.leftHandEquip);
   }
-    // if (chara.unit.equips.mainHand === 'iron_spear') {
+  // if (chara.unit.equips.mainHand === 'iron_spear') {
   //   chara.rightHandEquip.setPosition(60, -10);
   //   chara.rightHandEquip.setScale(-1, 1);
   //   chara.rightHandEquip.setOrigin(0.5);
@@ -146,101 +153,111 @@ function front(chara: Chara) {
   // }
   //
   chara.container.sendToBack(chara.offHandContainer);
+  chara.container?.bringToTop(chara.head);
+  if (chara.hair) chara.container?.bringToTop(chara.hair);
+  if (chara.hat) chara.container?.bringToTop(chara.hat);
 }
-function back(scene: Chara) {
-  const {skinColor, hair, hairColor} = scene.unit.style;
+function back(chara: Chara, headOnly = false) {
+  const {skinColor, hair, hairColor} = chara.unit.style;
   const renderHair = (gx: number, gy: number) => {
-    if (scene.unit.equips.head !== 'none') return null;
+    if (!shouldRenderHair(chara)) return null;
 
-    const hairSprite = scene.add.image(gx, gy, 'back_' + hair);
+    const hairSprite = chara.add.image(gx, gy, 'back_' + hair);
     hairSprite.setTint(hairColor);
-    scene.container?.add(hairSprite);
+    chara.container?.add(hairSprite);
     return hairSprite;
   };
 
   function renderHead(gx: number, gy: number) {
-    const head = scene.add.image(gx, gy, 'back_head');
+    const head = chara.add.image(gx, gy, 'back_head');
     head.setTint(skinColor);
-    scene.container?.add(head);
+    chara.container?.add(head);
 
     return head;
   }
 
   function renderFoot(footX: number, footY: number) {
-    const foot = scene.add.image(footX, footY, 'foot');
+    const foot = chara.add.image(footX, footY, 'foot');
 
     foot.scaleX = -1;
     foot.rotation = 0.6;
-    scene.container?.add(foot);
+    chara.container?.add(foot);
 
     return foot;
   }
 
   function renderTrunk(class_: string, trunkX: number, trunkY: number) {
-    const trunk = scene.add.image(trunkX, trunkY, `trunk_back_${class_}`);
+    const trunk = chara.add.image(trunkX, trunkY, `trunk_back_${class_}`);
 
-    scene.container?.add(trunk);
+    chara.container?.add(trunk);
 
     return trunk;
   }
 
   function renderHand(handX: number, handY: number) {
-    const hand = scene.add.image(handX, handY, 'hand');
+    const hand = chara.add.image(handX, handY, 'hand');
 
     hand.setTint(skinColor);
-    scene.container?.add(hand);
+    chara.container?.add(hand);
     return hand;
   }
 
   function renderHat(x: number, y: number) {
-    if (scene.unit.equips.head === 'none') return null;
+    if (!shouldRenderHat) return null;
 
-    const hat = scene.add.image(x, y, `equips/back_${scene.unit.equips.head}`);
+    const hat = chara.add.image(x, y, `equips/back_${chara.unit.equips.head}`);
 
-    scene.container?.add(hat);
+    chara.container?.add(hat);
     return hat;
   }
 
-  scene.mainHandContainer = scene.add.container(
+  chara.head = renderHead(HEAD_BACK_X, HEAD_BACK_Y);
+  chara.hair = renderHair(HEAD_FRONT_X, HEAD_FRONT_Y);
+  chara.hat = renderHat(HEAD_BACK_X, HEAD_BACK_Y);
+
+  if (headOnly) return;
+
+  chara.mainHandContainer = chara.add.container(
     RIGHT_HAND_BACK_X,
     RIGHT_HAND_BACK_Y,
   );
-  scene.container?.add(scene.mainHandContainer);
+  chara.container?.add(chara.mainHandContainer);
 
-  scene.offHandContainer = scene.add.container(
+  chara.offHandContainer = chara.add.container(
     LEFT_HAND_BACK_X,
     LEFT_HAND_BACK_Y,
   );
-  scene.container?.add(scene.offHandContainer);
+  chara.container?.add(chara.offHandContainer);
 
-  scene.rightHandEquip = scene.add.image(
+  chara.rightHandEquip = chara.add.image(
     -10,
     20,
-    `equips/${scene.unit.equips.mainHand}`,
+    `equips/${chara.unit.equips.mainHand}`,
   );
-  scene.mainHandContainer.add(scene.rightHandEquip);
-  scene.rightHandEquip.setScale(-0.2, 0.2);
-  scene.rightHandEquip.setOrigin(1, 1);
+  chara.mainHandContainer.add(chara.rightHandEquip);
+  chara.rightHandEquip.setScale(-0.2, 0.2);
+  chara.rightHandEquip.setOrigin(1, 1);
 
-  scene.rightHand = renderHand(12, 16);
-  scene.rightHand.setOrigin(0.5);
-  scene.rightHand.setScale(-1, 1);
-  scene.rightHand.setRotation(1.6);
-  scene.mainHandContainer.add(scene.rightHand);
+  chara.rightHand = renderHand(12, 16);
+  chara.rightHand.setOrigin(0.5);
+  chara.rightHand.setScale(-1, 1);
+  chara.rightHand.setRotation(1.6);
+  chara.mainHandContainer.add(chara.rightHand);
 
-  scene.rightFoot = renderFoot(RIGHT_FOOT_BACK_X, RIGHT_FOOT_BACK_Y);
-  scene.rightFoot.scaleY = -1;
-  scene.leftFoot = renderFoot(LEFT_FOOT_BACK_X, LEFT_FOOT_BACK_Y);
-  scene.leftFoot.scaleY = -1;
+  chara.rightFoot = renderFoot(RIGHT_FOOT_BACK_X, RIGHT_FOOT_BACK_Y);
+  chara.rightFoot.scaleY = -1;
+  chara.leftFoot = renderFoot(LEFT_FOOT_BACK_X, LEFT_FOOT_BACK_Y);
+  chara.leftFoot.scaleY = -1;
 
-  scene.trunk = renderTrunk(scene.unit.class, TRUNK_BACK_X, TRUNK_BACK_Y);
-  scene.head = renderHead(HEAD_BACK_X, HEAD_BACK_Y);
-  scene.hair = renderHair(HEAD_FRONT_X, HEAD_FRONT_Y);
-  scene.leftHand = renderHand(LEFT_HAND_BACK_X, LEFT_HAND_BACK_Y);
-  scene.hat = renderHat(HEAD_BACK_X, HEAD_BACK_Y);
+  chara.trunk = renderTrunk(chara.unit.class, TRUNK_BACK_X, TRUNK_BACK_Y);
+  chara.leftHand = renderHand(LEFT_HAND_BACK_X, LEFT_HAND_BACK_Y);
+
+  chara.container?.bringToTop(chara.head);
+  if (chara.hair) chara.container?.bringToTop(chara.hair);
+  if (chara.hat) chara.container?.bringToTop(chara.hat);
 }
 
-export default (chara: Chara) => {
-  if (chara.front) front(chara);
-  else back(chara);
+export default (chara: Chara, headOnly = false) => {
+  if (chara.front) front(chara, headOnly);
+  else back(chara, headOnly);
 };

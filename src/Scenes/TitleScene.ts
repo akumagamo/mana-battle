@@ -62,7 +62,7 @@ export default class TitleScene extends Phaser.Scene {
       });
     });
 
-    button(20, 100, 'Edit Squad 0', this.container, this, () => {
+    button(20, 110, 'Edit Squad 0', this.container, this, () => {
       this.turnOff();
       this.scene.transition({
         target: 'EditSquadScene',
@@ -72,39 +72,38 @@ export default class TitleScene extends Phaser.Scene {
       });
     });
 
-    button(20, 150, 'List Squads', this.container, this, () => {
+    button(20, 170, 'List Squads', this.container, this, () => {
       this.turnOff();
       this.scene.start('ListSquadsScene');
     });
 
-    button(20, 200, 'Maps', this.container, this, () => {
+    button(20, 230, 'Maps', this.container, this, () => {
       this.turnOff();
       this.scene.start('MapListScene');
     });
 
-    button(20, 250, 'Combat', this.container, this, () => {
+    button(20, 290, 'Combat', this.container, this, () => {
       this.turnOff();
       this.scene.start('CombatScene', {top: '0', bottom: '1'});
     });
 
-    button(20, 600, 'Erase Data', this.container, this, () => {
+    button(20, 650, 'Erase Data', this.container, this, () => {
       defaultData(true);
       alert('Data erased!');
     });
 
-    button(220, 600, 'Go Fullscreen', this.container, this, () => {
+    button(220, 650, 'Go Fullscreen', this.container, this, () => {
       window.document.body.requestFullscreen();
     });
 
     button(SCREEN_WIDTH / 2, 550, 'New Game', this.container, this, () => {
-
-      this.cameras.main.fadeOut(1000, 0, 0, 0)
+      this.cameras.main.fadeOut(1000, 0, 0, 0);
       //this.turnOff();
       this.scene.transition({
         target: 'WorldScene',
         duration: 1000,
         moveBelow: true,
-        remove: true
+        remove: true,
       });
     });
     button(SCREEN_WIDTH / 2, 620, 'Options', this.container, this, () => {

@@ -10,7 +10,6 @@ export function preload(this: {
   preload: () => void;
   create: (this: {preload: () => void; create: () => void}) => void;
 }) {
-  
   const images = [
     'insignea',
     'tile',
@@ -22,6 +21,13 @@ export function preload(this: {
     'backgrounds/sunset',
     'backgrounds/squad_edit',
   ];
+
+  // @ts-ignore
+  this.load.spritesheet('fire', `${PUBLIC_URL}/fire.svg`, {
+    frameWidth: 50,
+    frameHeight: 117,
+    endFrame: 7,
+  });
 
   images.forEach((str) =>
     this.load.image(str, PUBLIC_URL + '/' + str + '.svg'),
@@ -73,7 +79,6 @@ export function preload(this: {
     'equips/baldar_sword',
     'equips/oaken_staff',
     'equips/bow',
-
 
     'equips/simple_helm',
     'equips/iron_helm',
@@ -135,7 +140,14 @@ export function preload(this: {
     this.load.image(id, `${PUBLIC_URL}/art/castles/${id}.jpg`);
   });
 
-  const mp3s = ['title', 'combat1', 'map1', 'sword_hit', 'arrow_critical'];
+  const mp3s = [
+    'title',
+    'combat1',
+    'map1',
+    'sword_hit',
+    'arrow_critical',
+    'fireball',
+  ];
   mp3s.forEach((id: string) => {
     this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
   });

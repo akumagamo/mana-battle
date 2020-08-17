@@ -9,6 +9,7 @@ import stand from './animations/stand';
 import flinch from './animations/flinch';
 import slash from './animations/slash';
 import bowAttack from './animations/bowAttack';
+import castSpell from './animations/castSpell';
 import initial from './animations/initial';
 
 export class Chara extends Phaser.Scene {
@@ -33,6 +34,9 @@ export class Chara extends Phaser.Scene {
   leftHandEquip: Image | null = null;
   hat: Image | null = null;
 
+  //Options
+  displayHat = true;
+
   constructor(
     public key: string,
     public parent: Phaser.Scene,
@@ -40,8 +44,9 @@ export class Chara extends Phaser.Scene {
     public cx: number,
     public cy: number,
     public scaleSizing: number, // todo: rename
-    public front: boolean,
-    public animated: boolean = true,
+    public front: boolean = true,
+    public animated = true,
+    public headOnly = false,
   ) {
     super(key);
 
@@ -58,7 +63,7 @@ export class Chara extends Phaser.Scene {
 
     this.container.setDepth(this.cy);
 
-    initial(this);
+    initial(this, this.headOnly);
 
     if (this.animated) this.stand();
 

@@ -19,8 +19,16 @@ export type Slash = {
   updatedTarget: Unit;
   updatedSource: Unit;
 };
-export type UseBow = {
-  type: 'USE_BOW_ATTACK';
+export type Shoot = {
+  type: 'SHOOT';
+  source: string;
+  target: string;
+  damage: number;
+  updatedTarget: Unit;
+  updatedSource: Unit;
+};
+export type Fireball = {
+  type: 'FIREBALL';
   source: string;
   target: string;
   damage: number;
@@ -34,7 +42,8 @@ export type RestartTurns = {type: 'RESTART_TURNS'};
 
 export type Command =
   | Move
-  | UseBow
+  | Shoot
+  | Fireball
   | Slash
   | Victory
   | EndTurn
@@ -82,6 +91,10 @@ export const runTurn = (
     const res = rangedAttackSingleTarget(current, units, commands);
     turnCommands = res.commands;
     updatedUnits = res.updatedUnits;
+  } else if (current.unit.class === 'mage') {
+    const res = rangedSpellSingleTarget(current, units, commands);
+    turnCommands = res.commands;
+    updatedUnits = res.updatedUnits;
   } else {
     const res = meleeAttackSingleTarget(current, units, commands);
     turnCommands = res.commands;
@@ -102,7 +115,6 @@ export const runTurn = (
     return runTurn(nextTurn, updatedUnits, turnCommands);
   }
 };
-
 
 function meleeAttackSingleTarget(
   current: TurnUnit,
@@ -196,7 +208,7 @@ function rangedAttackSingleTarget(
 
   const useBow: Command[] = [
     {
-      type: 'USE_BOW_ATTACK',
+      type: 'SHOOT',
       source: current.unit.id,
       target: target.id,
       damage: Math.floor(Math.random() * 1000),
@@ -206,13 +218,59 @@ function rangedAttackSingleTarget(
   ];
 
   return {
-    commands: commands
-      .concat(useBow)
-      ,
+    commands: commands.concat(useBow),
     updatedUnits,
   };
 }
+function rangedSpellSingleTarget(
+  current: TurnUnit,
+  units: TurnUnit[],
+  commands: Command[],
+) {
+  const target = getTarget(current.unit, units);
 
+  if (!target) throw new Error(INVALID_STATE);
+
+  const updatedUnits = units
+    .map((unit) => {
+      const newHp = unit.unit.currentHp - Math.random() * 100;
+      const currentHp = newHp < 1 ? 0 : newHp;
+
+      return unit.unit.id === target.id
+        ? {
+            remainingAttacks: unit.remainingAttacks,
+            unit: {...unit.unit, currentHp},
+          }
+        : unit;
+    })
+    .map((unit) => {
+      return unit.unit.id === current.unit.id
+        ? {remainingAttacks: unit.remainingAttacks - 1, unit: {...unit.unit}}
+        : unit;
+    });
+
+  const updatedTarget = updatedUnits.find((u) => u.unit.id === target.id);
+
+  const updatedSource = updatedUnits.find((u) => u.unit.id === current.unit.id);
+
+  if (!updatedTarget || !updatedSource) throw new Error(INVALID_STATE);
+
+  const useFireball: Command[] = [
+    {
+      type: 'FIREBALL',
+      source: current.unit.id,
+      target: target.id,
+      damage: Math.floor(Math.random() * 1000),
+      updatedTarget: updatedTarget.unit,
+      updatedSource: updatedSource.unit,
+    },
+  ];
+
+  return {
+    commands: commands.concat(useFireball),
+    updatedUnits,
+  };
+}
 
 function isVictory(current: TurnUnit, units: TurnUnit[]) {
   const teamDefeated = S.pipe([

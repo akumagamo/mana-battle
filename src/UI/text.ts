@@ -15,7 +15,7 @@ export default (
     {
       color: '#000',
       fontSize: "24px",
-      fontFamily : "Signika"
+      fontFamily : "Alata"
     },
   );
 

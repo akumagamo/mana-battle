@@ -9,6 +9,7 @@ import CombatScene from './Combat/CombatScene';
 import OptionsScene from './Scenes/OptionsScene';
 import WorldScene from './Scenes/World';
 import defaultData from './defaultData';
+import WebFont from 'webfontloader';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -44,6 +45,13 @@ const getTimeout = () => {
 };
 
 setTimeout(() => {
-  const game = new Phaser.Game(config);
-  game.scale.lockOrientation(Phaser.Scale.PORTRAIT);
+  WebFont.load({
+    google: {
+      families: ['Alata'],
+    },
+    fontactive: () => {
+      const game = new Phaser.Game(config);
+      game.scale.lockOrientation(Phaser.Scale.PORTRAIT);
+    },
+  });
 }, getTimeout());

@@ -7,6 +7,8 @@ import {Unit} from '../Unit/Model';
 import {Command, runCombat} from '../API/Combat/turns';
 import plains from '../Backgrounds/plains';
 import {Container} from '../Models';
+import fireball from '../Chara/animations/spells/fireball';
+import castSpell from '../Chara/animations/castSpell';
 
 const COMBAT_CHARA_SCALE = 1;
 const WALK_DURATION = 500;
@@ -147,8 +149,15 @@ export default class CombatScene extends Phaser.Scene {
       this.slash(cmd.source, cmd.target, cmd.damage, cmd.updatedTarget).then(
         step,
       );
-    } else if (cmd.type === 'USE_BOW_ATTACK') {
+    } else if (cmd.type === 'SHOOT') {
       this.bowAttack(
+        cmd.source,
+        cmd.target,
+        cmd.damage,
+        cmd.updatedTarget,
+      ).then(step);
+    } else if (cmd.type === 'FIREBALL') {
+      this.castFireball(
         cmd.source,
         cmd.target,
         cmd.damage,
@@ -327,6 +336,37 @@ export default class CombatScene extends Phaser.Scene {
         onComplete: () => {
           arrow.destroy();
 
+          target.flinch(damage, updatedTarget.currentHp === 0);
+        },
+      });
+    });
+  }
+  castFireball(
+    sourceId: string,
+    targetId: string,
+    damage: number,
+    updatedTarget: Unit,
+  ) {
+    this.updateUnit(updatedTarget);
+
+    const source = this.getChara(sourceId);
+    const target = this.getChara(targetId);
+
+    const fb = fireball(this, source.container?.x, source.container?.y);
+
+    fb.rotation = 1.9;
+
+    if (source.front) fb.rotation = -1;
+
+    return new Promise((resolve) => {
+      castSpell(source,resolve);
+      this.add.tween({
+        targets: fb,
+        x: target.container?.x,
+        y: target.container?.y,
+        duration: 700,
+        onComplete: () => {
+          fb.destroy();
           target.flinch(damage, updatedTarget.currentHp === 0);
         },
       });

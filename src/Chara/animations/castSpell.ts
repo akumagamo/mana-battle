@@ -27,6 +27,6 @@ export default (chara: Chara, onComplete: () => void) => {
     ease: 'ExpoOut',
   });
 
-  chara.sound.add('sword_hit').play()
+  chara.sound.add('fireball').play()
   
 };
