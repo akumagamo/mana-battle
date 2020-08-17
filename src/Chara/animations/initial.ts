@@ -222,7 +222,6 @@ function back(chara: Chara, headOnly = false) {
   chara.trunk = renderTrunk(chara.unit.class, TRUNK_BACK_X, TRUNK_BACK_Y);
   chara.rightHand = renderHand(0, 0);
 
-
   chara.mainHandContainer = chara.add.container(
     RIGHT_HAND_BACK_X,
     RIGHT_HAND_BACK_Y,
@@ -271,7 +270,7 @@ function back(chara: Chara, headOnly = false) {
       20,
       `equips/${chara.unit.equips.mainHand}`,
     );
-    chara.leftHandEquip.rotation = 1
+    chara.leftHandEquip.rotation = 1;
 
     chara.offHandContainer.add(chara.leftHandEquip);
     chara.offHandContainer.sendToBack(chara.leftHandEquip);
@@ -279,7 +278,6 @@ function back(chara: Chara, headOnly = false) {
     chara.offHandContainer.sendToBack(chara.leftHandEquip);
 
     chara.offHandContainer.sendToBack(chara.leftHandEquip);
-
   }
 
   chara.container.sendToBack(chara.offHandContainer);
@@ -288,9 +286,7 @@ function back(chara: Chara, headOnly = false) {
   if (chara.hair) chara.container?.bringToTop(chara.hair);
   if (chara.hat) chara.container?.bringToTop(chara.hat);
 
-
   chara.container?.bringToTop(chara.mainHandContainer);
-
 }
 
 export default (chara: Chara, headOnly = false) => {
