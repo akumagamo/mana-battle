@@ -16,14 +16,18 @@ export const RIGHT_HAND_FRONT_Y = 65;
 
 export const HEAD_BACK_X = 0;
 export const HEAD_BACK_Y = 0;
-export const RIGHT_HAND_BACK_X = 20;
-export const RIGHT_HAND_BACK_Y = 50;
-export const LEFT_HAND_BACK_X = -30;
-export const LEFT_HAND_BACK_Y = 50;
+export const RIGHT_HAND_BACK_X = -30;
+export const RIGHT_HAND_BACK_Y = 70;
+
+export const LEFT_HAND_BACK_X = 10;
+export const LEFT_HAND_BACK_Y = 30;
+
 export const LEFT_FOOT_BACK_X = 20;
 export const LEFT_FOOT_BACK_Y = 80;
+
 export const RIGHT_FOOT_BACK_X = -10;
 export const RIGHT_FOOT_BACK_Y = 87;
+
 export const TRUNK_BACK_X = 0;
 export const TRUNK_BACK_Y = 55;
 
