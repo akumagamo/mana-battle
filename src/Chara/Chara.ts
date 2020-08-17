@@ -9,7 +9,6 @@ import stand from './animations/stand';
 import flinch from './animations/flinch';
 import slash from './animations/slash';
 import bowAttack from './animations/bowAttack';
-import castSpell from './animations/castSpell';
 import initial from './animations/initial';
 
 export class Chara extends Phaser.Scene {
