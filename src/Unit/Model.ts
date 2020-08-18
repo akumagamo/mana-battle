@@ -1,10 +1,11 @@
-import {Modifier, ItemSlot, ItemMap} from '../Item/Model';
+import {Modifier, ItemSlot, ItemMap, ItemType} from '../Item/Model';
 import {sum} from '../utils/math';
 import {Container} from '../Models';
+import {getItem, getItems} from '../DB';
 
 export type UnitMap = {[x: string]: Unit};
 
-export type Stat = 'str' | 'agi' | 'dex' | 'vit' | 'int' | 'wis';
+export type Stat = 'str' | 'dex' | 'int' ;
 
 export type Gender = 'male' | 'female';
 
@@ -42,11 +43,8 @@ export interface Unit {
   currentHp: number;
   exp: number;
   str: number;
-  agi: number;
   dex: number;
-  vit: number;
   int: number;
-  wis: number;
   style: {
     skinColor: number;
     hairColor: number;
@@ -126,3 +124,62 @@ export function getUnitsWithoutSquad(map: UnitMap) {
 }
 
 export const HAIR_STYLES = ['dark1', 'long1', 'split', 'long2', 'split2'];
+
+export type Skill = {
+  name: string;
+  formula: (u: Unit) => number;
+  attacksPerRow: {
+    front: number;
+    middle: number;
+    back: number;
+  };
+};
+
+export type Job = {
+  name: string;
+  statsPerLevel: {
+    str: number;
+    dex: number;
+    int: number;
+  };
+  attack: Skill;
+  equips: {
+    [x in ItemSlot]: ItemType;
+  };
+};
+
+const slash: Skill = {
+  name: 'slash',
+  formula: (unit) => {
+
+    const items = getItems()
+    const weapon = items[unit.equips.mainHand]
+    const str = getActualStat('str', items, unit)
+    const dex = getActualStat('dex', items, unit)
+
+    return str + (dex/4) + weapon.modifiers.atk
+
+  },
+  attacksPerRow: {
+    front: 2,
+    middle: 1,
+    back: 1,
+  },
+};
+
+const fighter: Job = {
+  name: 'fighter',
+  statsPerLevel: {
+    str: 6,
+    dex: 4,
+    int: 2,
+  },
+  attack: slash,
+  equips: {
+    head: 'helm',
+    mainHand: 'sword',
+    offHand: 'shield',
+    chest: 'heavy_armor',
+    ornament: 'accessory',
+  },
+};

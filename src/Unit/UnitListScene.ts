@@ -17,7 +17,6 @@ const rowOffsetX = -50;
 export default class UnitListScene extends Phaser.Scene {
   public rows: {chara: Chara; text: Text; container: Container}[];
   private page: number;
-  private itemsPerPage: number;
   private controls: Image[] = [];
   public onUnitClick: ((unit: Unit) => void) | null = null;
   public onDrag: ((unit: Unit, x: number, y: number) => void) | null = null;
@@ -25,11 +24,10 @@ export default class UnitListScene extends Phaser.Scene {
     | ((unit: Unit, x: number, y: number, chara: Chara) => void)
     | null = null;
 
-  constructor(public x: number, public y: number) {
+  constructor(public x: number, public y: number, public itemsPerPage:number) {
     super('UnitListScene');
     this.rows = [];
     this.page = 0;
-    this.itemsPerPage = 6;
   }
 
   create() {

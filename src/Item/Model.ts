@@ -58,6 +58,7 @@ export type ItemType =
   | 'axe'
   | 'robe'
   | 'light_armor'
+  | 'heavy_armor'
   | 'shield'
   | 'bow'
   | 'helm';
@@ -72,6 +73,7 @@ export const itemTypeSlots: ItemTypeSlots = {
   axe: 'mainHand',
   robe: 'chest',
   light_armor: 'chest',
+  heavy_armor: 'chest',
   shield: 'offHand',
   staff: 'mainHand',
   helm: 'head',

@@ -155,6 +155,9 @@ function front(chara: Chara, headOnly = false) {
   chara.container?.bringToTop(chara.head);
   if (chara.hair) chara.container?.bringToTop(chara.hair);
   if (chara.hat) chara.container?.bringToTop(chara.hat);
+
+  chara.container.bringToTop(chara.mainHandContainer);
+
 }
 function back(chara: Chara, headOnly = false) {
   const {skinColor, hair, hairColor} = chara.unit.style;

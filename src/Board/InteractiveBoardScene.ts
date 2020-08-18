@@ -99,10 +99,10 @@ export default class BoardScene extends Phaser.Scene {
         y: boardSprite.boardY,
       });
     } else {
+      
       const {x, y} = getUnitPositionInScreen(squadMember);
 
       // return to original position
-      console.log(`TWEEN: return to original`);
       this.tweens.add({
         targets: this.getChara(unit)?.container,
         x: x,
@@ -171,6 +171,13 @@ export default class BoardScene extends Phaser.Scene {
 
     return chara;
   }
+
+  makeUnitsClickable(fn:(u:Chara)=>void){
+
+    this.unitList.map(chara=>chara.onClick(fn))
+
+  }
+
   onUnitDrag = (unit: Unit, x: number, y: number) => {
     const boardSprite = this.findTileByXY(x, y);
 
@@ -185,7 +192,6 @@ export default class BoardScene extends Phaser.Scene {
 
   placeUnits() {
     const {squad} = this;
-    console.log(`...`, squad.members);
 
     Object.values(squad.members).forEach((member) =>
       this.placeUnit({member: member, fromOutside: false}),

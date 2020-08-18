@@ -7,10 +7,12 @@ import {Unit} from '../Unit/Model';
 import BoardScene, {BOARD_SCENE_KEY} from '../Board/InteractiveBoardScene';
 import button from '../UI/button';
 import menu from '../Backgrounds/menu';
+import {UnitDetailsBarScene} from '../Unit/UnitDetailsBarScene';
 
 export class EditSquadScene extends Phaser.Scene {
   unitListScene: UnitListScene | null = null;
   boardScene: BoardScene | null = null;
+  unitDetails: UnitDetailsBarScene | null = null;
 
   constructor() {
     super('EditSquadScene');
@@ -18,23 +20,30 @@ export class EditSquadScene extends Phaser.Scene {
   }
 
   create({squad}: {squad: Squad}) {
-
-    menu(this)
+    menu(this);
 
     this.renderBoard(squad);
 
     this.renderUnitList();
 
     this.renderReturnBtn();
+
+    this.unitDetails = new UnitDetailsBarScene();
+
+    this.scene.add('details-bar', this.unitDetails, true);
   }
 
   renderBoard(squad: Squad) {
     this.boardScene = new BoardScene(squad);
     this.scene.add(BOARD_SCENE_KEY, this.boardScene, true);
+
+    this.boardScene.makeUnitsClickable((c) => {
+      this.unitDetails?.render(c.unit.id);
+    });
   }
 
   renderUnitList() {
-    this.unitListScene = new UnitListScene(50, 40);
+    this.unitListScene = new UnitListScene(50, 40, 6);
     this.unitListScene.onDrag = (unit, x, y) => this.onDragFromList(unit, x, y);
     this.unitListScene.onDragEnd = (unit, x, y, chara) =>
       this.onDragEndFromList(unit, x, y, chara);

@@ -19,7 +19,7 @@ export class CreateSquadScene extends Phaser.Scene {
   }
 
   renderUnitList() {
-    this.unitListScene = new UnitListScene(100, 40);
+    this.unitListScene = new UnitListScene(100, 40, 8);
     this.unitListScene.onUnitClick = (unit: Unit) =>
       console.log(`hello from crete scene`, unit);
     this.scene.add('UnitListScene', this.unitListScene, true);

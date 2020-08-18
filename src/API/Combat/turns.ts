@@ -3,7 +3,7 @@ import {Unit} from '../../Unit/Model';
 import {INVALID_STATE} from '../../errors';
 import {ItemType} from '../../Item/Model';
 
-const sortInitiative = (unit: TurnUnit) => unit.unit.agi + unit.unit.dex;
+const sortInitiative = (unit: TurnUnit) => unit.unit.dex + unit.unit.dex;
 
 export const initiativeList = (units: TurnUnit[]) => {
   return units.sort((a, b) => sortInitiative(b) - sortInitiative(a));
