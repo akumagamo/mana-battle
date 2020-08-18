@@ -8,11 +8,13 @@ import BoardScene, {BOARD_SCENE_KEY} from '../Board/InteractiveBoardScene';
 import button from '../UI/button';
 import menu from '../Backgrounds/menu';
 import {UnitDetailsBarScene} from '../Unit/UnitDetailsBarScene';
+import SmallUnitDetailsBar from '../Unit/SmallUnitDetailsBar';
+import {Container} from '../Models';
 
 export class EditSquadScene extends Phaser.Scene {
   unitListScene: UnitListScene | null = null;
   boardScene: BoardScene | null = null;
-  unitDetails: UnitDetailsBarScene | null = null;
+  unitDetails: Container | null = null;
 
   constructor() {
     super('EditSquadScene');
@@ -27,10 +29,6 @@ export class EditSquadScene extends Phaser.Scene {
     this.renderUnitList();
 
     this.renderReturnBtn();
-
-    this.unitDetails = new UnitDetailsBarScene();
-
-    this.scene.add('details-bar', this.unitDetails, true);
   }
 
   renderBoard(squad: Squad) {
@@ -38,7 +36,9 @@ export class EditSquadScene extends Phaser.Scene {
     this.scene.add(BOARD_SCENE_KEY, this.boardScene, true);
 
     this.boardScene.makeUnitsClickable((c) => {
-      this.unitDetails?.render(c.unit.id);
+
+      this.unitDetails?.destroy()
+      this.unitDetails = SmallUnitDetailsBar(0, 650, this, c.unit.id)
     });
   }
 
@@ -118,7 +118,6 @@ export class EditSquadScene extends Phaser.Scene {
   }
 
   renderReturnBtn() {
-    console.log('rendering return btn');
 
     button(1100, 100, 'Return to title', this.add.container(0, 0), this, () => {
       this.scene.transition({
@@ -139,19 +138,6 @@ export class EditSquadScene extends Phaser.Scene {
       });
     });
 
-    // const list = this.add.text(1100, 200, 'Return to list');
-    // list.setInteractive();
-    // list.on('pointerdown', () => {
-    //   this.destroyChildren();
-
-    //   this.scene.transition({
-    //     target: 'ListSquadsScene',
-    //     duration: 0,
-    //     moveBelow: true,
-    //   });
-    // });
-
-    console.log(`done`);
   }
 
   destroyChildren() {
