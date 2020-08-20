@@ -129,7 +129,6 @@ export class Chara extends Phaser.Scene {
     this.container.on(
       'dragend',
       (_pointer: Pointer, _dragX: number, dragY: number) => {
-        console.log(_dragX,dragY)
         this.container.setDepth(dragY);
         dragEnd(this.unit, this.container.x || 0, this.container.y || 0, this);
       },

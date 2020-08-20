@@ -36,9 +36,8 @@ export class EditSquadScene extends Phaser.Scene {
     this.scene.add(BOARD_SCENE_KEY, this.boardScene, true);
 
     this.boardScene.makeUnitsClickable((c) => {
-
-      this.unitDetails?.destroy()
-      this.unitDetails = SmallUnitDetailsBar(0, 650, this, c.unit.id)
+      this.unitDetails?.destroy();
+      this.unitDetails = SmallUnitDetailsBar(0, 650, this, c.unit.id);
     });
   }
 
@@ -52,8 +51,6 @@ export class EditSquadScene extends Phaser.Scene {
 
   onDragEndFromList(unit: Unit, x: number, y: number, chara: Chara) {
     const boardSprite = this.boardScene?.findTileByXY(x, y);
-
-    console.log(`dropped on `, boardSprite);
 
     const {boardScene} = this;
     if (!boardScene) return;
@@ -97,14 +94,13 @@ export class EditSquadScene extends Phaser.Scene {
           yoyo: false,
         });
       }
+      boardScene.highlightTile(boardSprite);
     } else {
-      console.log(`lets return`, unit, this.unitListScene?.rows);
-
       this.unitListScene?.returnToOriginalPosition(unit);
       this.unitListScene?.scaleDown(chara);
-    }
 
-    boardScene.tiles.forEach((tile) => tile.sprite.clearTint());
+      boardScene.tiles.forEach((tile) => tile.sprite.clearTint());
+    }
   }
 
   onDragFromList(_: Unit, x: number, y: number) {
@@ -118,7 +114,6 @@ export class EditSquadScene extends Phaser.Scene {
   }
 
   renderReturnBtn() {
-
     button(1100, 100, 'Return to title', this.add.container(0, 0), this, () => {
       this.scene.transition({
         target: 'TitleScene',
@@ -137,7 +132,6 @@ export class EditSquadScene extends Phaser.Scene {
         moveBelow: true,
       });
     });
-
   }
 
   destroyChildren() {

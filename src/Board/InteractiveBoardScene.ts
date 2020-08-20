@@ -6,6 +6,7 @@ import {cartesianToIsometric} from '../utils/isometric';
 import {getUnit, changeSquadMemberPosition} from '../DB';
 import {Unit} from '../Unit/Model';
 import {tileWidth, tileHeight} from '../constants';
+import {INVALID_STATE} from '../errors';
 
 type BoardTile = {
   sprite: Image;
@@ -99,7 +100,6 @@ export default class BoardScene extends Phaser.Scene {
         y: boardSprite.boardY,
       });
     } else {
-      
       const {x, y} = getUnitPositionInScreen(squadMember);
 
       // return to original position
@@ -113,9 +113,12 @@ export default class BoardScene extends Phaser.Scene {
         paused: false,
         yoyo: false,
       });
+      this.tiles.forEach((sprite) => {
+        if (sprite.boardX === squadMember.x && sprite.boardY === squadMember.y)
+          this.highlightTile(sprite);
+        else sprite.sprite.clearTint();
+      });
     }
-
-    this.tiles.map((boardSprite) => boardSprite.sprite.clearTint());
   };
   private getChara(unit: {id: string}) {
     return this.unitList.find((chara) => chara.key === this.makeUnitKey(unit));
@@ -149,9 +152,7 @@ export default class BoardScene extends Phaser.Scene {
     });
 
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      this.tiles.filter(isPointerInTile(pointer)).forEach((tile) => {
-        console.log(`clicked>>`, tile.x, tile.y);
-      });
+      this.tiles.filter(isPointerInTile(pointer)).forEach((tile) => {});
     });
 
     return tiles;
@@ -172,24 +173,38 @@ export default class BoardScene extends Phaser.Scene {
     return chara;
   }
 
-  makeUnitsClickable(fn:(u:Chara)=>void){
+  makeUnitsClickable(fn: (u: Chara) => void) {
+    this.unitList.map((chara) => {
+      chara.onClick((c) => {
+        const member = Object.values(this.squad.members).find(
+          (mem) => mem.id === chara.unit.id,
+        );
 
-    this.unitList.map(chara=>chara.onClick(fn))
+        if (!member) throw new Error(INVALID_STATE);
 
+        const tile = this.tiles.find(
+          (t) => t.boardX === member.x && t.boardY === member.y,
+        );
+        if (tile) this.highlightTile(tile);
+        fn(c);
+      });
+    });
   }
 
   onUnitDrag = (unit: Unit, x: number, y: number) => {
-    const boardSprite = this.findTileByXY(x, y);
+    const tile = this.findTileByXY(x, y);
 
-    this.tiles.map((tile) => tile.sprite.clearTint());
-
-    if (boardSprite) {
-      boardSprite.sprite.setTint(0x00cc00);
+    if (tile) {
+      this.highlightTile(tile);
     }
-
     this.scene.bringToTop(this.makeUnitKey(unit));
   };
 
+  highlightTile(boardSprite: BoardTile) {
+    this.tiles.forEach((tile) => tile.sprite.clearTint());
+
+    boardSprite.sprite.setTint(0x00cc00);
+  }
   placeUnits() {
     const {squad} = this;
 
