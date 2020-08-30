@@ -16,7 +16,7 @@
    version="1.1"
    id="svg8"
    sodipodi:docname="iron_helm.svg"
-   inkscape:version="0.92.2 5c3e80d, 2017-08-06">
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
   <defs
      id="defs2">
     <linearGradient
@@ -187,18 +187,18 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="7.4260954"
-     inkscape:cx="42.434688"
-     inkscape:cy="80.171941"
+     inkscape:zoom="28.207185"
+     inkscape:cx="72.312566"
+     inkscape:cy="119.37632"
      inkscape:document-units="mm"
      inkscape:current-layer="g4578"
      showgrid="false"
      units="px"
-     inkscape:window-width="1680"
-     inkscape:window-height="925"
-     inkscape:window-x="11"
-     inkscape:window-y="22"
-     inkscape:window-maximized="0"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
@@ -241,9 +241,10 @@
          inkscape:connector-curvature="0" />
       <path
          style="fill:url(#radialGradient1586);fill-opacity:1;stroke:#000000;stroke-width:1.77444363px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 105.55628,170.2103 c -6.283157,-3.44361 -10.876089,-12.28209 -19.05489,-10.71508 -6.891273,0.78371 -13.782546,1.56743 -20.673819,2.35114 -7.003139,10.28897 -14.006279,20.57794 -21.009418,30.86691 1.12847,3.65093 2.256939,7.30185 3.385409,10.95278 12.453283,-9.58859 24.247837,-20.25894 37.611133,-28.52441 6.055025,-2.90807 12.660839,-4.05393 19.310245,-3.70742 0.59289,0.004 0.98226,-0.83143 0.43134,-1.22392 z"
+         d="m 105.55628,170.2103 c -30.106679,-28.3344 -66.282805,3.73233 -60.738127,22.50297 l 3.385409,10.95278 c 12.453283,-9.58859 24.247837,-20.25894 37.611133,-28.52441 6.055025,-2.90807 12.660839,-4.05393 19.310245,-3.70742 0.59289,0.004 0.98226,-0.83143 0.43134,-1.22392 z"
          id="path1552"
-         inkscape:connector-curvature="0" />
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cccccc" />
       <path
          style="fill:url(#radialGradient1618);fill-opacity:1;stroke:#000000;stroke-width:1.77444363px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 63.219115,219.10822 -8.861791,9.06094 -8.264369,4.7794 7.766514,8.16478 3.883258,2.091 5.078105,0.59742 5.775101,-10.25577 2.78798,-13.74077 -3.883257,-2.3897 -3.086692,0.3983 z"
@@ -271,9 +272,10 @@
          inkscape:connector-curvature="0" />
       <path
          style="opacity:0.6;fill:#ffffff;stroke:none;stroke-width:1.03560662px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 71.375027,163.01843 16.734607,-1.95237 9.204034,4.60202 -9.482945,-2.64965 -14.642781,2.09183 z"
+         d="m 72.025856,161.26147 c 4.121153,-0.98413 14.532518,-2.63589 25.762544,4.35712 -7.880218,-4.42514 -19.193624,-3.77709 -24.152398,-2.10549 z"
          id="path1646"
-         inkscape:connector-curvature="0" />
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cccc" />
       <path
          style="opacity:0.6;fill:#ffffff;stroke:none;stroke-width:1.03560662px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 46.970391,209.73588 1.673461,2.7891 3.346921,-3.20747 3.068012,-0.13945 2.091826,2.92855 -0.836731,-4.74147 -4.880927,-0.41836 z"

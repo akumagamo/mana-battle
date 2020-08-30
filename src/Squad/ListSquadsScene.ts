@@ -20,8 +20,7 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   create() {
-
-    menu(this)
+    menu(this);
     const squads = this.getSquads();
 
     this.renderSquadList(squads);
@@ -35,7 +34,7 @@ export class ListSquadsScene extends Phaser.Scene {
       this.page * this.itemsPerPage + this.itemsPerPage,
     );
   }
-  renderSquadList(squads:Squad[]) {
+  renderSquadList(squads: Squad[]) {
     const rows = this.formatList(squads, []);
 
     rows.forEach((row, y) =>
@@ -178,7 +177,6 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   refresh() {
-
     const squads = this.getSquads();
     this.removeChildren();
     this.renderSquadList(squads);
@@ -188,11 +186,13 @@ export class ListSquadsScene extends Phaser.Scene {
   nextPage() {
     this.page = this.page + 1;
     this.refresh();
+    this.selectSquad(this.getSquads()[0]);
   }
 
   prevPage() {
     this.page = this.page - 1;
     this.refresh();
+    this.selectSquad(this.getSquads()[0]);
   }
 
   removeChildren() {
