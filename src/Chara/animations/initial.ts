@@ -206,7 +206,7 @@ function back(chara: Chara, headOnly = false) {
   }
 
   function renderHat(x: number, y: number) {
-    if (!shouldRenderHat) return null;
+    if (!shouldRenderHat(chara)) return null;
 
     const hat = chara.add.image(x, y, `equips/back_${chara.unit.equips.head}`);
 
