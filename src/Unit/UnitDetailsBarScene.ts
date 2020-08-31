@@ -7,7 +7,7 @@ import {INVALID_STATE} from '../errors';
 import {ItemSlot} from '../Item/Model';
 import {ItemDetailWindowScene} from '../Item/ItemDetailWindowScene';
 import text from '../UI/text';
-import {getClassSkills, getUnitAttacks} from './Skills';
+import {getUnitAttacks} from './Skills';
 import button from '../UI/button';
 
 export class UnitDetailsBarScene extends Phaser.Scene {
