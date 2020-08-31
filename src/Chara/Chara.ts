@@ -33,9 +33,6 @@ export class Chara extends Phaser.Scene {
   leftHandEquip: Image | null = null;
   hat: Image | null = null;
 
-  //Options
-  displayHat = true;
-
   constructor(
     public key: string,
     public parent: Phaser.Scene,
@@ -50,6 +47,7 @@ export class Chara extends Phaser.Scene {
     super(key);
 
     parent.scene.add(key, this, true);
+
     return this;
   }
   create() {
@@ -151,8 +149,8 @@ export class Chara extends Phaser.Scene {
     stand(this);
   }
 
-  performBowAttack(onComplete: ()=>void){
-    bowAttack(this, onComplete)
+  performBowAttack(onComplete: () => void) {
+    bowAttack(this, onComplete);
   }
 
   slash(onComplete: () => void) {

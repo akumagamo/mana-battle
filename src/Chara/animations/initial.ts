@@ -27,9 +27,10 @@ import {
 } from './constants';
 
 const shouldRenderHair = (chara: Chara) =>
-  !chara.displayHat || chara.unit.equips.head === 'none';
+  !chara.unit.style.displayHat || chara.unit.equips.head === 'none';
+  
 const shouldRenderHat = (chara: Chara) =>
-  chara.displayHat && chara.unit.equips.head !== 'none';
+  chara.unit.style.displayHat && chara.unit.equips.head !== 'none';
 
 function front(chara: Chara, headOnly = false) {
   const {skinColor, hair, hairColor} = chara.unit.style;

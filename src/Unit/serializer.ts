@@ -28,10 +28,10 @@ export function fromJSON(n: number): Unit {
       skinColor: randomItem(SKIN_COLORS),
       hairColor: randomItem(HAIR_COLORS),
       hair: randomItem(HAIR_STYLES),
+      displayHat: true,
     },
   };
 }
-
 
 const baseEquips = {
   mage: {

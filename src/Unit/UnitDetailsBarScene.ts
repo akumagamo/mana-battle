@@ -7,6 +7,8 @@ import {INVALID_STATE} from '../errors';
 import {ItemSlot} from '../Item/Model';
 import {ItemDetailWindowScene} from '../Item/ItemDetailWindowScene';
 import text from '../UI/text';
+import {getClassSkills, getUnitAttacks} from './Skills';
+import button from '../UI/button';
 
 export class UnitDetailsBarScene extends Phaser.Scene {
   colWidth = 150;
@@ -14,6 +16,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
   chara: Chara | null = null;
   container: Container | null = null;
   itemDetail: ItemDetailWindowScene | null = null;
+  onHatToggle: ((u:Unit)=>void) | null = null
 
   constructor() {
     super('UnitDetailsBarScene');
@@ -58,6 +61,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
 
     this.unitStats(unit);
     this.unitItems(unit);
+    this.unitControls(unit);
     //this.renderItemDetails();
   }
 
@@ -70,7 +74,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
     );
 
   row = (x: number, y: number, strs: (string | number)[]) =>
-    strs.forEach((str, index) => this.write( (x + this.colWidth * index), y, str));
+    strs.forEach((str, index) => this.write(x + this.colWidth * index, y, str));
 
   unitStats(unit: Unit) {
     const {str, int, dex, lvl, exp, currentHp, hp} = unit;
@@ -83,22 +87,43 @@ export class UnitDetailsBarScene extends Phaser.Scene {
       unitClassLabels[unit.class],
       `Lvl ${lvl}`,
       `Exp ${exp}`,
-      "",
-      "",
-      "",
+      '',
+      '',
+      '',
       `${currentHp} / ${hp} HP`,
     ]);
 
+    this.scene.remove('pic');
+    const pic = new Chara(
+      'pic',
+      this,
+      unit,
+      baseX + 80,
+      baseY + 130,
+      1.3,
+      true,
+      false,
+      true,
+    );
 
-    this.scene.remove('pic')
-    const pic = new Chara('pic',this,unit,baseX + 80, baseY + 130, 1.3, true, false, true)
-
-    this.container?.add(pic.container)
+    this.container?.add(pic.container);
 
     this.col(baseX + this.colWidth + 20, baseY + this.rowHeight + 20, [
       `STR ${str}`,
       `DEX ${dex}`,
       `INT ${int}`,
+    ]);
+
+    let attacks = getUnitAttacks(unit);
+
+    let front = attacks.front(unit);
+    let middle = attacks.middle(unit);
+    let back = attacks.back(unit);
+
+    this.col(baseX + this.colWidth * 2 + 20, baseY + this.rowHeight + 20, [
+      `Front  - ${front.name} - ${front.damage}x${front.times}`,
+      `Middle - ${middle.name} - ${middle.damage}x${middle.times}`,
+      `Back   - ${back.name} - ${back.damage}x${back.times}`,
     ]);
   }
 
@@ -151,4 +176,17 @@ export class UnitDetailsBarScene extends Phaser.Scene {
     item(baseX + boxSize + textWidth, baseY, 'chest');
     item(baseX + boxSize + textWidth, baseY + boxSize, 'ornament');
   }
+
+  unitControls(unit: Unit) {
+    if (this.container)
+      button(600, 20, 'Toggle Hat', this.container, this, () => {
+
+        api.saveUnit({...unit, style: {... unit.style, displayHat: !unit.style.displayHat} })
+
+        if(this.onHatToggle)
+          this.onHatToggle(unit);
+
+      });
+  }
+
 }

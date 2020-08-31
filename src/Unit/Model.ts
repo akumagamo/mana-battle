@@ -5,7 +5,7 @@ import {getItem, getItems} from '../DB';
 
 export type UnitMap = {[x: string]: Unit};
 
-export type Stat = 'str' | 'dex' | 'int' ;
+export type Stat = 'str' | 'dex' | 'int';
 
 export type Gender = 'male' | 'female';
 
@@ -49,6 +49,7 @@ export interface Unit {
     skinColor: number;
     hairColor: number;
     hair: string;
+    displayHat: boolean;
   };
   equips: {
     [x in ItemSlot]: string;
@@ -151,14 +152,12 @@ export type Job = {
 const slash: Skill = {
   name: 'slash',
   formula: (unit) => {
+    const items = getItems();
+    const weapon = items[unit.equips.mainHand];
+    const str = getActualStat('str', items, unit);
+    const dex = getActualStat('dex', items, unit);
 
-    const items = getItems()
-    const weapon = items[unit.equips.mainHand]
-    const str = getActualStat('str', items, unit)
-    const dex = getActualStat('dex', items, unit)
-
-    return str + (dex/4) + weapon.modifiers.atk
-
+    return str + dex / 4 + weapon.modifiers.atk;
   },
   attacksPerRow: {
     front: 2,

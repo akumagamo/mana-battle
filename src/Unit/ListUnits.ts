@@ -22,9 +22,8 @@ export class ListUnitsScene extends Phaser.Scene {
     super('ListUnitsScene');
   }
 
-  getUnits(){
-
-// TODO: filter only player units
+  getUnits() {
+    // TODO: filter only player units
     return Object.values(api.getUnits()).slice(
       this.page * this.itemsPerPage,
       this.page * this.itemsPerPage + this.itemsPerPage,
@@ -34,7 +33,7 @@ export class ListUnitsScene extends Phaser.Scene {
     menu(this);
 
     // TODO: filter only player units
-    const units = this.getUnits()
+    const units = this.getUnits();
 
     this.detailsBar = new UnitDetailsBarScene();
     this.renderUnitsList(units);
@@ -107,32 +106,31 @@ export class ListUnitsScene extends Phaser.Scene {
   }
 
   renderUnitDetails(chara: Chara) {
-    this.detailsBar?.render(chara.unit.id);
-  }
+    if (!this.detailsBar) return;
 
-  renderNavigation() {}
+    this.detailsBar.render(chara.unit.id);
+    this.detailsBar.onHatToggle = (unit: Unit) => {
+      this.removeUnitList();
+      this.renderUnitsList(this.getUnits());
+
+      this.selectUnit(unit.id);
+    };
+  }
 
   refresh() {
     this.removeChildren();
     this.renderUnitsList(this.getUnits());
   }
-
-  nextPage() {
-    this.page = this.page + 1;
-    this.refresh();
-  }
-
-  prevPage() {
-    this.page = this.page - 1;
-    this.refresh();
-  }
-
-  removeChildren() {
+  removeUnitList() {
     this.units.forEach((chara) => {
       this.scene.remove(`list-chara-${chara.chara.unit.id}`);
       chara.tile.destroy();
     });
     this.units = [];
+  }
+
+  removeChildren() {
+    this.removeUnitList();
     this.detailsBar?.destroy(this);
   }
 }

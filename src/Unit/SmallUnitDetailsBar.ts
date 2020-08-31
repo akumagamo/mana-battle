@@ -1,14 +1,11 @@
 import * as Phaser from 'phaser';
 import * as api from '../DB';
 import {Container} from '../Models';
-import {Chara} from '../Chara/Chara';
 import {Unit, unitClassLabels} from './Model';
-import {INVALID_STATE} from '../errors';
-import {ItemSlot} from '../Item/Model';
 import text from '../UI/text';
+import S from 'sanctuary';
 
 const colWidth = 150;
-const rowHeight = 40;
 
 const row = (container: Container, scene: Phaser.Scene) => (
   x: number,
@@ -42,16 +39,21 @@ export default function(
 
   const unit = api.getUnit(unitId);
 
-  unitStats(x,y,container, scene, unit);
+  unitStats(x, y, container, scene, unit);
 
-  return container
+  return container;
 }
 
-function unitStats(x:number,y:number,container: Container, scene: Phaser.Scene, unit: Unit) {
+function unitStats(
+  x: number,
+  y: number,
+  container: Container,
+  scene: Phaser.Scene,
+  unit: Unit,
+) {
   const {name, lvl, exp, currentHp, hp} = unit;
 
-
-  row(container, scene)(x+10, y+10, [
+  row(container, scene)(x + 10, y + 10, [
     name,
     unitClassLabels[unit.class],
     `Lvl ${lvl}`,
