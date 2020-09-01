@@ -80,6 +80,10 @@ export function getUnitAttacks(unit: Unit) {
 }
 
 export function getUnitDamage(unit: Unit) {
+  return getUnitAttack(unit).damage;
+}
+
+export function getUnitAttack(unit: Unit) {
   const attacks = getUnitAttacks(unit);
 
   const squadInfo = DB.getSquadMember(unit.id);
@@ -90,5 +94,5 @@ export function getUnitDamage(unit: Unit) {
     else return 'front';
   };
 
-  return attacks[getPos()](unit).damage;
+  return attacks[getPos()](unit);
 }

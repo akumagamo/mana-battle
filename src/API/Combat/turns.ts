@@ -1,6 +1,6 @@
 import S from 'sanctuary';
 import {Unit} from '../../Unit/Model';
-import {getUnitAttacks, getUnitDamage} from '../../Unit/Skills';
+import {getUnitAttack, getUnitAttacks, getUnitDamage} from '../../Unit/Skills';
 import {INVALID_STATE} from '../../errors';
 
 const sortInitiative = (unit: TurnUnit) => unit.unit.dex + unit.unit.dex;
@@ -54,7 +54,7 @@ export type Command =
 export const runCombat = (units: Unit[]): Command[] => {
   const turnUnits: TurnUnit[] = units.map((unit) => ({
     unit,
-    remainingAttacks: 2,
+    remainingAttacks: getUnitAttack(unit).times,
   }));
   const unitList = initiativeList(turnUnits);
 
@@ -86,19 +86,24 @@ export const runTurn = (
   // TODO: remove mutation
 
   let turnCommands: Command[] = [];
-  let updatedUnits;
-  if (current.unit.class === 'archer') {
-    const res = rangedAttackSingleTarget(current, units, commands);
-    turnCommands = res.commands;
-    updatedUnits = res.updatedUnits;
-  } else if (current.unit.class === 'mage') {
-    const res = rangedSpellSingleTarget(current, units, commands);
-    turnCommands = res.commands;
-    updatedUnits = res.updatedUnits;
+  let updatedUnits = units;
+
+  if (current.remainingAttacks > 0) {
+    if (current.unit.class === 'archer') {
+      const res = rangedAttackSingleTarget(current, units, commands);
+      turnCommands = res.commands;
+      updatedUnits = res.updatedUnits;
+    } else if (current.unit.class === 'mage') {
+      const res = rangedSpellSingleTarget(current, units, commands);
+      turnCommands = res.commands;
+      updatedUnits = res.updatedUnits;
+    } else {
+      const res = meleeAttackSingleTarget(current, units, commands);
+      turnCommands = res.commands;
+      updatedUnits = res.updatedUnits;
+    }
   } else {
-    const res = meleeAttackSingleTarget(current, units, commands);
-    turnCommands = res.commands;
-    updatedUnits = res.updatedUnits;
+    turnCommands = commands;
   }
 
   const {squad} = current.unit;

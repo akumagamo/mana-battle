@@ -1,11 +1,10 @@
 import {initiativeList, runCombat} from './turns';
 import {makeUnit} from '../Units/mock';
 import {Unit} from '../../Unit/Model';
+import {getUnitAttack} from '../../Unit/Skills';
 
-function makeTurnUnit (unit:Unit){
-
-  return { remainingAttacks: 2, unit}
-
+function makeTurnUnit(unit: Unit) {
+  return {remainingAttacks: getUnitAttack(unit).times, unit};
 }
 
 test('Should sort by initiave correctly', () => {
@@ -14,7 +13,9 @@ test('Should sort by initiave correctly', () => {
     {name: 'f4', agi: 6, dex: 6},
     {name: 'f3', agi: 7, dex: 7},
     {name: 'f2', agi: 8, dex: 8},
-  ].map(makeUnit).map(makeTurnUnit);
+  ]
+    .map(makeUnit)
+    .map(makeTurnUnit);
 
   const sorted = initiativeList(units).map((unit) => unit.unit.name);
 
@@ -31,8 +32,7 @@ test('Combat should have the expected outcome', () => {
 
   const res = runCombat(units);
 
-  const last = res.reverse()[0]
+  const last = res.reverse()[0];
 
-  expect(last.type).toBe( "VICTORY")
-  
+  expect(last.type).toBe('VICTORY');
 });
