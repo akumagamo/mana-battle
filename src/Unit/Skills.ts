@@ -1,4 +1,5 @@
 import {Elem, Unit, UnitClass} from './Model';
+import * as DB from '../DB';
 
 export type Attack = {
   name: string;
@@ -78,3 +79,16 @@ export function getUnitAttacks(unit: Unit) {
   return skills[unit.class];
 }
 
+export function getUnitDamage(unit: Unit) {
+  const attacks = getUnitAttacks(unit);
+
+  const squadInfo = DB.getSquadMember(unit.id);
+
+  const getPos = (): Row => {
+    if (squadInfo.y === 0) return 'back';
+    else if (squadInfo.y === 1) return 'middle';
+    else return 'front';
+  };
+
+  return attacks[getPos()](unit).damage;
+}

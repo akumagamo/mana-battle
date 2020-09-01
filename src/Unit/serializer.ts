@@ -56,6 +56,7 @@ const baseEquips = {
     head: 'archer_hat',
   },
 };
+
 export function toJSON(_: Unit) {
   throw new Error('Not implemented.');
 }

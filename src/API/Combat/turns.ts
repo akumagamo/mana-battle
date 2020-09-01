@@ -1,7 +1,7 @@
 import S from 'sanctuary';
 import {Unit} from '../../Unit/Model';
+import {getUnitAttacks, getUnitDamage} from '../../Unit/Skills';
 import {INVALID_STATE} from '../../errors';
-import {ItemType} from '../../Item/Model';
 
 const sortInitiative = (unit: TurnUnit) => unit.unit.dex + unit.unit.dex;
 
@@ -125,9 +125,11 @@ function meleeAttackSingleTarget(
 
   if (!target) throw new Error(INVALID_STATE);
 
+  const damage = getUnitDamage(current.unit);
+
   const updatedUnits = units
     .map((unit) => {
-      const newHp = unit.unit.currentHp - Math.random() * 100;
+      const newHp = unit.unit.currentHp - damage;
       const currentHp = newHp < 1 ? 0 : newHp;
 
       return unit.unit.id === target.id
@@ -157,7 +159,7 @@ function meleeAttackSingleTarget(
       type: 'SLASH',
       source: current.unit.id,
       target: target.id,
-      damage: Math.floor(Math.random() * 1000),
+      damage,
       updatedTarget: updatedTarget.unit,
       updatedSource: updatedSource.unit,
     },
@@ -182,9 +184,11 @@ function rangedAttackSingleTarget(
 
   if (!target) throw new Error(INVALID_STATE);
 
+  const damage = getUnitDamage(current.unit);
+
   const updatedUnits = units
     .map((unit) => {
-      const newHp = unit.unit.currentHp - Math.random() * 100;
+      const newHp = unit.unit.currentHp - damage;
       const currentHp = newHp < 1 ? 0 : newHp;
 
       return unit.unit.id === target.id
@@ -211,7 +215,7 @@ function rangedAttackSingleTarget(
       type: 'SHOOT',
       source: current.unit.id,
       target: target.id,
-      damage: Math.floor(Math.random() * 1000),
+      damage,
       updatedTarget: updatedTarget.unit,
       updatedSource: updatedSource.unit,
     },
@@ -231,9 +235,11 @@ function rangedSpellSingleTarget(
 
   if (!target) throw new Error(INVALID_STATE);
 
+  const damage = getUnitDamage(current.unit);
+
   const updatedUnits = units
     .map((unit) => {
-      const newHp = unit.unit.currentHp - Math.random() * 100;
+      const newHp = unit.unit.currentHp - damage;
       const currentHp = newHp < 1 ? 0 : newHp;
 
       return unit.unit.id === target.id
@@ -260,7 +266,7 @@ function rangedSpellSingleTarget(
       type: 'FIREBALL',
       source: current.unit.id,
       target: target.id,
-      damage: Math.floor(Math.random() * 1000),
+      damage,
       updatedTarget: updatedTarget.unit,
       updatedSource: updatedSource.unit,
     },
