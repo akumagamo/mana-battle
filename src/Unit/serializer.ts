@@ -2,6 +2,7 @@ import {Unit, HAIR_STYLES} from './Model';
 import {maleNames} from '../constants/names';
 import {randomItem, classes} from '../defaultData';
 import {SKIN_COLORS, HAIR_COLORS} from '../Chara/animations/constants';
+import {getUnitAttacks} from './Skills';
 /**
  * @todo replace with reading data from the database (JSON) and generating a valid unit
  * @param n
@@ -30,6 +31,7 @@ export function fromJSON(n: number): Unit {
       hair: randomItem(HAIR_STYLES),
       displayHat: true,
     },
+    attacks: getUnitAttacks(class_)
   };
 }
 

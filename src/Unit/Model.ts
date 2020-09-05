@@ -2,6 +2,7 @@ import {Modifier, ItemSlot, ItemMap, ItemType} from '../Item/Model';
 import {sum} from '../utils/math';
 import {Container} from '../Models';
 import {getItem, getItems} from '../DB';
+import {UnitAttacks} from './Skills';
 
 export type UnitMap = {[x: string]: Unit};
 
@@ -37,7 +38,7 @@ export interface Unit {
   class: UnitClass;
   gender: Gender;
   movement: Movement;
-  squad: string | null;
+  squad: {id: string, x:number, y:number} | null;
   lvl: number;
   hp: number;
   currentHp: number;
@@ -56,6 +57,7 @@ export interface Unit {
   };
   elem: Elem;
   leader?: boolean;
+  attacks: UnitAttacks
 }
 
 interface Animated {

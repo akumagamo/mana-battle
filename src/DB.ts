@@ -6,6 +6,7 @@ import {removeIdFromMap} from './utils';
 import {INVALID_STATE} from './errors';
 import {Options} from './Models';
 import {BattleFieldMap} from './API/Map/Model';
+import {getUnitAttacks} from './Unit/Skills';
 
 const get = (str: string) => JSON.parse(localStorage.getItem(str) || '{}');
 const set = (str: string, data: any) =>
@@ -30,7 +31,7 @@ export const getSquadMembers = (id: string): Unit[] => {
 export const getSquadMember = (id: string): SquadMember => {
   const unit = getUnit(id);
   if (!unit || !unit.squad) throw new Error(INVALID_STATE);
-  const squad = getSquad(unit.squad);
+  const squad = getSquad(unit.squad.id);
 
   return Object.values(squad.members).find(
     (unit) => unit.id === id,
@@ -61,6 +62,8 @@ export const getItemTypes = (): ItemTypeSlots => itemTypeSlots;
 export const getUnit = (id: string): Unit => {
   const unit = getUnits()[id];
 
+  unit.attacks = getUnitAttacks(unit.class);
+
   if (!unit) throw new Error(INVALID_STATE);
 
   return unit;
@@ -68,7 +71,18 @@ export const getUnit = (id: string): Unit => {
 
 export const saveSquads = (squads: SquadMap) => set('squads', squads);
 
-export const saveUnits = (units: UnitMap) => set('units', units);
+export const saveUnits = (units: UnitMap) => {
+  const unitsToSave = {};
+
+  for (let k in units) {
+    //@ts-ignore
+    unitsToSave[k] = {...units[k]};
+    //@ts-ignore
+    delete unitsToSave[k].attacks;
+  }
+
+  set('units', unitsToSave);
+};
 
 export const saveItems = (items: ItemMap) => set('items', items);
 
@@ -172,11 +186,20 @@ export const addUnitToSquad = (
     if (!removedUnit) throw new Error(INVALID_STATE);
 
     saveUnit({...removedUnit, squad: null});
-    saveUnit({...unit, squad: squad.id});
+    saveUnit({
+      ...unit,
+      squad: {
+        id: squad.id,
+        x: members[unit.id].x,
+        y: members[unit.id].y,
+      },
+    });
     saveSquad(updatedSquad);
 
     return updatedSquad;
   } else {
+
+    // Add unit to squad
     const updatedMembers = {...members, [unit.id]: newEntry};
 
     const updatedSquad = {
@@ -185,7 +208,14 @@ export const addUnitToSquad = (
       name: newEntry.leader ? unit.name : squad.name,
     };
 
-    saveUnit({...unit, squad: squad.id});
+    saveUnit({
+      ...unit,
+      squad: {
+        id: squad.id,
+        x,
+        y,
+      },
+    });
     saveSquad(updatedSquad);
 
     return updatedSquad;
@@ -280,12 +310,15 @@ export const createSquad = (leader: Unit) => {
   const squads = getSquads();
   const newId = squads.length.toString();
 
+  let defaultX = 2;
+  let defaultY = 2;
+
   const newSquad = {
     id: newId,
     name: leader.name,
     emblem: 'Emoji',
     members: {
-      [leader.id]: {id: leader.id, leader: true, x: 2, y: 2},
+      [leader.id]: {id: leader.id, leader: true, x: defaultX, y: defaultY},
     },
   };
   const updatedSquads = {
@@ -293,7 +326,7 @@ export const createSquad = (leader: Unit) => {
     [newId]: newSquad,
   };
 
-  const updatedUnit = {...leader, squad: newId};
+  const updatedUnit = {...leader, squad: {id: newId, x: defaultX, y: defaultY}};
   const fn = (
     resolve: ({units, squads}: {units: UnitMap; squads: SquadMap}) => void,
   ) => {
@@ -321,8 +354,9 @@ export const equipItem = (itemId: string, unitId: string) => {
   saveUnit(updatedUnit);
 };
 
-
-export const getOptions = ():Options => get('options')
-export const setSoundEnabled = (val:boolean)=>set('options', {...getOptions(), soundEnabled: val }  )
-export const setMusicEnabled = (val:boolean)=>set('options', {...getOptions(), musicEnabled: val }  )
-export const getMaps = ():BattleFieldMap => get('maps')
+export const getOptions = (): Options => get('options');
+export const setSoundEnabled = (val: boolean) =>
+  set('options', {...getOptions(), soundEnabled: val});
+export const setMusicEnabled = (val: boolean) =>
+  set('options', {...getOptions(), musicEnabled: val});
+export const getMaps = (): BattleFieldMap => get('maps');

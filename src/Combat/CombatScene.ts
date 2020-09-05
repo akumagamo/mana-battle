@@ -23,7 +23,7 @@ const invertBoard = (n: number) => {
 const getBoardCoords = (topSquadId: string) => (unit: Unit) => {
   if (!unit.squad) throw new Error(INVALID_STATE);
 
-  const squad = DB.getSquad(unit.squad);
+  const squad = DB.getSquad(unit.squad.id);
   if (!squad) throw new Error(INVALID_STATE);
   const {x, y} = squad.members[unit.id];
 
@@ -210,7 +210,9 @@ export default class CombatScene extends Phaser.Scene {
     unit.clearAnimations();
     unit.run();
 
-    const targetIsTop = this.top === target.unit.squad;
+    if(!target.unit.squad) throw new Error(INVALID_STATE)
+
+    const targetIsTop = this.top === target.unit.squad.id;
 
     if (!target.container) throw new Error(INVALID_STATE);
 
@@ -257,7 +259,9 @@ export default class CombatScene extends Phaser.Scene {
       chara.clearAnimations();
       chara.run();
 
-      const charaIsTop = this.top === chara.unit.squad;
+    if(!chara.unit.squad) throw new Error(INVALID_STATE)
+
+      const charaIsTop = this.top === chara.unit.squad.id;
 
       const getTargetPos = () => {
         if (!chara.container) throw new Error(INVALID_STATE);
@@ -377,9 +381,11 @@ export default class CombatScene extends Phaser.Scene {
     const chara = this.getChara(id);
     chara.clearAnimations();
     chara.run();
+
+    if(!chara.unit.squad) throw new Error(INVALID_STATE)
     const coords = getBoardCoords(this.top)(chara.unit);
     const {x, y} = cartesianToIsometricBattle(
-      this.top === chara.unit.squad,
+      this.top === chara.unit.squad.id,
       coords.x,
       coords.y,
     );

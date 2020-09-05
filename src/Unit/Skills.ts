@@ -75,8 +75,8 @@ export const skills: {[x in UnitClass]: UnitAttacks} = {
   },
 };
 
-export function getUnitAttacks(unit: Unit) {
-  return skills[unit.class];
+export function getUnitAttacks(class_:UnitClass) {
+  return skills[class_];
 }
 
 export function getUnitDamage(unit: Unit) {
@@ -84,7 +84,7 @@ export function getUnitDamage(unit: Unit) {
 }
 
 export function getUnitAttack(unit: Unit) {
-  const attacks = getUnitAttacks(unit);
+  const attacks = getUnitAttacks(unit.class);
 
   const squadInfo = DB.getSquadMember(unit.id);
 

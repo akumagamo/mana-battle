@@ -108,7 +108,7 @@ export const runTurn = (
 
   const {squad} = current.unit;
 
-  const victory: () => Victory = () => ({type: 'VICTORY', target: squad});
+  const victory: () => Victory = () => ({type: 'VICTORY', target: squad.id});
 
   const endCombat: () => EndCombat = () => ({type: 'END_COMBAT'});
 
@@ -299,6 +299,7 @@ function noAttacksRemaining(units: TurnUnit[]) {
 
 // TODO: add get closest target option
 export function getTarget(current: Unit, units: TurnUnit[]) {
+  debugger;
   return units
     .map((u) => u.unit)
     .filter(isFromAnotherSquad(current))
@@ -312,6 +313,6 @@ function isAlive(unit: Unit) {
 
 function isFromAnotherSquad(current: Unit) {
   return function(unit: Unit) {
-    return current.squad !== unit.squad;
+    return current.squad?.id !== unit.squad?.id;
   };
 }

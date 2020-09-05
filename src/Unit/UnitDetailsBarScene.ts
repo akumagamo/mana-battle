@@ -77,7 +77,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
     strs.forEach((str, index) => this.write(x + this.colWidth * index, y, str));
 
   unitStats(unit: Unit) {
-    const {str, int, dex, lvl, exp, currentHp, hp} = unit;
+    const {str, int, dex, lvl, exp, currentHp, hp, attacks} = unit;
 
     const baseX = 20;
     const baseY = 20;
@@ -113,8 +113,6 @@ export class UnitDetailsBarScene extends Phaser.Scene {
       `DEX ${dex}`,
       `INT ${int}`,
     ]);
-
-    let attacks = getUnitAttacks(unit);
 
     let front = attacks.front(unit);
     let middle = attacks.middle(unit);

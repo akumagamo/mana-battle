@@ -32,7 +32,7 @@ export var units: UnitMap = indexById(
 );
 
 function squad(n: number, leader: Unit) {
-  leader.squad = n.toString();
+  leader.squad = { id: n.toString(), x:2, y:2};
 
   return {
     id: n.toString(),

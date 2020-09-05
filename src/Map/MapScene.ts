@@ -1223,9 +1223,9 @@ export class MapScene extends Phaser.Scene {
     const chara = this.charas.find((c) => c.unit.id === unitId);
     const force = this.getCurrentForce();
 
-    if (!chara || !force) throw new Error(INVALID_STATE);
+    if (!chara || !force ) throw new Error(INVALID_STATE);
 
-    const squad = this.state.units.find((unit) => unit.id === chara.unit.squad);
+    const squad = this.state.units.find((unit) => unit.id === chara.unit.squad?.id);
 
     if (!squad) throw new Error(INVALID_STATE);
 
