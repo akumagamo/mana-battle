@@ -299,7 +299,6 @@ function noAttacksRemaining(units: TurnUnit[]) {
 
 // TODO: add get closest target option
 export function getTarget(current: Unit, units: TurnUnit[]) {
-  debugger;
   return units
     .map((u) => u.unit)
     .filter(isFromAnotherSquad(current))

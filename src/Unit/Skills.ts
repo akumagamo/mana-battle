@@ -51,11 +51,7 @@ const spell = (times: number) => (unit: Unit) => {
   else return fireball;
 };
 
-export type UnitAttacks = {
-  front: (u: Unit) => Attack;
-  middle: (u: Unit) => Attack;
-  back: (u: Unit) => Attack;
-};
+export type UnitAttacks = { [x in Row]: (u:Unit)=>Attack };
 
 export const skills: {[x in UnitClass]: UnitAttacks} = {
   fighter: {
@@ -84,15 +80,11 @@ export function getUnitDamage(unit: Unit) {
 }
 
 export function getUnitAttack(unit: Unit) {
-  const attacks = getUnitAttacks(unit.class);
-
-  const squadInfo = DB.getSquadMember(unit.id);
-
   const getPos = (): Row => {
-    if (squadInfo.y === 0) return 'back';
-    else if (squadInfo.y === 1) return 'middle';
+    if (unit.squad?.y === 0) return 'back';
+    else if (unit.squad?.y === 1) return 'middle';
     else return 'front';
   };
 
-  return attacks[getPos()](unit);
+  return unit.attacks[getPos()](unit);
 }

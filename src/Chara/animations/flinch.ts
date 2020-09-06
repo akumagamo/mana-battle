@@ -6,7 +6,7 @@ export default (chara: Chara, damage: number, isKilled: boolean) => {
 
   chara.parent.tweens.add({
     targets: chara?.container,
-    rotation: chara.front ? FLINCH_ROTATION : FLINCH_ROTATION * -1 ,
+    rotation: chara.front ? FLINCH_ROTATION : FLINCH_ROTATION * -1,
     yoyo: !isKilled,
     duration: isKilled ? FLINCH_DURATION / 2 : FLINCH_DURATION,
     onComplete: () => {
@@ -15,9 +15,17 @@ export default (chara: Chara, damage: number, isKilled: boolean) => {
     },
   });
 
+  chara.tweens.add({
+    targets: chara?.container,
+    alpha: 0,
+    yoyo: true,
+    repeat: 2,
+    duration: 20,
+  });
+
   // TODO: this should move to the parent scene
   const dmg = chara.parent.add.text(-25, 0, damage.toString(), {fontSize: 48});
-  dmg.setShadow(2,2,'#000')
+  dmg.setShadow(2, 2, '#000');
   dmg.setStroke('#000000', 2);
 
   chara.container.add(dmg);
