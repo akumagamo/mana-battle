@@ -77,8 +77,7 @@ export const runTurn = (
 
   const nextTurn = isLastActor ? 0 : turnNumber + 1;
 
-  if (current.unit.currentHp < 1) return runTurn(nextTurn, units, commands);
-
+  //TODO: create type for unit with sure squad
   if (!current.unit.squad) throw new Error(INVALID_STATE);
 
   // Decide on what to do based on the character's class
@@ -88,7 +87,7 @@ export const runTurn = (
   let turnCommands: Command[] = [];
   let updatedUnits = units;
 
-  if (current.remainingAttacks > 0) {
+  if (current.remainingAttacks > 0 && current.unit.currentHp > 0) {
     if (current.unit.class === 'archer') {
       const res = rangedAttackSingleTarget(current, units, commands);
       turnCommands = res.commands;
@@ -294,7 +293,7 @@ function isVictory(current: TurnUnit, units: TurnUnit[]) {
 }
 
 function noAttacksRemaining(units: TurnUnit[]) {
-  return S.all((u: TurnUnit) => u.remainingAttacks < 1)(units);
+  return units.filter(u=> isAlive(u.unit)).every(u=>u.remainingAttacks < 1)
 }
 
 // TODO: add get closest target option
