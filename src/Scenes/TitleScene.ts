@@ -84,7 +84,13 @@ export default class TitleScene extends Phaser.Scene {
 
     button(20, 290, 'Combat', this.container, this, () => {
       this.turnOff();
-      this.scene.start('CombatScene', {top: '0', bottom: '1'});
+      this.scene.start('CombatScene', {
+        top: '0',
+        bottom: '1',
+        onCombatFinish: () => {
+          this.scene.start('TitleScene');
+        },
+      });
     });
 
     button(20, 650, 'Erase Data', this.container, this, () => {

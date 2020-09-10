@@ -1,37 +1,69 @@
 import Phaser from 'phaser';
 import {preload} from '../preload';
 import button from '../UI/button';
+import maps from '../maps';
+import {MapCommands} from './MapScene';
+import {CPU_FORCE, PLAYER_FORCE} from '../API/Map/Model';
+import * as api from '../DB';
+import {unitToMapUnit} from '../Unit/Model';
 
 export default class MapListScene extends Phaser.Scene {
   constructor() {
-    super('WorldScene');
+    super('MapListScene');
   }
   preload = preload;
   create() {
+    const container = this.add.container(100, 100);
 
+    maps.forEach((map, index) => {
+      button(0, index * 100, map.name, container, this, () => {
+        this.cameras.main.fadeOut(1000, 0, 0, 0);
 
+        let commands: MapCommands[] = [
+          {
+            type: 'UPDATE_STATE',
+            target: {
+              ...map,
+              forces: [
+                {
+                  id: PLAYER_FORCE,
+                  name: 'Player',
+                  units: ['1'],
+                  relations: {[CPU_FORCE]: 'hostile'},
+                  initialPosition: {x: 2, y: 4},
+                },
+                {
+                  id: CPU_FORCE,
+                  name: 'Computer',
+                  units: ['10'],
+                  relations: {[PLAYER_FORCE]: 'hostile'},
+                  initialPosition: {x: 12, y: 4},
+                },
+              ],
+              cities: map.cities.map((city) => {
+                //TODO: change map model so that each force has a starting city id
+                if (city.id === 'castle1')
+                  return {...city, force: PLAYER_FORCE};
 
-    this.cameras.main.setBackgroundColor('#000000');
-    const container = this.add.container(300, 100);
+                if (city.id === 'castle2') return {...city, force: CPU_FORCE};
 
-    button(10, 400, 'Battalion', container, this, () => {
-      this.cameras.main.fadeOut(1000, 0, 0, 0);
+                return city;
+              }),
+              units: [
+                unitToMapUnit(api.getUnit('1'), PLAYER_FORCE, 2, 4),
+                unitToMapUnit(api.getUnit('10'), CPU_FORCE, 12, 4),
+              ],
+            },
+          },
+        ];
 
-      this.scene.transition({
-        target: 'TitleScene',
-        duration: 1000,
-        moveBelow: true,
-        remove: true,
-      });
-    });
-
-    button(210, 400, 'Items', container, this, () => {
-      container.destroy();
-
-      this.scene.transition({
-        target: 'TitleScene',
-        duration: 0,
-        moveBelow: true,
+        this.scene.transition({
+          target: 'MapScene',
+          duration: 1000,
+          moveBelow: true,
+          remove: true,
+          data: commands,
+        });
       });
     });
   }

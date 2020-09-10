@@ -1,7 +1,6 @@
 
 import greenHarbor from "./green_harbor"
 
-export default {
+export default [
  greenHarbor
-
-}
+]

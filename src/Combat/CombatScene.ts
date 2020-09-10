@@ -40,6 +40,7 @@ export default class CombatScene extends Phaser.Scene {
   conflictId = '';
   currentTurn = 0;
   container: Container | null = null;
+  onCombatFinish: ((s:string)=>void) | null = null;
 
   constructor() {
     super('CombatScene');
@@ -56,8 +57,10 @@ export default class CombatScene extends Phaser.Scene {
   }
 
   // LIFECYCLE METHODS
-  create(data: {top: string; bottom: string; conflictId: string}) {
+  create(data: {top: string; bottom: string; conflictId: string; onCombatFinish: (s:string)=>void}) {
     if (this.container) this.container.destroy();
+
+    this.onCombatFinish = this.onCombatFinish
 
     this.sound.stopAll();
     const music = this.sound.add('combat1');
@@ -182,14 +185,11 @@ export default class CombatScene extends Phaser.Scene {
       });
     } else if (cmd.type === 'VICTORY') {
       console.log('Winning Team:', cmd.target);
-      this.scene.start('MapScene', [
-        // REMOVE LOSING TEAM
-        {
-          type: 'DESTROY_TEAM',
-          target: cmd.target === this.top ? this.bottom : this.top,
-        },
-        {type: 'END_UNIT_TURN'},
-      ]);
+
+      if(this.onCombatFinish){
+        let losingTeam = cmd.target === this.top ? this.bottom : this.top
+        this.onCombatFinish(losingTeam)
+      }
 
       this.turnOff();
     } else console.error(`Unknown command:`, cmd);

@@ -62,7 +62,7 @@ type MapTile = {
   tile: Image;
 };
 
-type MapCommands =
+export type MapCommands =
   | {type: 'UPDATE_STATE'; target: MapState}
   | {type: 'UPDATE_UNIT_POS'; id: string; pos: Vector}
   | {
@@ -262,6 +262,8 @@ export class MapScene extends Phaser.Scene {
 
     this.renderMap();
     this.renderStructures();
+
+    this.setValidMoves();
     this.renderUnits();
     this.renderUI();
 
@@ -831,6 +833,12 @@ export class MapScene extends Phaser.Scene {
           data: {
             top: isPlayer ? enemyUnit.id : selectedAlly.id,
             bottom: isPlayer ? selectedAlly.id : enemyUnit.id,
+            onCombatFinish: (losingTeam: string) => {
+              this.signal([
+                {type: 'DESTROY_TEAM', target: losingTeam},
+                {type: 'END_UNIT_TURN'},
+              ]);
+            },
           },
         });
       };
@@ -1223,9 +1231,11 @@ export class MapScene extends Phaser.Scene {
     const chara = this.charas.find((c) => c.unit.id === unitId);
     const force = this.getCurrentForce();
 
-    if (!chara || !force ) throw new Error(INVALID_STATE);
+    if (!chara || !force) throw new Error(INVALID_STATE);
 
-    const squad = this.state.units.find((unit) => unit.id === chara.unit.squad?.id);
+    const squad = this.state.units.find(
+      (unit) => unit.id === chara.unit.squad?.id,
+    );
 
     if (!squad) throw new Error(INVALID_STATE);
 

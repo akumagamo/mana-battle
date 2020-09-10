@@ -3,6 +3,7 @@ import {sum} from '../utils/math';
 import {Container} from '../Models';
 import {getItem, getItems} from '../DB';
 import {UnitAttacks} from './Skills';
+import {ForceId, MapUnit} from '../API/Map/Model';
 
 export type UnitMap = {[x: string]: Unit};
 
@@ -38,7 +39,7 @@ export interface Unit {
   class: UnitClass;
   gender: Gender;
   movement: Movement;
-  squad: {id: string, x:number, y:number} | null;
+  squad: {id: string; x: number; y: number} | null;
   lvl: number;
   hp: number;
   currentHp: number;
@@ -57,7 +58,19 @@ export interface Unit {
   };
   elem: Elem;
   leader?: boolean;
-  attacks: UnitAttacks
+  attacks: UnitAttacks;
+}
+
+export function unitToMapUnit(unit: Unit, forceId: ForceId, x:number, y:number): MapUnit {
+  return {
+    id: unit.id,
+    pos: {x, y},
+    range: 5,
+    validSteps: [],
+    enemiesInRange: [],
+    status: 'alive',
+    force: forceId,
+  };
 }
 
 interface Animated {

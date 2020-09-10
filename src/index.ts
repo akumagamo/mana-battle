@@ -5,6 +5,7 @@ import {EditSquadScene} from './Squad/EditSquadScene';
 import {ListSquadsScene} from './Squad/ListSquadsScene';
 import {ListUnitsScene} from './Unit/ListUnits';
 import {MapScene} from './Map/MapScene';
+import MapListScene from './Map/MapListScene';
 import CombatScene from './Combat/CombatScene';
 import OptionsScene from './Scenes/OptionsScene';
 import WorldScene from './Scenes/World';
@@ -26,6 +27,7 @@ const config: Phaser.Types.Core.GameConfig = {
     ListSquadsScene,
     ListUnitsScene,
     MapScene,
+    MapListScene,
     CombatScene,
     OptionsScene,
     WorldScene,
