@@ -2,32 +2,33 @@ import {initiativeList, runCombat} from './turns';
 import {makeUnit} from '../Units/mock';
 import {Unit} from '../../Unit/Model';
 import {getUnitAttack} from '../../Unit/Skills';
+import {fighter} from '../../Unit/Jobs';
 
 function makeTurnUnit(unit: Unit) {
   return {remainingAttacks: getUnitAttack(unit).times, unit};
 }
 
 test('Should sort by initiave correctly', () => {
+
   const units = [
-    {name: 'f1', agi: 9, dex: 9},
-    {name: 'f4', agi: 6, dex: 6},
-    {name: 'f3', agi: 7, dex: 7},
-    {name: 'f2', agi: 8, dex: 8},
+    {...fighter(0,1,1), dex: 9 },
+    {...fighter(1,1,1), dex: 6 },
+    {...fighter(2,1,1), dex: 7 },
+    {...fighter(3,1,1), dex: 8 }
   ]
-    .map(makeUnit)
     .map(makeTurnUnit);
 
-  const sorted = initiativeList(units).map((unit) => unit.unit.name);
+  const sorted = initiativeList(units).map((unit) => unit.unit.id);
 
-  expect(sorted).toEqual(['f1', 'f2', 'f3', 'f4']);
+  expect(sorted).toEqual(['0', '3', '2', '1']);
 });
 
 test('Combat should have the expected outcome', () => {
   const units = [
-    {id: 'f1', squad: '1', currentHp: 100},
-    {id: 'f2', squad: '1', currentHp: 100},
-    {id: 'f3', squad: '1', currentHp: 100},
-    {id: 'f4', squad: '2', currentHp: 100},
+    fighter(0,1,1) ,
+    fighter(1,1,1) ,
+    fighter(2,1,1) ,
+    fighter(3,2,1) 
   ].map(makeUnit);
 
   const res = runCombat(units);

@@ -11,7 +11,6 @@ export function isPointerInTile(
     const dy = Math.abs(tile.y - pointer.y);
     const deltaX = dx / tileWidth;
     const deltaY = dy / tileHeight;
-    console.log(deltaX + deltaY);
     return deltaX + deltaY < 1;
   };
 }

@@ -27,7 +27,7 @@ export function randomItem<T>(items: Array<T>): T {
 }
 
 export var units: UnitMap = indexById(
-  Array.from({length: 70}, (_, i) => i).map((unitJSON) => fromJSON(unitJSON)),
+  Array.from({length: 10}, (_, i) => i).map((unitJSON) => fromJSON(unitJSON)),
 );
 
 function squad(n: number, leader: Unit) {
@@ -44,7 +44,7 @@ function squad(n: number, leader: Unit) {
 }
 
 export var squads: SquadMap = {};
-for (var j = 0; j < 30; j++) squads[j.toString()] = squad(j, units[j]);
+for (var j = 0; j < 4; j++) squads[j.toString()] = squad(j, units[j]);
 
 function makeItem(acc: Item[], itemData: any): Item[] {
   const {type, name} = itemData;

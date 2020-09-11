@@ -3,7 +3,7 @@ import {Unit} from '../../Unit/Model';
 import {getUnitAttack, getUnitAttacks, getUnitDamage} from '../../Unit/Skills';
 import {INVALID_STATE} from '../../errors';
 
-const sortInitiative = (unit: TurnUnit) => unit.unit.dex + unit.unit.dex;
+const sortInitiative = (unit: TurnUnit) => unit.unit.dex * 2;
 
 export const initiativeList = (units: TurnUnit[]) => {
   return units.sort((a, b) => sortInitiative(b) - sortInitiative(a));

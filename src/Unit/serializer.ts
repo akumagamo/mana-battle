@@ -5,7 +5,7 @@ import {SKIN_COLORS, HAIR_COLORS} from '../Chara/animations/constants';
 import {getUnitAttacks} from './Skills';
 /**
  * @todo replace with reading data from the database (JSON) and generating a valid unit
- * @param n
+ * @param {number} n
  */
 export function fromJSON(n: number): Unit {
   const class_ = randomItem(classes);
@@ -29,9 +29,9 @@ export function fromJSON(n: number): Unit {
       skinColor: randomItem(SKIN_COLORS),
       hairColor: randomItem(HAIR_COLORS),
       hair: randomItem(HAIR_STYLES),
-      displayHat: true,
+      displayHat: randomItem([true, false]),
     },
-    attacks: getUnitAttacks(class_)
+    attacks: getUnitAttacks(class_),
   };
 }
 
