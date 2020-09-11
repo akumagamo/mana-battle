@@ -5,7 +5,7 @@ import maps from '../maps';
 import {MapCommands} from './MapScene';
 import {CPU_FORCE, PLAYER_FORCE} from '../API/Map/Model';
 import * as api from '../DB';
-import {unitToMapUnit} from '../Unit/Model';
+import {makeMapSquad} from '../Unit/Model';
 
 export default class MapListScene extends Phaser.Scene {
   constructor() {
@@ -35,7 +35,7 @@ export default class MapListScene extends Phaser.Scene {
                 {
                   id: CPU_FORCE,
                   name: 'Computer',
-                  units: ['10'],
+                  units: ['2'],
                   relations: {[PLAYER_FORCE]: 'hostile'},
                   initialPosition: {x: 12, y: 4},
                 },
@@ -50,8 +50,8 @@ export default class MapListScene extends Phaser.Scene {
                 return city;
               }),
               units: [
-                unitToMapUnit(api.getUnit('1'), PLAYER_FORCE, 2, 4),
-                unitToMapUnit(api.getUnit('10'), CPU_FORCE, 12, 4),
+                makeMapSquad(1, PLAYER_FORCE, 2, 4),
+                makeMapSquad(2, CPU_FORCE, 12, 5),
               ],
             },
           },

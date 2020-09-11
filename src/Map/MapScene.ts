@@ -206,7 +206,7 @@ export class MapScene extends Phaser.Scene {
           console.log(`ai turn, proceed`);
           this.time.addEvent({
             delay: 500,
-            callback: () => this.runAi(this.currentForce),
+            callback: () => this.runAi(),
           });
         } else {
           console.log(`player turn!!`);
@@ -1008,15 +1008,15 @@ export class MapScene extends Phaser.Scene {
   runTurn() {
     const force = this.getForce(this.currentForce);
 
+    this.setValidMoves();
+
     console.log(this.movedUnits);
 
     this.showTurnTitle(force);
 
-    this.setValidMoves();
-
     if (force.id === CPU_FORCE) {
       this.dragDisabled = true;
-      this.runAiActions(force.id);
+      this.runAi();
     } else {
       this.dragDisabled = false;
       const unit = this.state.units.filter((u) => u.force === PLAYER_FORCE)[0];
@@ -1029,8 +1029,9 @@ export class MapScene extends Phaser.Scene {
       (u) => u.status === 'alive',
     );
   }
-  runAi(forceId: string) {
-    const remainingUnits = this.getAliveUnitsFromForce(forceId).filter(
+  runAi() {
+    
+    const remainingUnits = this.getAliveUnitsFromForce(this.currentForce).filter(
       (u) => !this.movedUnits.includes(u.id),
     );
 
@@ -1066,9 +1067,6 @@ export class MapScene extends Phaser.Scene {
         this.setValidMoves();
       });
     }
-  }
-  runAiActions(forceId: string) {
-    this.runAi(forceId);
   }
 
   checkTurnEnd() {
