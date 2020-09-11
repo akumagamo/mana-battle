@@ -40,7 +40,7 @@ export default class CombatScene extends Phaser.Scene {
   conflictId = '';
   currentTurn = 0;
   container: Container | null = null;
-  onCombatFinish: ((s:string)=>void) | null = null;
+  onCombatFinish: (<CMD>(cmd: CMD[]) => void) | null = null;
 
   constructor() {
     super('CombatScene');
@@ -57,10 +57,15 @@ export default class CombatScene extends Phaser.Scene {
   }
 
   // LIFECYCLE METHODS
-  create(data: {top: string; bottom: string; conflictId: string; onCombatFinish: (s:string)=>void}) {
+  create(data: {
+    top: string;
+    bottom: string;
+    conflictId: string;
+    onCombatFinish: <CMD>(cmd: CMD[]) => void;
+  }) {
     if (this.container) this.container.destroy();
 
-    this.onCombatFinish = this.onCombatFinish
+    this.onCombatFinish = data.onCombatFinish;
 
     this.sound.stopAll();
     const music = this.sound.add('combat1');
@@ -80,9 +85,7 @@ export default class CombatScene extends Phaser.Scene {
       const getCoords = getBoardCoords(data.top);
 
       members
-        .sort((a, b) => {
-          return getCoords(a).y - getCoords(b).y;
-        })
+        .sort((a, b) => getCoords(a).y - getCoords(b).y)
         .forEach((unit) => {
           const coords = getCoords(unit);
           const {x, y} = cartesianToIsometricBattle(
@@ -111,6 +114,7 @@ export default class CombatScene extends Phaser.Scene {
   }
 
   turnOff() {
+    this.onCombatFinish = null;
     this.removeChildren();
     this.container?.destroy();
     this.scene.stop();
@@ -133,7 +137,7 @@ export default class CombatScene extends Phaser.Scene {
   execute(commands: Command[]) {
     const cmd = commands[0];
 
-    console.log(`Command:`, cmd);
+    console.log(`CombatScene CMDs:`, cmd);
 
     const next = (arr: Command[]) => {
       return arr.filter((_, i) => i > 0);
@@ -176,19 +180,30 @@ export default class CombatScene extends Phaser.Scene {
       this.turn();
     } else if (cmd.type === 'END_COMBAT') {
       this.retreatUnits().then((updatedUnits: Unit[]) => {
-        const units = updatedUnits.map((u) => ({
+        const units = updatedUnits.map((unit) => ({
           type: 'UPDATE_UNIT',
-          target: u,
+          unit,
         }));
-        this.scene.start('MapScene', [...units, {type: 'END_UNIT_TURN'}]);
+        //this.scene.start('MapScene', [...units, ]);
+
+        if (this.onCombatFinish) {
+          console.log(`onCombatFinish END_COMBAT`);
+          this.onCombatFinish([{type: 'END_UNIT_TURN'}].concat(units));
+        }
+
         this.turnOff();
       });
     } else if (cmd.type === 'VICTORY') {
       console.log('Winning Team:', cmd.target);
 
-      if(this.onCombatFinish){
-        let losingTeam = cmd.target === this.top ? this.bottom : this.top
-        this.onCombatFinish(losingTeam)
+      console.log(`onCombatFinish VICTORY`);
+
+      if (this.onCombatFinish) {
+        this.onCombatFinish(
+          this.charas
+            .map((chara) => chara.unit)
+            .map((unit) => ({type: 'UPDATE_UNIT', unit})),
+        );
       }
 
       this.turnOff();
@@ -210,7 +225,7 @@ export default class CombatScene extends Phaser.Scene {
     unit.clearAnimations();
     unit.run();
 
-    if(!target.unit.squad) throw new Error(INVALID_STATE)
+    if (!target.unit.squad) throw new Error(INVALID_STATE);
 
     const targetIsTop = this.top === target.unit.squad.id;
 
@@ -259,7 +274,7 @@ export default class CombatScene extends Phaser.Scene {
       chara.clearAnimations();
       chara.run();
 
-    if(!chara.unit.squad) throw new Error(INVALID_STATE)
+      if (!chara.unit.squad) throw new Error(INVALID_STATE);
 
       const charaIsTop = this.top === chara.unit.squad.id;
 
@@ -363,7 +378,7 @@ export default class CombatScene extends Phaser.Scene {
     if (source.front) fb.rotation = -1;
 
     return new Promise((resolve) => {
-      castSpell(source,resolve);
+      castSpell(source, resolve);
       this.add.tween({
         targets: fb,
         x: target.container?.x,
@@ -382,7 +397,7 @@ export default class CombatScene extends Phaser.Scene {
     chara.clearAnimations();
     chara.run();
 
-    if(!chara.unit.squad) throw new Error(INVALID_STATE)
+    if (!chara.unit.squad) throw new Error(INVALID_STATE);
     const coords = getBoardCoords(this.top)(chara.unit);
     const {x, y} = cartesianToIsometricBattle(
       this.top === chara.unit.squad.id,

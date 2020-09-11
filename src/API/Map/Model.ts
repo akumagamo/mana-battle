@@ -5,16 +5,32 @@ export type CityId = string;
 export const PLAYER_FORCE = 'PLAYER_FORCE';
 export const CPU_FORCE = 'CPU_FORCE';
 
-export type CellNumber = 0 | 1 | 2 | 3 | 4 |5 |6 |7 |8 | 9| 10 | 11 | 12 | 13 | 14 | 15;
+export type CellNumber =
+  | 0
+  | 1
+  | 2
+  | 3
+  | 4
+  | 5
+  | 6
+  | 7
+  | 8
+  | 9
+  | 10
+  | 11
+  | 12
+  | 13
+  | 14
+  | 15;
 export type MapState = {
-  id: string,
-  name:string;
-  author:string;
-  description:string;
+  id: string;
+  name: string;
+  author: string;
+  description: string;
   cells: CellNumber[][];
   forces: Force[];
   cities: City[];
-  units: MapUnit[];
+  squads: MapSquad[];
 };
 export type Force = {
   id: ForceId;
@@ -30,31 +46,31 @@ export type City = {
   x: number;
   y: number;
   force: ForceId | null;
-  type: "town" | "castle" | "shop"
+  type: 'town' | 'castle' | 'shop';
 };
 
 export type Vector = {x: number; y: number};
-export type ValidStep = {target: Vector, steps: Vector[]}
-export type EnemyInRange = {enemy: string, steps: Vector[]}
-export type MapUnit = {
+export type ValidStep = {target: Vector; steps: Vector[]};
+export type EnemyInRange = {enemy: string; steps: Vector[]};
+export type MapSquad = {
   id: UnitId;
   pos: Vector;
   range: number;
   force: ForceId;
   validSteps: ValidStep[];
   enemiesInRange: EnemyInRange[];
-  status: "alive" | "defeated";
+  status: 'alive' | 'defeated';
 };
 
 export type TurnManager = {
   forces: Force[];
-  units: MapUnit[];
+  units: MapSquad[];
   currentForce: ForceId;
   grid: number[][];
   walkableCells: number[];
 };
 
-export type Step = {target:Vector, steps:Vector[]}
+export type Step = {target: Vector; steps: Vector[]};
 
 export const tileMap: {[x in CellNumber]: string} = {
   0: 'grass',
@@ -144,7 +160,7 @@ export const translateTiles = (tiles: CellNumber[][]) => {
         }
 
         //bl
-        if (!topIsland && !rightIsland && leftIsland && bottomIsland ) {
+        if (!topIsland && !rightIsland && leftIsland && bottomIsland) {
           return 13;
         }
 
@@ -164,7 +180,6 @@ export const translateTiles = (tiles: CellNumber[][]) => {
   );
 };
 
-
 export type BattleFieldMap = {
-  [x:string]: MapState
-}
+  [x: string]: MapState;
+};

@@ -1,6 +1,6 @@
 import * as PF from 'pathfinding';
 import S from 'sanctuary';
-import {Vector, TurnManager, MapUnit, Step} from './Model';
+import {Vector, TurnManager, MapSquad, Step} from './Model';
 import {MapState} from './Model';
 import {Map, Range} from 'immutable';
 
@@ -21,10 +21,10 @@ export const getDistance = (vec1: Vector) => (vec2: Vector) =>
   Math.abs(vec1.x - vec2.x) + Math.abs(vec1.y - vec2.y);
 
 export const unitsFromForce = (state: MapState) => (id: string) =>
-  S.filter((u: MapUnit) => u.force === id)(state.units);
+  S.filter((u: MapSquad) => u.force === id)(state.squads);
 
 export const getUnit = (state: MapState) => (id: string) =>
-  findById(state.units)(id);
+  findById(state.squads)(id);
 
 export const getForce = (state: MapState) => (id: string) =>
   findById(state.forces)(id);
@@ -49,7 +49,7 @@ export const getPossibleMoves = ({
   /**   force :: Maybe Force */
   const force = byId(currentForce)(forces);
 
-  const enemyUnits = S.filter((u: MapUnit) => u.force !== currentForce)(units);
+  const enemyUnits = S.filter((u: MapSquad) => u.force !== currentForce)(units);
 
   const getUnits = S.pipe([S.map((unitId) => byId(unitId)(units)), S.justs]);
 
@@ -64,7 +64,7 @@ export const getPossibleMoves = ({
   // @ts-ignore
   const updatedGrid: number[][] = blockVectorsInGrid(grid)(enemyIndex);
 
-  const getUnitValidSteps = ({pos: {x, y}, range}: MapUnit): Step[] => {
+  const getUnitValidSteps = ({pos: {x, y}, range}: MapSquad): Step[] => {
     const xs = Range(x - range - 1, x + range + 1)
       .filter((n) => n >= 0 && n < width)
       .toList();
@@ -103,7 +103,7 @@ export const getPossibleMoves = ({
     S.pipe([
       S.prop('units'),
       getUnits,
-      S.map((unit: MapUnit) => {
+      S.map((unit: MapSquad) => {
         const steps = getUnitValidSteps(unit);
 
         const targets = S.map((step: Step) => step.target)(steps);
@@ -112,15 +112,15 @@ export const getPossibleMoves = ({
           ...unit,
           validSteps: steps,
           enemiesInRange: S.pipe([
-            S.filter((u: MapUnit) => unit.force !== u.force),
-            S.filter((enemy: MapUnit) =>
+            S.filter((u: MapSquad) => unit.force !== u.force),
+            S.filter((enemy: MapSquad) =>
               S.any(
                 (step: Vector) =>
                   getDistance(step)(enemy.pos) === 1 &&
                   getPathTo(grid)(unit.pos)(enemy.pos).length <= unit.range,
               )(targets),
             ),
-            S.map((enemy: MapUnit) => ({
+            S.map((enemy: MapSquad) => ({
               enemy: enemy.id,
               steps: getPathTo(grid)(unit.pos)(enemy.pos)
                 .slice(0, -1)

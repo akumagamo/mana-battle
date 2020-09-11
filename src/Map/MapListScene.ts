@@ -4,7 +4,6 @@ import button from '../UI/button';
 import maps from '../maps';
 import {MapCommands} from './MapScene';
 import {CPU_FORCE, PLAYER_FORCE} from '../API/Map/Model';
-import * as api from '../DB';
 import {makeMapSquad} from '../Unit/Model';
 
 export default class MapListScene extends Phaser.Scene {
@@ -49,7 +48,7 @@ export default class MapListScene extends Phaser.Scene {
 
                 return city;
               }),
-              units: [
+              squads: [
                 makeMapSquad(1, PLAYER_FORCE, 2, 4),
                 makeMapSquad(2, CPU_FORCE, 12, 5),
               ],
