@@ -30,16 +30,18 @@ export const unitClassLabels: {[x in UnitClass]: string} = {
 
 export type Movement = 'plain' | 'mountain' | 'sky' | 'forest';
 
+export type UnitSquadPosition = {id: string; x: number; y: number};
+
 /**
  * Database representation of a unit. Contains basic data.
  */
-export interface Unit {
+export type Unit = {
   id: string;
   name: string;
   class: UnitClass;
   gender: Gender;
   movement: Movement;
-  squad: {id: string; x: number; y: number} | null;
+  squad: UnitSquadPosition | null;
   lvl: number;
   hp: number;
   currentHp: number;
@@ -59,9 +61,19 @@ export interface Unit {
   elem: Elem;
   leader?: boolean;
   attacks: UnitAttacks;
+};
+export type UnitInSquad = Unit & {squad: UnitSquadPosition};
+
+export function assignSquad(unit: Unit, position: UnitSquadPosition):UnitInSquad {
+  return {...unit, squad: position};
 }
 
-export function unitToMapUnit(unit: Unit, forceId: ForceId, x:number, y:number): MapUnit {
+export function unitToMapUnit(
+  unit: Unit,
+  forceId: ForceId,
+  x: number,
+  y: number,
+): MapUnit {
   return {
     id: unit.id,
     pos: {x, y},

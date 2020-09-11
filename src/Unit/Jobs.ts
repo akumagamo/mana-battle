@@ -4,7 +4,7 @@ import {randomItem} from '../defaultData';
 import {HAIR_STYLES, Unit} from './Model';
 import {getUnitAttacks} from './Skills';
 
-export function fighter(id: number, squad: number, lvl: number): Unit {
+export function fighter(id: number, lvl: number): Unit {
   return {
     id: id.toString(),
     name: randomItem(maleNames),
@@ -19,7 +19,7 @@ export function fighter(id: number, squad: number, lvl: number): Unit {
       offHand: 'iron_shield',
       head: 'iron_helm',
     },
-    squad: {id: squad.toString(), x: 2, y: 2},
+    squad: null,
     lvl,
     hp: 50,
     currentHp: 50,

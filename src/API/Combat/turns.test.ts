@@ -1,6 +1,6 @@
 import {initiativeList, runCombat} from './turns';
 import {makeUnit} from '../Units/mock';
-import {Unit} from '../../Unit/Model';
+import {Unit, assignSquad} from '../../Unit/Model';
 import {getUnitAttack} from '../../Unit/Skills';
 import {fighter} from '../../Unit/Jobs';
 
@@ -9,14 +9,12 @@ function makeTurnUnit(unit: Unit) {
 }
 
 test('Should sort by initiave correctly', () => {
-
   const units = [
-    {...fighter(0,1,1), dex: 9 },
-    {...fighter(1,1,1), dex: 6 },
-    {...fighter(2,1,1), dex: 7 },
-    {...fighter(3,1,1), dex: 8 }
-  ]
-    .map(makeTurnUnit);
+    {...fighter(0, 1), dex: 9},
+    {...fighter(1, 1), dex: 6},
+    {...fighter(2, 1), dex: 7},
+    {...fighter(3, 1), dex: 8},
+  ].map(makeTurnUnit);
 
   const sorted = initiativeList(units).map((unit) => unit.unit.id);
 
@@ -25,10 +23,10 @@ test('Should sort by initiave correctly', () => {
 
 test('Combat should have the expected outcome', () => {
   const units = [
-    fighter(0,1,1) ,
-    fighter(1,1,1) ,
-    fighter(2,1,1) ,
-    fighter(3,2,1) 
+    assignSquad(fighter(0, 1), {id: '1', x: 1, y: 2}),
+    assignSquad(fighter(1, 1), {id: '1', x: 2, y: 2}),
+    assignSquad(fighter(2, 1), {id: '1', x: 3, y: 2}),
+    assignSquad(fighter(3, 1), {id: '2', x: 2, y: 2}),
   ].map(makeUnit);
 
   const res = runCombat(units);
