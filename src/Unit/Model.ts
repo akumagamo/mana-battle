@@ -69,13 +69,13 @@ export function assignSquad(unit: Unit, position: UnitSquadPosition):UnitInSquad
 }
 
 export function makeMapSquad(
-  squadId: number,
+  squadId: number | string,
   forceId: ForceId,
   x: number,
   y: number,
 ): MapSquad {
   return {
-    id: squadId.toString(),
+    id: typeof squadId  === "string" ? squadId: squadId.toString(),
     pos: {x, y},
     range: 5,
     validSteps: [],
