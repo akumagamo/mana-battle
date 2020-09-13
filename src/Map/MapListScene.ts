@@ -5,6 +5,7 @@ import maps from '../maps';
 import {MapCommands} from './MapScene';
 import {CPU_FORCE, PLAYER_FORCE} from '../API/Map/Model';
 import {makeMapSquad} from '../Unit/Model';
+import {getCity} from '../API/Map/utils';
 
 export default class MapListScene extends Phaser.Scene {
   constructor() {
@@ -29,14 +30,14 @@ export default class MapListScene extends Phaser.Scene {
                   name: 'Player',
                   units: ['1'],
                   relations: {[CPU_FORCE]: 'hostile'},
-                  initialPosition: {x: 2, y: 4},
+                  initialPosition: 'castle1',
                 },
                 {
                   id: CPU_FORCE,
                   name: 'Computer',
                   units: ['2'],
                   relations: {[PLAYER_FORCE]: 'hostile'},
-                  initialPosition: {x: 12, y: 4},
+                  initialPosition: 'castle2',
                 },
               ],
               cities: map.cities.map((city) => {
@@ -49,8 +50,8 @@ export default class MapListScene extends Phaser.Scene {
                 return city;
               }),
               squads: [
-                makeMapSquad(1, PLAYER_FORCE, 2, 4),
-                makeMapSquad(2, CPU_FORCE, 12, 5),
+                makeMapSquad(1, PLAYER_FORCE, getCity('castle1',map)),
+                makeMapSquad(2, CPU_FORCE, getCity('castle2',map)),
               ],
             },
           },

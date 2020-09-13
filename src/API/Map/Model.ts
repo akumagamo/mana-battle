@@ -37,7 +37,7 @@ export type Force = {
   name: string;
   units: string[];
   relations: {[id: string]: 'hostile' | 'neutral' | 'ally'};
-  initialPosition: Vector;
+  initialPosition: string;
 };
 
 export type City = {

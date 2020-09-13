@@ -3,7 +3,7 @@ import {sum} from '../utils/math';
 import {Container} from '../Models';
 import {getItem, getItems} from '../DB';
 import {UnitAttacks} from './Skills';
-import {ForceId, MapSquad as MapSquad} from '../API/Map/Model';
+import {City, ForceId, MapSquad as MapSquad} from '../API/Map/Model';
 
 export type UnitMap = {[x: string]: Unit};
 
@@ -71,12 +71,11 @@ export function assignSquad(unit: Unit, position: UnitSquadPosition):UnitInSquad
 export function makeMapSquad(
   squadId: number | string,
   forceId: ForceId,
-  x: number,
-  y: number,
+  city:City,
 ): MapSquad {
   return {
     id: typeof squadId  === "string" ? squadId: squadId.toString(),
-    pos: {x, y},
+    pos: {x:city.x, y:city.y},
     range: 5,
     validSteps: [],
     enemiesInRange: [],

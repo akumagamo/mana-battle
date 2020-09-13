@@ -30,6 +30,7 @@ import {SCREEN_WIDTH, SCREEN_HEIGHT} from '../constants';
 import BoardScene from '../Board/StaticBoardScene';
 import {makeMapSquad, Unit} from '../Unit/Model';
 import {Map} from 'immutable';
+import {getCity} from '../API/Map/utils';
 const WALKABLE_CELL_TINT = 0x88aa88;
 const ENEMY_IN_CELL_TINT = 0xff2222;
 const SELECTED_TILE_TINT = 0x9955aa;
@@ -1042,10 +1043,14 @@ export class MapScene extends Phaser.Scene {
   }
 
   dispatchSquad(squadId: string) {
-    let mapSquad = makeMapSquad(squadId, PLAYER_FORCE, 8, 8);
+    let force = this.getForce(PLAYER_FORCE)
+    let mapSquad = makeMapSquad(squadId, PLAYER_FORCE, getCity(force.initialPosition, this.state));
 
     this.state.squads.push(mapSquad);
+    force.units.push(squadId)
 
+    // TODO: make this a pipeline instead of a side effect
+    this.setValidMoves();
     // TODO: add "summon" effect
     this.renderSquad(mapSquad);
   }
