@@ -101,7 +101,7 @@ export const getPossibleMoves = ({
   // TODO: it makes no sense to return a maybe because the force should be a parameter
   return S.map(
     S.pipe([
-      S.prop('units'),
+      S.prop('squads'),
       getUnits,
       S.map((unit: MapSquad) => {
         const steps = getUnitValidSteps(unit);

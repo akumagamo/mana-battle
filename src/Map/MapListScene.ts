@@ -28,14 +28,14 @@ export default class MapListScene extends Phaser.Scene {
                 {
                   id: PLAYER_FORCE,
                   name: 'Player',
-                  units: ['1'],
+                  squads: ['1'],
                   relations: {[CPU_FORCE]: 'hostile'},
                   initialPosition: 'castle1',
                 },
                 {
                   id: CPU_FORCE,
                   name: 'Computer',
-                  units: ['2'],
+                  squads: ['2'],
                   relations: {[PLAYER_FORCE]: 'hostile'},
                   initialPosition: 'castle2',
                 },

@@ -35,7 +35,7 @@ export type MapState = {
 export type Force = {
   id: ForceId;
   name: string;
-  units: string[];
+  squads: string[];
   relations: {[id: string]: 'hostile' | 'neutral' | 'ally'};
   initialPosition: string;
 };
