@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import {getPossibleMoves} from './api';
 import {Just, map} from 'sanctuary';
 import {Map, Range, Set} from 'immutable';
