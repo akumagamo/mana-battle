@@ -19,7 +19,7 @@ const map:MapState = {
   author: "Leonardo Farroco",
   description: "The first map",
   cells: tiles,
-  squads: [],
+  mapSquads: [],
   forces: [],
   cities: [
     {

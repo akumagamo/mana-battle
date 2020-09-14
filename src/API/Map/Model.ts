@@ -33,7 +33,7 @@ export type MapState = {
   cells: CellNumber[][];
   forces: Force[];
   cities: City[];
-  squads: MapSquad[];
+  mapSquads: MapSquad[];
   units: Map<string,Unit>
 };
 export type Force = {
@@ -66,7 +66,7 @@ export type MapSquad =  Squad & {
 
 export type TurnManager = {
   forces: Force[];
-  units: MapSquad[];
+  mapSquads: MapSquad[];
   currentForce: ForceId;
   grid: number[][];
   walkableCells: number[];

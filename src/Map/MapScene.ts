@@ -154,7 +154,7 @@ export class MapScene extends Phaser.Scene {
       } else if (cmd.type === 'UPDATE_STATE') {
         this.updateState(cmd.target);
       } else if (cmd.type === 'UPDATE_SQUAD_POS') {
-        this.state.squads = this.state.squads.map((unit) =>
+        this.state.mapSquads = this.state.mapSquads.map((unit) =>
           unit.id === cmd.id ? {...unit, pos: cmd.pos} : unit,
         );
       } else if (cmd.type === 'UPDATE_UNIT') {
@@ -575,7 +575,7 @@ export class MapScene extends Phaser.Scene {
     return this.state.forces
       .map((f) => f.id)
       .reduce((xs, x) => {
-        const allDefeated = this.state.squads
+        const allDefeated = this.state.mapSquads
           .filter((u) => u.force === x)
           .every((u) => u.status === 'defeated');
 
@@ -661,7 +661,7 @@ export class MapScene extends Phaser.Scene {
     this.tiles.forEach((tile) => tile.tile.clearTint());
   }
   renderSquads() {
-    this.state.squads
+    this.state.mapSquads
       .filter((u) => u.status === 'alive')
       .forEach((unit) => this.renderSquad(unit));
   }
@@ -720,7 +720,7 @@ export class MapScene extends Phaser.Scene {
 
   showClickableCellsForUnit(un: MapSquad) {
     this.clearTiles();
-    const unit = this.state.squads.find((u) => u.id === un.id);
+    const unit = this.state.mapSquads.find((u) => u.id === un.id);
     if (!unit) return;
     unit.validSteps.forEach((cell) =>
       this.makeCellClickable(this.tileAt(cell.target.x, cell.target.y)),
@@ -1020,7 +1020,7 @@ export class MapScene extends Phaser.Scene {
       .filter((f) => f.id === PLAYER_FORCE)
       .map((force) => {
         force.squads
-          .map((id) => this.state.squads.find((s) => s.id === id))
+          .map((id) => this.state.mapSquads.find((s) => s.id === id))
           .forEach((sqd) => {
             if (typeof sqd === 'undefined') return;
 
@@ -1062,9 +1062,9 @@ export class MapScene extends Phaser.Scene {
       container.destroy();
     });
 
-    let currentSquads = new Set(this.state.squads.map((s) => s.id));
+    let currentSquads = new Set(this.state.mapSquads.map((s) => s.id));
 
-    let squadsToRender = this.state.squads.filter(
+    let squadsToRender = this.state.mapSquads.filter(
       (sqd) => !currentSquads.has(sqd.id) && sqd.force === PLAYER_FORCE
     );
 
@@ -1074,7 +1074,7 @@ export class MapScene extends Phaser.Scene {
         container.destroy();
         this.refreshUI();
 
-        let squad = this.state.squads.find((s) => s.id === sqd.id);
+        let squad = this.state.mapSquads.find((s) => s.id === sqd.id);
         if (squad) {
           this.signal([
             {type: 'CLICK_MAP_SQUAD', unit: squad},
@@ -1091,7 +1091,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   getSquad(squadId: string) {
-    let squad = this.state.squads.find((s) => s.id === squadId);
+    let squad = this.state.mapSquads.find((s) => s.id === squadId);
 
     if (!squad) throw new Error(INVALID_STATE);
 
@@ -1105,7 +1105,7 @@ export class MapScene extends Phaser.Scene {
       getCity(force.initialPosition, this.state),
     );
 
-    this.state.squads.push(mapSquad);
+    this.state.mapSquads.push(mapSquad);
     force.squads.push(squadId);
 
     // TODO: make this a pipeline instead of a side effect
@@ -1152,7 +1152,7 @@ export class MapScene extends Phaser.Scene {
       this.runAi();
     } else {
       this.dragDisabled = false;
-      const unit = this.state.squads.filter((u) => u.force === PLAYER_FORCE)[0];
+      const unit = this.state.mapSquads.filter((u) => u.force === PLAYER_FORCE)[0];
       this.moveCameraTo(unit.pos, 500);
     }
   }
@@ -1363,7 +1363,7 @@ export class MapScene extends Phaser.Scene {
 
     if (!chara || !force) throw new Error(INVALID_STATE);
 
-    const squad = this.state.squads.find(
+    const squad = this.state.mapSquads.find(
       (unit) => unit.id === chara.unit.squad?.id,
     );
 
@@ -1446,7 +1446,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   getEnemies() {
-    return this.state.squads.filter((unit) => unit.force !== this.currentForce);
+    return this.state.mapSquads.filter((unit) => unit.force !== this.currentForce);
   }
 
   getTileAt(x: number, y: number) {
@@ -1458,7 +1458,7 @@ export class MapScene extends Phaser.Scene {
   }
 }
 const formatDataForApi = (state: MapState) => (currentForce: string) => ({
-  units: state.squads.filter((u) => u.status === 'alive'),
+  mapSquads: state.mapSquads.filter((u) => u.status === 'alive'),
   forces: state.forces,
   width: 14,
   height: 6,

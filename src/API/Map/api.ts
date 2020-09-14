@@ -21,10 +21,10 @@ export const getDistance = (vec1: Vector) => (vec2: Vector) =>
   Math.abs(vec1.x - vec2.x) + Math.abs(vec1.y - vec2.y);
 
 export const unitsFromForce = (state: MapState) => (id: string) =>
-  S.filter((u: MapSquad) => u.force === id)(state.squads);
+  S.filter((u: MapSquad) => u.force === id)(state.mapSquads);
 
 export const getUnit = (state: MapState) => (id: string) =>
-  findById(state.squads)(id);
+  findById(state.mapSquads)(id);
 
 export const getForce = (state: MapState) => (id: string) =>
   findById(state.forces)(id);
@@ -37,7 +37,7 @@ export const getMovesForUnit = (state: MapState) => (id: string) => {
 };
 
 export const getPossibleMoves = ({
-  units,
+  mapSquads,
   forces,
   currentForce,
   grid,
@@ -49,19 +49,18 @@ export const getPossibleMoves = ({
   /**   force :: Maybe Force */
   const force = byId(currentForce)(forces);
 
-  const enemyUnits = S.filter((u: MapSquad) => u.force !== currentForce)(units);
+  const enemyUnits = S.filter((u: MapSquad) => u.force !== currentForce)(mapSquads);
 
-  const getUnits = S.pipe([S.map((unitId) => byId(unitId)(units)), S.justs]);
+  const getUnits = S.pipe([S.map((unitId) => byId(unitId)(mapSquads)), S.justs]);
 
   /**   getVectors :: MapUnit -> Vector */
   const getVectors = S.prop('pos'); // Vector
 
   const enemyVectors = S.map(getVectors)(enemyUnits);
 
-  const enemyIndex = indexVectors(enemyVectors);
+  const enemyIndex = indexVectors(enemyVectors) as Map<string,Map<string,boolean>>;
 
   // Marks enemy-occupied cells as "walls"
-  // @ts-ignore
   const updatedGrid: number[][] = blockVectorsInGrid(grid)(enemyIndex);
 
   const getUnitValidSteps = ({pos: {x, y}, range}: MapSquad): Step[] => {
@@ -103,30 +102,30 @@ export const getPossibleMoves = ({
     S.pipe([
       S.prop('squads'),
       getUnits,
-      S.map((unit: MapSquad) => {
-        const steps = getUnitValidSteps(unit);
+      S.map((mapSquad: MapSquad) => {
+        const steps = getUnitValidSteps(mapSquad);
 
         const targets = S.map((step: Step) => step.target)(steps);
 
         return {
-          ...unit,
+          ...mapSquad,
           validSteps: steps,
           enemiesInRange: S.pipe([
-            S.filter((u: MapSquad) => unit.force !== u.force),
+            S.filter((u: MapSquad) => mapSquad.force !== u.force),
             S.filter((enemy: MapSquad) =>
               S.any(
                 (step: Vector) =>
                   getDistance(step)(enemy.pos) === 1 &&
-                  getPathTo(grid)(unit.pos)(enemy.pos).length <= unit.range,
+                  getPathTo(grid)(mapSquad.pos)(enemy.pos).length <= mapSquad.range,
               )(targets),
             ),
             S.map((enemy: MapSquad) => ({
               enemy: enemy.id,
-              steps: getPathTo(grid)(unit.pos)(enemy.pos)
+              steps: getPathTo(grid)(mapSquad.pos)(enemy.pos)
                 .slice(0, -1)
                 .map(([x, y]) => makeVector(x)(y)),
             })),
-          ])(units),
+          ])(mapSquads),
         };
       }),
     ]),
@@ -148,9 +147,7 @@ export const getPathTo = (grid: number[][]) => (source: Vector) => (
   const pfGrid = new PF.Grid(grid);
   const finder = new PF.AStarFinder();
 
-  const res = finder.findPath(source.x, source.y, target.x, target.y, pfGrid);
-
-  return res;
+  return finder.findPath(source.x, source.y, target.x, target.y, pfGrid);
 };
 
 const indexVectors = (vectors: Vector[]) =>

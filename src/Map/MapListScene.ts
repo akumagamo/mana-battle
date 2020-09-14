@@ -69,7 +69,7 @@ export default class MapListScene extends Phaser.Scene {
 
                 return city;
               }),
-              squads: [
+              mapSquads: [
                 toMapSquad(getSquad('1'), getCity('castle1', map)),
               ].concat(enemySquads),
               units: Map(alliedUnits).merge(Map(enemyUnits)),
