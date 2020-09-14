@@ -5,7 +5,7 @@ import {Unit, UnitMap} from './Unit/Model';
 import {removeIdFromMap} from './utils';
 import {INVALID_STATE} from './errors';
 import {Options} from './Models';
-import {BattleFieldMap} from './API/Map/Model';
+import {BattleFieldMap, PLAYER_FORCE} from './API/Map/Model';
 import {getUnitAttacks} from './Unit/Skills';
 
 const get = (str: string) => JSON.parse(localStorage.getItem(str) || '{}');
@@ -317,6 +317,7 @@ export const createSquad = (leader: Unit) => {
     id: newId,
     name: leader.name,
     emblem: 'Emoji',
+    force: PLAYER_FORCE,
     members: {
       [leader.id]: {id: leader.id, leader: true, x: defaultX, y: defaultY},
     },

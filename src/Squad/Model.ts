@@ -9,11 +9,14 @@ export type SquadMemberMap = {
   [id: string]: SquadMember;
 };
 
+export type ForceId = string
+
 export type Squad = {
   id: string;
   name: string;
   emblem: string;
   members: SquadMemberMap;
+  force: ForceId;
 };
 
 export type SquadMap = {

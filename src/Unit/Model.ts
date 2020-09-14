@@ -4,6 +4,7 @@ import {Container} from '../Models';
 import {getItem, getItems} from '../DB';
 import {UnitAttacks} from './Skills';
 import {City, ForceId, MapSquad as MapSquad} from '../API/Map/Model';
+import {Squad} from '../Squad/Model';
 
 export type UnitMap = {[x: string]: Unit};
 
@@ -68,19 +69,16 @@ export function assignSquad(unit: Unit, position: UnitSquadPosition):UnitInSquad
   return {...unit, squad: position};
 }
 
-export function makeMapSquad(
-  squadId: number | string,
-  forceId: ForceId,
+export function toMapSquad(
+  squad: Squad,
   city:City,
 ): MapSquad {
-  return {
-    id: typeof squadId  === "string" ? squadId: squadId.toString(),
+  return { ...squad,
     pos: {x:city.x, y:city.y},
     range: 5,
     validSteps: [],
     enemiesInRange: [],
     status: 'alive',
-    force: forceId,
   };
 }
 

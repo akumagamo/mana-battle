@@ -6,4 +6,5 @@ export type Player = {
     [itemId: string]: number;
   };
   units: string[];
+  squads: string[];
 };

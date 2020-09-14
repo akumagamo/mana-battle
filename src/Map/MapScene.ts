@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser';
 import {Chara} from '../Chara/Chara';
-import {getSquad, getSquadLeader, getSquads, saveUnit} from '../DB';
+import {saveUnit} from '../DB';
 import {INVALID_STATE} from '../errors';
 import button from '../UI/button';
 import {Container, Image, Pointer} from '../Models';
@@ -28,7 +28,7 @@ import {randomItem} from '../defaultData';
 import S from 'sanctuary';
 import {SCREEN_WIDTH, SCREEN_HEIGHT} from '../constants';
 import BoardScene from '../Board/StaticBoardScene';
-import {makeMapSquad, Unit} from '../Unit/Model';
+import {toMapSquad, Unit} from '../Unit/Model';
 import {Map} from 'immutable';
 import {getCity} from '../API/Map/utils';
 const WALKABLE_CELL_TINT = 0x88aa88;
@@ -674,7 +674,13 @@ export class MapScene extends Phaser.Scene {
 
   renderSquad(squad: MapSquad) {
     const {container} = this.getContainers();
-    const leader = getSquadLeader(squad.id);
+    const squadLeader = Object.values(squad.members).find(mem=>mem.leader);
+
+    if(!squadLeader) throw new Error(INVALID_STATE)
+
+    let leader = this.state.units.find((_,k)=>k === squadLeader.id)
+
+    if(!leader) throw new Error(INVALID_STATE)
 
     const {x, y} = this.getCellPositionOnScreen(squad.pos);
 
@@ -919,7 +925,8 @@ export class MapScene extends Phaser.Scene {
 
     //UNIT INFORMATION
     if (this.selectedEntity && this.selectedEntity.type === 'unit') {
-      const squad = getSquad(this.selectedEntity.id);
+      const squad = this.getSquad(this.selectedEntity.id);
+
       this.unitIO((unit) => {
         text(20, 610, squad.name, uiContainer, this);
         text(1000, 610, `${unit.range} cells`, uiContainer, this);
@@ -1019,7 +1026,7 @@ export class MapScene extends Phaser.Scene {
 
             posY = posY += 60;
 
-            button(20, posY, getSquad(sqd.id).name, uiContainer, this, () => {
+            button(20, posY, this.getSquad(sqd.id).name, uiContainer, this, () => {
               this.signal([
                 {type: 'CLICK_MAP_SQUAD', unit: sqd},
                 {
@@ -1057,8 +1064,8 @@ export class MapScene extends Phaser.Scene {
 
     let currentSquads = new Set(this.state.squads.map((s) => s.id));
 
-    let squadsToRender = Object.values(getSquads()).filter(
-      (sqd) => !currentSquads.has(sqd.id),
+    let squadsToRender = this.state.squads.filter(
+      (sqd) => !currentSquads.has(sqd.id) && sqd.force === PLAYER_FORCE
     );
 
     squadsToRender.forEach((sqd, i) => {
@@ -1083,11 +1090,18 @@ export class MapScene extends Phaser.Scene {
     });
   }
 
+  getSquad(squadId: string) {
+    let squad = this.state.squads.find((s) => s.id === squadId);
+
+    if (!squad) throw new Error(INVALID_STATE);
+
+    return squad;
+  }
+
   dispatchSquad(squadId: string) {
     let force = this.getForce(PLAYER_FORCE);
-    let mapSquad = makeMapSquad(
-      squadId,
-      PLAYER_FORCE,
+    let mapSquad = toMapSquad(
+      this.getSquad(squadId),
       getCity(force.initialPosition, this.state),
     );
 
@@ -1344,7 +1358,7 @@ export class MapScene extends Phaser.Scene {
     const {x, y} = mapTile;
 
     // Move unit to tile
-    const chara = this.charas.find((c) => c.unit.id === unitId);
+    const chara = this.charas.find((c) => c.unit.squad?.id === unitId);
     const force = this.getCurrentForce();
 
     if (!chara || !force) throw new Error(INVALID_STATE);

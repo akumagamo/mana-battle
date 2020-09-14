@@ -1,3 +1,4 @@
+import {Map} from "immutable";
 import {CellNumber, MapState} from "../API/Map/Model";
 
 const tiles:CellNumber[][] = [
@@ -42,6 +43,7 @@ const map:MapState = {
     {id: 'c3', name: 'Bauhaus', x: 9, y: 5, force: null, type: 'town'},
     {id: 'c4', name: 'Vila Rica', x: 6, y: 4, force: null, type: 'town'},
   ],
+  units: Map()
 };
 
 export default map

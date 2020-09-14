@@ -18,7 +18,7 @@ import {SquadMap} from './Squad/Model';
 import {Player} from './Player/Model';
 import {Range} from 'immutable'
 import {Options} from './Models';
-import {BattleFieldMap} from './API/Map/Model';
+import {BattleFieldMap, PLAYER_FORCE} from './API/Map/Model';
 
 export const classes: UnitClass[] = ['fighter', 'mage', 'archer'];
 
@@ -27,7 +27,7 @@ export function randomItem<T>(items: Array<T>): T {
 }
 
 export var units: UnitMap = indexById(
-  Array.from({length: 10}, (_, i) => i).map((unitJSON) => fromJSON(unitJSON)),
+  Array.from({length: 20}, (_, i) => i).map((unitJSON) => fromJSON(unitJSON)),
 );
 
 function squad(n: number, leader: Unit) {
@@ -37,6 +37,7 @@ function squad(n: number, leader: Unit) {
     id: n.toString(),
     name: leader.name,
     emblem: 'Emoji',
+    force: PLAYER_FORCE,
     members: {
       [leader.id]: {id: leader.id, leader: true, x: 2, y: 2},
     },
@@ -44,7 +45,7 @@ function squad(n: number, leader: Unit) {
 }
 
 export var squads: SquadMap = {};
-for (var j = 0; j < 4; j++) squads[j.toString()] = squad(j, units[j]);
+for (var j = 0; j < 10; j++) squads[j.toString()] = squad(j, units[j]);
 
 function makeItem(acc: Item[], itemData: any): Item[] {
   const {type, name} = itemData;
@@ -90,7 +91,8 @@ export var player: Player = {
     iron_sword: 2,
     steel_sword: 1,
   },
-  units: Range(0,10).map(n=>n.toString()).toJS()
+  units: ['1'],
+  squads: ['1'],
 };
 
 const options:Options ={

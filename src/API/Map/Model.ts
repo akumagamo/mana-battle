@@ -1,3 +1,6 @@
+import {Squad} from "../../Squad/Model";
+import {Unit, UnitMap} from "../../Unit/Model";
+import {Map} from 'immutable';
 export type UnitId = string;
 export type ForceId = string;
 export type CityId = string;
@@ -31,6 +34,7 @@ export type MapState = {
   forces: Force[];
   cities: City[];
   squads: MapSquad[];
+  units: Map<string,Unit>
 };
 export type Force = {
   id: ForceId;
@@ -52,11 +56,9 @@ export type City = {
 export type Vector = {x: number; y: number};
 export type ValidStep = {target: Vector; steps: Vector[]};
 export type EnemyInRange = {enemy: string; steps: Vector[]};
-export type MapSquad = {
-  id: UnitId;
+export type MapSquad =  Squad & {
   pos: Vector;
   range: number;
-  force: ForceId;
   validSteps: ValidStep[];
   enemiesInRange: EnemyInRange[];
   status: 'alive' | 'defeated';
