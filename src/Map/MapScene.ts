@@ -137,7 +137,7 @@ export class MapScene extends Phaser.Scene {
     cmds.forEach((cmd) => {
       console.log(`SIGNAL::`, cmd);
       if (cmd.type === 'DESTROY_TEAM') {
-        this.unitIO((u) => {
+        this.squadIO((u) => {
           u.status = 'defeated';
           this.movedUnits = S.reject<string>((id) => id === u.id)(
             this.movedUnits,
@@ -222,9 +222,11 @@ export class MapScene extends Phaser.Scene {
       } else if (cmd.type === 'CITY_CLICK') {
         if (this.selectedEntity && this.selectedEntity.type === 'unit')
           this.cityIO((city) => {
-            this.unitIO((unit) => {
-              if (unit.force === 'PLAYER_FORCE') {
-                this.showCellMenu(unit, city, () => this.checkTurnEnd());
+            this.squadIO((squad) => {
+              if (squad.force === 'PLAYER_FORCE') {
+                this.showCellMenu(squad, city, () => this.checkTurnEnd());
+              }else{
+                this.signal([{type: 'SELECT_CITY', id: cmd.id}]);
               }
             })((this.selectedEntity as any).id);
           })(cmd.id);
@@ -551,7 +553,7 @@ export class MapScene extends Phaser.Scene {
   mapUnit = <A>(fn: (u: MapSquad) => A) => (id: string) =>
     S.map<MapSquad, A>((unit) => fn(unit))(this.getUnit(id));
 
-  unitIO = (fn: (u: MapSquad) => void) => (id: string) => {
+  squadIO = (fn: (u: MapSquad) => void) => (id: string) => {
     S.map<MapSquad, void>((unit) => fn(unit))(this.getUnit(id));
   };
 
@@ -727,7 +729,7 @@ export class MapScene extends Phaser.Scene {
     );
 
     unit.enemiesInRange.forEach(({enemy}) => {
-      this.unitIO((e) => {
+      this.squadIO((e) => {
         this.tileAt(e.pos.x, e.pos.y).tile.setTint(ENEMY_IN_CELL_TINT);
       })(enemy);
     });
@@ -927,7 +929,7 @@ export class MapScene extends Phaser.Scene {
     if (this.selectedEntity && this.selectedEntity.type === 'unit') {
       const squad = this.getSquad(this.selectedEntity.id);
 
-      this.unitIO((unit) => {
+      this.squadIO((unit) => {
         text(20, 610, squad.name, uiContainer, this);
         text(1000, 610, `${unit.range} cells`, uiContainer, this);
 
@@ -1180,7 +1182,7 @@ export class MapScene extends Phaser.Scene {
 
     if (S.isJust(maybeEnemiesInRange)) {
       S.map<EnemyInRange, void>((eir) => {
-        this.unitIO((enemy) => {
+        this.squadIO((enemy) => {
           const enemyChara = this.getChara(enemy.id);
 
           S.map<Chara, void>((chara) => {
@@ -1375,7 +1377,7 @@ export class MapScene extends Phaser.Scene {
 
     this.movedUnits.push(unitId);
 
-    this.unitIO((unit) => {
+    this.squadIO((unit) => {
       const maybePath = S.find((step: any) => S.equals(step.target)({x, y}))(
         unit.validSteps,
       );
