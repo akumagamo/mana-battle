@@ -9,6 +9,9 @@ import plains from '../Backgrounds/plains';
 import {Container} from '../Models';
 import fireball from '../Chara/animations/spells/fireball';
 import castSpell from '../Chara/animations/castSpell';
+import {Squad} from '../Squad/Model';
+import {Vector} from '../API/Map/Model';
+import {Map} from 'immutable';
 
 const COMBAT_CHARA_SCALE = 1;
 const WALK_DURATION = 500;
@@ -20,16 +23,11 @@ const invertBoard = (n: number) => {
   else return n;
 };
 
-const getBoardCoords = (topSquadId: string) => (unit: Unit) => {
-  if (!unit.squad) throw new Error(INVALID_STATE);
-
-  const squad = DB.getSquad(unit.squad.id);
-  if (!squad) throw new Error(INVALID_STATE);
-  const {x, y} = squad.members[unit.id];
+const getBoardCoords = (topSquadId: string, squadId:string) => ({x,y}: Vector) => {
 
   return {
-    x: squad.id === topSquadId ? x : invertBoard(x),
-    y: squad.id === topSquadId ? y : invertBoard(y),
+    x: squadId === topSquadId ? x : invertBoard(x),
+    y: squadId === topSquadId ? y : invertBoard(y),
   };
 };
 
@@ -61,6 +59,8 @@ export default class CombatScene extends Phaser.Scene {
     top: string;
     bottom: string;
     conflictId: string;
+    squads: Squad[];
+    units: Map<string,Unit>;
     onCombatFinish: <CMD>(cmd: CMD[]) => void;
   }) {
     if (this.container) this.container.destroy();
@@ -80,22 +80,29 @@ export default class CombatScene extends Phaser.Scene {
     const combatants = [data.top, data.bottom];
 
     combatants.forEach((id) => {
-      const members = DB.getSquadMembers(id);
+      const squad = data.squads.find(s=>s.id===id)
+
+      if(!squad) throw new Error(INVALID_STATE)
+
+      const members = Object.values(squad.members);
       const isTopSquad = id === data.top;
-      const getCoords = getBoardCoords(data.top);
+      const getCoords = getBoardCoords(data.top, squad.id);
 
       members
         .sort((a, b) => getCoords(a).y - getCoords(b).y)
-        .forEach((unit) => {
-          const coords = getCoords(unit);
+        .forEach((member) => {
+
+          const unit = data.units.find(u=>u.id === member.id)
+          if(!unit) throw new Error(INVALID_STATE)
+
           const {x, y} = cartesianToIsometricBattle(
             isTopSquad,
-            coords.x,
-            coords.y,
+            member.x,
+            member.y,
           );
 
           const chara = new Chara(
-            `combat-chara-${unit.id}`,
+            `combat-chara-${member.id}`,
             this,
             unit,
             x,
@@ -398,7 +405,7 @@ export default class CombatScene extends Phaser.Scene {
     chara.run();
 
     if (!chara.unit.squad) throw new Error(INVALID_STATE);
-    const coords = getBoardCoords(this.top)(chara.unit);
+    const coords = getBoardCoords(this.top, chara.unit.squad.id)(chara.unit.squad);
     const {x, y} = cartesianToIsometricBattle(
       this.top === chara.unit.squad.id,
       coords.x,

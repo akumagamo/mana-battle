@@ -47,7 +47,16 @@ export const getSquadLeader = (id: string): Unit => {
   return unit;
 };
 
-export const getUnits = (): UnitMap => get('units');
+export const getUnits = (): UnitMap => {
+
+  let units = get('units')
+
+  for(let k in units)
+    units[k].attacks = getUnitAttacks(units[k].class)
+
+  return units
+
+};
 
 export const getItems = (): ItemMap => get('items');
 export const getItem = (id: string): Item => {
