@@ -170,6 +170,37 @@ export class MapScene extends Phaser.Scene {
                   cell: cmd.cell,
                   onAttack: () => {
                     this.signal([{type: 'CLOSE_ACTION_PANEL'}]);
+                    this.showAttackableCells(unit);
+                    unit.enemiesInRange.forEach(({enemy}) => {
+                      this.squadIO((e) => {
+                        this.charaIO((enemyChara) => {
+                          console.log(`opening attack window...`);
+                          enemyChara.container.removeAllListeners();
+                          enemyChara.onClick(() =>
+                            this.actionWindow(
+                              enemyChara.container.x + this.mapX || 0,
+                              enemyChara.container.y + this.mapY || 0,
+                              [
+                                {
+                                  title: 'Attack',
+                                  action: () => {
+                                    this.closeActionWindow();
+                                    this.attack(unit, e);
+                                  },
+                                },
+                                {
+                                  title: 'Cancel',
+                                  action: () => {
+                                    console.log(`Cancel`);
+                                    this.closeActionWindow();
+                                  },
+                                },
+                              ],
+                            ),
+                          );
+                        })(e.id);
+                      })(enemy);
+                    });
                   },
                   onWait: () => {
                     this.signal([{type: 'CLOSE_ACTION_PANEL'}]);
@@ -677,11 +708,15 @@ export class MapScene extends Phaser.Scene {
   }
   makeInteractive(cell: MapTile) {
     cell.tile.on('pointerup', () => {
+      console.log(`click:`, cell);
       if (!this.cellClickDisabled) this.signal([{type: 'CLICK_CELL', cell}]);
     });
   }
   clearAllTileEvents() {
-    this.tiles.forEach((tile) => tile.tile.removeAllListeners());
+    this.tiles.forEach((tile) => {
+      tile.tile.removeAllListeners();
+      this.tweens.killTweensOf(tile.tile);
+    });
   }
   clearAllTileTint() {
     this.tiles.forEach((tile) => tile.tile.clearTint());
@@ -752,9 +787,21 @@ export class MapScene extends Phaser.Scene {
       this.makeCellClickable(this.tileAt(cell.target.x, cell.target.y)),
     );
 
-    unit.enemiesInRange.forEach(({enemy}) => {
+    //this.showAttackableCells(un);
+  }
+
+  showAttackableCells(mapSquad: MapSquad) {
+    mapSquad.enemiesInRange.forEach(({enemy}) => {
       this.squadIO((e) => {
-        this.tileAt(e.pos.x, e.pos.y).tile.setTint(ENEMY_IN_CELL_TINT);
+        const tile = this.tileAt(e.pos.x, e.pos.y).tile;
+        tile.setTint(ENEMY_IN_CELL_TINT);
+        this.tweens.add({
+          targets: tile,
+          alpha: 0.2,
+          duration: 500,
+          yoyo: true,
+          repeat: -1,
+        });
       })(enemy);
     });
   }
@@ -868,6 +915,51 @@ export class MapScene extends Phaser.Scene {
       ],
     );
   }
+  attack = (starter: MapSquad, target: MapSquad) => {
+    this.turnOff();
+
+    const isPlayer = starter.force === PLAYER_FORCE;
+
+    this.scene.transition({
+      target: 'CombatScene',
+      duration: 0,
+      moveBelow: true,
+      data: {
+        squads: this.state.mapSquads,
+        units: this.state.units,
+        top: isPlayer ? target.id : starter.id,
+        bottom: isPlayer ? starter.id : target.id,
+        onCombatFinish: (cmds: MapCommands[]) => {
+          console.log(`cmds::`, cmds);
+
+          let squads = cmds.reduce((xs, x) => {
+            if (x.type === 'UPDATE_UNIT') {
+              let sqdId = x.unit.squad?.id || '';
+
+              if (!xs[sqdId]) {
+                xs[sqdId] = [];
+              }
+
+              xs[sqdId].push(x.unit.currentHp);
+            }
+
+            return xs;
+          }, {} as {[x: string]: number[]});
+
+          let defeated = Map(squads)
+            .filter((v, k) => v.every((n) => n === 0))
+            .keySeq()
+            .map((target) => ({type: 'DESTROY_TEAM', target}))
+            .toJS();
+
+          this.scene.start(
+            'MapScene',
+            cmds.concat(defeated).concat([{type: 'END_SQUAD_TURN'}]),
+          );
+        },
+      },
+    });
+  };
 
   moveToEnemyUnit(enemySquad: MapSquad, selectedAlly: MapSquad) {
     const enemy = S.find<EnemyInRange>((e) => e.enemy === enemySquad.id)(
@@ -875,56 +967,12 @@ export class MapScene extends Phaser.Scene {
     );
     this.movedSquads.push(selectedAlly.id);
     if (S.isJust(enemy)) {
-      const attack = () => {
-        this.turnOff();
-
-        const isPlayer = selectedAlly.force === PLAYER_FORCE;
-
-        this.scene.transition({
-          target: 'CombatScene',
-          duration: 0,
-          moveBelow: true,
-          data: {
-            squads: this.state.mapSquads,
-            units: this.state.units,
-            top: isPlayer ? enemySquad.id : selectedAlly.id,
-            bottom: isPlayer ? selectedAlly.id : enemySquad.id,
-            onCombatFinish: (cmds: MapCommands[]) => {
-              console.log(`cmds::`, cmds);
-
-              let squads = cmds.reduce((xs, x) => {
-                if (x.type === 'UPDATE_UNIT') {
-                  let sqdId = x.unit.squad?.id || '';
-
-                  if (!xs[sqdId]) {
-                    xs[sqdId] = [];
-                  }
-
-                  xs[sqdId].push(x.unit.currentHp);
-                }
-
-                return xs;
-              }, {} as {[x: string]: number[]});
-
-              let defeated = Map(squads)
-                .filter((v, k) => v.every((n) => n === 0))
-                .keySeq()
-                .map((target) => ({type: 'DESTROY_TEAM', target}))
-                .toJS();
-
-              this.scene.start(
-                'MapScene',
-                cmds.concat(defeated).concat([{type: 'END_SQUAD_TURN'}]),
-              );
-            },
-          },
-        });
-      };
-
       S.map<EnemyInRange, void>((e) => {
         S.map<Chara, void>((chara) => {
           const target = e.steps;
-          this.moveUnit(chara, target, attack);
+          this.moveUnit(chara, target, () => {
+            this.attack(selectedAlly, enemySquad);
+          });
         })(this.getChara(selectedAlly.id));
       })(enemy);
     } else {
@@ -946,7 +994,7 @@ export class MapScene extends Phaser.Scene {
     this.tiles = [];
   }
 
-  private makeCellClickable(cell: MapTile) {
+  makeCellClickable(cell: MapTile) {
     cell.tile.setTint(WALKABLE_CELL_TINT);
     this.makeInteractive(cell);
   }
@@ -1205,7 +1253,9 @@ export class MapScene extends Phaser.Scene {
       this.dragDisabled = true;
       this.disableCityClick();
       this.disableCellClick();
-      this.runAi();
+      setTimeout(() => {
+        this.runAi();
+      }, 1000);
     } else {
       this.dragDisabled = false;
       this.enableCityClick();
@@ -1222,6 +1272,10 @@ export class MapScene extends Phaser.Scene {
       (u) => u.status === 'alive',
     );
   }
+  /**
+   * @TODO: refactor to make this return a list of ai actions
+   * its hard to debug by going into other methods
+   */
   runAi() {
     console.log(`=== AI ===`);
     this.setValidMoves();
@@ -1230,29 +1284,32 @@ export class MapScene extends Phaser.Scene {
       (u) => !this.movedSquads.includes(u.id),
     );
 
-    if (remainingUnits.length < 1) return;
+    const [currentSquad] = remainingUnits;
+    if (!currentSquad) {
+      console.log(`no remainingUnits!`);
+      return;
+    }
 
-    const ally = remainingUnits[0];
-    if (!ally) throw new Error(INVALID_STATE);
-
-    this.moveCameraTo(ally.pos, 200);
-    this.setSelectedUnit(ally.id);
+    this.moveCameraTo(currentSquad.pos, 200);
+    this.setSelectedUnit(currentSquad.id);
     this.refreshUI();
 
-    const maybeEnemiesInRange = S.head(ally.enemiesInRange);
+    const maybeEnemiesInRange = S.head(currentSquad.enemiesInRange);
 
     if (S.isJust(maybeEnemiesInRange)) {
+      console.log(`there are enemies in range, attacking`);
       S.map<EnemyInRange, void>((eir) => {
         this.squadIO((enemySquad) => {
-          this.moveToEnemyUnit(enemySquad, ally);
+          this.moveToEnemyUnit(enemySquad, currentSquad);
         })(eir.enemy);
       })(maybeEnemiesInRange);
     } else {
-      const {x, y} = randomItem(ally.validSteps).target;
+      console.log(`no enemies in range, moving to random location`);
+      const {x, y} = currentSquad.validSteps[0].steps[1];
 
       const tile = this.getTileAt(x, y);
 
-      this.moveToTile(ally.id, tile, () => {
+      this.moveToTile(currentSquad.id, tile, () => {
         this.signal([{type: 'END_SQUAD_TURN'}]);
       });
     }
@@ -1414,6 +1471,7 @@ export class MapScene extends Phaser.Scene {
   moveToTile(squadId: string, mapTile: MapTile, onMoveComplete: Function) {
     const {x, y} = mapTile;
 
+    console.log(`moving`, squadId);
     // Move unit to tile
     const chara = this.charas.find((c) => c.key === this.charaKey(squadId));
     const force = this.getCurrentForce();
@@ -1442,6 +1500,7 @@ export class MapScene extends Phaser.Scene {
               ]);
           })(maybeCity);
 
+          //TODO: having onMoveComplete AND this firing signals makes no sense
           onMoveComplete();
 
           this.signal([{type: 'UPDATE_SQUAD_POS', id: squadId, pos: {x, y}}]);
@@ -1490,7 +1549,7 @@ export class MapScene extends Phaser.Scene {
           duration: 200,
 
           // @ts-ignore
-          alpha: 0.2,
+          alpha: 0.5,
           onComplete: endCallback.bind(this),
         },
       ]);
@@ -1529,20 +1588,20 @@ export class MapScene extends Phaser.Scene {
     onAttack: () => void;
     onWait: () => void;
   }) {
-    let targets = () => {
+    let targets = (): MapSquad[] => {
       const enemies = this.getEnemies();
-      let enemiesInRange = [];
 
-      const vecs = [-1, 0, -1];
+      let coords = [-1, 0, 1];
 
-      vecs.forEach((x) =>
-        vecs.forEach((y) => {
-          const unit = enemies.find(
-            (s) => s.pos.x === x + cell.x && s.pos.y === y + cell.y,
-          );
-
-          if (unit) enemiesInRange.push(unit);
-        }),
+      return S.justs(
+        //@ts-ignore
+        S.lift2((x: number) => (y: number) =>
+          S.find(
+            (enemySquad: MapSquad) =>
+              enemySquad.pos.x === x + cell.x &&
+              enemySquad.pos.y === y + cell.y,
+          )(enemies),
+        )(coords)(coords),
       );
     };
 

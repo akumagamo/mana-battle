@@ -61,7 +61,7 @@ export type MapSquad =  Squad & {
   range: number;
   validSteps: ValidStep[];
   enemiesInRange: EnemyInRange[];
-  status: 'alive' | 'defeated';
+  status: 'alive' | 'defeated' | 'retreated';
 };
 
 export type TurnManager = {
