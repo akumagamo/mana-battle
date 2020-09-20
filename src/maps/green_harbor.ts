@@ -42,7 +42,10 @@ const map: MapState = {
         id: 'es1',
         name: 'Derpy',
         emblem: 'smile',
-        members: {e1: {id: 'e1', x: 2, y: 2, leader: true}},
+        members: {
+          e1: {id: 'e1', x: 2, y: 2, leader: true},
+          e2: {id: 'e2', x: 1, y: 2, leader: false}
+        },
         force: CPU_FORCE,
       },
       enemyCastle,
@@ -81,6 +84,7 @@ const map: MapState = {
   ],
   units: Map({
     e1: assignSquad({...fighter(0, 10), id: 'e1'}, {id: 'es1', x: 2, y: 2}),
+    e2: assignSquad({...fighter(0, 10), id: 'e2'}, {id: 'es2', x: 1, y: 2}),
   }),
 };
 

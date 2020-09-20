@@ -1,6 +1,6 @@
 import S from 'sanctuary';
 import {Unit} from '../../Unit/Model';
-import {getUnitAttack, getUnitAttacks, getUnitDamage} from '../../Unit/Skills';
+import {getUnitAttack, getUnitDamage} from '../../Unit/Skills';
 import {INVALID_STATE} from '../../errors';
 
 const sortInitiative = (unit: TurnUnit) => unit.unit.dex * 2;

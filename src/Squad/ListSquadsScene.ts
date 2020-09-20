@@ -76,7 +76,7 @@ export class ListSquadsScene extends Phaser.Scene {
   renderBoard(squad: Squad, x: number, y: number) {
     const BOARD_X = x * 250;
     const BOARD_Y = y * 130;
-    const boardScene = new BoardScene(squad, BOARD_X, BOARD_Y, 0.3);
+    const boardScene = new BoardScene(squad, api.getSquadMembers(squad.id), BOARD_X, BOARD_Y, 0.3);
     this.scene.add(`board-squad-${squad.id}`, boardScene, true);
 
     boardScene.onClick((sqd) => {

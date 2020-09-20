@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import {getSquads, getOptions, getUnit} from '../DB';
+import {getSquads, getOptions, getUnit, getSquad} from '../DB';
 import defaultData from '../defaultData';
 import {preload} from '../preload';
 import button from '../UI/button';
@@ -85,8 +85,10 @@ export default class TitleScene extends Phaser.Scene {
     button(20, 290, 'Combat', this.container, this, () => {
       this.turnOff();
       this.scene.start('CombatScene', {
-        top: '0',
-        bottom: '1',
+        top: '1',
+        bottom: '2',
+        squads: [getSquad('1'), getSquad('2')],
+        units: [getUnit('1'), getUnit('2')],
         onCombatFinish: () => {
           this.scene.start('TitleScene');
         },

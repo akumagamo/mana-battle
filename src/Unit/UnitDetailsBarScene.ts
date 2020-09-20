@@ -1,5 +1,4 @@
 import * as Phaser from 'phaser';
-import * as api from '../DB';
 import {Container} from '../Models';
 import {Chara} from '../Chara/Chara';
 import {Unit, unitClassLabels} from './Model';
@@ -7,8 +6,8 @@ import {INVALID_STATE} from '../errors';
 import {ItemSlot} from '../Item/Model';
 import {ItemDetailWindowScene} from '../Item/ItemDetailWindowScene';
 import text from '../UI/text';
-import {getUnitAttacks} from './Skills';
 import button from '../UI/button';
+import * as api from '../DB';
 
 export class UnitDetailsBarScene extends Phaser.Scene {
   colWidth = 150;
@@ -40,7 +39,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
 
   renderBgLayer() {}
 
-  render(unitId: string) {
+  render(unit: Unit) {
     this.clearChildren();
 
     const panel = this.add.image(0, 0, 'panel');
@@ -50,10 +49,6 @@ export class UnitDetailsBarScene extends Phaser.Scene {
     panel.setOrigin(0, 0);
     panel.displayWidth = 1260;
     panel.displayHeight = 220;
-
-    const unit = api.getUnit(unitId);
-
-    if (!unit) throw new Error(INVALID_STATE);
 
     //const chara = new Chara('edit-chara', this, unit, 200, 200, 1, true);
     //this.scene.add('edit-chara', chara, true);
@@ -152,7 +147,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
         icon.displayHeight = iconSize;
         icon.setInteractive();
         icon.on('pointerdown', () => {
-          this.itemDetail?.render(slot.id, unit.id, () => this.render(unit.id));
+          this.itemDetail?.render(slot.id, unit.id, () => this.render(unit));
           //this.renderItemDetails()
         });
 

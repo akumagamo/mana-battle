@@ -5,6 +5,8 @@ import {cartesianToIsometric} from '../utils/isometric';
 import {getUnit} from '../DB';
 import {BoardTile} from './Model';
 import {Graphics} from '../Models';
+import {Unit} from '../Unit/Model';
+import {Vector} from 'matter';
 
 const BOARD_WIDTH = 250;
 const BOARD_HEIGHT = 150;
@@ -19,6 +21,7 @@ export default class StaticBoardScene extends Phaser.Scene {
   isSelected=  false
   constructor(
     public squad: Squad,
+    public units: Unit[],
     public x: number,
     public y: number,
     public scaleSizing: number,
@@ -125,28 +128,27 @@ export default class StaticBoardScene extends Phaser.Scene {
     return tiles;
   }
 
-  addUnitToBoard(squadMember: SquadMember) {
-    let {x, y} = this.getUnitPositionInScreen(squadMember);
+  addUnitToBoard(unit: Unit) {
+
+    if(!unit.squad) return;
+
+    let {x, y} = this.getUnitPositionInScreen(unit.squad);
 
     x = x * this.scaleSizing + this.x;
     y = y * this.scaleSizing + this.y;
-
-    const unit = getUnit(squadMember.id);
-
-    if (!unit) throw new Error('Invalid member supplied');
 
     const key = this.makeUnitKey(unit);
     return new Chara(key, this, unit, x, y, this.scaleSizing, true, false);
   }
 
   placeUnits() {
-    const {squad} = this;
-
-    Object.values(squad.members).forEach((member) => this.placeUnit(member));
+    this.units.forEach((member) => this.placeUnit(member));
   }
 
-  placeUnit(member: SquadMember) {
+  placeUnit(member: Unit) {
     const chara = this.addUnitToBoard(member);
+
+    if(!chara) return;
 
     this.unitList = this.unitList.concat([chara]);
 
@@ -166,7 +168,7 @@ export default class StaticBoardScene extends Phaser.Scene {
       .sort((a, b) => (a.container?.depth || 0) - (b.container?.depth || 0))
       .forEach((chara) => chara.scene.bringToTop());
   }
-  getUnitPositionInScreen(squadMember: SquadMember) {
+  getUnitPositionInScreen(squadMember: Vector) {
     const {x, y} = cartesianToIsometric(squadMember.x, squadMember.y);
 
     return {x, y: y - 230};

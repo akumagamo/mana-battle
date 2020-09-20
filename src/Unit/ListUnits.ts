@@ -108,7 +108,7 @@ export class ListUnitsScene extends Phaser.Scene {
   renderUnitDetails(chara: Chara) {
     if (!this.detailsBar) return;
 
-    this.detailsBar.render(chara.unit.id);
+    this.detailsBar.render(chara.unit);
     this.detailsBar.onHatToggle = (unit: Unit) => {
       this.removeUnitList();
       this.renderUnitsList(this.getUnits());
