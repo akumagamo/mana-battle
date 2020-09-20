@@ -39,12 +39,12 @@ const map: MapState = {
   mapSquads: [
     toMapSquad(
       {
-        id: 'es1',
+        id: 'squad1',
         name: 'Derpy',
         emblem: 'smile',
         members: {
-          e1: {id: 'e1', x: 2, y: 2, leader: true},
-          e2: {id: 'e2', x: 1, y: 2, leader: false}
+          enemy1: {id: 'enemy1', x: 2, y: 2, leader: true},
+          enemy2: {id: 'enemy2', x: 1, y: 2, leader: false}
         },
         force: CPU_FORCE,
       },
@@ -62,7 +62,7 @@ const map: MapState = {
     {
       id: CPU_FORCE,
       name: 'Computer',
-      squads: ['es1'],
+      squads: ['squad1'],
       relations: {[PLAYER_FORCE]: 'hostile'},
       initialPosition: 'castle2',
     },
@@ -83,8 +83,8 @@ const map: MapState = {
     {id: 'c4', name: 'Vila Rica', x: 6, y: 4, force: CPU_FORCE, type: 'town'},
   ],
   units: Map({
-    e1: assignSquad({...fighter(0, 10), id: 'e1'}, {id: 'es1', x: 2, y: 2}),
-    e2: assignSquad({...fighter(0, 10), id: 'e2'}, {id: 'es2', x: 1, y: 2}),
+    enemy1: assignSquad({...fighter(0, 10), id: 'enemy1'}, {id: 'squad1', x: 2, y: 2}),
+    enemy2: assignSquad({...fighter(0, 10), id: 'enemy2'}, {id: 'squad1', x: 1, y: 2}),
   }),
 };
 

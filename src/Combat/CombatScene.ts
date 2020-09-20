@@ -238,12 +238,12 @@ export default class CombatScene extends Phaser.Scene {
 
     if (!target.container) throw new Error(INVALID_STATE);
 
-    const targetSquadPos = DB.getSquadMember(target.unit.id);
+    const pos = target.unit.squad;
 
     const {x, y} = cartesianToIsometricBattle(
       targetIsTop,
-      targetIsTop ? targetSquadPos.x + 1 : invertBoard(targetSquadPos.x) - 1,
-      targetIsTop ? targetSquadPos.y : invertBoard(targetSquadPos.y),
+      targetIsTop ? pos.x + 1 : invertBoard(pos.x) - 1,
+      targetIsTop ? pos.y : invertBoard(pos.y),
     );
 
     const config = (onComplete: () => void) => ({

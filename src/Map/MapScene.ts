@@ -971,6 +971,7 @@ export class MapScene extends Phaser.Scene {
 
                 this.refreshUI();
               },
+              this.movedSquads.includes(sqd.id)
             );
           });
       });
@@ -979,7 +980,7 @@ export class MapScene extends Phaser.Scene {
       this.renderDispatchWindow();
     });
 
-    button(20, posY + 120, 'End Turn', uiContainer, this, () => {
+    button(1150, 650, 'End Turn', uiContainer, this, () => {
       this.endTurn();
     });
   }
@@ -1494,7 +1495,7 @@ export class MapScene extends Phaser.Scene {
         onWait: () => {
           this.signal([{type: 'CLOSE_ACTION_PANEL'}]);
           this.finishSquadActions(chara);
-          this.checkTurnEnd();
+          //this.checkTurnEnd();
         },
       });
     })(squad.id);
