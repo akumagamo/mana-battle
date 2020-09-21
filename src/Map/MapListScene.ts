@@ -3,13 +3,9 @@ import {preload} from '../preload';
 import button from '../UI/button';
 import maps from '../maps';
 import {MapCommands} from './MapScene';
-import {CPU_FORCE, MapSquad, PLAYER_FORCE} from '../API/Map/Model';
-import {assignSquad, toMapSquad, Unit} from '../Unit/Model';
+import {toMapSquad} from '../Unit/Model';
 import {getCity} from '../API/Map/utils';
-import {getSquad, getUnit, getUnits} from '../DB';
-import {fighter} from '../Unit/Jobs';
-import {Map, List} from 'immutable';
-import {Squad} from '../Squad/Model';
+import {getSquad, getUnits} from '../DB';
 
 export default class MapListScene extends Phaser.Scene {
   constructor() {

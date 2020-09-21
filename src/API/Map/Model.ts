@@ -25,6 +25,7 @@ export type CellNumber =
   | 13
   | 14
   | 15;
+export type AICommand = "DEFEND" | "ATTACK"
 export type MapState = {
   id: string;
   name: string;
@@ -35,6 +36,7 @@ export type MapState = {
   cities: City[];
   mapSquads: MapSquad[];
   units: Map<string,Unit>
+  ai: Map<string,AICommand>
 };
 export type Force = {
   id: ForceId;

@@ -416,7 +416,7 @@ export class MapScene extends Phaser.Scene {
       (_: Pointer, gameObject: Image, dragX: number, dragY: number) => {
         if (this.dragDisabled) return;
 
-        if (!this.isDragging) this.isDragging =  true;
+        if (!this.isDragging) this.isDragging = true;
 
         const dx = gameObject.x - dragX;
         const dy = gameObject.y - dragY;
@@ -435,7 +435,6 @@ export class MapScene extends Phaser.Scene {
 
           this.mapContainer.setPosition(gx, gy);
         }
-
       },
     );
 
@@ -443,16 +442,15 @@ export class MapScene extends Phaser.Scene {
       this.mapX = this.mapContainer.x;
       this.mapY = this.mapContainer.y;
       // Avoid firing "click_cell" event on dragend
-      
-       
+
       if (this.isDragging) {
-        console.log('dragend, avoid firing click event')
+        console.log('dragend, avoid firing click event');
         this.disableCellClick();
         this.delay(10).then(() => {
           this.enableCellClick();
         });
       }
-      this.isDragging = 0
+      this.isDragging = false;
     });
   }
 
@@ -473,11 +471,11 @@ export class MapScene extends Phaser.Scene {
 
   setValidMoves() {
     console.log(`SET VALID MOVES`);
-    console.log(`the state...`, this.state, this.currentForce);
     const moveList = getPossibleMoves(
       formatDataForApi(this.state)(this.currentForce),
     );
 
+    console.log(moveList);
     const squads = getSquadsFromForce(this.state)(this.currentForce);
 
     squads.forEach((unit_) => {
@@ -835,7 +833,7 @@ export class MapScene extends Phaser.Scene {
       moveBelow: true,
       data: {
         squads: this.state.mapSquads,
-        units: this.state.units,
+        units: this.state.units.filter((u) => u.currentHp > 0),
         top: isPlayer ? target.id : starter.id,
         bottom: isPlayer ? starter.id : target.id,
         onCombatFinish: (cmds: MapCommands[]) => {
@@ -1205,7 +1203,9 @@ export class MapScene extends Phaser.Scene {
   }
 
   async showTurnTitle(force: Force) {
-    const title = this.add.text(-200, 500, `${force.name} Turn`);
+    const title = this.add.text(-200, 500, `${force.name} Turn`, {
+      fontSize: 36,
+    });
 
     return new Promise((resolve) => {
       const timeline = this.tweens.createTimeline({
@@ -1219,12 +1219,12 @@ export class MapScene extends Phaser.Scene {
       timeline.add({
         targets: title,
         x: 800,
-        duration: 600,
+        duration: 1200,
       });
       timeline.add({
         targets: title,
-        x: 1700,
-        duration: 300,
+        x: 2000,
+        duration: 500,
       });
 
       timeline.play();

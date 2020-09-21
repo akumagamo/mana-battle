@@ -35,7 +35,7 @@ export function fromJSON(n: number): Unit {
   };
 }
 
-const baseEquips = {
+export const baseEquips = {
   mage: {
     ornament: 'amulet',
     chest: 'robe',

@@ -5,6 +5,7 @@ import {getItem, getItems} from '../DB';
 import {UnitAttacks} from './Skills';
 import {City, ForceId, MapSquad as MapSquad} from '../API/Map/Model';
 import {Squad} from '../Squad/Model';
+import {Vector} from 'matter';
 
 export type UnitMap = {[x: string]: Unit};
 
@@ -71,10 +72,10 @@ export function assignSquad(unit: Unit, position: UnitSquadPosition):UnitInSquad
 
 export function toMapSquad(
   squad: Squad,
-  city:City,
+  pos:Vector,
 ): MapSquad {
   return { ...squad,
-    pos: {x:city.x, y:city.y},
+    pos: {x:pos.x, y:pos.y},
     range: 5,
     validSteps: [],
     enemiesInRange: [],
