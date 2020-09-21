@@ -7,35 +7,31 @@ import {Unit} from '../../Unit/Model';
 import {UnitDetailsBarScene} from '../../Unit/UnitDetailsBarScene';
 import {MapScene} from '../MapScene';
 
-export default (scene: MapScene, squad: MapSquad, units:Unit[]) => {
+export default (scene: MapScene, squad: MapSquad, units: Unit[]) => {
   let charaStats = scene.add.container(0, 0);
   panel(50, 50, 1080, 540, scene.uiContainer, scene);
   scene.disableCellClick();
   scene.disableCityClick();
   scene.dragDisabled = true;
 
-  let details:UnitDetailsBarScene | null = null;
+  const details = new UnitDetailsBarScene();
+  scene.scene.add('details-bar', details, true);
 
-  const boardScene = new BoardScene(squad,units, 50, 0, 0.7);
+  const boardScene = new BoardScene(squad, units, 50, 0, 0.7);
   scene.scene.add(`board-squad-${squad.id}`, boardScene, true);
   boardScene.onUnitClick((chara) => {
     charaStats.removeAll();
-    if(details)
-      details.destroy(details);
-    details = new UnitDetailsBarScene();
-
     const unit = chara.unit;
-
-    scene.scene.add('details-bar', details, true);
 
     details.render(unit);
   });
 
+  details.render(units[0]);
+
   button(900, 120, 'Close', scene.uiContainer, scene, () => {
     boardScene.destroy(scene);
 
-    if(details)
-      details.destroy(details);
+    if (details) details.destroy(details);
 
     charaStats.destroy();
 
