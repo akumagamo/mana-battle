@@ -26,7 +26,9 @@ export default class MapListScene extends Phaser.Scene {
             type: 'UPDATE_STATE',
             target: {
               ...map,
-              mapSquads: map.mapSquads.concat([ toMapSquad(getSquad('1'), getCity('castle1', map))]),
+              mapSquads: map.mapSquads.concat([
+                toMapSquad(getSquad('1'), getCity('castle1', map)),
+              ]),
               units: map.units.merge(alliedUnits),
             },
           },

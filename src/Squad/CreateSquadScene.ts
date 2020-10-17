@@ -15,19 +15,15 @@ export class CreateSquadScene extends Phaser.Scene {
     this.renderUnitList();
 
     this.renderReturnBtn();
-    console.log(`btn`);
   }
 
   renderUnitList() {
     this.unitListScene = new UnitListScene(100, 40, 8);
-    this.unitListScene.onUnitClick = (unit: Unit) =>
-      console.log(`hello from crete scene`, unit);
+    this.unitListScene.onUnitClick = (unit: Unit) => console.log(unit);
     this.scene.add('UnitListScene', this.unitListScene, true);
   }
 
   renderReturnBtn() {
-    console.log('rendering return btn');
-
     const btn = this.add.text(1100, 100, 'Return to title');
     btn.setInteractive();
     btn.on('pointerdown', () => {

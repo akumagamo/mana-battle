@@ -224,7 +224,7 @@ export class MapScene extends Phaser.Scene {
       } else if (cmd.type === 'CLEAR_TILES_TINTING') {
         this.clearAllTileTint();
       } else if (cmd.type === 'SHOW_SQUAD_PANEL') {
-        this.showUnitPanel(cmd.unit);
+        this.showSquadPanel(cmd.unit);
       } else if (cmd.type === 'SHOW_TARGETABLE_CELLS') {
         this.showClickableCellsForUnit(cmd.unit);
       } else if (cmd.type === 'HIGHLIGHT_CELL') {
@@ -774,7 +774,7 @@ export class MapScene extends Phaser.Scene {
     }
   }
 
-  showUnitPanel(squad: MapSquad) {
+  showSquadPanel(squad: MapSquad) {
     this.setSelectedUnit(squad.id);
     this.refreshUI();
   }
@@ -808,7 +808,7 @@ export class MapScene extends Phaser.Scene {
           title: 'View',
           action: () => {
             this.moveCameraTo(enemySquad.pos, 500);
-            this.showUnitPanel(enemySquad);
+            this.showSquadPanel(enemySquad);
             this.clearTiles();
             this.closeActionWindow();
           },
@@ -886,7 +886,7 @@ export class MapScene extends Phaser.Scene {
       })(enemy);
     } else {
       console.error(`This should be impossible, check logic`);
-      this.showUnitPanel(enemySquad);
+      this.showSquadPanel(enemySquad);
     }
   }
   turnOff() {
@@ -925,9 +925,9 @@ export class MapScene extends Phaser.Scene {
 
     //UNIT INFORMATION
     if (this.selectedEntity && this.selectedEntity.type === 'unit') {
-      const squad = this.getSquad(this.selectedEntity.id);
-
+      console.log('looking for squad', this.selectedEntity.id);
       this.squadIO((squad) => {
+        console.log(`da squad...`, squad);
         text(20, 610, squad.name, uiContainer, this);
         text(1000, 610, `${squad.range} cells`, uiContainer, this);
 
@@ -972,6 +972,7 @@ export class MapScene extends Phaser.Scene {
       });
     });
 
+    // Squad List (Left Navbar)
     let posY = 0;
     this.state.forces
       .filter((f) => f.id === PLAYER_FORCE)
@@ -1164,6 +1165,16 @@ export class MapScene extends Phaser.Scene {
       console.log(`no remainingUnits!`);
       this.switchForce();
       this.runTurn();
+      return;
+    }
+
+    let aiMode = this.state.ai.get(currentSquad.id);
+
+    if (aiMode === 'DEFEND') {
+      console.log(`Squad ${currentSquad.id} set to defend. Ending turn`);
+      this.movedSquads.push(currentSquad.id);
+
+      this.signal([{type: 'END_SQUAD_TURN'}]);
       return;
     }
 

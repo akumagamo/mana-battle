@@ -9,6 +9,7 @@ import {SCREEN_WIDTH} from '../constants';
 import text from '../UI/text';
 import S from 'sanctuary';
 import menu from '../Backgrounds/menu';
+import {PLAYER_FORCE} from '../API/Map/Model';
 export class ListSquadsScene extends Phaser.Scene {
   boardScenes: BoardScene[] = [];
   controls: (Image | Text)[] = [];
@@ -76,7 +77,13 @@ export class ListSquadsScene extends Phaser.Scene {
   renderBoard(squad: Squad, x: number, y: number) {
     const BOARD_X = x * 250;
     const BOARD_Y = y * 130;
-    const boardScene = new BoardScene(squad, api.getSquadMembers(squad.id), BOARD_X, BOARD_Y, 0.3);
+    const boardScene = new BoardScene(
+      squad,
+      api.getSquadMembers(squad.id),
+      BOARD_X,
+      BOARD_Y,
+      0.3,
+    );
     this.scene.add(`board-squad-${squad.id}`, boardScene, true);
 
     boardScene.onClick((sqd) => {
@@ -129,6 +136,7 @@ export class ListSquadsScene extends Phaser.Scene {
             name: '',
             emblem: '',
             members: {},
+            force: PLAYER_FORCE,
           },
         },
       });
