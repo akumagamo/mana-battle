@@ -469,33 +469,30 @@ export class MapScene extends Phaser.Scene {
     return S.find<City>((c) => c.x === x && c.y === y)(this.state.cities);
   }
 
-  setValidMoves() {
+  getValidMoves() {
     console.log(`SET VALID MOVES`);
     const moveList = getPossibleMoves(
       formatDataForApi(this.state)(this.currentForce),
     );
 
-    console.log(moveList);
     const squads = getSquadsFromForce(this.state)(this.currentForce);
 
-    squads.forEach((unit_) => {
-      const resultUnit = S.chain(
-        S.find((mapSquad: MapSquad) => mapSquad.id === unit_.id),
-      )(moveList);
+    console.log(`moveList`, moveList);
 
-      const moves = S.map<MapSquad, ValidStep[]>((u) => u.validSteps)(
-        resultUnit,
-      );
-      const enemies = S.map<MapSquad, EnemyInRange[]>((u) => u.enemiesInRange)(
-        resultUnit,
-      );
+    console.log(`>>>squads`, squads);
 
-      S.map<ValidStep[], void>((steps) => {
-        unit_.validSteps = steps;
-      })(moves);
-      S.map<EnemyInRange[], void>((e) => {
-        unit_.enemiesInRange = e;
-      })(enemies);
+    moveList.forEach((move) => {
+      const squad = squads.find((s) => s.id === move.id);
+
+      if (!squad) throw new Error(INVALID_STATE);
+
+      console.log(`FOUND::`, squad);
+
+      //TODO: remove functor from enemiesInRange
+      squad.enemiesInRange = move.enemiesInRange;
+      squad.validSteps = move.validSteps;
+
+      console.log(`...`, squad);
     });
   }
 
@@ -512,7 +509,10 @@ export class MapScene extends Phaser.Scene {
   }
 
   getUnit(id: string) {
-    return getUnit(this.state)(id);
+    let u = getUnit(this.state)(id);
+
+    if (!u) throw new Error(INVALID_STATE);
+    return u;
   }
   mapUnit = <A>(fn: (u: MapSquad) => A) => (id: string) =>
     S.map<MapSquad, A>((unit) => fn(unit))(this.getUnit(id));
@@ -619,7 +619,7 @@ export class MapScene extends Phaser.Scene {
   }
   getSelectedUnit() {
     if (this.selectedEntity && this.selectedEntity.type === 'unit') {
-      return this.getUnit(this.selectedEntity.id);
+      return S.Just(this.getUnit(this.selectedEntity.id));
     } else return S.Nothing;
   }
   makeInteractive(cell: MapTile) {
@@ -679,6 +679,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   clickSquad(unit: MapSquad) {
+    console.log(`force is..`, unit.force);
     if (unit.force === PLAYER_FORCE) {
       this.handleClickOnOwnUnit(unit);
     } else {
@@ -690,6 +691,7 @@ export class MapScene extends Phaser.Scene {
     this.clearTiles();
     const unit = this.state.mapSquads.find((u) => u.id === un.id);
     if (!unit) return;
+
     unit.validSteps.forEach((cell) =>
       this.makeCellClickable(this.tileAt(cell.target.x, cell.target.y)),
     );
@@ -1080,7 +1082,7 @@ export class MapScene extends Phaser.Scene {
       force.squads.push(squad.id);
 
       // TODO: make this a pipeline instead of a side effect
-      this.setValidMoves();
+      this.getValidMoves();
       // TODO: add "summon" effect
       this.renderSquad(mapSquad);
     });
@@ -1113,7 +1115,7 @@ export class MapScene extends Phaser.Scene {
   async runTurn() {
     const force = this.getForce(this.currentForce);
 
-    this.setValidMoves();
+    this.getValidMoves();
 
     await this.showTurnTitle(force);
 
@@ -1154,7 +1156,7 @@ export class MapScene extends Phaser.Scene {
    */
   runAi() {
     console.log(`=== AI ===`);
-    this.setValidMoves();
+    this.getValidMoves();
 
     const remainingUnits = this.getAliveSquadsFromForce(CPU_FORCE).filter(
       (u) => !this.movedSquads.includes(u.id),
@@ -1208,7 +1210,7 @@ export class MapScene extends Phaser.Scene {
 
     const aliveUnits = this.getAliveSquadsFromForce(force.id);
 
-    this.setValidMoves();
+    this.getValidMoves();
 
     if (this.movedSquads.length === aliveUnits.length) this.endTurn();
   }

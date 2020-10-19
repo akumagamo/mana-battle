@@ -126,6 +126,8 @@ export class ListSquadsScene extends Phaser.Scene {
       this.removeChildren();
 
       const squads = Object.keys(api.getSquads());
+
+      // TODO; create a functino with typed requirements
       this.scene.transition({
         target: 'EditSquadScene',
         duration: 0,

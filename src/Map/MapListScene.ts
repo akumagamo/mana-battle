@@ -5,7 +5,7 @@ import maps from '../maps';
 import {MapCommands} from './MapScene';
 import {toMapSquad} from '../Unit/Model';
 import {getCity} from '../API/Map/utils';
-import {getSquad, getUnits} from '../DB';
+import {getSquads, getUnits} from '../DB';
 
 export default class MapListScene extends Phaser.Scene {
   constructor() {
@@ -27,7 +27,7 @@ export default class MapListScene extends Phaser.Scene {
             target: {
               ...map,
               mapSquads: map.mapSquads.concat([
-                toMapSquad(getSquad('1'), getCity('castle1', map)),
+                toMapSquad(getSquads()[0], getCity('castle1', map)),
               ]),
               units: map.units.merge(alliedUnits),
             },

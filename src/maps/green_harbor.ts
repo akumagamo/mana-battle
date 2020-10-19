@@ -6,6 +6,7 @@ import {
   MapState,
   PLAYER_FORCE,
 } from '../API/Map/Model';
+import {getSquads} from '../DB';
 import {makeUnit} from '../Unit/Jobs';
 import {assignSquad, toMapSquad} from '../Unit/Model';
 
@@ -72,7 +73,7 @@ const map: MapState = {
     {
       id: PLAYER_FORCE,
       name: 'Lankel Knights',
-      squads: ['1'],
+      squads: [getSquads()[0].id],
       relations: {[CPU_FORCE]: 'hostile'},
       initialPosition: 'castle1',
     },

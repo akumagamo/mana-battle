@@ -3,17 +3,10 @@ import S from 'sanctuary';
 import {Vector, TurnManager, MapSquad, Step} from './Model';
 import {MapState} from './Model';
 import {Map, Range} from 'immutable';
+import {INVALID_STATE} from '../../errors';
 
-const getBy = (attr: string) => <A>(target: A) =>
-  S.find((el: any) => S.equals(S.prop(attr)(el))(target));
-
-const byId = getBy('id');
-
-export const findById = <A>(list: A[]) => (id: string) => getBy('id')(id)(list);
-
-const uniq = S.reduce((ns: any[]) => (n: any) =>
-  S.elem(n)(ns) ? ns : ns.concat([n]),
-)([]);
+export const findById = (list: {id: string}[]) => (id: string) =>
+  list.find((n) => n.id === id);
 
 const makeVector = (x: number) => (y: number) => ({x, y});
 
@@ -29,10 +22,10 @@ export const getUnit = (state: MapState) => (id: string) =>
 export const getForce = (state: MapState) => (id: string) =>
   findById(state.forces)(id);
 
-export const getEntities = <A>(entityList: A[]) => (idList: string) =>
+export const getEntities = (entityList: {id: string}[]) => (idList: string) =>
   S.pipe([S.map((id: string) => findById(entityList)(id)), S.justs])(idList);
 
-export const getMovesForUnit = (state: MapState) => (id: string) => {
+export const getMovesForUnit = (_: MapState) => (_: string) => {
   //resume-todo: victory screen: just like wc3!
 };
 
@@ -46,19 +39,26 @@ export const getPossibleMoves = ({
   const width = grid[0].length;
   const height = grid.length;
 
-  /**   force :: Maybe Force */
-  const force = byId(currentForce)(forces);
+  const force = forces.find((f) => f.id === currentForce);
 
-  const enemyUnits = S.filter((u: MapSquad) => u.force !== currentForce)(mapSquads);
+  if (!force) throw new Error(INVALID_STATE);
 
-  const getUnits = S.pipe([S.map((unitId) => byId(unitId)(mapSquads)), S.justs]);
+  const enemyUnits = mapSquads.filter((u) => u.force !== currentForce);
 
-  /**   getVectors :: MapUnit -> Vector */
-  const getVectors = S.prop('pos'); // Vector
+  const getSquad = (unitId: string) => {
+    let s = mapSquads.find((s) => s.id === unitId);
 
-  const enemyVectors = S.map(getVectors)(enemyUnits);
+    if (!s) throw new Error(INVALID_STATE);
 
-  const enemyIndex = indexVectors(enemyVectors) as Map<string,Map<string,boolean>>;
+    return s;
+  };
+
+  const enemyVectors = enemyUnits.map((e) => e.pos);
+
+  const enemyIndex = indexVectors(enemyVectors) as Map<
+    string,
+    Map<string, boolean>
+  >;
 
   // Marks enemy-occupied cells as "walls"
   const updatedGrid: number[][] = blockVectorsInGrid(grid)(enemyIndex);
@@ -97,44 +97,40 @@ export const getPossibleMoves = ({
       .toJS();
   };
 
-  // TODO: it makes no sense to return a maybe because the force should be a parameter
-  return S.map(
-    S.pipe([
-      S.prop('squads'),
-      getUnits,
-      S.map((mapSquad: MapSquad) => {
-        const steps = getUnitValidSteps(mapSquad);
+  let bb = force.squads.map(getSquad).map((mapSquad) => {
+    const steps = getUnitValidSteps(mapSquad);
 
-        const targets = S.map((step: Step) => step.target)(steps);
+    const targets = S.map((step: Step) => step.target)(steps);
 
-        return {
-          ...mapSquad,
-          validSteps: steps,
-          enemiesInRange: S.pipe([
-            S.filter((u: MapSquad) => mapSquad.force !== u.force),
-            S.filter((enemy: MapSquad) =>
-              S.any(
-                (step: Vector) =>
-                  getDistance(step)(enemy.pos) === 1 &&
-                  getPathTo(grid)(mapSquad.pos)(enemy.pos).length <= mapSquad.range,
-              )(targets),
-            ),
-            S.map((enemy: MapSquad) => ({
-              enemy: enemy.id,
-              steps: getPathTo(grid)(mapSquad.pos)(enemy.pos)
-                .slice(0, -1)
-                .map(([x, y]) => makeVector(x)(y)),
-            })),
-          ])(mapSquads),
-        };
-      }),
-    ]),
-  )(force);
+    return {
+      ...mapSquad,
+      validSteps: steps,
+      enemiesInRange: S.pipe([
+        S.filter((u: MapSquad) => mapSquad.force !== u.force),
+        S.filter((enemy: MapSquad) =>
+          S.any(
+            (step: Vector) =>
+              getDistance(step)(enemy.pos) === 1 &&
+              getPathTo(grid)(mapSquad.pos)(enemy.pos).length <= mapSquad.range,
+          )(targets),
+        ),
+        S.map((enemy: MapSquad) => ({
+          enemy: enemy.id,
+          steps: getPathTo(grid)(mapSquad.pos)(enemy.pos)
+            .slice(0, -1)
+            .map(([x, y]) => makeVector(x)(y)),
+        })),
+      ])(mapSquads),
+    };
+  });
+
+  return bb;
 };
 
 export const blockVectorsInGrid = (grid: number[][]) => (
   blockIndex: Map<string, Map<string, boolean>>,
-) => grid.map((ys, y) =>
+) =>
+  grid.map((ys, y) =>
     ys.map((cell, x) => {
       if (blockIndex.getIn([y, x], false)) return 1;
       else return cell;
