@@ -513,12 +513,12 @@ export class MapScene extends Phaser.Scene {
   mapUnit = <A>(fn: (u: MapSquad) => A) => (id: string) =>
     S.map<MapSquad, A>((unit) => fn(unit))(this.getUnit(id));
 
-  squadIO = (fn: (u: MapSquad) => void) => (id: string) => {
+  squadIO = async (id: string) => {
     let sqd = this.state.mapSquads.find((s) => s.id === id);
 
     if (!sqd) throw new Error(INVALID_STATE);
 
-    fn(sqd);
+    return sqd;
   };
 
   cityIO = (fn: (u: City) => void) => (id: string) => {
@@ -906,7 +906,7 @@ export class MapScene extends Phaser.Scene {
     //this.makeInteractive(cell);
   }
 
-  refreshUI() {
+  async refreshUI() {
     const {container, uiContainer} = this.getContainers();
     uiContainer.removeAll();
 
@@ -923,23 +923,20 @@ export class MapScene extends Phaser.Scene {
 
     //UNIT INFORMATION
     if (this.selectedEntity && this.selectedEntity.type === 'unit') {
-      console.log('looking for squad', this.selectedEntity.id);
-      this.squadIO((squad) => {
-        console.log(`da squad...`, squad);
-        text(20, 610, squad.name, uiContainer, this);
-        text(1000, 610, `${squad.range} cells`, uiContainer, this);
+      const squad = await this.squadIO(this.selectedEntity.id);
+      text(20, 610, squad.name, uiContainer, this);
+      text(1000, 610, `${squad.range} cells`, uiContainer, this);
 
-        button(200, 620, 'Squad Details', this.uiContainer, this, () =>
-          squadDetails(
-            this,
-            squad,
-            this.state.units
-              .toList()
-              .filter((u) => Object.keys(squad.members).includes(u.id))
-              .toJS(),
-          ),
-        );
-      })(this.selectedEntity.id);
+      button(200, 620, 'Squad Details', this.uiContainer, this, () =>
+        squadDetails(
+          this,
+          squad,
+          this.state.units
+            .toList()
+            .filter((u) => Object.keys(squad.members).includes(u.id))
+            .toJS(),
+        ),
+      );
 
       //CITY INFORMATION
     } else if (this.selectedEntity && this.selectedEntity.type === 'city') {
@@ -1150,7 +1147,7 @@ export class MapScene extends Phaser.Scene {
    * @TODO: refactor to make this return a list of ai actions
    * its hard to debug by going into other methods
    */
-  runAi() {
+  async runAi() {
     console.log(`=== AI ===`);
     this.getValidMoves();
 
@@ -1180,15 +1177,12 @@ export class MapScene extends Phaser.Scene {
     this.setSelectedUnit(currentSquad.id);
     this.refreshUI();
 
-    const maybeEnemiesInRange = S.head(currentSquad.enemiesInRange);
+    const enemyInRange = currentSquad.enemiesInRange[0];
 
-    if (S.isJust(maybeEnemiesInRange)) {
+    if (enemyInRange) {
       console.log(`there are enemies in range, attacking`);
-      S.map<EnemyInRange, void>((eir) => {
-        this.squadIO((enemySquad) => {
-          this.moveToEnemyUnit(enemySquad, currentSquad);
-        })(eir.enemy);
-      })(maybeEnemiesInRange);
+      const enemySquad = await this.squadIO(enemyInRange.enemy);
+      this.moveToEnemyUnit(enemySquad, currentSquad);
     } else {
       console.log(`no enemies in range, moving to random location`);
 
@@ -1357,7 +1351,11 @@ export class MapScene extends Phaser.Scene {
 
   // TODO: simplify interface
   // wtf: moveToTile and moveunit???
-  moveToTile(squadId: string, mapTile: MapTile, onMoveComplete: Function) {
+  async moveToTile(
+    squadId: string,
+    mapTile: MapTile,
+    onMoveComplete: Function,
+  ) {
     const {x, y} = mapTile;
 
     console.log(`moving`, squadId);
@@ -1375,29 +1373,28 @@ export class MapScene extends Phaser.Scene {
 
     this.movedSquads.push(squadId);
 
-    this.squadIO((mapSquad) => {
-      const step = mapSquad.validSteps.find((step) =>
-        Map(step.target).equals(Map({x, y})),
-      );
+    const mapSquad = await this.squadIO(squadId);
+    const step = mapSquad.validSteps.find((step) =>
+      Map(step.target).equals(Map({x, y})),
+    );
 
-      if (!step) throw new Error(INVALID_STATE);
+    if (!step) throw new Error(INVALID_STATE);
 
-      this.moveUnit(chara, step.steps).then(() => {
-        S.map<City, void>((city) => {
-          if (city.force !== mapSquad.force)
-            this.signal([
-              {type: 'CAPTURE_CITY', id: city.id, force: mapSquad.force},
-            ]);
-        })(this.cityAt(x, y));
+    this.moveUnit(chara, step.steps).then(() => {
+      S.map<City, void>((city) => {
+        if (city.force !== mapSquad.force)
+          this.signal([
+            {type: 'CAPTURE_CITY', id: city.id, force: mapSquad.force},
+          ]);
+      })(this.cityAt(x, y));
 
-        this.signal([{type: 'UPDATE_SQUAD_POS', id: squadId, pos: {x, y}}]);
+      this.signal([{type: 'UPDATE_SQUAD_POS', id: squadId, pos: {x, y}}]);
 
-        //TODO: having onMoveComplete AND this firing signals makes no sense
-        onMoveComplete();
+      //TODO: having onMoveComplete AND this firing signals makes no sense
+      onMoveComplete();
 
-        this.refreshUI();
-      });
-    })(squadId);
+      this.refreshUI();
+    });
   }
   endTurn() {
     this.clearTiles();
