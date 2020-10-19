@@ -3,9 +3,10 @@ import {sum} from '../utils/math';
 import {Container} from '../Models';
 import {getItem, getItems} from '../DB';
 import {UnitAttacks} from './Skills';
-import {City, ForceId, MapSquad as MapSquad} from '../API/Map/Model';
+import {City, ForceId, MapSquad} from '../API/Map/Model';
 import {Squad} from '../Squad/Model';
 import {Vector} from 'matter';
+import {List} from 'immutable';
 
 export type UnitMap = {[x: string]: Unit};
 
@@ -66,18 +67,19 @@ export type Unit = {
 };
 export type UnitInSquad = Unit & {squad: UnitSquadPosition};
 
-export function assignSquad(unit: Unit, position: UnitSquadPosition):UnitInSquad {
+export function assignSquad(
+  unit: Unit,
+  position: UnitSquadPosition,
+): UnitInSquad {
   return {...unit, squad: position};
 }
 
-export function toMapSquad(
-  squad: Squad,
-  pos:Vector,
-): MapSquad {
-  return { ...squad,
-    pos: {x:pos.x, y:pos.y},
+export function toMapSquad(squad: Squad, pos: Vector): MapSquad {
+  return {
+    ...squad,
+    pos: {x: pos.x, y: pos.y},
     range: 5,
-    validSteps: [],
+    validSteps: List(),
     enemiesInRange: [],
     status: 'alive',
   };

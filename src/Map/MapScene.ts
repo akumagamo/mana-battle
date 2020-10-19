@@ -8,7 +8,7 @@ import panel from '../UI/panel';
 import text from '../UI/text';
 import {
   getPossibleMoves,
-  unitsFromForce as getSquadsFromForce,
+  squadsFromForce as getSquadsFromForce,
   getUnit,
 } from '../API/Map/api';
 import {
@@ -486,13 +486,9 @@ export class MapScene extends Phaser.Scene {
 
       if (!squad) throw new Error(INVALID_STATE);
 
-      console.log(`FOUND::`, squad);
-
       //TODO: remove functor from enemiesInRange
       squad.enemiesInRange = move.enemiesInRange;
       squad.validSteps = move.validSteps;
-
-      console.log(`...`, squad);
     });
   }
 
@@ -518,11 +514,11 @@ export class MapScene extends Phaser.Scene {
     S.map<MapSquad, A>((unit) => fn(unit))(this.getUnit(id));
 
   squadIO = (fn: (u: MapSquad) => void) => (id: string) => {
-    let sqd = S.find<MapSquad>((s) => s.id === id)(this.state.mapSquads);
+    let sqd = this.state.mapSquads.find((s) => s.id === id);
 
-    if (S.isNothing(sqd)) throw new Error(INVALID_STATE);
+    if (!sqd) throw new Error(INVALID_STATE);
 
-    S.map<MapSquad, void>((unit) => fn(unit))(sqd);
+    fn(sqd);
   };
 
   cityIO = (fn: (u: City) => void) => (id: string) => {
@@ -1195,7 +1191,8 @@ export class MapScene extends Phaser.Scene {
       })(maybeEnemiesInRange);
     } else {
       console.log(`no enemies in range, moving to random location`);
-      const {x, y} = currentSquad.validSteps[0].steps[1];
+
+      const {x, y} = (currentSquad.validSteps.first() as ValidStep).steps[1];
 
       const tile = this.getTileAt(x, y);
 
@@ -1379,28 +1376,27 @@ export class MapScene extends Phaser.Scene {
     this.movedSquads.push(squadId);
 
     this.squadIO((mapSquad) => {
-      const maybePath = S.find<ValidStep>((step) =>
-        S.equals(step.target)({x, y}),
-      )(mapSquad.validSteps);
+      const step = mapSquad.validSteps.find((step) =>
+        Map(step.target).equals(Map({x, y})),
+      );
 
-      S.map<ValidStep, void>((step) => {
-        this.moveUnit(chara, step.steps).then(() => {
-          S.map<City, void>((city) => {
-            if (city.force !== mapSquad.force)
-              this.signal([
-                {type: 'CAPTURE_CITY', id: city.id, force: mapSquad.force},
-              ]);
-          })(this.cityAt(x, y));
+      if (!step) throw new Error(INVALID_STATE);
 
-          this.signal([{type: 'UPDATE_SQUAD_POS', id: squadId, pos: {x, y}}]);
+      this.moveUnit(chara, step.steps).then(() => {
+        S.map<City, void>((city) => {
+          if (city.force !== mapSquad.force)
+            this.signal([
+              {type: 'CAPTURE_CITY', id: city.id, force: mapSquad.force},
+            ]);
+        })(this.cityAt(x, y));
 
-          //TODO: having onMoveComplete AND this firing signals makes no sense
-          console.log(`on move complete...`);
-          onMoveComplete();
+        this.signal([{type: 'UPDATE_SQUAD_POS', id: squadId, pos: {x, y}}]);
 
-          this.refreshUI();
-        });
-      })(maybePath);
+        //TODO: having onMoveComplete AND this firing signals makes no sense
+        onMoveComplete();
+
+        this.refreshUI();
+      });
     })(squadId);
   }
   endTurn() {

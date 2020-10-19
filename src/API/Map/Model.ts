@@ -1,6 +1,6 @@
-import {Squad} from "../../Squad/Model";
-import {Unit, UnitMap} from "../../Unit/Model";
-import {Map} from 'immutable';
+import {Squad} from '../../Squad/Model';
+import {Unit, UnitMap} from '../../Unit/Model';
+import {Map, List} from 'immutable';
 export type UnitId = string;
 export type ForceId = string;
 export type CityId = string;
@@ -25,7 +25,7 @@ export type CellNumber =
   | 13
   | 14
   | 15;
-export type AICommand = "DEFEND" | "ATTACK"
+export type AICommand = 'DEFEND' | 'ATTACK';
 export type MapState = {
   id: string;
   name: string;
@@ -35,8 +35,8 @@ export type MapState = {
   forces: Force[];
   cities: City[];
   mapSquads: MapSquad[];
-  units: Map<string,Unit>
-  ai: Map<string,AICommand>
+  units: Map<string, Unit>;
+  ai: Map<string, AICommand>;
 };
 export type Force = {
   id: ForceId;
@@ -58,10 +58,10 @@ export type City = {
 export type Vector = {x: number; y: number};
 export type ValidStep = {target: Vector; steps: Vector[]};
 export type EnemyInRange = {enemy: string; steps: Vector[]};
-export type MapSquad =  Squad & {
+export type MapSquad = Squad & {
   pos: Vector;
   range: number;
-  validSteps: ValidStep[];
+  validSteps: List<ValidStep>;
   enemiesInRange: EnemyInRange[];
   status: 'alive' | 'defeated' | 'retreated';
 };

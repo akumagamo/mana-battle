@@ -1,11 +1,12 @@
 import * as PF from 'pathfinding';
-import S from 'sanctuary';
 import {Vector, TurnManager, MapSquad, Step} from './Model';
 import {MapState} from './Model';
-import {Map, Range} from 'immutable';
+import {Map, Range, List} from 'immutable';
 import {INVALID_STATE} from '../../errors';
 
-export const findById = (list: {id: string}[]) => (id: string) =>
+export type Identifiable = {id: string};
+
+export const findById = (list: Identifiable[]) => (id: string) =>
   list.find((n) => n.id === id);
 
 const makeVector = (x: number) => (y: number) => ({x, y});
@@ -13,8 +14,8 @@ const makeVector = (x: number) => (y: number) => ({x, y});
 export const getDistance = (vec1: Vector) => (vec2: Vector) =>
   Math.abs(vec1.x - vec2.x) + Math.abs(vec1.y - vec2.y);
 
-export const unitsFromForce = (state: MapState) => (id: string) =>
-  S.filter((u: MapSquad) => u.force === id)(state.mapSquads);
+export const squadsFromForce = (state: MapState) => (id: string) =>
+  state.mapSquads.filter((u) => u.force === id);
 
 export const getUnit = (state: MapState) => (id: string) =>
   findById(state.mapSquads)(id);
@@ -22,8 +23,13 @@ export const getUnit = (state: MapState) => (id: string) =>
 export const getForce = (state: MapState) => (id: string) =>
   findById(state.forces)(id);
 
-export const getEntities = (entityList: {id: string}[]) => (idList: string) =>
-  S.pipe([S.map((id: string) => findById(entityList)(id)), S.justs])(idList);
+export const getEntities = (entityList: Identifiable[]) => (idList: string[]) =>
+  idList
+    .map((id) => findById(entityList)(id))
+    .reduce(
+      (xs, x) => (typeof x !== 'undefined' ? xs.concat([x]) : xs),
+      [] as Identifiable[],
+    );
 
 export const getMovesForUnit = (_: MapState) => (_: string) => {
   //resume-todo: victory screen: just like wc3!
@@ -63,7 +69,7 @@ export const getPossibleMoves = ({
   // Marks enemy-occupied cells as "walls"
   const updatedGrid: number[][] = blockVectorsInGrid(grid)(enemyIndex);
 
-  const getUnitValidSteps = ({pos: {x, y}, range}: MapSquad): Step[] => {
+  const getUnitValidSteps = ({pos: {x, y}, range}: MapSquad): List<Step> => {
     const xs = Range(x - range - 1, x + range + 1)
       .filter((n) => n >= 0 && n < width)
       .toList();
@@ -80,10 +86,11 @@ export const getPossibleMoves = ({
 
     const pathInRange = <T>(list: T[]) => list.length <= range + 1;
 
-    //@ts-ignore
-    return ys
+    const vectors = ys
       .map((y_) => xs.map((x_) => ({x: x_, y: y_})))
-      .flatten(1)
+      .flatten(1) as List<Vector>;
+
+    return vectors
       .filter(isInRange(range))
       .filter(isWalkable)
       .map(pathFinder)
@@ -93,38 +100,32 @@ export const getPossibleMoves = ({
       .map((steps: Vector[]) => ({
         target: steps[steps.length - 1],
         steps,
-      }))
-      .toJS();
+      }));
   };
 
-  let bb = force.squads.map(getSquad).map((mapSquad) => {
+  return force.squads.map(getSquad).map((mapSquad) => {
     const steps = getUnitValidSteps(mapSquad);
-
-    const targets = S.map((step: Step) => step.target)(steps);
 
     return {
       ...mapSquad,
       validSteps: steps,
-      enemiesInRange: S.pipe([
-        S.filter((u: MapSquad) => mapSquad.force !== u.force),
-        S.filter((enemy: MapSquad) =>
-          S.any(
-            (step: Vector) =>
-              getDistance(step)(enemy.pos) === 1 &&
+      enemiesInRange: mapSquads
+        .filter((u) => mapSquad.force !== u.force)
+        .filter((enemy: MapSquad) =>
+          steps.some(
+            (step) =>
+              getDistance(step.target)(enemy.pos) === 1 &&
               getPathTo(grid)(mapSquad.pos)(enemy.pos).length <= mapSquad.range,
-          )(targets),
-        ),
-        S.map((enemy: MapSquad) => ({
+          ),
+        )
+        .map((enemy: MapSquad) => ({
           enemy: enemy.id,
           steps: getPathTo(grid)(mapSquad.pos)(enemy.pos)
             .slice(0, -1)
             .map(([x, y]) => makeVector(x)(y)),
         })),
-      ])(mapSquads),
     };
   });
-
-  return bb;
 };
 
 export const blockVectorsInGrid = (grid: number[][]) => (

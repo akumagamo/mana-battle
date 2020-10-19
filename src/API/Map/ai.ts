@@ -12,5 +12,5 @@ import {MapSquad} from './Model';
 export const randomMove = (unit: MapSquad) => {
   const {validSteps} = unit;
 
-  return randomItem(validSteps);
+  return randomItem(validSteps.toJS());
 };
