@@ -1,6 +1,5 @@
 import * as Phaser from 'phaser';
 import {Chara} from '../Chara/Chara';
-import * as DB from '../DB';
 import {cartesianToIsometricBattle} from '../utils/isometric';
 import {INVALID_STATE} from '../errors';
 import {Unit} from '../Unit/Model';
@@ -194,7 +193,7 @@ export default class CombatScene extends Phaser.Scene {
       this.retreatUnits().then((updatedUnits: Unit[]) => {
         const units = updatedUnits.map((unit) => ({
           type: 'UPDATE_UNIT',
-          unit,
+          unit: {...unit, exp: unit.exp + 40},
         }));
         //this.scene.start('MapScene', [...units, ]);
 

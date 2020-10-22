@@ -477,10 +477,6 @@ export class MapScene extends Phaser.Scene {
 
     const squads = getSquadsFromForce(this.state)(this.currentForce);
 
-    console.log(`moveList`, moveList);
-
-    console.log(`>>>squads`, squads);
-
     moveList.forEach((move) => {
       const squad = squads.find((s) => s.id === move.id);
 
