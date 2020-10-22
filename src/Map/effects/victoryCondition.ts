@@ -84,7 +84,7 @@ export default (scene: MapScene) => {
             duration: 1000,
           }),
         )
-        .then(() => scene.runTurn());
+        .then(() => scene.startForceTurn());
     }),
   ])(scene.state);
 };

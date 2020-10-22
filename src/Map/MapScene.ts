@@ -61,6 +61,8 @@ const boardPadding = 50;
 
 const walkableTiles = [0];
 
+const CITY_HEAL_PERCENT = 20;
+
 type MapTile = {
   x: number;
   y: number;
@@ -257,7 +259,7 @@ export class MapScene extends Phaser.Scene {
           console.log(`=== PLAYER ===`);
         }
       } else if (cmd.type === 'RUN_TURN') {
-        this.runTurn();
+        this.startForceTurn();
       } else if (cmd.type === 'CITY_CLICK') {
         this.signal([{type: 'SELECT_CITY', id: cmd.id}]);
 
@@ -304,7 +306,7 @@ export class MapScene extends Phaser.Scene {
     this.setWorldBounds();
     this.makeWorldDraggable();
 
-    this.runTurn();
+    this.startForceTurn();
     // if (!this.hasShownVictoryCondition) {
     //   this.showVictoryCondition();
     //   this.hasShownVictoryCondition = true;
@@ -1101,12 +1103,14 @@ export class MapScene extends Phaser.Scene {
     this.currentForce = force.id;
   }
 
-  async runTurn() {
+  async startForceTurn() {
     const force = this.getForce(this.currentForce);
 
     this.getValidMoves();
 
     await this.showTurnTitle(force);
+
+    this.healUnits(force);
 
     if (force.id === CPU_FORCE) {
       this.disableInput();
@@ -1120,6 +1124,32 @@ export class MapScene extends Phaser.Scene {
       )[0];
       this.moveCameraTo(unit.pos, 500);
     }
+  }
+
+  healUnits(force: Force) {
+    this.getAliveSquadsFromForce(force.id).forEach((s) => {
+      if (this.state.cities.find((c) => c.x === s.pos.x && c.y === s.pos.y)) {
+        this.healSquad(s);
+      }
+    });
+  }
+
+  healSquad(squad: MapSquad) {
+    Object.keys(squad.members).forEach((unitId) => {
+      const unit = this.state.units.get(unitId);
+
+      if (unit && unit.currentHp > 0 && unit.currentHp < unit.hp) {
+        const healAmount = Math.floor((unit.hp / 100) * CITY_HEAL_PERCENT);
+
+        const newHp = unit.currentHp + healAmount;
+
+        if (newHp < unit.hp)
+          this.state.units = this.state.units.set(unitId, {
+            ...unit,
+            currentHp: newHp,
+          });
+      }
+    });
   }
 
   disableInput() {
@@ -1155,7 +1185,7 @@ export class MapScene extends Phaser.Scene {
     if (!currentSquad) {
       console.log(`no remainingUnits!`);
       this.switchForce();
-      this.runTurn();
+      this.startForceTurn();
       return;
     }
 
@@ -1397,7 +1427,7 @@ export class MapScene extends Phaser.Scene {
     this.movedSquads = [];
     this.charas.forEach((u) => u.container?.setAlpha(1));
     this.switchForce();
-    this.runTurn();
+    this.startForceTurn();
   }
 
   // TODO: simplify interface (require only ids)
