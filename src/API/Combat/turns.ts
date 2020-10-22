@@ -293,7 +293,9 @@ function isVictory(current: TurnUnit, units: TurnUnit[]) {
 }
 
 function noAttacksRemaining(units: TurnUnit[]) {
-  return units.filter(u=> isAlive(u.unit)).every(u=>u.remainingAttacks < 1)
+  return units
+    .filter((u) => isAlive(u.unit))
+    .every((u) => u.remainingAttacks < 1);
 }
 
 // TODO: add get closest target option

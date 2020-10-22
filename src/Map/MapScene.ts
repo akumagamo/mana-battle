@@ -831,7 +831,7 @@ export class MapScene extends Phaser.Scene {
       moveBelow: true,
       data: {
         squads: this.state.mapSquads,
-        units: this.state.units.filter((u) => u.currentHp > 0),
+        units: this.state.units,
         top: isPlayer ? target.id : starter.id,
         bottom: isPlayer ? starter.id : target.id,
         onCombatFinish: (cmds: MapCommands[]) => {

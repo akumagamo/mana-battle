@@ -96,6 +96,8 @@ export default class CombatScene extends Phaser.Scene {
           const unit = data.units.find((u) => u.id === member.id);
           if (!unit) throw new Error(INVALID_STATE);
 
+          if (unit.currentHp < 1) return;
+
           const coords = getCoords(member);
 
           const {x, y} = cartesianToIsometricBattle(
