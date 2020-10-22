@@ -1,9 +1,8 @@
 // @ts-nocheck
 
 import {getPossibleMoves} from './api';
-import {Just, map} from 'sanctuary';
-import {Map, Range, Set} from 'immutable';
-import {MapState, TurnManager} from './Model';
+import {Range, Set, fromJS} from 'immutable';
+import {TurnManager} from './Model';
 const defaultParams: TurnManager = {
   currentForce: 'a',
   forces: [
@@ -61,12 +60,12 @@ const defaultParams: TurnManager = {
 test('Get moves in straight line', () => {
   const cells = getPossibleMoves(defaultParams);
 
-  const lens = map((c) => c[0].validSteps.map((t) => t.target));
+  const lens = (c) => c[0].validSteps.map((t) => t.target).toJS();
 
-  const expected = Just([
+  const expected = [
     {x: 0, y: 1},
     {x: 0, y: 2},
-  ]);
+  ];
 
   expect(lens(cells)).toEqual(expected);
 });
@@ -79,18 +78,18 @@ test('Make a turn', () => {
       unit.id === 'a1' ? {...unit, range: 4} : unit,
     ),
   };
-  const cells = getPossibleMoves(longerRange);
+  const moves = getPossibleMoves(longerRange);
 
-  const lens = map((c) => c[0].validSteps.map((t) => t.target));
+  const lens = (c) => c[0].validSteps.map((t) => t.target).toJS();
 
-  const expected = Just([
+  const expected = [
     {x: 0, y: 1},
     {x: 0, y: 2},
     {x: 0, y: 3},
     {x: 1, y: 3},
-  ]);
+  ];
 
-  expect(lens(cells)).toEqual(expected);
+  expect(lens(moves)).toEqual(expected);
 });
 
 test('Get moves in blocked path ', () => {
@@ -108,15 +107,15 @@ test('Get moves in blocked path ', () => {
       unit.id === 'a1' ? {...unit, range: 4} : unit,
     ),
   };
-  const cells = getPossibleMoves(path);
+  const moves = getPossibleMoves(path);
 
-  const lens = map((c) => c[0].validSteps.map((t) => t.target));
-  const expected = Just([
+  const lens = (c) => c[0].validSteps.map((t) => t.target).toJS();
+  const expected = [
     {x: 0, y: 1},
     {x: 0, y: 2},
-  ]);
+  ];
 
-  expect(lens(cells)).toEqual(expected);
+  expect(lens(moves)).toEqual(expected);
 });
 
 test('Get moves in forked path ', () => {
@@ -134,10 +133,10 @@ test('Get moves in forked path ', () => {
       unit.id === 'a1' ? {...unit, range: 4} : unit,
     ),
   };
-  const cells = getPossibleMoves(path);
+  const moves = getPossibleMoves(path);
 
-  const expected = Just(
-    Set([
+  const expected = Set(
+    [
       {x: 0, y: 1},
       {x: 0, y: 2},
       {x: 0, y: 3},
@@ -146,12 +145,14 @@ test('Get moves in forked path ', () => {
       {x: 2, y: 1},
       {x: 2, y: 2},
       {x: 3, y: 1},
-    ]),
+    ].map((v) => fromJS(v)),
   );
 
-  const lens = map((c) => Set(c[0].validSteps.map((t) => t.target)));
+  const result = Set(
+    fromJS(moves[0].validSteps.map((t) => t.target).map((v) => fromJS(v))),
+  );
 
-  expect(lens(cells)).toEqual(expected);
+  expect(result.equals(expected)).toBe(true);
 });
 
 test('Enemy blocks path', () => {
@@ -161,9 +162,9 @@ test('Enemy blocks path', () => {
       .map((unit) => (unit.id === 'a1' ? {...unit, range: 4} : unit))
       .map((unit) => (unit.id === 'b1' ? {...unit, pos: {x: 0, y: 3}} : unit)),
   };
-  const maybeCells = getPossibleMoves(path);
+  const moves = getPossibleMoves(path);
 
-  const expected = Just([
+  const expected = [
     {
       steps: [
         {
@@ -200,17 +201,18 @@ test('Enemy blocks path', () => {
         y: 2,
       },
     },
-  ]);
+  ];
 
-  const lens = map((c) => c[0].validSteps);
+  const result = moves[0].validSteps.toJS();
 
-  expect(lens(maybeCells)).toEqual(expected);
+  expect(fromJS(result).equals(fromJS(expected))).toBe(true);
+  //expect(result).toEqual(expected);
 });
 test('Large map - performance check', () => {
   const path = {
     ...defaultParams,
     grid: Range(0, 50)
-      .map((n) => Range(0, 50).map((n) => 0))
+      .map(() => Range(0, 50).map(() => 0))
       .toJS(),
   };
   getPossibleMoves(path);
