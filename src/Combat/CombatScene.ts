@@ -23,8 +23,10 @@ const invertBoard = (n: number) => {
   else return n;
 };
 
-const getBoardCoords = (topSquadId: string, squadId:string) => ({x,y}: Vector) => {
-
+const getBoardCoords = (topSquadId: string, squadId: string) => ({
+  x,
+  y,
+}: Vector) => {
   return {
     x: squadId === topSquadId ? x : invertBoard(x),
     y: squadId === topSquadId ? y : invertBoard(y),
@@ -60,7 +62,7 @@ export default class CombatScene extends Phaser.Scene {
     bottom: string;
     conflictId: string;
     squads: Squad[];
-    units: Map<string,Unit>;
+    units: Map<string, Unit>;
     onCombatFinish: <CMD>(cmd: CMD[]) => void;
   }) {
     if (this.container) this.container.destroy();
@@ -80,9 +82,9 @@ export default class CombatScene extends Phaser.Scene {
     const combatants = [data.top, data.bottom];
 
     combatants.forEach((id) => {
-      const squad = data.squads.find(s=>s.id===id)
+      const squad = data.squads.find((s) => s.id === id);
 
-      if(!squad) throw new Error(INVALID_STATE)
+      if (!squad) throw new Error(INVALID_STATE);
 
       const members = Object.values(squad.members);
       const isTopSquad = id === data.top;
@@ -91,14 +93,15 @@ export default class CombatScene extends Phaser.Scene {
       members
         .sort((a, b) => getCoords(a).y - getCoords(b).y)
         .forEach((member) => {
+          const unit = data.units.find((u) => u.id === member.id);
+          if (!unit) throw new Error(INVALID_STATE);
 
-          const unit = data.units.find(u=>u.id === member.id)
-          if(!unit) throw new Error(INVALID_STATE)
+          const coords = getCoords(member);
 
           const {x, y} = cartesianToIsometricBattle(
             isTopSquad,
-            member.x,
-            member.y,
+            coords.x,
+            coords.y,
           );
 
           const chara = new Chara(
@@ -405,7 +408,10 @@ export default class CombatScene extends Phaser.Scene {
     chara.run();
 
     if (!chara.unit.squad) throw new Error(INVALID_STATE);
-    const coords = getBoardCoords(this.top, chara.unit.squad.id)(chara.unit.squad);
+    const coords = getBoardCoords(
+      this.top,
+      chara.unit.squad.id,
+    )(chara.unit.squad);
     const {x, y} = cartesianToIsometricBattle(
       this.top === chara.unit.squad.id,
       coords.x,
