@@ -204,7 +204,8 @@ export class MapScene extends Phaser.Scene {
             if (unit.force === PLAYER_FORCE)
               this.showCellMenu(unit, cmd.cell, async () => {
                 const targets = this.targets(cmd.cell);
-                if (targets.length > 0) this.showSquadActionsMenu(unit);
+                const city = this.cityAt(cmd.cell.x, cmd.cell.y);
+                if (targets.length > 0 || city) this.showSquadActionsMenu(unit);
                 else this.finishSquadActions(await this.getChara(unit.id));
               });
           })(this.getSelectedUnit());
@@ -471,7 +472,7 @@ export class MapScene extends Phaser.Scene {
     return tile;
   }
   cityAt(x: number, y: number) {
-    return S.find<City>((c) => c.x === x && c.y === y)(this.state.cities);
+    return this.state.cities.find((c) => c.x === x && c.y === y);
   }
 
   getValidMoves() {
@@ -1410,12 +1411,11 @@ export class MapScene extends Phaser.Scene {
     if (!step) throw new Error(INVALID_STATE);
 
     this.moveUnit(chara, step.steps).then(() => {
-      S.map<City, void>((city) => {
-        if (city.force !== mapSquad.force)
-          this.signal([
-            {type: 'CAPTURE_CITY', id: city.id, force: mapSquad.force},
-          ]);
-      })(this.cityAt(x, y));
+      const city = this.cityAt(x, y);
+      if (city && city.force !== mapSquad.force)
+        this.signal([
+          {type: 'CAPTURE_CITY', id: city.id, force: mapSquad.force},
+        ]);
 
       this.signal([{type: 'UPDATE_SQUAD_POS', id: squadId, pos: {x, y}}]);
 
@@ -1641,9 +1641,9 @@ export class MapScene extends Phaser.Scene {
                     console.log(`...`, currentSquad);
                     if (!currentSquad) return;
 
-                    console.log(`targets...`, this.targets);
+                    const city = this.cityAt(cell.x, cell.y);
 
-                    if (this.targets(cell).length > 0)
+                    if (this.targets(cell).length > 0 || city)
                       this.showSquadActionsMenu(currentSquad);
                     else
                       this.finishSquadActions(
