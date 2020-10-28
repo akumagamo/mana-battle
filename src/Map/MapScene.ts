@@ -151,10 +151,11 @@ export class MapScene extends Phaser.Scene {
         this.state.mapSquads = this.state.mapSquads.filter(
           (s) => s.id !== cmd.target,
         );
-        const animation = () =>
-          this.charaIO((chara) => {
-            chara.fadeOut(() => {});
-          })(cmd.target);
+        const animation = async () => {
+          const chara = await this.getChara(cmd.target);
+
+          chara.fadeOut(() => {});
+        };
         this.time.addEvent({
           delay: 100,
           callback: () => animation(),
@@ -201,8 +202,10 @@ export class MapScene extends Phaser.Scene {
         } else {
           S.map<MapSquad, void>((unit) => {
             if (unit.force === PLAYER_FORCE)
-              this.showCellMenu(unit, cmd.cell, () => {
-                this.showSquadActionsMenu(unit);
+              this.showCellMenu(unit, cmd.cell, async () => {
+                const targets = this.targets(cmd.cell);
+                if (targets.length > 0) this.showSquadActionsMenu(unit);
+                else this.finishSquadActions(await this.getChara(unit.id));
               });
           })(this.getSelectedUnit());
         }
@@ -531,10 +534,6 @@ export class MapScene extends Phaser.Scene {
     );
   };
 
-  charaIO = (fn: (u: Chara) => void) => (id: string) => {
-    S.map<Chara, void>((unit) => fn(unit))(this.getChara(id));
-  };
-
   getDefeatedForces(): string[] {
     return this.state.forces
       .map((f) => f.id)
@@ -705,8 +704,12 @@ export class MapScene extends Phaser.Scene {
     });
   }
 
-  getChara(unitId: string) {
-    return S.find<Chara>((c) => c.key === this.charaKey(unitId))(this.charas);
+  async getChara(unitId: string) {
+    const chara = this.charas.find((c) => c.key === this.charaKey(unitId));
+
+    if (!chara) throw new Error('Invalid ID');
+
+    return chara;
   }
 
   charaKey(squadId: string) {
@@ -1548,66 +1551,67 @@ export class MapScene extends Phaser.Scene {
     );
   };
 
-  showSquadActionsMenu(squad: MapSquad) {
-    this.charaIO((chara) => {
-      this.showActionMenu({
-        chara,
-        cell: squad.pos,
-        onAttack: () => {
-          this.signal([{type: 'CLOSE_ACTION_PANEL'}]);
-          this.highlightAttackableCells(squad);
-          this.makeCellAttackable(squad);
-        },
-        onWait: () => {
-          this.signal([{type: 'CLOSE_ACTION_PANEL'}]);
-          this.finishSquadActions(chara);
-          //this.checkTurnEnd();
-        },
-      });
-    })(squad.id);
+  async showSquadActionsMenu(squad: MapSquad) {
+    const chara = await this.getChara(squad.id);
+
+    this.showActionMenu({
+      chara,
+      cell: squad.pos,
+      onAttack: () => {
+        this.signal([{type: 'CLOSE_ACTION_PANEL'}]);
+        this.highlightAttackableCells(squad);
+        this.makeCellAttackable(squad);
+      },
+      onWait: () => {
+        this.signal([{type: 'CLOSE_ACTION_PANEL'}]);
+        this.finishSquadActions(chara);
+        //this.checkTurnEnd();
+      },
+    });
   }
 
   finishSquadActions(chara: Chara) {
     chara.container.setAlpha(0.5);
+
+    this.signal([{type: 'END_SQUAD_TURN'}]);
   }
 
-  makeCellAttackable(squad: MapSquad) {
+  async makeCellAttackable(squad: MapSquad) {
     const enemies = this.targets(squad.pos);
-    enemies.forEach((e) => {
-      this.charaIO((enemyChara) => {
-        console.log(`making enemy clickable...`);
-        enemyChara.container.removeAllListeners();
-        enemyChara.onClick(() =>
-          this.actionWindow(
-            enemyChara.container.x + this.mapX || 0,
-            enemyChara.container.y + this.mapY || 0,
-            [
-              {
-                title: 'Attack Squad',
-                action: () => {
-                  this.closeActionWindow();
-                  this.attack(squad, e);
-                },
+    enemies.forEach(async (e) => {
+      const enemyChara = await this.getChara(e.id);
+      console.log(`making enemy clickable...`);
+      enemyChara.container.removeAllListeners();
+      enemyChara.onClick(() =>
+        this.actionWindow(
+          enemyChara.container.x + this.mapX || 0,
+          enemyChara.container.y + this.mapY || 0,
+          [
+            {
+              title: 'Attack Squad',
+              action: () => {
+                this.closeActionWindow();
+                this.attack(squad, e);
               },
-              {
-                title: 'View',
-                action: () => {
-                  this.closeActionWindow();
-                  // TODO
-                },
+            },
+            {
+              title: 'View',
+              action: () => {
+                this.closeActionWindow();
+                // TODO
               },
+            },
 
-              {
-                title: 'Cancel',
-                action: () => {
-                  console.log(`Cancel`);
-                  this.closeActionWindow();
-                },
+            {
+              title: 'Cancel',
+              action: () => {
+                console.log(`Cancel`);
+                this.closeActionWindow();
               },
-            ],
-          ),
-        );
-      })(e.id);
+            },
+          ],
+        ),
+      );
     });
   }
 
@@ -1633,8 +1637,18 @@ export class MapScene extends Phaser.Scene {
               title: 'Move',
               action: () => {
                 if (currentSquad)
-                  this.moveToTile(currentSquad.id, cell, () => {
-                    if (currentSquad) this.showSquadActionsMenu(currentSquad);
+                  this.moveToTile(currentSquad.id, cell, async () => {
+                    console.log(`...`, currentSquad);
+                    if (!currentSquad) return;
+
+                    console.log(`targets...`, this.targets);
+
+                    if (this.targets(cell).length > 0)
+                      this.showSquadActionsMenu(currentSquad);
+                    else
+                      this.finishSquadActions(
+                        await this.getChara(currentSquad.id),
+                      );
                   });
 
                 this.actionWindowContainer?.destroy();
