@@ -189,9 +189,6 @@ export class MapScene extends Phaser.Scene {
         );
         const city = this.state.cities.find((c) => c.x === x && c.y === y);
 
-        console.log(`squads:`, squads);
-        console.log(`city:`, city);
-
         this.signal([
           {type: 'CLEAR_TILES_TINTING'},
           {type: 'HIGHLIGHT_CELL', pos: cmd.cell},
@@ -444,15 +441,25 @@ export class MapScene extends Phaser.Scene {
       },
     );
 
-    this.input.on('dragend', () => {
+    this.input.on('dragend', (pointer: Pointer) => {
+      const timeDelta = pointer.upTime - pointer.downTime;
+      const posDelta =
+        Math.abs(pointer.upX - pointer.downX) +
+        Math.abs(pointer.upY - pointer.downY);
+      const minTimeDelta = 300;
+      const minPosDelta = 30;
+
       this.mapX = this.mapContainer.x;
       this.mapY = this.mapContainer.y;
       // Avoid firing "click_cell" event on dragend
 
-      if (this.isDragging) {
-        console.log('dragend, avoid firing click event');
+      if (
+        this.isDragging &&
+        timeDelta > minTimeDelta &&
+        posDelta > minPosDelta
+      ) {
         this.disableCellClick();
-        this.delay(10).then(() => {
+        this.delay(20).then(() => {
           this.enableCellClick();
         });
       }
@@ -926,6 +933,7 @@ export class MapScene extends Phaser.Scene {
     //UNIT INFORMATION
     if (this.selectedEntity && this.selectedEntity.type === 'unit') {
       const squad = await this.squadIO(this.selectedEntity.id);
+
       text(20, 610, squad.name, uiContainer, this);
       text(1000, 610, `${squad.range} cells`, uiContainer, this);
 
@@ -1286,72 +1294,70 @@ export class MapScene extends Phaser.Scene {
     if (this.movedSquads.includes(squad.id)) return;
 
     this.dragDisabled = true;
-    const maybeMapTile = S.find<MapTile>(
-      (tile) => tile.x === x && tile.y === y,
-    )(this.tiles);
+    const mapTile = this.tiles.find((tile) => tile.x === x && tile.y === y);
 
-    S.map<MapTile, void>((mapTile) => {
-      const {tile} = mapTile;
-      this.signal([
-        {type: 'CLOSE_ACTION_PANEL'},
-        {type: 'SHOW_TARGETABLE_CELLS', unit: squad},
-        {type: 'HIGHLIGHT_CELL', pos: {x: mapTile.x, y: mapTile.y}},
-      ]);
+    if (!mapTile) throw new Error('Invalid tile position.');
 
-      const moveAction = () => {
-        if (squad.validSteps.some((step) => S.equals(step.target)({x, y})))
-          return [
-            {
-              title: 'Move',
-              action: () => {
-                //TODO: convert to data
-                this.moveToTile(squad.id, mapTile, () => {
-                  this.dragDisabled = false;
-                  onMoveComplete();
-                });
-                this.actionWindowContainer?.destroy();
-                tile.clearTint();
-              },
-            },
-          ];
-        else return [];
-      };
+    const {tile} = mapTile;
+    this.signal([
+      {type: 'CLOSE_ACTION_PANEL'},
+      {type: 'SHOW_TARGETABLE_CELLS', unit: squad},
+      {type: 'HIGHLIGHT_CELL', pos: {x: mapTile.x, y: mapTile.y}},
+    ]);
 
-      const viewCityAction = () => {
-        const maybeCity = this.state.cities.find((c) => c.x === x && c.y === y);
-
-        if (maybeCity) {
-          return [
-            {
-              title: 'Select City',
-              action: () => {
+    const moveAction = () => {
+      if (squad.validSteps.some((step) => S.equals(step.target)({x, y})))
+        return [
+          {
+            title: 'Move',
+            action: () => {
+              //TODO: convert to data
+              this.moveToTile(squad.id, mapTile, () => {
                 this.dragDisabled = false;
-                this.signal([{type: 'SELECT_CITY', id: maybeCity.id}]);
-              },
+                onMoveComplete();
+              });
+              this.actionWindowContainer?.destroy();
+              tile.clearTint();
             },
-          ];
-        } else return [];
-      };
+          },
+        ];
+      else return [];
+    };
 
-      this.actionWindow(
-        tile.x + this.mapX,
-        tile.y + this.mapY,
-        moveAction()
-          .concat(viewCityAction())
-          .concat([
-            {
-              title: 'Cancel',
-              action: () => {
-                this.dragDisabled = false;
-                this.signal([
-                  {type: 'CLOSE_ACTION_PANEL'},
-                  {type: 'SHOW_TARGETABLE_CELLS', unit: squad},
-                ]);
-              },
+    const viewCityAction = () => {
+      const maybeCity = this.state.cities.find((c) => c.x === x && c.y === y);
+
+      if (maybeCity) {
+        return [
+          {
+            title: 'Select City',
+            action: () => {
+              this.dragDisabled = false;
+              this.signal([{type: 'SELECT_CITY', id: maybeCity.id}]);
             },
-          ]),
-      );
-    })(maybeMapTile);
+          },
+        ];
+      } else return [];
+    };
+
+    this.actionWindow(
+      tile.x + this.mapX,
+      tile.y + this.mapY,
+      moveAction()
+        .concat(viewCityAction())
+        .concat([
+          {
+            title: 'Cancel',
+            action: () => {
+              this.dragDisabled = false;
+              this.signal([
+                {type: 'CLOSE_ACTION_PANEL'},
+                {type: 'SHOW_TARGETABLE_CELLS', unit: squad},
+              ]);
+            },
+          },
+        ]),
+    );
   }
 
   showCityInfo(id: string) {
@@ -1426,6 +1432,10 @@ export class MapScene extends Phaser.Scene {
     });
   }
   endTurn() {
+    this.selectedEntity = null;
+    setTimeout(() => {
+      this.refreshUI();
+    }, 50);
     this.clearTiles();
     this.movedSquads = [];
     this.charas.forEach((u) => u.container?.setAlpha(1));
@@ -1538,17 +1548,21 @@ export class MapScene extends Phaser.Scene {
   targets = (cell: Vector): MapSquad[] => {
     const enemies = this.getEnemies();
 
-    let coords = [-1, 0, 1];
+    const coords = [
+      [-1, 0],
+      [1, 0],
+      [0, -1],
+      [0, 1],
+    ];
 
-    return S.justs(
-      //@ts-ignore
-      S.lift2((x: number) => (y: number) =>
-        S.find(
-          (enemySquad: MapSquad) =>
-            enemySquad.pos.x === x + cell.x && enemySquad.pos.y === y + cell.y,
-        )(enemies),
-      )(coords)(coords),
-    );
+    return coords.reduce((xs, [x, y]) => {
+      const target = enemies.find(
+        (e) => e.pos.x + x === cell.x && e.pos.y + y === cell.y,
+      );
+
+      if (target) return xs.concat([target]);
+      else return xs;
+    }, [] as MapSquad[]);
   };
 
   async showSquadActionsMenu(squad: MapSquad) {
@@ -1590,6 +1604,8 @@ export class MapScene extends Phaser.Scene {
             {
               title: 'Attack Squad',
               action: () => {
+                this.clearAllTileEvents();
+                this.clearTiles();
                 this.closeActionWindow();
                 this.attack(squad, e);
               },
@@ -1597,15 +1613,19 @@ export class MapScene extends Phaser.Scene {
             {
               title: 'View',
               action: () => {
+                this.clearAllTileEvents();
+                this.clearTiles();
                 this.closeActionWindow();
-                // TODO
+                this.setSelectedUnit(e.id);
+                this.refreshUI();
               },
             },
 
             {
               title: 'Cancel',
               action: () => {
-                console.log(`Cancel`);
+                this.clearAllTileEvents();
+                this.clearTiles();
                 this.closeActionWindow();
               },
             },
@@ -1638,8 +1658,7 @@ export class MapScene extends Phaser.Scene {
               action: () => {
                 if (currentSquad)
                   this.moveToTile(currentSquad.id, cell, async () => {
-                    console.log(`...`, currentSquad);
-                    if (!currentSquad) return;
+                    if (!currentSquad) return; // TODO: this is bad
 
                     const city = this.cityAt(cell.x, cell.y);
 
