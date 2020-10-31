@@ -4,11 +4,6 @@ import {MapState} from './Model';
 import {Map, Range, List} from 'immutable';
 import {INVALID_STATE} from '../../errors';
 
-export type Identifiable = {id: string};
-
-export const findById = (list: Identifiable[]) => (id: string) =>
-  list.find((n) => n.id === id);
-
 const makeVector = (x: number) => (y: number) => ({x, y});
 
 export const getDistance = (vec1: Vector) => (vec2: Vector) =>
@@ -18,18 +13,10 @@ export const squadsFromForce = (state: MapState) => (id: string) =>
   state.mapSquads.filter((u) => u.force === id);
 
 export const getUnit = (state: MapState) => (id: string) =>
-  findById(state.mapSquads)(id);
+  state.mapSquads.find((s) => s.id === id);
 
 export const getForce = (state: MapState) => (id: string) =>
-  findById(state.forces)(id);
-
-export const getEntities = (entityList: Identifiable[]) => (idList: string[]) =>
-  idList
-    .map((id) => findById(entityList)(id))
-    .reduce(
-      (xs, x) => (typeof x !== 'undefined' ? xs.concat([x]) : xs),
-      [] as Identifiable[],
-    );
+  state.forces.find((s) => s.id === id);
 
 export const getMovesForUnit = (_: MapState) => (_: string) => {
   //resume-todo: victory screen: just like wc3!

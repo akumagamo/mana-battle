@@ -194,18 +194,24 @@ export class MapScene extends Phaser.Scene {
           {type: 'HIGHLIGHT_CELL', pos: cmd.cell},
         ]);
 
-        if (squads.length > 0 || city) {
+        if (squads.length === 1 && !city) {
+          this.signal([{type: 'CLICK_SQUAD', unit: squads[0]}]);
+        } else if (squads.length > 0 || city) {
           this.renderCellMenu(squads, city, cmd.cell);
         } else {
-          S.map<MapSquad, void>((unit) => {
-            if (unit.force === PLAYER_FORCE)
-              this.showCellMenu(unit, cmd.cell, async () => {
-                const targets = this.targets(cmd.cell);
-                const city = this.cityAt(cmd.cell.x, cmd.cell.y);
-                if (targets.length > 0 || city) this.showSquadActionsMenu(unit);
-                else this.finishSquadActions(await this.getChara(unit.id));
-              });
-          })(this.getSelectedUnit());
+          const selectedUnit = this.getSelectedUnit();
+
+          if (!selectedUnit) return;
+
+          if (selectedUnit.force === PLAYER_FORCE)
+            this.showCellMenu(selectedUnit, cmd.cell, async () => {
+              const targets = this.targets(cmd.cell);
+              const city = this.cityAt(cmd.cell.x, cmd.cell.y);
+              if (targets.length > 0 || city)
+                this.showSquadActionsMenu(selectedUnit);
+              else
+                this.finishSquadActions(await this.getChara(selectedUnit.id));
+            });
         }
       } else if (cmd.type === 'CLICK_SQUAD') {
         this.clickSquad(cmd.unit);
@@ -269,7 +275,7 @@ export class MapScene extends Phaser.Scene {
         this.state.cities = this.state.cities.map((city) =>
           city.id === cmd.id ? {...city, force: cmd.force} : city,
         );
-        this.citySpriteIO((sprite) => sprite.setTint(ALLIED_CITY_TINT))(cmd.id);
+        //this.citySpriteIO((sprite) => sprite.setTint(ALLIED_CITY_TINT))(cmd.id);
       }
     });
   }
@@ -575,9 +581,9 @@ export class MapScene extends Phaser.Scene {
       city_.setScale(CITY_SCALE);
 
       if (city.force === 'PLAYER_FORCE') {
-        city_.setTint(ALLIED_CITY_TINT);
+        //city_.setTint(ALLIED_CITY_TINT);
       } else {
-        city_.setTint(ENEMY_CITY_TINT);
+        //city_.setTint(ENEMY_CITY_TINT);
       }
       // city_.setInteractive();
       // city_.on('pointerup', () => {
@@ -620,8 +626,8 @@ export class MapScene extends Phaser.Scene {
   }
   getSelectedUnit() {
     if (this.selectedEntity && this.selectedEntity.type === 'unit') {
-      return S.Just(this.getUnit(this.selectedEntity.id));
-    } else return S.Nothing;
+      return this.getUnit(this.selectedEntity.id);
+    }
   }
   makeInteractive(cell: MapTile) {
     cell.tile.on('pointerup', () => {
@@ -741,10 +747,10 @@ export class MapScene extends Phaser.Scene {
     }
   }
 
-  handleClickOnEnemyUnit(enemyUnit: MapSquad) {
-    const maybeSelectedUnit = this.getSelectedUnit();
+  async handleClickOnEnemyUnit(enemyUnit: MapSquad) {
+    const selectedUnit = this.getSelectedUnit();
 
-    if (S.isNothing(maybeSelectedUnit)) {
+    if (!selectedUnit) {
       // TODO: done rely on selected unit status (use state machine)
       this.signal([{type: 'SHOW_SQUAD_PANEL', unit: enemyUnit}]);
     } else {
@@ -773,11 +779,9 @@ export class MapScene extends Phaser.Scene {
         }
       };
 
-      S.map<MapSquad, void>((selectedUnit) => {
-        S.map<Chara, void>((chara_) => {
-          action(selectedUnit, chara_);
-        })(this.getChara(enemyUnit.id));
-      })(maybeSelectedUnit);
+      const enemyChara_ = await this.getChara(enemyUnit.id);
+
+      action(selectedUnit, enemyChara_);
     }
   }
 
