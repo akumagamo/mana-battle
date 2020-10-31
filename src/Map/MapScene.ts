@@ -135,6 +135,8 @@ export class MapScene extends Phaser.Scene {
   cellClickDisabled = false;
   cityClickDisabled = false;
 
+  cellHighlight: Phaser.GameObjects.Rectangle | null = null;
+
   // ----- Phaser --------------------
   constructor() {
     super('MapScene');
@@ -180,6 +182,8 @@ export class MapScene extends Phaser.Scene {
           console.log(`cell click disabled! cancelling`);
           return;
         }
+
+        this.clearTiles();
 
         this.closeActionWindow();
         const {x, y} = cmd.cell;
@@ -239,7 +243,15 @@ export class MapScene extends Phaser.Scene {
       } else if (cmd.type === 'HIGHLIGHT_CELL') {
         const {x, y} = cmd.pos;
         const mapTile = this.tileAt(x, y);
-        mapTile.tile.setTint(SELECTED_TILE_TINT);
+
+        this.cellHighlight = this.add.rectangle(
+          mapTile.tile.x + this.mapContainer.x,
+          mapTile.tile.y + this.mapContainer.y,
+          cellSize,
+          cellSize,
+        );
+
+        this.cellHighlight.setStrokeStyle(2, 0x1a65ac);
       } else if (cmd.type === 'CLOSE_ACTION_PANEL') {
         this.closeActionWindow();
       } else if (cmd.type === 'END_SQUAD_TURN') {
@@ -1021,9 +1033,10 @@ export class MapScene extends Phaser.Scene {
       this.renderDispatchWindow();
     });
 
-    button(1150, 650, 'End Turn', uiContainer, this, () => {
-      this.endTurn();
-    });
+    if (this.currentForce === PLAYER_FORCE)
+      button(1150, 650, 'End Turn', uiContainer, this, () => {
+        this.endTurn();
+      });
   }
 
   renderDispatchWindow() {
@@ -1287,6 +1300,8 @@ export class MapScene extends Phaser.Scene {
 
   clearTiles() {
     this.clearAllTileTint();
+
+    if (this.cellHighlight) this.cellHighlight.destroy();
     //  this.clearAllTileEvents();
   }
 
