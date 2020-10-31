@@ -130,7 +130,7 @@ export function preload(this: {
 
   const structures = ['tiles/town'];
   structures.forEach((id: string) => {
-    this.load.image(id, `${PUBLIC_URL}/${id}.png`);
+    this.load.image(id, `${PUBLIC_URL}/${id}.svg`);
   });
 
   // merano - Alois_Kirnig_-_Forst_Castle_on_the_Adige_near_Merano
