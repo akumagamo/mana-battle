@@ -1,7 +1,8 @@
 import S from 'sanctuary';
-import {Unit} from '../../Unit/Model';
+import {Unit, UnitSquadPosition} from '../../Unit/Model';
 import {getUnitAttack, getUnitDamage} from '../../Unit/Skills';
 import {INVALID_STATE} from '../../errors';
+import {invertBoardPosition} from './utils';
 
 const sortInitiative = (unit: TurnUnit) => unit.unit.dex * 2;
 
@@ -125,7 +126,7 @@ function meleeAttackSingleTarget(
   units: TurnUnit[],
   commands: Command[],
 ) {
-  const target = getTarget(current.unit, units);
+  const target = getMeleeTarget(current.unit, units);
 
   if (!target) throw new Error(INVALID_STATE);
 
@@ -298,13 +299,43 @@ function noAttacksRemaining(units: TurnUnit[]) {
     .every((u) => u.remainingAttacks < 1);
 }
 
+function transpose({id, x, y}: UnitSquadPosition) {
+  return {
+    id,
+    x: invertBoardPosition(x) + 3,
+    y: invertBoardPosition(y),
+  };
+}
+
 // TODO: add get closest target option
 export function getTarget(current: Unit, units: TurnUnit[]) {
   return units
     .map((u) => u.unit)
     .filter(isFromAnotherSquad(current))
     .filter(isAlive)
-    .sort((a, b) => a.currentHp - b.currentHp)[0];
+    .map((u) => {
+      if (u.squad === null) throw new Error('Null squad');
+      return {...u, squad: transpose(u.squad)};
+    })
+    .sort(
+      (a, b) =>
+        Math.abs(a.squad.x - b.squad.x) + Math.abs(a.squad.y - b.squad.y),
+    )[0];
+}
+
+function getMeleeTarget(current: Unit, units: TurnUnit[]) {
+  return units
+    .map((u) => u.unit)
+    .filter(isFromAnotherSquad(current))
+    .filter(isAlive)
+    .map((u) => {
+      if (u.squad === null) throw new Error('Null squad');
+      return {...u, squad: transpose(u.squad)};
+    })
+    .sort(
+      (a, b) =>
+        Math.abs(b.squad.x - a.squad.x) + Math.abs(b.squad.y - a.squad.y),
+    )[0];
 }
 
 function isAlive(unit: Unit) {

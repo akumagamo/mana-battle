@@ -51,7 +51,7 @@ const map: MapState = {
         },
         force: CPU_FORCE,
       },
-      enemyCastle,
+      {x: 3, y: 6},
     ),
     toMapSquad(
       {
@@ -66,7 +66,7 @@ const map: MapState = {
         },
         force: CPU_FORCE,
       },
-      {x: 11, y: 4},
+      enemyCastle
     ),
   ],
   forces: [
@@ -107,11 +107,11 @@ const map: MapState = {
     ),
     enemy2: assignSquad(
       {...makeUnit('fighter', 0, 10), id: 'enemy2'},
-      {id: 'squad1', x: 1, y: 3},
+      {id: 'squad1', x: 3, y: 1},
     ),
     enemy3: assignSquad(
       {...makeUnit('fighter', 0, 10), id: 'enemy3'},
-      {id: 'squad1', x: 2, y: 3},
+      {id: 'squad1', x: 3, y: 2},
     ),
     enemy4: assignSquad(
       {...makeUnit('fighter', 0, 10), id: 'enemy4'},
@@ -124,11 +124,11 @@ const map: MapState = {
     ),
     enemy6: assignSquad(
       {...makeUnit('fighter', 0, 10), id: 'enemy6'},
-      {id: 'squad2', x: 1, y: 3},
+      {id: 'squad2', x: 3, y: 1},
     ),
     enemy7: assignSquad(
       {...makeUnit('fighter', 0, 10), id: 'enemy7'},
-      {id: 'squad2', x: 2, y: 3},
+      {id: 'squad2', x: 3, y: 2},
     ),
     enemy8: assignSquad(
       {...makeUnit('fighter', 0, 10), id: 'enemy8'},

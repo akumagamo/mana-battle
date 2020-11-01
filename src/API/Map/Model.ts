@@ -1,5 +1,5 @@
 import {Squad} from '../../Squad/Model';
-import {Unit, UnitMap} from '../../Unit/Model';
+import {Unit} from '../../Unit/Model';
 import {Map, List} from 'immutable';
 export type UnitId = string;
 export type ForceId = string;

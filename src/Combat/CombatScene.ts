@@ -1,34 +1,26 @@
 import * as Phaser from 'phaser';
-import {Chara} from '../Chara/Chara';
-import {cartesianToIsometricBattle} from '../utils/isometric';
-import {INVALID_STATE} from '../errors';
-import {Unit} from '../Unit/Model';
-import {Command, runCombat} from '../API/Combat/turns';
+import { Chara } from '../Chara/Chara';
+import { cartesianToIsometricBattle } from '../utils/isometric';
+import { INVALID_STATE } from '../errors';
+import { Unit } from '../Unit/Model';
+import { Command, runCombat } from '../API/Combat/turns';
 import plains from '../Backgrounds/plains';
-import {Container} from '../Models';
+import { Container } from '../Models';
 import fireball from '../Chara/animations/spells/fireball';
 import castSpell from '../Chara/animations/castSpell';
-import {Squad} from '../Squad/Model';
-import {Vector} from '../API/Map/Model';
-import {Map} from 'immutable';
+import { Squad } from '../Squad/Model';
+import { Vector } from '../API/Map/Model';
+import { Map } from 'immutable';
+import { invertBoardPosition } from '../API/Combat/utils';
 
 const COMBAT_CHARA_SCALE = 1;
 const WALK_DURATION = 500;
 const WALK_FRAMES = 60;
 
-const invertBoard = (n: number) => {
-  if (n === 1) return 3;
-  else if (n === 3) return 1;
-  else return n;
-};
-
-const getBoardCoords = (topSquadId: string, squadId: string) => ({
-  x,
-  y,
-}: Vector) => {
+const getBoardCoords = (isTopSquad: boolean) => ({ x, y }: Vector) => {
   return {
-    x: squadId === topSquadId ? x : invertBoard(x),
-    y: squadId === topSquadId ? y : invertBoard(y),
+    x: isTopSquad ? x : invertBoardPosition(x),
+    y: isTopSquad ? y : invertBoardPosition(y),
   };
 };
 
@@ -60,7 +52,7 @@ export default class CombatScene extends Phaser.Scene {
     top: string;
     bottom: string;
     conflictId: string;
-    squads: Squad[];
+    squads: Map<string,Squad>;
     units: Map<string, Unit>;
     onCombatFinish: <CMD>(cmd: CMD[]) => void;
   }) {
@@ -85,24 +77,23 @@ export default class CombatScene extends Phaser.Scene {
 
       if (!squad) throw new Error(INVALID_STATE);
 
-      const members = Object.values(squad.members);
       const isTopSquad = id === data.top;
-      const getCoords = getBoardCoords(data.top, squad.id);
+      const getCoords = getBoardCoords(data.top === squad.id);
 
-      members
-        .sort((a, b) => getCoords(a).y - getCoords(b).y)
+      Object.values(squad.members)
+        .sort((a, b) => getCoords(a).x - getCoords(b).x)
         .forEach((member) => {
           const unit = data.units.find((u) => u.id === member.id);
           if (!unit) throw new Error(INVALID_STATE);
 
           if (unit.currentHp < 1) return;
 
-          const coords = getCoords(member);
+          if(!unit.squad) return
 
-          const {x, y} = cartesianToIsometricBattle(
+          const { x, y } = cartesianToIsometricBattle(
             isTopSquad,
-            coords.x,
-            coords.y,
+            isTopSquad ?(unit.squad.x):invertBoardPosition(unit.squad.x),
+            isTopSquad ?(unit.squad.y):invertBoardPosition(unit.squad.y),
           );
 
           const chara = new Chara(
@@ -112,7 +103,7 @@ export default class CombatScene extends Phaser.Scene {
             x,
             y,
             COMBAT_CHARA_SCALE,
-            isTopSquad,
+            isTopSquad
           );
 
           this.charas.push(chara);
@@ -165,24 +156,24 @@ export default class CombatScene extends Phaser.Scene {
       this.moveUnit(cmd.source, cmd.target).then(step);
     } else if (cmd.type === 'SLASH') {
       this.slash(cmd.source, cmd.target, cmd.damage, cmd.updatedTarget).then(
-        step,
+        step
       );
     } else if (cmd.type === 'SHOOT') {
       this.bowAttack(
         cmd.source,
         cmd.target,
         cmd.damage,
-        cmd.updatedTarget,
+        cmd.updatedTarget
       ).then(step);
     } else if (cmd.type === 'FIREBALL') {
       this.castFireball(
         cmd.source,
         cmd.target,
         cmd.damage,
-        cmd.updatedTarget,
+        cmd.updatedTarget
       ).then(step);
     } else if (cmd.type === 'RETURN') {
-      this.return(cmd.target).then(step);
+      this.returnToPosition(cmd.target).then(step);
     } else if (cmd.type === 'END_TURN') {
       this.currentTurn = this.currentTurn + 1;
       this.turn();
@@ -193,13 +184,13 @@ export default class CombatScene extends Phaser.Scene {
       this.retreatUnits().then((updatedUnits: Unit[]) => {
         const units = updatedUnits.map((unit) => ({
           type: 'UPDATE_UNIT',
-          unit: {...unit, exp: unit.exp + 40},
+          unit: { ...unit, exp: unit.exp + 40 },
         }));
         //this.scene.start('MapScene', [...units, ]);
 
         if (this.onCombatFinish) {
           console.log(`onCombatFinish END_COMBAT`);
-          this.onCombatFinish([{type: 'END_UNIT_TURN'}].concat(units));
+          this.onCombatFinish([{ type: 'END_UNIT_TURN' }].concat(units));
         }
 
         this.turnOff();
@@ -213,7 +204,7 @@ export default class CombatScene extends Phaser.Scene {
         this.onCombatFinish(
           this.charas
             .map((chara) => chara.unit)
-            .map((unit) => ({type: 'UPDATE_UNIT', unit})),
+            .map((unit) => ({ type: 'UPDATE_UNIT', unit }))
         );
       }
 
@@ -244,10 +235,10 @@ export default class CombatScene extends Phaser.Scene {
 
     const pos = target.unit.squad;
 
-    const {x, y} = cartesianToIsometricBattle(
+    const { x, y } = cartesianToIsometricBattle(
       targetIsTop,
-      targetIsTop ? pos.x + 1 : invertBoard(pos.x) - 1,
-      targetIsTop ? pos.y : invertBoard(pos.y),
+      targetIsTop ? pos.x + 1 : invertBoardPosition(pos.x) - 1,
+      targetIsTop ? pos.y : invertBoardPosition(pos.y)
     );
 
     const config = (onComplete: () => void) => ({
@@ -267,7 +258,7 @@ export default class CombatScene extends Phaser.Scene {
         // reordering a list of 10 scenes takes about 0.013ms
         this.charas
           .sort((a, b) =>
-            a.container && b.container ? a.container.y - b.container.y : 0,
+            a.container && b.container ? a.container.y - b.container.y : 0
           )
           .forEach((unit) => this.scene.bringToTop(unit.key));
       },
@@ -292,11 +283,12 @@ export default class CombatScene extends Phaser.Scene {
       const getTargetPos = () => {
         if (!chara.container) throw new Error(INVALID_STATE);
         if (charaIsTop) {
-          return {x: chara.container.x - 200, y: chara.container.y - 200};
-        } else return {x: chara.container.x + 200, y: chara.container.y + 200};
+          return { x: chara.container.x - 200, y: chara.container.y - 200 };
+        } else
+          return { x: chara.container.x + 200, y: chara.container.y + 200 };
       };
 
-      const {x, y} = getTargetPos();
+      const { x, y } = getTargetPos();
 
       const config = {
         targets: chara.container,
@@ -322,7 +314,7 @@ export default class CombatScene extends Phaser.Scene {
     sourceId: string,
     targetId: string,
     damage: number,
-    updatedTarget: Unit,
+    updatedTarget: Unit
   ) {
     this.updateUnit(updatedTarget);
 
@@ -339,7 +331,7 @@ export default class CombatScene extends Phaser.Scene {
     sourceId: string,
     targetId: string,
     damage: number,
-    updatedTarget: Unit,
+    updatedTarget: Unit
   ) {
     this.updateUnit(updatedTarget);
 
@@ -349,7 +341,7 @@ export default class CombatScene extends Phaser.Scene {
     const arrow = this.add.image(
       source.container?.x,
       source.container?.y,
-      'arrow',
+      'arrow'
     );
 
     arrow.rotation = 0.5;
@@ -375,7 +367,7 @@ export default class CombatScene extends Phaser.Scene {
     sourceId: string,
     targetId: string,
     damage: number,
-    updatedTarget: Unit,
+    updatedTarget: Unit
   ) {
     this.updateUnit(updatedTarget);
 
@@ -403,20 +395,37 @@ export default class CombatScene extends Phaser.Scene {
     });
   }
 
-  return(id: string) {
+  returnToPosition(id: string) {
     const chara = this.getChara(id);
     chara.clearAnimations();
     chara.run();
 
     if (!chara.unit.squad) throw new Error(INVALID_STATE);
-    const coords = getBoardCoords(
-      this.top,
-      chara.unit.squad.id,
-    )(chara.unit.squad);
-    const {x, y} = cartesianToIsometricBattle(
+    const coords = getBoardCoords(this.top === chara.unit.squad.id)(
+      chara.unit.squad
+    );
+
+    console.log(
+      `for`,
+      chara.unit.id,
+      `return with params`,
+      chara.unit.id,
+      coords.x,
+      coords.y
+    );
+    const { x, y } = cartesianToIsometricBattle(
       this.top === chara.unit.squad.id,
       coords.x,
-      coords.y,
+      coords.y
+    );
+
+    console.log(
+      `returning, `,
+
+      this.top === chara.unit.squad.id,
+      chara.unit.id,
+      x,
+      y
     );
 
     const config = (onComplete: () => void) => ({

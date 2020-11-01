@@ -642,9 +642,21 @@ export class MapScene extends Phaser.Scene {
     }
   }
   makeInteractive(cell: MapTile) {
-    cell.tile.on('pointerup', () => {
+    cell.tile.on('pointerup', (pointer: Pointer) => {
       console.log(`click:`, cell);
       if (!this.cellClickDisabled) this.signal([{type: 'CLICK_CELL', cell}]);
+
+      var ping = this.add.circle(pointer.upX, pointer.upY, 20, 0xffff66);
+
+      this.tween({
+        targets: ping,
+        alpha: 0,
+        duration: 500,
+        scale: 2,
+        onComplete: () => {
+          ping.destroy();
+        },
+      });
     });
   }
   clearAllTileEvents() {

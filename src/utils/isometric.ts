@@ -11,7 +11,7 @@ import {tileWidth, tileHeight, centerX, centerY} from '../constants';
 export function cartesianToIsometric(x: number, y: number) {
   return {
     x: (x - y) * tileWidth + centerX,
-    y: (x + y) * tileHeight + centerY-50,
+    y: (x + y) * tileHeight + centerY - 50,
   };
 }
 
