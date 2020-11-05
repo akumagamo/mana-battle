@@ -214,6 +214,14 @@ function back(chara: Chara, headOnly = false) {
     return hat;
   }
 
+  chara.mainHandContainer = chara.add.container(
+    RIGHT_HAND_BACK_X,
+    RIGHT_HAND_BACK_Y,
+  );
+
+  chara.container?.add(chara.mainHandContainer);
+
+
   chara.head = renderHead(HEAD_BACK_X, HEAD_BACK_Y);
   chara.hair = renderHair(HEAD_FRONT_X, HEAD_FRONT_Y);
   chara.hat = renderHat(HEAD_BACK_X, HEAD_BACK_Y);
@@ -226,17 +234,12 @@ function back(chara: Chara, headOnly = false) {
   chara.trunk = renderTrunk(chara.unit.class, TRUNK_BACK_X, TRUNK_BACK_Y);
   chara.rightHand = renderHand(0, 0);
 
-  chara.mainHandContainer = chara.add.container(
-    RIGHT_HAND_BACK_X,
-    RIGHT_HAND_BACK_Y,
-  );
 
   chara.offHandContainer = chara.add.container(
     LEFT_HAND_BACK_X,
     LEFT_HAND_BACK_Y,
   );
 
-  chara.container?.add(chara.mainHandContainer);
   chara.container?.add(chara.offHandContainer);
   chara.mainHandContainer.add(chara.rightHand);
   chara.offHandContainer.add(chara.leftHand);
@@ -257,17 +260,16 @@ function back(chara: Chara, headOnly = false) {
     chara.mainHandContainer.sendToBack(chara.rightHandEquip);
   } else if (chara.unit.class === 'fighter') {
     chara.rightHandEquip = chara.add.image(
-      23,
-      17,
+      -10,
+      15,
       `equips/${chara.unit.equips.mainHand}`,
     );
 
-    chara.rightHandEquip.setScale(0.2);
+    chara.rightHandEquip.setScale(-0.2, 0.2);
     chara.rightHandEquip.setOrigin(1, 1);
 
     chara.mainHandContainer.add(chara.rightHandEquip);
     chara.mainHandContainer.sendToBack(chara.rightHandEquip);
-    chara.container.bringToTop(chara.mainHandContainer);
   } else if (chara.unit.class === 'archer') {
     chara.leftHandEquip = chara.add.image(
       0,
@@ -284,13 +286,14 @@ function back(chara: Chara, headOnly = false) {
     chara.offHandContainer.sendToBack(chara.leftHandEquip);
   }
 
-  chara.container.sendToBack(chara.offHandContainer);
   chara.container?.bringToTop(chara.head);
 
   if (chara.hair) chara.container?.bringToTop(chara.hair);
   if (chara.hat) chara.container?.bringToTop(chara.hat);
 
-  chara.container?.bringToTop(chara.mainHandContainer);
+  chara.container?.sendToBack(chara.mainHandContainer);
+
+  chara.container.bringToTop(chara.offHandContainer);
 }
 
 export default (chara: Chara, headOnly = false) => {

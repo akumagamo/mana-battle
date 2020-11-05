@@ -9,8 +9,8 @@ export default (chara: Chara, onComplete: () => void) => {
     targets: chara?.mainHandContainer,
     rotation: chara.front ? 1.9 : -1.9,
     yoyo: true,
-    x: (chara.mainHandContainer?.x || 0) + (chara.front ? 30 : -60),
-    Y: (chara.mainHandContainer?.y || 0) - 20,
+    x: (chara.mainHandContainer?.x || 0) + (chara.front ? 30 : -10),
+    Y: (chara.mainHandContainer?.y || 0)  + (chara.front ? -20 : -40),
     duration: ATTACK_DURATION,
     ease: 'Expo',
     onComplete: () => {
