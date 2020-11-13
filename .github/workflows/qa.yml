@@ -33,7 +33,7 @@ jobs:
         NODE_ENV: 'production'
         
     - name: Copy Assets
-      run: cp -r assets/ build/assets/
+      run: cp -r assets/ dist/assets/
     
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
@@ -41,4 +41,4 @@ jobs:
         deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         external_repository: lfarroco/mana_public
         publish_branch: gh-pages
-        publish_dir: ./build
+        publish_dir: ./dist
