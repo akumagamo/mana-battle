@@ -1,7 +1,7 @@
 import {Squad, SquadMember, SquadMemberMap, SquadMap} from './Squad/Model';
 import {unitsWithoutSquadSelector} from './Unit/selectors';
 import {Item, itemTypeSlots, ItemTypeSlots, ItemMap} from './Item/Model';
-import {Unit, UnitMap} from './Unit/Model';
+import {Unit, UnitMap, UnitSquadPosition} from './Unit/Model';
 import {removeIdFromMap} from './utils';
 import {INVALID_STATE} from './errors';
 import {Options} from './Models';
@@ -303,7 +303,7 @@ export const removeUnitFromSquad = (unitId: string, squad: Squad) => {
   if (!unit) {
     throw new Error('ERROR: tried to save unit with invalid ID');
   }
-  const updatedUnit = {...unit, squad: null};
+  const updatedUnit = {...unit, squad: (null as UnitSquadPosition|null)};
 
   const {members} = squad;
 

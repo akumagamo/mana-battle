@@ -16,7 +16,6 @@ import {fromJSON} from './Unit/serializer';
 import {indexById} from './utils';
 import {SquadMap} from './Squad/Model';
 import {Player} from './Player/Model';
-import {Range} from 'immutable'
 import {Options} from './Models';
 import {BattleFieldMap, PLAYER_FORCE} from './API/Map/Model';
 

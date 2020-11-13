@@ -5,9 +5,8 @@
   "author": "lfarroco",
   "main": "index.js",
   "scripts": {
-    "start": "webpack",
-    "dev": "webpack",
-    "deploy": "webpack --config webpack.production.config.js",
+    "start": "webpack serve --config webpack.dev.js",
+    "deploy": "webpack --config webpack.prod.js",
     "test": "jest"
   },
   "license": "MIT",
@@ -17,16 +16,21 @@
     "@babel/polyfill": "^7.0.0-rc.2",
     "@babel/preset-env": "^7.8.7",
     "@babel/preset-typescript": "^7.8.3",
-    "awesome-typescript-loader": "^3.4.1",
     "babel-jest": "^25.1.0",
     "babel-loader": "8.0.0-beta.2",
     "browser-sync": "^2.18.13",
     "browser-sync-webpack-plugin": "^1.2.0",
+    "clean-webpack-plugin": "^3.0.0",
     "csvtojson": "^2.0.10",
-    "html-webpack-plugin": "^2.30.1",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^4.5.0",
+    "json5-loader": "^4.0.1",
     "raw-loader": "^0.5.1",
     "typescript": "^4.0.2",
-    "webpack": "3.11.0"
+    "webpack": "^5.4.0",
+    "webpack-cli": "^4.2.0",
+    "webpack-dev-server": "^3.11.0",
+    "webpack-merge": "^5.4.0"
   },
   "dependencies": {
     "@capacitor/android": "2.4.0",
@@ -44,6 +48,7 @@
     "phaser": "^3.24.1",
     "sanctuary": "^3.0.0",
     "svgo": "^1.3.2",
+    "ts-loader": "^8.0.11",
     "webfontloader": "^1.6.28"
   }
 }
