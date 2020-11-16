@@ -32,6 +32,7 @@ import {getCity} from '../API/Map/utils';
 import {Squad} from '../Squad/Model';
 import victoryCondition from './effects/victoryCondition';
 import squadDetails from './effects/squadDetails';
+import speech from '../UI/speech';
 
 type ActionWindowAction = {title: string; action: () => void};
 
@@ -1095,9 +1096,20 @@ export class MapScene extends Phaser.Scene {
     let squad = this.state.mapSquads.find((s) => s.id === squadId);
 
     if (!squad) throw new Error(INVALID_STATE);
-
     return squad;
   }
+getSquadLeader(squadId: string) {
+    let squad = this.getSquad(squadId);
+
+    let leader = Object.values(squad.members).find(u=>u.leader)
+
+  let unit = this.state.units.get(leader.id)
+
+    if (!unit) throw new Error(INVALID_STATE);
+    return unit;
+
+  }
+
 
   getPlayerSquads() {
     return this.state.mapSquads.filter((sqd) => sqd.force === PLAYER_FORCE);
@@ -1634,10 +1646,16 @@ export class MapScene extends Phaser.Scene {
           [
             {
               title: 'Attack Squad',
-              action: () => {
+              action: async() => {
+
+                const leader =this.getSquadLeader(squad.id)
                 this.clearAllTileEvents();
                 this.clearTiles();
                 this.closeActionWindow();
+                const speech_ = speech(leader, 450, 100, this.uiContainer, this);
+                await this.delay(2000);
+
+      this.scene.remove(speech_.portrait)
                 this.attack(squad, e);
               },
             },
