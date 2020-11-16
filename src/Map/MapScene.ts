@@ -1652,7 +1652,7 @@ getSquadLeader(squadId: string) {
                 this.clearAllTileEvents();
                 this.clearTiles();
                 this.closeActionWindow();
-                const speech_ = speech(leader, 450, 100, this.uiContainer, this);
+                const speech_ = speech(leader, 450, 100, 'Ready for Combat', this.uiContainer, this);
                 await this.delay(2000);
 
       this.scene.remove(speech_.portrait)

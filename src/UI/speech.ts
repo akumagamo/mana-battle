@@ -5,11 +5,11 @@ import {Unit} from '../Unit/Model';
 import panel from './panel';
 import text from './text';
 
-const text_ = 'Ready for combat.';
 export default (
   unit: Unit,
   x: number,
   y: number,
+  text_:string,
   container: Container,
   scene: Scene,
 ) => {
