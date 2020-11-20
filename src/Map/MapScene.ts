@@ -33,6 +33,7 @@ import { Squad } from "../Squad/Model";
 import victoryCondition from "./effects/victoryCondition";
 import squadDetails from "./effects/squadDetails";
 import speech from "../UI/speech";
+import StaticBoardScene from "../Board/StaticBoardScene";
 
 type ActionWindowAction = { title: string; action: () => void };
 
@@ -1098,7 +1099,7 @@ export class MapScene extends Phaser.Scene {
     if (!squad) throw new Error(INVALID_STATE);
     return squad;
   }
-  getSquadLeader(squadId: string) {
+  getSelectedSquadLeader(squadId: string) {
     let squad = this.getSquad(squadId);
 
     let leader = Object.values(squad.members).find((u) => u.leader);
@@ -1633,8 +1634,8 @@ export class MapScene extends Phaser.Scene {
     this.signal([{ type: "END_SQUAD_TURN" }]);
   }
 
-  async makeCellAttackable(squad: MapSquad) {
-    const enemies = this.targets(squad.pos);
+  async makeCellAttackable(playerSquad: MapSquad) {
+    const enemies = this.targets(playerSquad.pos);
     enemies.forEach(async (e) => {
       const enemyChara = await this.getChara(e.id);
       console.log(`making enemy clickable...`);
@@ -1647,7 +1648,7 @@ export class MapScene extends Phaser.Scene {
             {
               title: "Attack Squad",
               action: async () => {
-                const leader = this.getSquadLeader(squad.id);
+                const leader = this.getSelectedSquadLeader(playerSquad.id);
                 this.clearAllTileEvents();
                 this.clearTiles();
                 this.closeActionWindow();
@@ -1659,10 +1660,51 @@ export class MapScene extends Phaser.Scene {
                   this.uiContainer,
                   this
                 );
-                await this.delay(2000);
 
-                this.scene.remove(speech_.portrait);
-                this.attack(squad, e);
+                const enemySquad = this.getSquad(enemyChara.unit.squad.id);
+
+                const alliedUnits = this.state.units
+                  .filter((u) => u.squad?.id === playerSquad.id)
+                  .toList()
+                  .toJS();
+
+                console.log(alliedUnits);
+
+                const ally = new StaticBoardScene(
+                  playerSquad,
+                  alliedUnits,
+                  100,
+                  200,
+                  0.5
+                );
+
+                const enemyUnits = this.state.units
+                  .filter((u) => u.squad?.id === enemySquad.id)
+                  .toList()
+                  .toJS();
+
+                console.log(enemyUnits);
+                const enemy = new StaticBoardScene(
+                  enemySquad,
+                  enemyUnits,
+                  600,
+                  200,
+                  0.5
+                );
+
+                this.scene.add("ally_board", ally, true);
+                this.scene.add("enemy_board", enemy, true);
+
+                await this.delay(5000);
+
+                this.scene.remove(speech_.portrait.scene.key);
+
+                ally.destroy(this);
+                enemy.destroy(this);
+
+                this.attack(playerSquad, e);
+
+                //add transition
               },
             },
             {
