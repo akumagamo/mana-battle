@@ -1,15 +1,15 @@
-import * as Phaser from 'phaser';
+import * as Phaser from "phaser";
 
-import {Unit} from '../Unit/Model';
-import {Container, Pointer, Image} from '../Models';
-import run from './animations/run';
+import { Unit } from "../Unit/Model";
+import { Container, Pointer, Image } from "../Models";
+import run from "./animations/run";
 
-import defaultPose from './animations/defaultPose';
-import stand from './animations/stand';
-import flinch from './animations/flinch';
-import slash from './animations/slash';
-import bowAttack from './animations/bowAttack';
-import initial from './animations/initial';
+import defaultPose from "./animations/defaultPose";
+import stand from "./animations/stand";
+import flinch from "./animations/flinch";
+import slash from "./animations/slash";
+import bowAttack from "./animations/bowAttack";
+import initial from "./animations/initial";
 
 export class Chara extends Phaser.Scene {
   container: Container = {} as Container;
@@ -42,7 +42,7 @@ export class Chara extends Phaser.Scene {
     public scaleSizing: number, // todo: rename
     public front: boolean = true,
     public animated = true,
-    public headOnly = false,
+    public headOnly = false
   ) {
     super(key);
 
@@ -92,7 +92,7 @@ export class Chara extends Phaser.Scene {
 
   private maybeRenderInsignea() {
     if (this.unit.leader) {
-      const insignea = this.add.image(50, 0, 'insignea');
+      const insignea = this.add.image(50, 0, "insignea");
       this.container.add(insignea);
     }
   }
@@ -100,20 +100,20 @@ export class Chara extends Phaser.Scene {
   onClick(fn: (chara: Chara) => void) {
     this.container.setInteractive();
 
-    this.container.on('pointerdown', (_pointer: Pointer) => {
+    this.container.on("pointerdown", (_pointer: Pointer) => {
       fn(this);
     });
   }
 
   enableDrag(
     dragStart: (unit: Unit, x: number, y: number, chara: Chara) => void,
-    dragEnd: (unit: Unit, x: number, y: number, chara: Chara) => void,
+    dragEnd: (unit: Unit, x: number, y: number, chara: Chara) => void
   ) {
     this.container.setInteractive();
     this.input.setDraggable(this.container);
 
     this.input.on(
-      'drag',
+      "drag",
       (_pointer: Pointer, obj: Container, x: number, y: number) => {
         this.container.setDepth(Infinity);
 
@@ -121,20 +121,20 @@ export class Chara extends Phaser.Scene {
         obj.y = y;
 
         dragStart(this.unit, x, y, this);
-      },
+      }
     );
 
     this.container.on(
-      'dragend',
+      "dragend",
       (_pointer: Pointer, _dragX: number, dragY: number) => {
         this.container.setDepth(dragY);
         dragEnd(this.unit, this.container.x || 0, this.container.y || 0, this);
-      },
+      }
     );
   }
 
   handleClick(fn: (chara: Chara, pointer: Pointer) => void) {
-    this.container.on('pointerdown', (pointer: Pointer) => {
+    this.container.on("pointerdown", (pointer: Pointer) => {
       fn(this, pointer);
     });
   }
@@ -162,8 +162,6 @@ export class Chara extends Phaser.Scene {
   }
 
   die() {
-    console.log(`die!!`);
-
     this.tweens.add({
       targets: this.container,
       alpha: 0,
@@ -190,25 +188,25 @@ export class Chara extends Phaser.Scene {
               onComplete,
             });
           },
-          onUpdate: function(tween) {
+          onUpdate: function (tween) {
             var value = Math.floor(tween.getValue());
 
-            if (child.type === 'Container') {
+            if (child.type === "Container") {
               (child as Phaser.GameObjects.Container).iterate(
                 (grand: Phaser.GameObjects.Image) => {
                   grand.setTint(
-                    Phaser.Display.Color.GetColor(value, value, value),
+                    Phaser.Display.Color.GetColor(value, value, value)
                   );
-                },
+                }
               );
             } else {
               (child as Phaser.GameObjects.Image).setTint(
-                Phaser.Display.Color.GetColor(value, value, value),
+                Phaser.Display.Color.GetColor(value, value, value)
               );
             }
           },
         });
-      },
+      }
     );
   }
 }

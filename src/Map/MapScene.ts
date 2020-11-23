@@ -1648,63 +1648,67 @@ export class MapScene extends Phaser.Scene {
             {
               title: "Attack Squad",
               action: async () => {
+                const baseX = 200;
+                const baseY = 200;
+
+                const scale = 0.5;
                 const leader = this.getSelectedSquadLeader(playerSquad.id);
                 this.clearAllTileEvents();
                 this.clearTiles();
                 this.closeActionWindow();
-                const speech_ = speech(
-                  leader,
-                  450,
-                  100,
-                  "Ready for Combat",
-                  this.uiContainer,
-                  this
-                );
 
                 const enemySquad = this.getSquad(enemyChara.unit.squad.id);
+                const enemyUnits = this.state.units
+                  .filter((u) => u.squad?.id === enemySquad.id)
+                  .toList()
+                  .toJS();
+
+                const enemy = new StaticBoardScene(
+                  enemySquad,
+                  enemyUnits,
+                  baseX + 10,
+                  baseY + 5,
+                  scale,
+                  true
+                );
+
+                this.scene.add("enemy_board", enemy, true);
 
                 const alliedUnits = this.state.units
                   .filter((u) => u.squad?.id === playerSquad.id)
                   .toList()
                   .toJS();
 
-                console.log(alliedUnits);
-
                 const ally = new StaticBoardScene(
                   playerSquad,
                   alliedUnits,
-                  100,
-                  200,
-                  0.5
-                );
-
-                const enemyUnits = this.state.units
-                  .filter((u) => u.squad?.id === enemySquad.id)
-                  .toList()
-                  .toJS();
-
-                console.log(enemyUnits);
-                const enemy = new StaticBoardScene(
-                  enemySquad,
-                  enemyUnits,
-                  600,
-                  200,
-                  0.5
+                  baseX + 200,
+                  baseY + 100,
+                  scale,
+                  false
                 );
 
                 this.scene.add("ally_board", ally, true);
-                this.scene.add("enemy_board", enemy, true);
 
-                await this.delay(5000);
+                const { portrait } = speech(
+                  leader,
+                  450,
+                  70,
+                  "Ready for Combat",
+                  this.uiContainer,
+                  this
+                );
 
-                this.scene.remove(speech_.portrait.scene.key);
+                await this.delay(3000);
+
+                this.scene.remove(portrait.scene.key);
 
                 ally.destroy(this);
                 enemy.destroy(this);
 
                 this.attack(playerSquad, e);
 
-                //add transition
+                //TODO: add transition
               },
             },
             {

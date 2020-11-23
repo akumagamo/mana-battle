@@ -1,12 +1,13 @@
-import * as Phaser from 'phaser';
-import {Chara} from '../Chara/Chara';
-import {SquadMember, Squad} from '../Squad/Model';
-import {cartesianToIsometric} from '../utils/isometric';
-import {getUnit} from '../DB';
-import {BoardTile} from './Model';
-import {Graphics} from '../Models';
-import {Unit} from '../Unit/Model';
-import {Vector} from 'matter';
+import * as Phaser from "phaser";
+import { Chara } from "../Chara/Chara";
+import { SquadMember, Squad } from "../Squad/Model";
+import { cartesianToIsometric } from "../utils/isometric";
+import { getUnit } from "../DB";
+import { BoardTile } from "./Model";
+import { Graphics } from "../Models";
+import { Unit } from "../Unit/Model";
+import { Vector } from "matter";
+import { invertBoardPosition } from "../API/Combat/utils";
 
 const BOARD_WIDTH = 250;
 const BOARD_HEIGHT = 150;
@@ -18,24 +19,25 @@ export default class StaticBoardScene extends Phaser.Scene {
   tiles: BoardTile[] = [];
   unitList: Chara[] = [];
   overlay: Graphics | null = null;
-  isSelected=  false
+  isSelected = false;
   constructor(
     public squad: Squad,
     public units: Unit[],
     public x: number,
     public y: number,
     public scaleSizing: number,
+    public front = true
   ) {
     super(makeId(squad));
   }
 
-  select(){
-    this.isSelected = true
-          this.tiles.forEach((tile) => tile.sprite.setTint(0x558899));
+  select() {
+    this.isSelected = true;
+    this.tiles.forEach((tile) => tile.sprite.setTint(0x558899));
   }
-  deselect(){
-    this.isSelected = false
-    this.tiles.forEach(t=>t.sprite.clearTint())
+  deselect() {
+    this.isSelected = false;
+    this.tiles.forEach((t) => t.sprite.clearTint());
   }
 
   create() {
@@ -69,10 +71,10 @@ export default class StaticBoardScene extends Phaser.Scene {
       this.x + OFFSET_X,
       this.y + OFFSET_Y,
       BOARD_WIDTH,
-      BOARD_HEIGHT,
+      BOARD_HEIGHT
     );
     var graphics = this.add.graphics({
-      fillStyle: {color: 0x0000ff},
+      fillStyle: { color: 0x0000ff },
     });
 
     graphics.alpha = 0.2;
@@ -86,7 +88,7 @@ export default class StaticBoardScene extends Phaser.Scene {
       this.x + OFFSET_X,
       this.y + OFFSET_Y,
       BOARD_WIDTH,
-      BOARD_HEIGHT,
+      BOARD_HEIGHT
     );
     clickZone.setInteractive();
     clickZone.setOrigin(0);
@@ -95,7 +97,7 @@ export default class StaticBoardScene extends Phaser.Scene {
     });
   }
 
-  placeTiles({mapWidth, mapHeight}: {mapWidth: number; mapHeight: number}) {
+  placeTiles({ mapWidth, mapHeight }: { mapWidth: number; mapHeight: number }) {
     var grid: null[][] = [[]];
     let tiles: BoardTile[] = [];
 
@@ -106,12 +108,12 @@ export default class StaticBoardScene extends Phaser.Scene {
 
     grid.forEach((row, yIndex) => {
       row.forEach((_, xIndex) => {
-        let {x, y} = cartesianToIsometric(xIndex, yIndex);
+        let { x, y } = cartesianToIsometric(xIndex, yIndex);
 
         x = x * this.scaleSizing + this.x;
         y = y * this.scaleSizing + this.y;
 
-        const tileSprite = this.add.image(x, y, 'tile');
+        const tileSprite = this.add.image(x, y, "tile");
         tileSprite.scale = this.scaleSizing;
         tileSprite.depth = y;
 
@@ -129,16 +131,24 @@ export default class StaticBoardScene extends Phaser.Scene {
   }
 
   addUnitToBoard(unit: Unit) {
+    if (!unit.squad) return;
 
-    if(!unit.squad) return;
-
-    let {x, y} = this.getUnitPositionInScreen(unit.squad);
+    let { x, y } = this.getUnitPositionInScreen(unit.squad);
 
     x = x * this.scaleSizing + this.x;
     y = y * this.scaleSizing + this.y;
 
     const key = this.makeUnitKey(unit);
-    return new Chara(key, this, unit, x, y, this.scaleSizing, true, false);
+    return new Chara(
+      key,
+      this,
+      unit,
+      x,
+      y,
+      this.scaleSizing,
+      this.front,
+      false
+    );
   }
 
   placeUnits() {
@@ -148,20 +158,20 @@ export default class StaticBoardScene extends Phaser.Scene {
   placeUnit(member: Unit) {
     const chara = this.addUnitToBoard(member);
 
-    if(!chara) return;
+    if (!chara) return;
 
     this.unitList = this.unitList.concat([chara]);
 
     this.sortUnitsByDepth();
   }
 
-  private makeUnitKey(unit: {id: string}) {
+  private makeUnitKey(unit: { id: string }) {
     return `board-unit-${unit.id}`;
   }
 
   sortUnitsByDepth() {
     this.unitList.forEach((chara) =>
-      chara.container.setDepth(chara.container?.y),
+      chara.container.setDepth(chara.container?.y)
     );
 
     this.unitList
@@ -169,9 +179,12 @@ export default class StaticBoardScene extends Phaser.Scene {
       .forEach((chara) => chara.scene.bringToTop());
   }
   getUnitPositionInScreen(squadMember: Vector) {
-    const {x, y} = cartesianToIsometric(squadMember.x, squadMember.y);
+    const x_ = invertBoardPosition(squadMember.x);
+    const y_ = invertBoardPosition(squadMember.y);
 
-    return {x, y: y - 230};
+    const { x, y } = cartesianToIsometric(x_, y_);
+
+    return { x, y: y - 230 };
   }
 
   onUnitClick(fn: (c: Chara) => void) {

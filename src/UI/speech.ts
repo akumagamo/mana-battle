@@ -13,8 +13,6 @@ export default (
   container: Container,
   scene: Scene
 ) => {
-  const bg = panel(x, y, 440, 200, container, scene);
-
   const portrait = new Chara(
     `speech_${unit.id}`,
     scene,
@@ -26,6 +24,19 @@ export default (
     false,
     true
   );
+
+  const finalText = text(0, 0, text_, container, scene);
+  const bg = panel(
+    x,
+    y,
+    finalText.width + portrait.head.displayWidth + 40,
+    finalText.height + portrait.head.displayHeight / 3 + 40, // the full body size is included here. TODO: separate rendering of head
+    container,
+    scene
+  );
+  finalText.destroy();
+
+  text(x + 150, y + 10, unit.name, container, scene);
 
   const speechText = text(x + 150, y + 50, "", container, scene);
 
