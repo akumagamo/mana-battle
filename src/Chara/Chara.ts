@@ -33,6 +33,8 @@ export class Chara extends Phaser.Scene {
   leftHandEquip: Image | null = null;
   hat: Image | null = null;
 
+  hpBar: Phaser.GameObjects.Graphics | null;
+
   constructor(
     public key: string,
     public parent: Phaser.Scene,
@@ -42,7 +44,8 @@ export class Chara extends Phaser.Scene {
     public scaleSizing: number, // todo: rename
     public front: boolean = true,
     public animated = true,
-    public headOnly = false
+    public headOnly = false,
+    public showHpBar = false
   ) {
     super(key);
 
@@ -84,6 +87,37 @@ export class Chara extends Phaser.Scene {
     //
     //graphics.fillRectShape(rect);
     //this.container.add(graphics);
+    //
+
+    if (this.showHpBar) {
+      const x = -30;
+      const y = 90;
+
+      const width = 76;
+      const height = 16;
+      const borderWidth = 2;
+
+      this.hpBar = new Phaser.GameObjects.Graphics(this);
+
+      this.hpBar.fillStyle(0x000000);
+      this.hpBar.fillRect(
+        x,
+        y,
+        width + borderWidth * 2,
+        height + borderWidth * 2
+      );
+
+      this.hpBar.fillStyle(0xffffff);
+      this.hpBar.fillRect(x + borderWidth, y + borderWidth, width, height);
+
+      this.hpBar.fillStyle(0x00ff00);
+
+      var d = Math.floor(width * (this.unit.currentHp / this.unit.hp));
+
+      this.hpBar.fillRect(x + borderWidth, y + borderWidth, d, height);
+
+      this.container.add(this.hpBar);
+    }
 
     this.container.scale = this.scaleSizing;
 

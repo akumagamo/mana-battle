@@ -147,7 +147,9 @@ export default class StaticBoardScene extends Phaser.Scene {
       y,
       this.scaleSizing,
       this.front,
-      false
+      false,
+      false,
+      true
     );
   }
 
