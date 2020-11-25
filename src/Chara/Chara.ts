@@ -10,6 +10,7 @@ import flinch from "./animations/flinch";
 import slash from "./animations/slash";
 import bowAttack from "./animations/bowAttack";
 import initial from "./animations/initial";
+import text from "../UI/text";
 
 export class Chara extends Phaser.Scene {
   container: Container = {} as Container;
@@ -90,10 +91,10 @@ export class Chara extends Phaser.Scene {
     //
 
     if (this.showHpBar) {
-      const x = -30;
-      const y = 90;
+      const x = -50;
+      const y = -40;
 
-      const width = 76;
+      const width = 100;
       const height = 16;
       const borderWidth = 2;
 
@@ -117,6 +118,11 @@ export class Chara extends Phaser.Scene {
       this.hpBar.fillRect(x + borderWidth, y + borderWidth, d, height);
 
       this.container.add(this.hpBar);
+
+      const hp = text(-30, -95, this.unit.currentHp, this.container, this);
+      hp.setColor("#ffffff");
+      hp.setShadow(1, 1, "#000000", 10);
+      hp.setFontSize(40);
     }
 
     this.container.scale = this.scaleSizing;
