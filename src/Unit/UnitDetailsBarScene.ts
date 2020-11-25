@@ -1,13 +1,14 @@
-import * as Phaser from 'phaser';
-import {Container} from '../Models';
-import {Chara} from '../Chara/Chara';
-import {Unit, unitClassLabels} from './Model';
-import {INVALID_STATE} from '../errors';
-import {ItemSlot} from '../Item/Model';
-import {ItemDetailWindowScene} from '../Item/ItemDetailWindowScene';
-import text from '../UI/text';
-import button from '../UI/button';
-import * as api from '../DB';
+import * as Phaser from "phaser";
+import { Container } from "../Models";
+import { Chara } from "../Chara/Chara";
+import { Unit, unitClassLabels } from "./Model";
+import { INVALID_STATE } from "../errors";
+import { ItemSlot } from "../Item/Model";
+import { ItemDetailWindowScene } from "../Item/ItemDetailWindowScene";
+import text from "../UI/text";
+import button from "../UI/button";
+import * as api from "../DB";
+import { PLAYER_FORCE } from "../API/Map/Model";
 
 export class UnitDetailsBarScene extends Phaser.Scene {
   colWidth = 150;
@@ -15,21 +16,21 @@ export class UnitDetailsBarScene extends Phaser.Scene {
   chara: Chara | null = null;
   container: Container | null = null;
   itemDetail: ItemDetailWindowScene | null = null;
-  onHatToggle: ((u:Unit)=>void) | null = null
+  onHatToggle: ((u: Unit) => void) | null = null;
 
   constructor() {
-    super('UnitDetailsBarScene');
+    super("UnitDetailsBarScene");
   }
 
   create() {
     this.itemDetail = new ItemDetailWindowScene();
-    this.scene.add('item-detail', this.itemDetail, true);
+    this.scene.add("item-detail", this.itemDetail, true);
   }
 
   destroy(parentScene: Phaser.Scene) {
     this.container?.destroy();
-    parentScene.scene.remove('ItemDetailWindowScene');
-    parentScene.scene.remove('UnitDetailsBarScene');
+    parentScene.scene.remove("ItemDetailWindowScene");
+    parentScene.scene.remove("UnitDetailsBarScene");
   }
 
   clearChildren() {
@@ -42,7 +43,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
   render(unit: Unit) {
     this.clearChildren();
 
-    const panel = this.add.image(0, 0, 'panel');
+    const panel = this.add.image(0, 0, "panel");
 
     this.container?.add(panel);
 
@@ -65,14 +66,14 @@ export class UnitDetailsBarScene extends Phaser.Scene {
 
   col = (x: number, y: number, strs: (string | number)[]) =>
     strs.forEach((str, index) =>
-      this.write(x, y + this.rowHeight * index, str),
+      this.write(x, y + this.rowHeight * index, str)
     );
 
   row = (x: number, y: number, strs: (string | number)[]) =>
     strs.forEach((str, index) => this.write(x + this.colWidth * index, y, str));
 
   unitStats(unit: Unit) {
-    const {str, int, dex, lvl, exp, currentHp, hp, attacks} = unit;
+    const { str, int, dex, lvl, exp, currentHp, hp, attacks } = unit;
 
     const baseX = 20;
     const baseY = 20;
@@ -82,15 +83,15 @@ export class UnitDetailsBarScene extends Phaser.Scene {
       unitClassLabels[unit.class],
       `Lvl ${lvl}`,
       `Exp ${exp}`,
-      '',
-      '',
-      '',
+      "",
+      "",
+      "",
       `${currentHp} / ${hp} HP`,
     ]);
 
-    this.scene.remove('pic');
+    this.scene.remove("pic");
     const pic = new Chara(
-      'pic',
+      "pic",
       this,
       unit,
       baseX + 80,
@@ -98,7 +99,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
       1.3,
       true,
       false,
-      true,
+      true
     );
 
     this.container?.add(pic.container);
@@ -131,9 +132,9 @@ export class UnitDetailsBarScene extends Phaser.Scene {
 
     const item = (x: number, y: number, slotId: ItemSlot) => {
       const itemId = unit.equips[slotId];
-      const slot = itemId !== 'none' ? api.getItem(itemId) : null;
+      const slot = itemId !== "none" ? api.getItem(itemId) : null;
 
-      const bg = this.add.image(x, y, 'panel');
+      const bg = this.add.image(x, y, "panel");
 
       bg.displayWidth = iconSize + padding;
       bg.displayHeight = iconSize + padding;
@@ -146,7 +147,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
         icon.displayWidth = iconSize;
         icon.displayHeight = iconSize;
         icon.setInteractive();
-        icon.on('pointerdown', () => {
+        icon.on("pointerdown", () => {
           this.itemDetail?.render(slot.id, unit.id, () => this.render(unit));
           //this.renderItemDetails()
         });
@@ -159,27 +160,26 @@ export class UnitDetailsBarScene extends Phaser.Scene {
             y,
             slot.name,
             this.container,
-            this,
+            this
           );
       }
     };
 
-    item(baseX, baseY, 'mainHand');
-    item(baseX, baseY + boxSize, 'offHand');
-    item(baseX + boxSize + textWidth, baseY, 'chest');
-    item(baseX + boxSize + textWidth, baseY + boxSize, 'ornament');
+    item(baseX, baseY, "mainHand");
+    item(baseX, baseY + boxSize, "offHand");
+    item(baseX + boxSize + textWidth, baseY, "chest");
+    item(baseX + boxSize + textWidth, baseY + boxSize, "ornament");
   }
 
   unitControls(unit: Unit) {
-    if (this.container)
-      button(600, 20, 'Toggle Hat', this.container, this, () => {
+    if (this.container && !unit.id.startsWith("enemy"))
+      button(600, 20, "Toggle Hat", this.container, this, () => {
+        api.saveUnit({
+          ...unit,
+          style: { ...unit.style, displayHat: !unit.style.displayHat },
+        });
 
-        api.saveUnit({...unit, style: {... unit.style, displayHat: !unit.style.displayHat} })
-
-        if(this.onHatToggle)
-          this.onHatToggle(unit);
-
+        if (this.onHatToggle) this.onHatToggle(unit);
       });
   }
-
 }
