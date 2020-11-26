@@ -2,13 +2,11 @@ import * as Phaser from "phaser";
 import { Container } from "../Models";
 import { Chara } from "../Chara/Chara";
 import { Unit, unitClassLabels } from "./Model";
-import { INVALID_STATE } from "../errors";
 import { ItemSlot } from "../Item/Model";
 import { ItemDetailWindowScene } from "../Item/ItemDetailWindowScene";
 import text from "../UI/text";
 import button from "../UI/button";
 import * as api from "../DB";
-import { PLAYER_FORCE } from "../API/Map/Model";
 
 export class UnitDetailsBarScene extends Phaser.Scene {
   colWidth = 150;
@@ -18,7 +16,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
   itemDetail: ItemDetailWindowScene | null = null;
   onHatToggle: ((u: Unit) => void) | null = null;
 
-  constructor() {
+  constructor(public showToggleHat = false) {
     super("UnitDetailsBarScene");
   }
 
@@ -172,7 +170,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
   }
 
   unitControls(unit: Unit) {
-    if (this.container && !unit.id.startsWith("enemy"))
+    if (this.container && this.showToggleHat)
       button(600, 20, "Toggle Hat", this.container, this, () => {
         api.saveUnit({
           ...unit,

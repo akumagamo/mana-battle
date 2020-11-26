@@ -39,7 +39,6 @@ type ActionWindowAction = { title: string; action: () => void };
 
 const WALKABLE_CELL_TINT = 0x88aa88;
 const ENEMY_IN_CELL_TINT = 0xff2222;
-const SELECTED_TILE_TINT = 0x9955aa;
 
 const SPEED = 1;
 
@@ -53,9 +52,6 @@ const BOTTOM_PANEL_X = 0;
 const BOTTOM_PANEL_Y = 600;
 const BOTTOM_PANEL_WIDTH = 1280;
 const BOTTOM_PANEL_HEIGHT = 120;
-
-const ALLIED_CITY_TINT = 0x66ff66;
-const ENEMY_CITY_TINT = 0xff6666;
 
 const cellSize = 100;
 
@@ -145,7 +141,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   signal(cmds: MapCommands[]) {
-    cmds.forEach((cmd) => {
+    cmds.forEach(async (cmd) => {
       console.log(`SIGNAL::`, cmd);
       if (cmd.type === "DESTROY_TEAM") {
         this.movedSquads = S.reject<string>((id) => id === cmd.target)(
@@ -227,11 +223,10 @@ export class MapScene extends Phaser.Scene {
       } else if (cmd.type === "SELECT_CITY") {
         this.signal([{ type: "CLOSE_ACTION_PANEL" }, { type: "CLEAR_TILES" }]);
         this.setSelectedCity(cmd.id);
-        this.cityIO((c) => {
-          this.signal([
-            { type: "MOVE_CAMERA_TO", x: c.x, y: c.y, duration: 500 },
-          ]);
-        })(cmd.id);
+        this.refreshUI();
+        const { x, y } = await this.cityIO(cmd.id);
+
+        this.signal([{ type: "MOVE_CAMERA_TO", x, y, duration: 500 }]);
       } else if (cmd.type === "CLEAR_TILES") {
         this.clearTiles();
       } else if (cmd.type === "CLEAR_TILES_EVENTS") {
@@ -283,8 +278,6 @@ export class MapScene extends Phaser.Scene {
         this.startForceTurn();
       } else if (cmd.type === "CITY_CLICK") {
         this.signal([{ type: "SELECT_CITY", id: cmd.id }]);
-
-        this.refreshUI();
       } else if (cmd.type === "CAPTURE_CITY") {
         this.state.cities = this.state.cities.map((city) =>
           city.id === cmd.id ? { ...city, force: cmd.force } : city
@@ -550,10 +543,11 @@ export class MapScene extends Phaser.Scene {
     return sqd;
   };
 
-  cityIO = (fn: (u: City) => void) => (id: string) => {
-    S.map<City, void>((unit) => fn(unit))(
-      S.find<City>((c) => c.id === id)(this.state.cities)
-    );
+  cityIO = async (id: string) => {
+    const city = this.state.cities.find((c) => c.id === id);
+
+    if (!city) throw new Error(INVALID_STATE);
+    else return city;
   };
 
   citySpriteIO = (fn: (u: Image) => void) => (id: string) => {
@@ -633,10 +627,14 @@ export class MapScene extends Phaser.Scene {
           tile: tile,
         };
         this.tiles.push(mapTile);
-
-        this.makeInteractive(mapTile);
       })
     );
+
+    this.makeCellsInteractive();
+  }
+  makeCellsInteractive() {
+    this.clearAllTileEvents();
+    this.tiles.forEach((tile) => this.makeInteractive(tile));
   }
   getSelectedUnit() {
     if (this.selectedEntity && this.selectedEntity.type === "unit") {
@@ -831,6 +829,8 @@ export class MapScene extends Phaser.Scene {
   ) {
     this.closeActionWindow();
 
+    this.disableInput();
+
     this.actionWindow(
       enemyChara.container.x + this.mapX || 0,
       enemyChara.container.y + this.mapY || 0,
@@ -891,7 +891,7 @@ export class MapScene extends Phaser.Scene {
           }, {} as { [x: string]: number[] });
 
           let defeated = Map(squads)
-            .filter((v, k) => v.every((n) => n === 0))
+            .filter((v) => v.every((n) => n === 0))
             .keySeq()
             .map((target) => ({ type: "DESTROY_TEAM", target }))
             .toJS();
@@ -962,52 +962,57 @@ export class MapScene extends Phaser.Scene {
 
     //UNIT INFORMATION
     if (this.selectedEntity && this.selectedEntity.type === "unit") {
-      const squad = await this.squadIO(this.selectedEntity.id);
-
-      text(20, 610, squad.name, uiContainer, this);
-      text(1000, 610, `${squad.range} cells`, uiContainer, this);
-
-      button(200, 620, "Squad Details", this.uiContainer, this, () =>
-        squadDetails(
-          this,
-          squad,
-          this.state.units
-            .toList()
-            .filter((u) => Object.keys(squad.members).includes(u.id))
-            .toJS()
-        )
-      );
+      await this.selectedSquadInfo(uiContainer);
 
       //CITY INFORMATION
     } else if (this.selectedEntity && this.selectedEntity.type === "city") {
-      this.cityIO((city) => {
-        text(20, 610, city.name, uiContainer, this);
-        if (city.force)
-          text(
-            1000,
-            610,
-            `Controlled by ${this.getForce(city.force).name}`,
-            uiContainer,
-            this
-          );
-      })(this.selectedEntity.id);
+      await this.selectedCityInfo(uiContainer);
     }
 
-    button(1100, 50, "Return to Title", uiContainer, this, () => {
-      container.removeAll();
-      uiContainer.removeAll();
-      this.charas.forEach((c) => this.scene.remove(c.scene.key));
-      this.charas = [];
-      this.tiles = [];
-
-      this.scene.transition({
-        target: "TitleScene",
-        duration: 0,
-        moveBelow: true,
-      });
-    });
+    this.returnToTitleButton(uiContainer, container);
 
     // Squad List (Left Navbar)
+    this.playerSquadList(uiContainer);
+
+    if (this.currentForce === PLAYER_FORCE)
+      button(1150, 650, "End Turn", uiContainer, this, () => {
+        this.endTurn();
+      });
+  }
+
+  private async selectedCityInfo(uiContainer: Phaser.GameObjects.Container) {
+    const city = await this.cityIO(this.selectedEntity.id);
+
+    text(20, 610, city.name, uiContainer, this);
+    if (city.force)
+      text(
+        1000,
+        610,
+        `Controlled by ${this.getForce(city.force).name}`,
+        uiContainer,
+        this
+      );
+  }
+
+  private async selectedSquadInfo(uiContainer: Phaser.GameObjects.Container) {
+    const squad = await this.squadIO(this.selectedEntity.id);
+
+    text(20, 610, squad.name, uiContainer, this);
+    text(1000, 610, `${squad.range} cells`, uiContainer, this);
+
+    button(200, 620, "Squad Details", this.uiContainer, this, () =>
+      squadDetails(
+        this,
+        squad,
+        this.state.units
+          .toList()
+          .filter((u) => Object.keys(squad.members).includes(u.id))
+          .toJS()
+      )
+    );
+  }
+
+  private playerSquadList(uiContainer: Phaser.GameObjects.Container) {
     let posY = 0;
     this.state.forces
       .filter((f) => f.id === PLAYER_FORCE)
@@ -1046,11 +1051,25 @@ export class MapScene extends Phaser.Scene {
     button(20, posY + 60, "+ Dispatch", uiContainer, this, () => {
       this.renderDispatchWindow();
     });
+  }
 
-    if (this.currentForce === PLAYER_FORCE)
-      button(1150, 650, "End Turn", uiContainer, this, () => {
-        this.endTurn();
+  private returnToTitleButton(
+    uiContainer: Phaser.GameObjects.Container,
+    container: Phaser.GameObjects.Container
+  ) {
+    button(1100, 50, "Return to Title", uiContainer, this, () => {
+      container.removeAll();
+      uiContainer.removeAll();
+      this.charas.forEach((c) => this.scene.remove(c.scene.key));
+      this.charas = [];
+      this.tiles = [];
+
+      this.scene.transition({
+        target: "TitleScene",
+        duration: 0,
+        moveBelow: true,
       });
+    });
   }
 
   renderDispatchWindow() {
@@ -1204,18 +1223,6 @@ export class MapScene extends Phaser.Scene {
     });
   }
 
-  disableInput() {
-    this.dragDisabled = true;
-    this.disableCityClick();
-    this.disableCellClick();
-  }
-
-  enableInput() {
-    this.dragDisabled = false;
-    this.enableCityClick();
-    this.enableCellClick();
-  }
-
   getAliveSquadsFromForce(forceId: string) {
     return getSquadsFromForce(this.state)(forceId).filter(
       (u) => u.status === "alive"
@@ -1332,6 +1339,7 @@ export class MapScene extends Phaser.Scene {
 
   closeActionWindow() {
     this.actionWindowContainer?.destroy();
+    this.enableInput();
   }
 
   showCellMenu(squad: MapSquad, { x, y }: Vector, onMoveComplete: Function) {
@@ -1405,18 +1413,18 @@ export class MapScene extends Phaser.Scene {
   }
 
   showCityInfo(id: string) {
-    const city = this.state.cities.find((c) => c.id === id);
+    this.state.cities.find((c) => c.id === id);
 
     const pic = this.add.sprite(SCREEN_WIDTH / 2, 350, "merano");
     pic.setOrigin(0.5);
     pic.setDisplaySize(250, 250);
-    const name = this.label(SCREEN_WIDTH / 2, 520, "Merano Castle");
+    this.label(SCREEN_WIDTH / 2, 520, "Merano Castle");
   }
 
   actionWindow(x: number, y: number, actions: ActionWindowAction[]) {
     if (this.actionWindowContainer) this.actionWindowContainer.destroy();
     this.actionWindowContainer = this.add.container(x, y);
-    const btns = actions.map(({ title, action }, index) => {
+    actions.map(({ title, action }, index) => {
       if (!this.actionWindowContainer) throw new Error(INVALID_STATE);
       return button(
         20,
@@ -1669,7 +1677,7 @@ export class MapScene extends Phaser.Scene {
                   baseX + 10,
                   baseY + 5,
                   scale,
-                  true
+                  false
                 );
 
                 this.scene.add("enemy_board", enemy, true);
@@ -1807,6 +1815,21 @@ export class MapScene extends Phaser.Scene {
       cell.tile.y + this.mapY,
       actions
     );
+  }
+
+  disableInput() {
+    this.clearAllTileEvents();
+    this.disableCellClick();
+    this.disableCityClick();
+    this.dragDisabled = true;
+  }
+
+  enableInput() {
+    this.dragDisabled = false;
+    this.enableCellClick();
+    this.enableCityClick();
+    this.makeCellsInteractive();
+    this.refreshUI();
   }
 }
 const formatDataForApi = (state: MapState) => (currentForce: string) => ({

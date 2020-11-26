@@ -1,11 +1,11 @@
-import * as Phaser from 'phaser';
-import * as api from '../DB';
-import {Text, Image} from '../Models';
-import {Chara} from '../Chara/Chara';
-import {Unit} from './Model';
-import {UnitDetailsBarScene} from './UnitDetailsBarScene';
-import button from '../UI/button';
-import menu from '../Backgrounds/menu';
+import * as Phaser from "phaser";
+import * as api from "../DB";
+import { Text, Image } from "../Models";
+import { Chara } from "../Chara/Chara";
+import { Unit } from "./Model";
+import { UnitDetailsBarScene } from "./UnitDetailsBarScene";
+import button from "../UI/button";
+import menu from "../Backgrounds/menu";
 
 type ListUnit = {
   tile: Image;
@@ -19,14 +19,14 @@ export class ListUnitsScene extends Phaser.Scene {
   detailsBar: UnitDetailsBarScene | null = null;
 
   constructor() {
-    super('ListUnitsScene');
+    super("ListUnitsScene");
   }
 
   getUnits() {
     // TODO: filter only player units
     return Object.values(api.getUnits()).slice(
       this.page * this.itemsPerPage,
-      this.page * this.itemsPerPage + this.itemsPerPage,
+      this.page * this.itemsPerPage + this.itemsPerPage
     );
   }
   create() {
@@ -35,18 +35,18 @@ export class ListUnitsScene extends Phaser.Scene {
     // TODO: filter only player units
     const units = this.getUnits();
 
-    this.detailsBar = new UnitDetailsBarScene();
+    this.detailsBar = new UnitDetailsBarScene(true);
     this.renderUnitsList(units);
 
-    this.scene.add('details-bar', this.detailsBar, true);
+    this.scene.add("details-bar", this.detailsBar, true);
 
-    button(1120, 20, 'Back to Title', this.add.container(0, 0), this, () => {
+    button(1120, 20, "Back to Title", this.add.container(0, 0), this, () => {
       this.removeChildren();
 
-      this.scene.remove('UnitDetailsBarScene');
+      this.scene.remove("UnitDetailsBarScene");
 
       this.scene.transition({
-        target: 'TitleScene',
+        target: "TitleScene",
         duration: 0,
         moveBelow: true,
       });
@@ -59,7 +59,7 @@ export class ListUnitsScene extends Phaser.Scene {
     const rows = this.formatList(units, []);
 
     rows.forEach((row, y) =>
-      row.forEach((col, x) => this.renderUnit(col, x, y)),
+      row.forEach((col, x) => this.renderUnit(col, x, y))
     );
   }
 
@@ -71,7 +71,7 @@ export class ListUnitsScene extends Phaser.Scene {
       const slice = units.slice(0, cols);
       return this.formatList(
         units.slice(cols, units.length),
-        accumulator.concat([slice]),
+        accumulator.concat([slice])
       );
     }
   }
@@ -82,16 +82,16 @@ export class ListUnitsScene extends Phaser.Scene {
     const x_ = 100 + x * 120;
     const y_ = 100 + y * 130;
 
-    const tile = this.add.image(x_ + 2, y_ + 63, 'tile');
+    const tile = this.add.image(x_ + 2, y_ + 63, "tile");
     tile.setScale(0.4);
     const chara = new Chara(key, this, unit, x_, y_, 0.6, true, false);
 
     chara.onClick(() => this.selectUnit(unit.id));
 
     tile.setInteractive();
-    tile.on('pointerdown', () => this.selectUnit(unit.id));
+    tile.on("pointerdown", () => this.selectUnit(unit.id));
 
-    this.units.push({tile, chara});
+    this.units.push({ tile, chara });
   }
 
   selectUnit(id: string) {
