@@ -806,6 +806,8 @@ export class MapScene extends Phaser.Scene {
       const enemyChara_ = await this.getChara(enemyUnit.id);
 
       action(selectedUnit, enemyChara_);
+
+      this.refreshUI();
     }
   }
 
@@ -946,18 +948,19 @@ export class MapScene extends Phaser.Scene {
   }
 
   async refreshUI() {
-    const { container, uiContainer } = this.getContainers();
-    uiContainer.removeAll();
+    console.log(`refreshing UI`);
+    await this.delay(10); // To avoid having labels one over another (sometimes children are not removed)
 
-    uiContainer.add(
-      panel(
-        BOTTOM_PANEL_X,
-        BOTTOM_PANEL_Y,
-        BOTTOM_PANEL_WIDTH,
-        BOTTOM_PANEL_HEIGHT,
-        uiContainer,
-        this
-      )
+    const { container, uiContainer } = this.getContainers();
+    uiContainer.removeAll(true);
+
+    panel(
+      BOTTOM_PANEL_X,
+      BOTTOM_PANEL_Y,
+      BOTTOM_PANEL_WIDTH,
+      BOTTOM_PANEL_HEIGHT,
+      uiContainer,
+      this
     );
 
     //UNIT INFORMATION
@@ -981,6 +984,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   private async selectedCityInfo(uiContainer: Phaser.GameObjects.Container) {
+    console.log(`render selectedCityInfo`);
     const city = await this.cityIO(this.selectedEntity.id);
 
     text(20, 610, city.name, uiContainer, this);
@@ -995,6 +999,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   private async selectedSquadInfo(uiContainer: Phaser.GameObjects.Container) {
+    console.log(`render selected squad info`);
     const squad = await this.squadIO(this.selectedEntity.id);
 
     text(20, 610, squad.name, uiContainer, this);
