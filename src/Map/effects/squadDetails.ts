@@ -8,13 +8,13 @@ import { MapScene } from "../MapScene";
 
 export default (scene: MapScene, squad: MapSquad, units: Unit[]) => {
   let charaStats = scene.add.container(0, 0);
-  panel(50, 50, 1080, 540, scene.uiContainer, scene);
+  panel(0, 50, 1080, 340, scene.uiContainer, scene);
 
   scene.disableInput();
   const details = new UnitDetailsBarScene();
   scene.scene.add("details-bar", details, true);
 
-  const boardScene = new BoardScene(squad, units, 50, 0, 0.7);
+  const boardScene = new BoardScene(squad, units, 0, 50, 0.7);
   scene.scene.add(`board-squad-${squad.id}`, boardScene, true);
   boardScene.onUnitClick((chara) => {
     charaStats.removeAll();
@@ -25,7 +25,7 @@ export default (scene: MapScene, squad: MapSquad, units: Unit[]) => {
 
   details.render(units[0]);
 
-  button(950, 50, "Close", scene.uiContainer, scene, () => {
+  button(1050, 50, "Close", scene.uiContainer, scene, () => {
     boardScene.destroy(scene);
 
     if (details) details.destroy(details);

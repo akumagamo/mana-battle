@@ -17,7 +17,6 @@ export class EditSquadScene extends Phaser.Scene {
 
   constructor() {
     super("EditSquadScene");
-    console.log("EditSquadScene constructor. this:", this);
   }
 
   create({ squad }: { squad: Squad }) {

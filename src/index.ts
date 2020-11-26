@@ -1,20 +1,24 @@
-import 'phaser';
-import {SCREEN_WIDTH, SCREEN_HEIGHT} from './constants';
-import TitleScene from './Scenes/TitleScene';
-import {EditSquadScene} from './Squad/EditSquadScene';
-import {ListSquadsScene} from './Squad/ListSquadsScene';
-import {ListUnitsScene} from './Unit/ListUnits';
-import {MapScene} from './Map/MapScene';
-import MapListScene from './Map/MapListScene';
-import CombatScene from './Combat/CombatScene';
-import OptionsScene from './Scenes/OptionsScene';
-import WorldScene from './Scenes/World';
-import defaultData from './defaultData';
-import WebFont from 'webfontloader';
+import "phaser";
+import { SCREEN_WIDTH, SCREEN_HEIGHT } from "./constants";
+import TitleScene from "./Scenes/TitleScene";
+import { EditSquadScene } from "./Squad/EditSquadScene";
+import { ListSquadsScene } from "./Squad/ListSquadsScene";
+import { ListUnitsScene } from "./Unit/ListUnits";
+import { MapScene } from "./Map/MapScene";
+import MapListScene from "./Map/MapListScene";
+import CombatScene from "./Combat/CombatScene";
+import OptionsScene from "./Scenes/OptionsScene";
+import WorldScene from "./Scenes/World";
+import defaultData from "./defaultData";
+import WebFont from "webfontloader";
+
+console.log(`Starting up app. Some lessons to remember 📚:
+  - avoid promises in rendering (Phaser doesn't like them)
+`);
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  backgroundColor: '#125555',
+  backgroundColor: "#125555",
   width: SCREEN_WIDTH,
   height: SCREEN_HEIGHT,
   scale: {
@@ -35,7 +39,7 @@ const config: Phaser.Types.Core.GameConfig = {
 };
 
 const getTimeout = () => {
-  if (localStorage.getItem('player') === null) {
+  if (localStorage.getItem("player") === null) {
     defaultData(true);
     // TODO: improve this
     // Forcing a small delay to allow writing data
@@ -49,7 +53,7 @@ const getTimeout = () => {
 setTimeout(() => {
   WebFont.load({
     google: {
-      families: ['Alata'],
+      families: ["Alata"],
     },
     fontactive: () => {
       const game = new Phaser.Game(config);

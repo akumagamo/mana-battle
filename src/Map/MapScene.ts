@@ -370,7 +370,7 @@ export class MapScene extends Phaser.Scene {
       else return y;
     };
 
-    return new Promise((resolve) =>
+    return new Promise((resolve: () => void) =>
       this.tweens.add({
         targets: this.mapContainer,
         x: tx(),
@@ -1312,7 +1312,7 @@ export class MapScene extends Phaser.Scene {
       fontSize: 36,
     });
 
-    return new Promise((resolve) => {
+    return new Promise((resolve: () => void) => {
       const timeline = this.tweens.createTimeline({
         onComplete: () => resolve(),
       });
@@ -1532,11 +1532,8 @@ export class MapScene extends Phaser.Scene {
         };
       });
 
-    //if unit is
-    //
-    //
     if (tweens.length > 0)
-      return new Promise((resolve) => {
+      return new Promise((resolve: () => void) => {
         this.tweens.timeline({
           tweens,
           onComplete: () => {
@@ -1544,7 +1541,7 @@ export class MapScene extends Phaser.Scene {
           },
         });
       });
-    else return new Promise((resolve) => resolve());
+    else return Promise.resolve();
   }
 
   isEnemyInTile(tile: Vector) {
