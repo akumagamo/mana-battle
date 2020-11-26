@@ -242,13 +242,14 @@ export class MapScene extends Phaser.Scene {
         const mapTile = this.tileAt(x, y);
 
         this.cellHighlight = this.add.rectangle(
-          mapTile.tile.x + this.mapContainer.x,
-          mapTile.tile.y + this.mapContainer.y,
+          mapTile.tile.x,
+          mapTile.tile.y,
           cellSize,
           cellSize
         );
 
         this.cellHighlight.setStrokeStyle(2, 0x1a65ac);
+        this.mapContainer.add(this.cellHighlight);
       } else if (cmd.type === "CLOSE_ACTION_PANEL") {
         this.closeActionWindow();
       } else if (cmd.type === "END_SQUAD_TURN") {
