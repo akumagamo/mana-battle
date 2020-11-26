@@ -8,7 +8,7 @@ test("Should get correct melee targets", () => {
   //  [ _, _, 2],
   //  [ 4, _, 3],
   //
-  // Team 1 facing right =>
+  // Team 2 facing right =>
   //  [ _, _, 6],
   //  [ _, 5, 7],
   //  [ _, _, 8],
@@ -62,4 +62,36 @@ test("Should get correct melee targets", () => {
   expect(getMeleeTarget(ally2, units).id).toEqual("7");
   expect(getMeleeTarget(ally3, units).id).toEqual("6");
   expect(getMeleeTarget(ally4, units).id).toEqual("6");
+});
+
+test("Should choose closer enemy on diagonal", () => {
+  // Team 1 facing right =>
+  //  [ _, _, 0],
+  //  [ _, _, _],
+  //  [ _, _, _],
+  //
+  // Team 2 facing right =>
+  //  [ _, _, _],
+  //  [ _, _, 3],
+  //  [ 2, _, _],
+  //
+  // After transposing:
+  //  [ _, _, 1, _, _, 2],
+  //  [ _, _, _, 3, _, _],
+  //  [ _, _, _, _, _, _],
+  //
+  // 1 -> 3
+  const ally0 = {
+    ...makeUnit("fighter", 0, 1),
+    squad: { id: "1", x: 3, y: 1 },
+  };
+
+  const units = [
+    ally0,
+    { ...makeUnit("fighter", 1, 1), squad: { id: "2", x: 2, y: 2 } },
+    { ...makeUnit("fighter", 2, 1), squad: { id: "2", x: 1, y: 3 } },
+    { ...makeUnit("fighter", 3, 1), squad: { id: "2", x: 3, y: 2 } },
+  ].map(makeTurnUnit);
+
+  expect(getMeleeTarget(ally0, units).id).toEqual("3");
 });
