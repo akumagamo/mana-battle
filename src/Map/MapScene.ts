@@ -329,7 +329,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   tween(options: any) {
-    return new Promise((resolve: any) =>
+    return new Promise<void>((resolve) =>
       this.tweens.add({
         ...options,
         onComplete: resolve,
@@ -337,7 +337,7 @@ export class MapScene extends Phaser.Scene {
     );
   }
   delay(delay: number) {
-    return new Promise((resolve: any) =>
+    return new Promise<void>((resolve) =>
       this.time.addEvent({
         delay,
         callback: resolve,
@@ -370,7 +370,7 @@ export class MapScene extends Phaser.Scene {
       else return y;
     };
 
-    return new Promise((resolve: () => void) =>
+    return new Promise<void>((resolve) =>
       this.tweens.add({
         targets: this.mapContainer,
         x: tx(),
@@ -1312,7 +1312,7 @@ export class MapScene extends Phaser.Scene {
       fontSize: 36,
     });
 
-    return new Promise((resolve: () => void) => {
+    return new Promise<void>((resolve) => {
       const timeline = this.tweens.createTimeline({
         onComplete: () => resolve(),
       });
@@ -1533,7 +1533,7 @@ export class MapScene extends Phaser.Scene {
       });
 
     if (tweens.length > 0)
-      return new Promise((resolve: () => void) => {
+      return new Promise<void>((resolve) => {
         this.tweens.timeline({
           tweens,
           onComplete: () => {
