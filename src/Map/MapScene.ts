@@ -9,7 +9,7 @@ import text from "../UI/text";
 import {
   getPossibleMoves,
   squadsFromForce as getSquadsFromForce,
-  getUnit,
+  getSquad,
 } from "../API/Map/api";
 import {
   Vector,
@@ -224,7 +224,7 @@ export class MapScene extends Phaser.Scene {
         this.signal([{ type: "CLOSE_ACTION_PANEL" }, { type: "CLEAR_TILES" }]);
         this.setSelectedCity(cmd.id);
         this.refreshUI();
-        const { x, y } = await this.cityIO(cmd.id);
+        const { x, y } = this.cityIO(cmd.id);
 
         this.signal([{ type: "MOVE_CAMERA_TO", x, y, duration: 500 }]);
       } else if (cmd.type === "CLEAR_TILES") {
@@ -526,8 +526,8 @@ export class MapScene extends Phaser.Scene {
     );
   }
 
-  getUnit(id: string) {
-    let u = getUnit(this.state)(id);
+  getUnit(id: string): MapSquad {
+    let u = getSquad(this.state)(id);
 
     if (!u) throw new Error(INVALID_STATE);
     return u;
@@ -535,7 +535,7 @@ export class MapScene extends Phaser.Scene {
   mapUnit = <A>(fn: (u: MapSquad) => A) => (id: string) =>
     S.map<MapSquad, A>((unit) => fn(unit))(this.getUnit(id));
 
-  squadIO = async (id: string) => {
+  squadIO = (id: string): MapSquad => {
     let sqd = this.state.mapSquads.find((s) => s.id === id);
 
     if (!sqd) throw new Error(INVALID_STATE);
@@ -543,7 +543,7 @@ export class MapScene extends Phaser.Scene {
     return sqd;
   };
 
-  cityIO = async (id: string) => {
+  cityIO = (id: string): City => {
     const city = this.state.cities.find((c) => c.id === id);
 
     if (!city) throw new Error(INVALID_STATE);
@@ -947,12 +947,18 @@ export class MapScene extends Phaser.Scene {
     //this.makeInteractive(cell);
   }
 
+  async destroyUI() {
+    const { uiContainer } = this.getContainers();
+
+    uiContainer.removeAll(true);
+  }
+
   async refreshUI() {
     console.log(`refreshing UI`);
-    await this.delay(10); // To avoid having labels one over another (sometimes children are not removed)
 
     const { container, uiContainer } = this.getContainers();
-    uiContainer.removeAll(true);
+
+    this.destroyUI();
 
     panel(
       BOTTOM_PANEL_X,
@@ -985,7 +991,7 @@ export class MapScene extends Phaser.Scene {
 
   private async selectedCityInfo(uiContainer: Phaser.GameObjects.Container) {
     console.log(`render selectedCityInfo`);
-    const city = await this.cityIO(this.selectedEntity.id);
+    const city = this.cityIO(this.selectedEntity.id);
 
     text(20, 610, city.name, uiContainer, this);
     if (city.force)
@@ -998,22 +1004,26 @@ export class MapScene extends Phaser.Scene {
       );
   }
 
-  private async selectedSquadInfo(uiContainer: Phaser.GameObjects.Container) {
+  private selectedSquadInfo(uiContainer: Phaser.GameObjects.Container) {
     console.log(`render selected squad info`);
-    const squad = await this.squadIO(this.selectedEntity.id);
+    const squad = this.squadIO(this.selectedEntity.id);
 
     text(20, 610, squad.name, uiContainer, this);
     text(1000, 610, `${squad.range} cells`, uiContainer, this);
 
     button(200, 620, "Squad Details", this.uiContainer, this, () =>
-      squadDetails(
-        this,
-        squad,
-        this.state.units
-          .toList()
-          .filter((u) => Object.keys(squad.members).includes(u.id))
-          .toJS()
-      )
+      this.viewSquadDetails(squad)
+    );
+  }
+
+  viewSquadDetails(squad: MapSquad): void {
+    squadDetails(
+      this,
+      squad,
+      this.state.units
+        .toList()
+        .filter((u) => Object.keys(squad.members).includes(u.id))
+        .toJS()
     );
   }
 
@@ -1271,7 +1281,7 @@ export class MapScene extends Phaser.Scene {
 
     if (enemyInRange) {
       console.log(`there are enemies in range, attacking`);
-      const enemySquad = await this.squadIO(enemyInRange.enemy);
+      const enemySquad = this.squadIO(enemyInRange.enemy);
       this.moveToEnemyUnit(enemySquad, currentSquad);
     } else {
       console.log(`no enemies in range, moving to random location`);
@@ -1466,7 +1476,7 @@ export class MapScene extends Phaser.Scene {
 
     this.movedSquads.push(squadId);
 
-    const mapSquad = await this.squadIO(squadId);
+    const mapSquad = this.squadIO(squadId);
     const step = mapSquad.validSteps.find((step) =>
       Map(step.target).equals(Map({ x, y }))
     );
@@ -1663,12 +1673,13 @@ export class MapScene extends Phaser.Scene {
               action: async () => {
                 const baseX = 200;
                 const baseY = 200;
-
                 const scale = 0.5;
-                const leader = this.getSelectedSquadLeader(playerSquad.id);
-                this.clearAllTileEvents();
-                this.clearTiles();
+
+                this.disableInput();
+                this.destroyUI();
                 this.closeActionWindow();
+
+                const leader = this.getSelectedSquadLeader(playerSquad.id);
 
                 const enemySquad = this.getSquad(enemyChara.unit.squad.id);
                 const enemyUnits = this.state.units
@@ -1682,7 +1693,7 @@ export class MapScene extends Phaser.Scene {
                   baseX + 10,
                   baseY + 5,
                   scale,
-                  false
+                  true
                 );
 
                 this.scene.add("enemy_board", enemy, true);
@@ -1726,12 +1737,13 @@ export class MapScene extends Phaser.Scene {
             },
             {
               title: "View",
-              action: () => {
+              action: async () => {
                 this.clearAllTileEvents();
                 this.clearTiles();
                 this.closeActionWindow();
                 this.setSelectedUnit(e.id);
-                this.refreshUI();
+                await this.refreshUI();
+                this.viewSquadDetails(this.getSquad(enemyChara.unit.squad.id));
               },
             },
 

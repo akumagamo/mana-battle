@@ -1,10 +1,10 @@
-import * as PF from 'pathfinding';
-import {Vector, TurnManager, MapSquad, Step} from './Model';
-import {MapState} from './Model';
-import {Map, Range, List} from 'immutable';
-import {INVALID_STATE} from '../../errors';
+import * as PF from "pathfinding";
+import { Vector, TurnManager, MapSquad, Step } from "./Model";
+import { MapState } from "./Model";
+import { Map, Range, List } from "immutable";
+import { INVALID_STATE } from "../../errors";
 
-const makeVector = (x: number) => (y: number) => ({x, y});
+const makeVector = (x: number) => (y: number) => ({ x, y });
 
 export const getDistance = (vec1: Vector) => (vec2: Vector) =>
   Math.abs(vec1.x - vec2.x) + Math.abs(vec1.y - vec2.y);
@@ -12,7 +12,7 @@ export const getDistance = (vec1: Vector) => (vec2: Vector) =>
 export const squadsFromForce = (state: MapState) => (id: string) =>
   state.mapSquads.filter((u) => u.force === id);
 
-export const getUnit = (state: MapState) => (id: string) =>
+export const getSquad = (state: MapState) => (id: string) =>
   state.mapSquads.find((s) => s.id === id);
 
 export const getForce = (state: MapState) => (id: string) =>
@@ -56,7 +56,10 @@ export const getPossibleMoves = ({
   // Marks enemy-occupied cells as "walls"
   const updatedGrid: number[][] = blockVectorsInGrid(grid)(enemyIndex);
 
-  const getUnitValidSteps = ({pos: {x, y}, range}: MapSquad): List<Step> => {
+  const getUnitValidSteps = ({
+    pos: { x, y },
+    range,
+  }: MapSquad): List<Step> => {
     const xs = Range(x - range - 1, x + range + 1)
       .filter((n) => n >= 0 && n < width)
       .toList();
@@ -65,16 +68,16 @@ export const getPossibleMoves = ({
       .toList();
 
     const isInRange = (range: number) => (vec: Vector) =>
-      getDistance({x, y})(vec) <= range;
+      getDistance({ x, y })(vec) <= range;
 
-    const isWalkable = ({x, y}: Vector) => walkableCells.includes(grid[y][x]);
+    const isWalkable = ({ x, y }: Vector) => walkableCells.includes(grid[y][x]);
 
-    const pathFinder = getPathTo(updatedGrid)({x, y});
+    const pathFinder = getPathTo(updatedGrid)({ x, y });
 
     const pathInRange = <T>(list: T[]) => list.length <= range + 1;
 
     const vectors = ys
-      .map((y_) => xs.map((x_) => ({x: x_, y: y_})))
+      .map((y_) => xs.map((x_) => ({ x: x_, y: y_ })))
       .flatten(1) as List<Vector>;
 
     return vectors
@@ -83,7 +86,7 @@ export const getPossibleMoves = ({
       .map(pathFinder)
       .filter((p) => p.length > 1)
       .filter(pathInRange)
-      .map((l) => l.map(([x, y]) => ({x, y})))
+      .map((l) => l.map(([x, y]) => ({ x, y })))
       .map((steps: Vector[]) => ({
         target: steps[steps.length - 1],
         steps,
@@ -102,8 +105,8 @@ export const getPossibleMoves = ({
           steps.some(
             (step) =>
               getDistance(step.target)(enemy.pos) === 1 &&
-              getPathTo(grid)(mapSquad.pos)(enemy.pos).length <= mapSquad.range,
-          ),
+              getPathTo(grid)(mapSquad.pos)(enemy.pos).length <= mapSquad.range
+          )
         )
         .map((enemy: MapSquad) => ({
           enemy: enemy.id,
@@ -116,17 +119,17 @@ export const getPossibleMoves = ({
 };
 
 export const blockVectorsInGrid = (grid: number[][]) => (
-  blockIndex: Map<string, Map<string, boolean>>,
+  blockIndex: Map<string, Map<string, boolean>>
 ) =>
   grid.map((ys, y) =>
     ys.map((cell, x) => {
       if (blockIndex.getIn([y, x], false)) return 1;
       else return cell;
-    }),
+    })
   );
 
 export const getPathTo = (grid: number[][]) => (source: Vector) => (
-  target: Vector,
+  target: Vector
 ) => {
   const pfGrid = new PF.Grid(grid);
   const finder = new PF.AStarFinder();
