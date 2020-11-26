@@ -265,7 +265,7 @@ export default class CombatScene extends Phaser.Scene {
       repeat: WALK_FRAMES,
     };
 
-    return new Promise((resolve: () => void) => {
+    return new Promise<void>((resolve) => {
       this.time.addEvent(timeEvents);
       this.tweens.add(config(resolve));
     });
@@ -321,7 +321,7 @@ export default class CombatScene extends Phaser.Scene {
     const source = this.getChara(sourceId);
     const target = this.getChara(targetId);
 
-    return new Promise((resolve: () => void) => {
+    return new Promise<void>((resolve) => {
       source.slash(resolve);
       target.flinch(damage, updatedTarget.currentHp === 0);
     });
@@ -348,7 +348,7 @@ export default class CombatScene extends Phaser.Scene {
 
     if (!source.front) arrow.scaleX = -1;
 
-    return new Promise((resolve: () => void) => {
+    return new Promise<void>((resolve) => {
       source.performBowAttack(resolve);
       this.add.tween({
         targets: arrow,
@@ -380,7 +380,7 @@ export default class CombatScene extends Phaser.Scene {
 
     if (source.front) fb.rotation = -1;
 
-    return new Promise((resolve: () => void) => {
+    return new Promise<void>((resolve) => {
       castSpell(source, resolve);
       this.add.tween({
         targets: fb,
@@ -439,7 +439,7 @@ export default class CombatScene extends Phaser.Scene {
       },
     });
 
-    return new Promise((resolve: () => void) => {
+    return new Promise<void>((resolve) => {
       this.tweens.add(config(resolve));
     });
   }
