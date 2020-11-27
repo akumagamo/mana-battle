@@ -1,15 +1,15 @@
-import * as Phaser from 'phaser';
-import {Squad} from '../Squad/Model';
-import * as api from '../DB';
-import BoardScene from '../Board/StaticBoardScene';
-import {Pointer, Image, Text} from '../Models';
-import button from '../UI/button';
-import panel from '../UI/panel';
-import {SCREEN_WIDTH} from '../constants';
-import text from '../UI/text';
-import S from 'sanctuary';
-import menu from '../Backgrounds/menu';
-import {PLAYER_FORCE} from '../API/Map/Model';
+import * as Phaser from "phaser";
+import { Squad } from "../Squad/Model";
+import * as api from "../DB";
+import BoardScene from "../Board/StaticBoardScene";
+import { Pointer, Image, Text } from "../Models";
+import button from "../UI/button";
+import panel from "../UI/panel";
+import { SCREEN_WIDTH } from "../constants";
+import text from "../UI/text";
+import S from "sanctuary";
+import menu from "../Backgrounds/menu";
+import { PLAYER_FORCE } from "../API/Map/Model";
 export class ListSquadsScene extends Phaser.Scene {
   boardScenes: BoardScene[] = [];
   controls: (Image | Text)[] = [];
@@ -17,7 +17,7 @@ export class ListSquadsScene extends Phaser.Scene {
   itemsPerPage: number = 16;
 
   constructor() {
-    super('ListSquadsScene');
+    super("ListSquadsScene");
   }
 
   create() {
@@ -32,14 +32,14 @@ export class ListSquadsScene extends Phaser.Scene {
   getSquads() {
     return Object.values(api.getSquads()).slice(
       this.page * this.itemsPerPage,
-      this.page * this.itemsPerPage + this.itemsPerPage,
+      this.page * this.itemsPerPage + this.itemsPerPage
     );
   }
   renderSquadList(squads: Squad[]) {
     const rows = this.formatList(squads, []);
 
     rows.forEach((row, y) =>
-      row.forEach((col, x) => this.renderBoard(col, x, y)),
+      row.forEach((col, x) => this.renderBoard(col, x, y))
     );
   }
 
@@ -51,7 +51,7 @@ export class ListSquadsScene extends Phaser.Scene {
       const slice = squads.slice(0, cols);
       return this.formatList(
         squads.slice(cols, squads.length),
-        accumulator.concat([slice]),
+        accumulator.concat([slice])
       );
     }
   }
@@ -63,11 +63,11 @@ export class ListSquadsScene extends Phaser.Scene {
 
     text(10, 10, squad.name, container, this);
 
-    button(200, 10, 'Edit', container, this, () => {
+    button(200, 10, "Edit", container, this, () => {
       this.editSquad(squad);
     });
 
-    button(1000, 10, 'Disband Squad', container, this, () => {
+    button(1000, 10, "Disband Squad", container, this, () => {
       api.disbandSquad(squad.id);
       container.destroy();
       this.refresh();
@@ -83,6 +83,7 @@ export class ListSquadsScene extends Phaser.Scene {
       BOARD_X,
       BOARD_Y,
       0.3,
+      true
     );
     this.scene.add(`board-squad-${squad.id}`, boardScene, true);
 
@@ -95,7 +96,7 @@ export class ListSquadsScene extends Phaser.Scene {
 
   squadSceneIO(id: string, fn: (board: BoardScene) => void) {
     const scene = S.find<BoardScene>((e) => e.squad.id === id)(
-      this.boardScenes,
+      this.boardScenes
     );
 
     S.map<BoardScene, void>((board) => {
@@ -113,30 +114,30 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   renderControls() {
-    button(1000, 10, 'Return to Title', this.add.container(0, 0), this, () => {
+    button(1000, 10, "Return to Title", this.add.container(0, 0), this, () => {
       this.removeChildren();
       this.scene.transition({
-        target: 'TitleScene',
+        target: "TitleScene",
         duration: 0,
         moveBelow: true,
       });
     });
 
-    button(1000, 600, 'Create Squad', this.add.container(0, 0), this, () => {
+    button(1000, 600, "Create Squad", this.add.container(0, 0), this, () => {
       this.removeChildren();
 
       const squads = Object.keys(api.getSquads());
 
       // TODO; create a functino with typed requirements
       this.scene.transition({
-        target: 'EditSquadScene',
+        target: "EditSquadScene",
         duration: 0,
         moveBelow: true,
         data: {
           squad: {
             id: (squads.length + 1).toString(),
-            name: '',
-            emblem: '',
+            name: "",
+            emblem: "",
             members: {},
             force: PLAYER_FORCE,
           },
@@ -154,21 +155,21 @@ export class ListSquadsScene extends Phaser.Scene {
 
     const totalSquads = Object.keys(squads).length;
 
-    const prev = this.add.image(NAV_X, NAV_Y, 'arrow_right');
+    const prev = this.add.image(NAV_X, NAV_Y, "arrow_right");
     prev.setScale(-1, 1);
 
     if (this.page === 0) {
       prev.setAlpha(0.5);
     } else {
       prev.setInteractive();
-      prev.on('pointerdown', (_pointer: Pointer) => {
+      prev.on("pointerdown", (_pointer: Pointer) => {
         this.prevPage();
       });
     }
 
     this.controls.push(prev);
 
-    const next = this.add.image(NAV_X + 100, NAV_Y, 'arrow_right');
+    const next = this.add.image(NAV_X + 100, NAV_Y, "arrow_right");
 
     const isLastPage =
       totalSquads < this.itemsPerPage ||
@@ -176,7 +177,7 @@ export class ListSquadsScene extends Phaser.Scene {
 
     if (!isLastPage) {
       next.setInteractive();
-      next.on('pointerdown', () => {
+      next.on("pointerdown", () => {
         this.nextPage();
       });
     } else {
@@ -218,10 +219,10 @@ export class ListSquadsScene extends Phaser.Scene {
     this.removeChildren();
 
     this.scene.transition({
-      target: 'EditSquadScene',
+      target: "EditSquadScene",
       duration: 0,
       moveBelow: true,
-      data: {squad},
+      data: { squad },
     });
   }
 }

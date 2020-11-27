@@ -1,8 +1,7 @@
 import * as Phaser from "phaser";
 import { Chara } from "../Chara/Chara";
-import { SquadMember, Squad } from "../Squad/Model";
+import { Squad } from "../Squad/Model";
 import { cartesianToIsometric } from "../utils/isometric";
-import { getUnit } from "../DB";
 import { BoardTile } from "./Model";
 import { Graphics } from "../Models";
 import { Unit } from "../Unit/Model";
@@ -133,7 +132,9 @@ export default class StaticBoardScene extends Phaser.Scene {
   addUnitToBoard(unit: Unit) {
     if (!unit.squad) return;
 
-    let { x, y } = this.getUnitPositionInScreen(unit.squad);
+    const pos = this.squad.members[unit.id];
+
+    let { x, y } = this.getUnitPositionInScreen(pos);
 
     x = x * this.scaleSizing + this.x;
     y = y * this.scaleSizing + this.y;
@@ -181,8 +182,8 @@ export default class StaticBoardScene extends Phaser.Scene {
       .forEach((chara) => chara.scene.bringToTop());
   }
   getUnitPositionInScreen(squadMember: Vector) {
-    const x_ = invertBoardPosition(squadMember.x);
-    const y_ = invertBoardPosition(squadMember.y);
+    const x_ = this.front ? squadMember.x : invertBoardPosition(squadMember.x);
+    const y_ = this.front ? squadMember.y : invertBoardPosition(squadMember.y);
 
     const { x, y } = cartesianToIsometric(x_, y_);
 

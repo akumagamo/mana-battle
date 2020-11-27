@@ -14,6 +14,7 @@ import WebFont from "webfontloader";
 
 console.log(`Starting up app. Some lessons to remember 📚:
   - avoid promises in rendering (Phaser doesn't like them)
+  - avoid reappling/removing events from all map cells, as this is slow
 `);
 
 const config: Phaser.Types.Core.GameConfig = {
