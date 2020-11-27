@@ -27,6 +27,4 @@ export default (scene: MapScene) => {
       scene.tiles.push(mapTile);
     })
   );
-
-  scene.makeCellsInteractive();
 };

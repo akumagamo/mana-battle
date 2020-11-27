@@ -9,11 +9,6 @@ export default (scene: MapScene, cell: MapTile) => {
   // 2 - The user is currently selecting an own unit. In this case, show
   // the move actions and the units/city in the cell
 
-  if (scene.cellClickDisabled) {
-    console.log(`cell click disabled! cancelling`);
-    return;
-  }
-
   //scene.clearTiles();
 
   scene.closeActionWindow();
@@ -24,13 +19,11 @@ export default (scene: MapScene, cell: MapTile) => {
   );
   const city = scene.state.cities.find((c) => c.x === x && c.y === y);
 
-  scene.signal([
-    //{type: 'CLEAR_TILES_TINTING'},
-    { type: "HIGHLIGHT_CELL", pos: cell },
-  ]);
-
+  // TODO: select city if nothing is there
   if (squads.length === 1 && !city) {
-    scene.signal([{ type: "CLICK_SQUAD", unit: squads[0] }]);
+    scene.signal("there was just a squad in the cell, select it", [
+      { type: "CLICK_SQUAD", unit: squads[0] },
+    ]);
   } else if (squads.length > 0 || city) {
     scene.renderCellMenu(squads, city, cell);
   } else {
@@ -39,12 +32,6 @@ export default (scene: MapScene, cell: MapTile) => {
     if (!selectedUnit) return;
 
     if (selectedUnit.force === PLAYER_FORCE)
-      scene.showCellMenu(selectedUnit, cell, async () => {
-        const targets = scene.targets(cell);
-        const city = scene.cityAt(cell.x, cell.y);
-        if (targets.length > 0 || city)
-          scene.showSquadActionsMenu(selectedUnit);
-        else scene.finishSquadActions(await scene.getChara(selectedUnit.id));
-      });
+      scene.showCellMenu(selectedUnit, cell);
   }
 };

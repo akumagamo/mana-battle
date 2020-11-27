@@ -13,8 +13,9 @@ import defaultData from "./defaultData";
 import WebFont from "webfontloader";
 
 console.log(`Starting up app. Some lessons to remember 📚:
-  - avoid promises in rendering (Phaser doesn't like them)
+  - avoid promises in rendering (this creates conflicts with Phaser's event manager)
   - avoid reappling/removing events from all map cells, as this is slow
+  - doing fire nested events ("but I want to make it shorter!" re: you are just hiding complexity under the rug, and it will bite you later)
 `);
 
 const config: Phaser.Types.Core.GameConfig = {

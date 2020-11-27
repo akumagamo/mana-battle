@@ -93,10 +93,14 @@ export type MapCommands =
   | { type: "HIGHLIGHT_CELL"; pos: Vector }
   | { type: "CLOSE_ACTION_PANEL" }
   | { type: "SELECT_CITY"; id: string }
+  | { type: "SET_SELECTED_UNIT"; id: string }
+  | { type: "VIEW_SQUAD_DETAILS"; id: string }
   | { type: "END_SQUAD_TURN" }
+  | { type: "REFRESH_UI" }
   | { type: "CITY_CLICK"; id: string }
   | { type: "CAPTURE_CITY"; id: string; force: string }
-  | { type: "RUN_TURN" };
+  | { type: "RUN_TURN" }
+  | { type: "MOVE_SQUAD"; mapTile: MapTile; squad: MapSquad };
 
 export class MapScene extends Phaser.Scene {
   charas: Chara[] = [];
@@ -140,11 +144,13 @@ export class MapScene extends Phaser.Scene {
     super("MapScene");
   }
 
-  signal(cmds: MapCommands[]) {
+  signal(eventName: string, cmds: MapCommands[]) {
+    console.log(`💁‍♀️ SIGNAL::: ${eventName}`);
     cmds.forEach(async (cmd) => {
-      console.log(`SIGNAL::`, cmd);
+      console.log(cmd);
+      console.time(cmd.type);
       if (cmd.type === "DESTROY_TEAM") {
-        this.destroySquad(cmd);
+        this.destroySquad(cmd.target);
       } else if (cmd.type === "UPDATE_STATE") {
         this.updateState(cmd.target);
       } else if (cmd.type === "UPDATE_SQUAD_POS") {
@@ -154,14 +160,16 @@ export class MapScene extends Phaser.Scene {
       } else if (cmd.type === "UPDATE_UNIT") {
         this.state.units = this.state.units.set(cmd.unit.id, cmd.unit);
       } else if (cmd.type === "CLICK_CELL") {
+        if (this.cellClickDisabled) {
+          console.log(`cell click disabled! cancelling`);
+          return;
+        }
         clickCell(this, cmd.cell);
       } else if (cmd.type === "CLICK_SQUAD") {
         this.clickSquad(cmd.unit);
         this.closeActionWindow();
       } else if (cmd.type === "MOVE_CAMERA_TO") {
         this.moveCameraTo({ x: cmd.x, y: cmd.y }, cmd.duration);
-      } else if (cmd.type === "SELECT_CITY") {
-        this.selectCity(cmd);
       } else if (cmd.type === "CLEAR_TILES") {
         this.clearTiles();
       } else if (cmd.type === "CLEAR_TILES_EVENTS") {
@@ -176,71 +184,111 @@ export class MapScene extends Phaser.Scene {
         this.highlightCell(cmd);
       } else if (cmd.type === "CLOSE_ACTION_PANEL") {
         this.closeActionWindow();
+      } else if (cmd.type === "SET_SELECTED_UNIT") {
+        this.selectedEntity = { type: "unit", id: cmd.id };
+      } else if (cmd.type === "VIEW_SQUAD_DETAILS") {
+        this.viewSquadDetails(cmd.id);
+      } else if (cmd.type === "REFRESH_UI") {
+        this.refreshUI();
       } else if (cmd.type === "END_SQUAD_TURN") {
-        const aliveIds = this.getAliveSquadsFromForce(this.currentForce).map(
-          (u) => u.id
-        );
-        const defeatedForces = this.getDefeatedForces();
-
-        if (defeatedForces.includes(PLAYER_FORCE)) {
-          alert(`Player loses!`);
-        } else if (defeatedForces.includes(CPU_FORCE)) {
-          alert(`Player wins!`);
-        } else if (Set(aliveIds).equals(this.movedSquads)) {
-          console.log(`all units moved, finish turn`);
-          // TODO: move this to own event
-          this.endTurn();
-        } else if (this.currentForce === CPU_FORCE) {
-          console.log(`ai turn, proceed`);
-          this.time.addEvent({
-            delay: 500,
-            callback: () => this.runAi(),
-          });
-        } else {
-          console.log(`=== PLAYER ===`);
-        }
+        this.endSquadTurn();
       } else if (cmd.type === "RUN_TURN") {
         this.startForceTurn();
       } else if (cmd.type === "CITY_CLICK") {
-        this.signal([{ type: "SELECT_CITY", id: cmd.id }]);
+        this.selectCity(cmd.id);
       } else if (cmd.type === "CAPTURE_CITY") {
-        this.state.cities = this.state.cities.map((city) =>
-          city.id === cmd.id ? { ...city, force: cmd.force } : city
-        );
+        this.captureCity(cmd);
+      } else if (cmd.type === "MOVE_SQUAD") {
+        this.moveSquad(cmd);
       }
+      console.timeEnd(cmd.type);
     });
+
+    console.log(`🙅‍♀️ ::: finish signal ${eventName}`);
   }
 
-  private destroySquad(cmd: { type: "DESTROY_TEAM"; target: string }) {
-    console.log(`destroy squad`);
-    this.movedSquads = this.movedSquads.filter((id) => id !== cmd.target);
-
-    this.state.mapSquads = this.state.mapSquads.filter(
-      (s) => s.id !== cmd.target
+  private captureCity(cmd: {
+    type: "CAPTURE_CITY";
+    id: string;
+    force: string;
+  }) {
+    this.state.cities = this.state.cities.map((city) =>
+      city.id === cmd.id ? { ...city, force: cmd.force } : city
     );
-    const animation = async () => {
-      const chara = await this.getChara(cmd.target);
+  }
 
-      chara.fadeOut(() => {});
+  private moveSquad(cmd: {
+    type: "MOVE_SQUAD";
+    mapTile: MapTile;
+    squad: MapSquad;
+  }) {
+    const { squad, mapTile } = cmd;
+    const callback = async () => {
+      this.dragDisabled = false;
+
+      const targets = this.targets(mapTile);
+      const city = this.cityAt(mapTile.x, mapTile.y);
+      if (targets.length > 0 || city) this.showSquadActionsMenu(squad);
+      else this.finishSquadActions(await this.getChara(squad.id));
+
+      this.actionWindowContainer?.destroy();
     };
-    this.time.addEvent({
-      delay: 100,
-      callback: () => animation(),
+
+    this.moveToTile(squad.id, mapTile, callback);
+  }
+
+  private async endSquadTurn() {
+    const aliveIds = this.getAliveSquadsFromForce(this.currentForce).map(
+      (u) => u.id
+    );
+    const defeatedForces = this.getDefeatedForces();
+
+    if (defeatedForces.includes(PLAYER_FORCE)) {
+      alert(`Player loses!`);
+    } else if (defeatedForces.includes(CPU_FORCE)) {
+      alert(`Player wins!`);
+    } else if (Set(aliveIds).equals(this.movedSquads)) {
+      // TODO: move this to own event
+      this.endTurn();
+    } else if (this.currentForce === CPU_FORCE) {
+      await this.delay(500);
+      this.runAi();
+    } else {
+      console.log(`=== PLAYER ===`);
+    }
+  }
+
+  private async destroySquad(target: string) {
+    this.movedSquads = this.movedSquads.filter((id) => id !== target);
+
+    this.state.mapSquads = this.state.mapSquads.map((s) =>
+      s.id === target ? { ...s, status: "defeated" } : s
+    );
+    // this.state.forces = this.state.forces.map((force) => ({
+    //   ...force,
+    //   squads: force.squads.filter((s) => s !== target),
+    // }));
+
+    await this.delay(100);
+
+    const chara = await this.getChara(target);
+
+    chara.fadeOut(() => {
+      this.scene.remove(chara.scene.key);
     });
   }
 
-  private selectCity(cmd: { type: "SELECT_CITY"; id: string }) {
-    console.log(`selectCity`);
-    this.signal([{ type: "CLOSE_ACTION_PANEL" }, { type: "CLEAR_TILES" }]);
-    this.setSelectedCity(cmd.id);
+  private selectCity(id: string) {
+    this.setSelectedCity(id);
     this.refreshUI();
-    const { x, y } = this.cityIO(cmd.id);
+    const { x, y } = this.cityIO(id);
 
-    this.signal([{ type: "MOVE_CAMERA_TO", x, y, duration: 500 }]);
+    this.signal("selectCity", [
+      { type: "MOVE_CAMERA_TO", x, y, duration: 500 },
+    ]);
   }
 
   private highlightCell(cmd: { type: "HIGHLIGHT_CELL"; pos: Vector }) {
-    console.log(`highlightCell`);
     const { x, y } = cmd.pos;
     const mapTile = this.tileAt(x, y);
 
@@ -257,12 +305,10 @@ export class MapScene extends Phaser.Scene {
   }
 
   updateState(state: MapState) {
-    console.log(`updateState`);
     this.state = state;
   }
 
   create(data: MapCommands[]) {
-    console.log(`CREATE COMMANDS:`, data);
     if (process.env.NODE_ENV !== "production") {
       //@ts-ignore
       window.mapScene = this;
@@ -279,7 +325,7 @@ export class MapScene extends Phaser.Scene {
     this.missionContainer = this.add.container();
     this.actionWindowContainer = this.add.container();
 
-    this.signal(data);
+    this.signal("startup", data);
 
     renderMap(this);
     this.renderStructures();
@@ -287,8 +333,8 @@ export class MapScene extends Phaser.Scene {
     renderSquads(this);
     this.refreshUI();
 
-    this.setWorldBounds();
     this.makeWorldDraggable();
+    this.setWorldBounds();
 
     this.startForceTurn();
     // if (!this.hasShownVictoryCondition) {
@@ -322,7 +368,6 @@ export class MapScene extends Phaser.Scene {
    * Moves camera position to a vector in the board. If the position is out of bounds, moves until the limit.
    */
   moveCameraTo(vec: Vector, duration: number) {
-    console.log(`moveCameraTo`);
     let { x, y } = this.getPos(vec);
 
     x = x * -1 + SCREEN_WIDTH / 2;
@@ -389,7 +434,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   makeWorldDraggable() {
-    console.log(`makeWorldDraggable`);
     this.mapContainer.setSize(
       this.mapContainer.getBounds().width,
       this.mapContainer.getBounds().height
@@ -468,7 +512,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   getValidMoves() {
-    console.log(`getValidMoves`);
     const moveList = getPossibleMoves(
       formatDataForApi(this.state)(this.currentForce)
     );
@@ -519,7 +562,6 @@ export class MapScene extends Phaser.Scene {
   };
 
   getDefeatedForces(): string[] {
-    console.log(`getDefeatedForces`);
     return this.state.forces
       .map((f) => f.id)
       .reduce((xs, x) => {
@@ -544,7 +586,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   renderStructures() {
-    console.log(`renderStructures`);
     this.state.cities.forEach((city) => {
       const { x, y } = this.getPos({ x: city.x, y: city.y });
 
@@ -569,7 +610,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   makeCellsInteractive() {
-    console.log(`makeCellsInteractive`);
     this.clearAllTileEvents();
     this.tiles.forEach((tile) => this.makeInteractive(tile));
   }
@@ -579,10 +619,12 @@ export class MapScene extends Phaser.Scene {
     }
   }
   makeInteractive(cell: MapTile) {
-    console.log(`makeInteractive`);
     cell.tile.on("pointerup", (pointer: Pointer) => {
-      console.log(`click:`, cell);
-      if (!this.cellClickDisabled) this.signal([{ type: "CLICK_CELL", cell }]);
+      if (!this.cellClickDisabled)
+        this.signal("regular click cell", [
+          { type: "CLICK_CELL", cell },
+          { type: "HIGHLIGHT_CELL", pos: cell },
+        ]);
 
       var ping = this.add.circle(pointer.upX, pointer.upY, 20, 0xffff66);
 
@@ -598,16 +640,16 @@ export class MapScene extends Phaser.Scene {
     });
   }
   clearAllTileEvents() {
-    console.log(`clearAllTileEvents`);
     this.tiles.forEach((tile) => {
       tile.tile.removeAllListeners();
-      this.tweens.killTweensOf(tile.tile);
-      tile.tile.alpha = 1;
     });
   }
   clearAllTileTint() {
-    console.log(`clearAllTileTint`);
-    this.tiles.forEach((tile) => tile.tile.clearTint());
+    this.tiles.forEach((tile) => {
+      tile.tile.clearTint();
+      this.tweens.killTweensOf(tile.tile);
+      tile.tile.alpha = 1;
+    });
   }
 
   getCellPositionOnScreen({ x, y }: { x: number; y: number }) {
@@ -617,7 +659,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   clickSquad(unit: MapSquad) {
-    console.log(`clickSquad`);
     if (unit.force === PLAYER_FORCE) {
       this.handleClickOnOwnUnit(unit);
     } else {
@@ -626,17 +667,15 @@ export class MapScene extends Phaser.Scene {
   }
 
   showClickableCellsForUnit(squad: MapSquad) {
-    console.log(`showClickableCellsForUnit`);
     this.clearTiles();
 
     squad.validSteps.forEach((cell) =>
-      this.makeCellClickable(this.tileAt(cell.target.x, cell.target.y))
+      this.tintClickableCells(this.tileAt(cell.target.x, cell.target.y))
     );
     this.highlightAttackableCells(squad);
   }
 
   highlightAttackableCells(mapSquad: MapSquad) {
-    console.log(`highlightAttackableCells`);
     this.targets(mapSquad.pos).forEach((e) => {
       const tile = this.tileAt(e.pos.x, e.pos.y).tile;
       tile.setTint(ENEMY_IN_CELL_TINT);
@@ -659,30 +698,29 @@ export class MapScene extends Phaser.Scene {
   }
 
   handleClickOnOwnUnit(squad: MapSquad) {
-    console.log(`handleClickOnOwnUnit`);
     if (this.movedSquads.includes(squad.id))
-      this.signal([
+      this.signal("click on moved unit", [
         { type: "CLEAR_TILES" },
         { type: "SHOW_SQUAD_PANEL", unit: squad },
       ]);
     else {
-      this.signal([
+      this.signal("click on non moved unit", [
         { type: "CLEAR_TILES" },
         { type: "SHOW_SQUAD_PANEL", unit: squad },
         { type: "SHOW_TARGETABLE_CELLS", unit: squad },
       ]);
-      this.highlightAttackableCells(squad); // TODO: add to signals
       this.makeCellAttackable(squad);
     }
   }
 
   async handleClickOnEnemyUnit(enemyUnit: MapSquad) {
-    console.log(`handleClickOnEnemyUnit`);
     const selectedUnit = this.getSelectedUnit();
 
     if (!selectedUnit) {
       // TODO: done rely on selected unit status (use state machine)
-      this.signal([{ type: "SHOW_SQUAD_PANEL", unit: enemyUnit }]);
+      this.signal("click on enemy unit, noone was selected", [
+        { type: "SHOW_SQUAD_PANEL", unit: enemyUnit },
+      ]);
     } else {
       let action = (selectedUnit: MapSquad, chara_: Chara) => {
         const isInRange = S.elem(enemyUnit.id)(
@@ -697,15 +735,21 @@ export class MapScene extends Phaser.Scene {
           !this.movedSquads.includes(selectedUnit.id)
         ) {
           this.showEnemyUnitMenu(enemyUnit, chara_, selectedUnit);
-          this.signal([
-            { type: "CLEAR_TILES" },
-            { type: "SHOW_TARGETABLE_CELLS", unit: selectedUnit },
-          ]);
+          this.signal(
+            "click on enemy unit, enemy is in range of selected ally that can attack",
+            [
+              { type: "CLEAR_TILES" },
+              { type: "SHOW_TARGETABLE_CELLS", unit: selectedUnit },
+            ]
+          );
         } else {
-          this.signal([
-            { type: "CLEAR_TILES" },
-            { type: "SHOW_SQUAD_PANEL", unit: enemyUnit },
-          ]);
+          this.signal(
+            "click on unit, either: not player turn, not in range or selected ally has moved",
+            [
+              { type: "CLEAR_TILES" },
+              { type: "SHOW_SQUAD_PANEL", unit: enemyUnit },
+            ]
+          );
         }
       };
 
@@ -733,7 +777,6 @@ export class MapScene extends Phaser.Scene {
     enemyChara: Chara,
     selectedAlly: MapSquad
   ) {
-    console.log(`showEnemyUnitMenu`);
     this.closeActionWindow();
 
     this.disableInput();
@@ -753,24 +796,53 @@ export class MapScene extends Phaser.Scene {
           action: () => {
             this.moveCameraTo(enemySquad.pos, 500);
             this.showSquadPanel(enemySquad);
-            this.clearTiles();
-            this.closeActionWindow();
+
+            this.signal("view enemy", [
+              { type: "CLEAR_TILES" },
+              { type: "CLOSE_ACTION_PANEL" },
+            ]);
           },
         },
         {
           title: "Cancel",
           action: () => {
-            this.closeActionWindow();
+            this.signal("view enemy", [{ type: "CLOSE_ACTION_PANEL" }]);
           },
         },
       ]
     );
   }
   attack = (starter: MapSquad, target: MapSquad) => {
-    console.log(`attack`);
     this.turnOff();
 
     const isPlayer = starter.force === PLAYER_FORCE;
+
+    const combatCallback = (cmds: MapCommands[]) => {
+      let squads = cmds.reduce((xs, x) => {
+        if (x.type === "UPDATE_UNIT") {
+          let sqdId = x.unit.squad?.id || "";
+
+          if (!xs[sqdId]) {
+            xs[sqdId] = [];
+          }
+
+          xs[sqdId].push(x.unit.currentHp);
+        }
+
+        return xs;
+      }, {} as { [x: string]: number[] });
+
+      let defeated = Map(squads)
+        .filter((v) => v.every((n) => n === 0))
+        .keySeq()
+        .map((target) => ({ type: "DESTROY_TEAM", target }))
+        .toJS();
+
+      this.scene.start(
+        "MapScene",
+        cmds.concat(defeated).concat([{ type: "END_SQUAD_TURN" }])
+      );
+    };
 
     this.scene.transition({
       target: "CombatScene",
@@ -781,61 +853,26 @@ export class MapScene extends Phaser.Scene {
         units: this.state.units,
         top: isPlayer ? target.id : starter.id,
         bottom: isPlayer ? starter.id : target.id,
-        onCombatFinish: (cmds: MapCommands[]) => {
-          console.log(`cmds::`, cmds);
-
-          let squads = cmds.reduce((xs, x) => {
-            if (x.type === "UPDATE_UNIT") {
-              let sqdId = x.unit.squad?.id || "";
-
-              if (!xs[sqdId]) {
-                xs[sqdId] = [];
-              }
-
-              xs[sqdId].push(x.unit.currentHp);
-            }
-
-            return xs;
-          }, {} as { [x: string]: number[] });
-
-          let defeated = Map(squads)
-            .filter((v) => v.every((n) => n === 0))
-            .keySeq()
-            .map((target) => ({ type: "DESTROY_TEAM", target }))
-            .toJS();
-
-          this.scene.start(
-            "MapScene",
-            cmds.concat(defeated).concat([{ type: "END_SQUAD_TURN" }])
-          );
-        },
+        onCombatFinish: combatCallback,
       },
     });
   };
 
-  moveToEnemyUnit(enemySquad: MapSquad, selectedAlly: MapSquad) {
-    console.log(`moveToEnemyUnit`);
-    const enemy = S.find<EnemyInRange>((e) => e.enemy === enemySquad.id)(
-      selectedAlly.enemiesInRange
+  async moveToEnemyUnit(enemySquad: MapSquad, selectedAlly: MapSquad) {
+    const enemy = selectedAlly.enemiesInRange.find(
+      (e) => e.enemy === enemySquad.id
     );
+
+    if (!enemy) throw new Error(INVALID_STATE);
+
     this.movedSquads.push(selectedAlly.id);
-    if (S.isJust(enemy)) {
-      S.map<EnemyInRange, void>((e) => {
-        S.map<Chara, void>((chara) => {
-          const target = e.steps;
-          this.moveUnit(chara, target).then(() => {
-            console.log(`initiating attack`);
-            this.attack(selectedAlly, enemySquad);
-          });
-        })(this.getChara(selectedAlly.id));
-      })(enemy);
-    } else {
-      console.error(`This should be impossible, check logic`);
-      this.showSquadPanel(enemySquad);
-    }
+
+    const chara = await this.getChara(selectedAlly.id);
+    await this.moveUnit(chara, enemy.steps);
+
+    this.attack(selectedAlly, enemySquad);
   }
   turnOff() {
-    console.log(`turnOff`);
     this.selectedEntity = null;
     this.mapContainer.destroy();
     this.uiContainer.destroy();
@@ -850,42 +887,37 @@ export class MapScene extends Phaser.Scene {
     this.tiles = [];
   }
 
-  makeCellClickable(cell: MapTile) {
-    console.log(`makeCellClickable`);
+  tintClickableCells(cell: MapTile) {
     cell.tile.setTint(WALKABLE_CELL_TINT);
-    //this.makeInteractive(cell);
   }
 
   async destroyUI() {
-    console.log(`destroyUI`);
     const { uiContainer } = this.getContainers();
 
     uiContainer.removeAll(true);
   }
 
   async refreshUI() {
-    console.log(`refreshUI`);
-
     const { container, uiContainer } = this.getContainers();
 
     this.destroyUI();
 
-    panel(
-      BOTTOM_PANEL_X,
-      BOTTOM_PANEL_Y,
-      BOTTOM_PANEL_WIDTH,
-      BOTTOM_PANEL_HEIGHT,
-      uiContainer,
-      this
-    );
+    // panel(
+    //   BOTTOM_PANEL_X,
+    //   BOTTOM_PANEL_Y,
+    //   BOTTOM_PANEL_WIDTH,
+    //   BOTTOM_PANEL_HEIGHT,
+    //   uiContainer,
+    //   this,
+    // );
 
     //UNIT INFORMATION
     if (this.selectedEntity && this.selectedEntity.type === "unit") {
-      await this.selectedSquadInfo(uiContainer);
+      this.selectedSquadInfo(uiContainer);
 
       //CITY INFORMATION
     } else if (this.selectedEntity && this.selectedEntity.type === "city") {
-      await this.selectedCityInfo(uiContainer);
+      this.selectedCityInfo(uiContainer);
     }
 
     this.returnToTitleButton(uiContainer, container);
@@ -899,8 +931,7 @@ export class MapScene extends Phaser.Scene {
       });
   }
 
-  private async selectedCityInfo(uiContainer: Phaser.GameObjects.Container) {
-    console.log(`selectedCityInfo`);
+  private selectedCityInfo(uiContainer: Phaser.GameObjects.Container) {
     const city = this.cityIO(this.selectedEntity.id);
 
     text(20, 610, city.name, uiContainer, this);
@@ -915,19 +946,18 @@ export class MapScene extends Phaser.Scene {
   }
 
   private selectedSquadInfo(uiContainer: Phaser.GameObjects.Container) {
-    console.log(`selectedSquadInfo`);
     const squad = this.squadIO(this.selectedEntity.id);
 
     text(20, 610, squad.name, uiContainer, this);
     text(1000, 610, `${squad.range} cells`, uiContainer, this);
 
     button(200, 620, "Squad Details", this.uiContainer, this, () =>
-      this.viewSquadDetails(squad)
+      this.viewSquadDetails(squad.id)
     );
   }
 
-  viewSquadDetails(squad: MapSquad): void {
-    console.log(`viewSquadDetails`);
+  viewSquadDetails(id: string): void {
+    const squad = this.getSquad(id);
     squadDetails(
       this,
       squad,
@@ -939,7 +969,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   private playerSquadList(uiContainer: Phaser.GameObjects.Container) {
-    console.log(`playerSquadList`);
     let posY = 0;
     this.state.forces
       .filter((f) => f.id === PLAYER_FORCE)
@@ -958,7 +987,7 @@ export class MapScene extends Phaser.Scene {
               uiContainer,
               this,
               () => {
-                this.signal([
+                this.signal("clicked dispatched squad list button", [
                   { type: "CLICK_SQUAD", unit: sqd },
                   {
                     type: "MOVE_CAMERA_TO",
@@ -976,8 +1005,10 @@ export class MapScene extends Phaser.Scene {
       });
 
     button(20, posY + 60, "+ Dispatch", uiContainer, this, () => {
-      this.clearAllTileEvents();
-      this.clearAllTileTint();
+      this.signal("opened dispatch squad list", [
+        { type: "CLEAR_TILES_TINTING" },
+        { type: "CLEAR_TILES_EVENTS" },
+      ]);
       this.disableInput();
       this.renderDispatchWindow();
     });
@@ -1031,7 +1062,7 @@ export class MapScene extends Phaser.Scene {
         await this.delay(100);
 
         let squad = this.squadIO(sqd.id);
-        this.signal([
+        this.signal("clicked dispatch squad button", [
           { type: "CLICK_SQUAD", unit: squad },
           {
             type: "MOVE_CAMERA_TO",
@@ -1116,9 +1147,8 @@ export class MapScene extends Phaser.Scene {
 
     if (force.id === CPU_FORCE) {
       this.disableInput();
-      setTimeout(() => {
-        this.runAi();
-      }, 300);
+      await this.delay(300);
+      this.runAi();
     } else {
       this.enableInput();
       const unit = this.state.mapSquads.filter(
@@ -1164,7 +1194,6 @@ export class MapScene extends Phaser.Scene {
    * its hard to debug by going into other methods
    */
   async runAi() {
-    console.log(`=== AI ===`);
     this.getValidMoves();
 
     const remainingUnits = this.getAliveSquadsFromForce(CPU_FORCE).filter(
@@ -1173,7 +1202,6 @@ export class MapScene extends Phaser.Scene {
 
     const [currentSquad] = remainingUnits;
     if (!currentSquad) {
-      console.log(`no remainingUnits!`);
       this.switchForce();
       this.startForceTurn();
       return;
@@ -1182,10 +1210,11 @@ export class MapScene extends Phaser.Scene {
     let aiMode = this.state.ai.get(currentSquad.id);
 
     if (aiMode === "DEFEND") {
-      console.log(`Squad ${currentSquad.id} set to defend. Ending turn`);
       this.movedSquads.push(currentSquad.id);
 
-      this.signal([{ type: "END_SQUAD_TURN" }]);
+      this.signal("finish ai squad turn (defend)", [
+        { type: "END_SQUAD_TURN" },
+      ]);
       return;
     }
 
@@ -1196,18 +1225,17 @@ export class MapScene extends Phaser.Scene {
     const enemyInRange = currentSquad.enemiesInRange[0];
 
     if (enemyInRange) {
-      console.log(`there are enemies in range, attacking`);
       const enemySquad = this.squadIO(enemyInRange.enemy);
       this.moveToEnemyUnit(enemySquad, currentSquad);
     } else {
-      console.log(`no enemies in range, moving to random location`);
-
       const { x, y } = (currentSquad.validSteps.first() as ValidStep).steps[1];
 
       const tile = this.getTileAt(x, y);
 
       this.moveToTile(currentSquad.id, tile, () => {
-        this.signal([{ type: "END_SQUAD_TURN" }]);
+        this.signal("finish ai turn, no enemy in range", [
+          { type: "END_SQUAD_TURN" },
+        ]);
       });
     }
   }
@@ -1262,7 +1290,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   clearTiles() {
-    console.log(`clearTiles`);
     this.clearAllTileTint();
 
     if (this.cellHighlight) this.cellHighlight.destroy();
@@ -1270,20 +1297,18 @@ export class MapScene extends Phaser.Scene {
   }
 
   closeActionWindow() {
-    console.log(`closeActionWindow`);
     this.actionWindowContainer?.destroy();
   }
 
   // TODO: refactor, all action menus should start here
-  showCellMenu(squad: MapSquad, mapTile: MapTile, onMoveComplete: Function) {
-    console.log(`showCellMenu`);
+  showCellMenu(squad: MapSquad, mapTile: MapTile) {
     if (this.movedSquads.includes(squad.id)) return;
 
     const { x, y, tile } = mapTile;
 
     this.dragDisabled = true;
 
-    this.signal([
+    this.signal("opening cell menu", [
       { type: "CLOSE_ACTION_PANEL" },
       { type: "SHOW_TARGETABLE_CELLS", unit: squad },
       { type: "HIGHLIGHT_CELL", pos: { x: mapTile.x, y: mapTile.y } },
@@ -1295,13 +1320,11 @@ export class MapScene extends Phaser.Scene {
           {
             title: "Move",
             action: () => {
-              //TODO: convert to data
-              this.moveToTile(squad.id, mapTile, () => {
-                this.dragDisabled = false;
-                onMoveComplete();
-              });
-              this.actionWindowContainer?.destroy();
-              tile.clearTint();
+              this.signal("clicked Move in cell menu", [
+                { type: "CLOSE_ACTION_PANEL" },
+                { type: "CLEAR_TILES_TINTING" },
+                { type: "MOVE_SQUAD", mapTile, squad },
+              ]);
             },
           },
         ];
@@ -1317,7 +1340,9 @@ export class MapScene extends Phaser.Scene {
             title: "Select City",
             action: () => {
               this.dragDisabled = false;
-              this.signal([{ type: "SELECT_CITY", id: maybeCity.id }]);
+              this.signal("clicked city on cell menu", [
+                { type: "SELECT_CITY", id: maybeCity.id },
+              ]);
             },
           },
         ];
@@ -1329,7 +1354,7 @@ export class MapScene extends Phaser.Scene {
         title: "Cancel",
         action: () => {
           this.dragDisabled = false;
-          this.signal([
+          this.signal("clicked cancel on cell menu", [
             { type: "CLOSE_ACTION_PANEL" },
             { type: "SHOW_TARGETABLE_CELLS", unit: squad },
           ]);
@@ -1348,7 +1373,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   showCityInfo(id: string) {
-    console.log(`showCityInfo`);
     this.state.cities.find((c) => c.id === id);
 
     const pic = this.add.sprite(SCREEN_WIDTH / 2, 350, "merano");
@@ -1358,7 +1382,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   actionWindow(x: number, y: number, actions: ActionWindowAction[]) {
-    console.log(`actionWindow`);
     if (this.actionWindowContainer) this.actionWindowContainer.destroy();
     this.actionWindowContainer = this.add.container(x, y);
     actions.map(({ title, action }, index) => {
@@ -1381,10 +1404,8 @@ export class MapScene extends Phaser.Scene {
     mapTile: MapTile,
     onMoveComplete: Function
   ) {
-    console.log(`moveToTile`);
     const { x, y } = mapTile;
 
-    console.log(`moving`, squadId);
     // Move unit to tile
     const chara = this.charas.find((c) => c.key === this.charaKey(squadId));
     const force = this.getCurrentForce();
@@ -1409,11 +1430,13 @@ export class MapScene extends Phaser.Scene {
     this.moveUnit(chara, step.steps).then(() => {
       const city = this.cityAt(x, y);
       if (city && city.force !== mapSquad.force)
-        this.signal([
+        this.signal("unit moved to enemy city, capturing", [
           { type: "CAPTURE_CITY", id: city.id, force: mapSquad.force },
         ]);
 
-      this.signal([{ type: "UPDATE_SQUAD_POS", id: squadId, pos: { x, y } }]);
+      this.signal("unit moved, update position", [
+        { type: "UPDATE_SQUAD_POS", id: squadId, pos: { x, y } },
+      ]);
 
       //TODO: having onMoveComplete AND this firing signals makes no sense
       onMoveComplete();
@@ -1435,7 +1458,6 @@ export class MapScene extends Phaser.Scene {
 
   // TODO: simplify interface (require only ids)
   async moveUnit(chara: Chara, path: Vector[]) {
-    console.log(`moveUnit`);
     let squad = this.state.mapSquads.find(
       (s) => this.charaKey(s.id) === chara.key
     );
@@ -1498,7 +1520,6 @@ export class MapScene extends Phaser.Scene {
     onAttack: () => void;
     onWait: () => void;
   }) {
-    console.log(`showActionMenu`);
     const targets = this.targets(cell);
 
     this.disableCellClick();
@@ -1554,19 +1575,22 @@ export class MapScene extends Phaser.Scene {
   };
 
   async showSquadActionsMenu(squad: MapSquad) {
-    console.log(`showSquadActionsMenu`);
     const chara = await this.getChara(squad.id);
 
     this.showActionMenu({
       chara,
       cell: squad.pos,
       onAttack: () => {
-        this.signal([{ type: "CLOSE_ACTION_PANEL" }]);
+        this.signal("will choose unit to attack, close action window", [
+          { type: "CLOSE_ACTION_PANEL" },
+        ]);
         this.highlightAttackableCells(squad);
         this.makeCellAttackable(squad);
       },
       onWait: () => {
-        this.signal([{ type: "CLOSE_ACTION_PANEL" }]);
+        this.signal("waited, close action window and stop actions", [
+          { type: "CLOSE_ACTION_PANEL" },
+        ]);
         this.finishSquadActions(chara);
         //this.checkTurnEnd();
       },
@@ -1574,18 +1598,15 @@ export class MapScene extends Phaser.Scene {
   }
 
   finishSquadActions(chara: Chara) {
-    console.log(`finishSquadActions`);
     chara.container.setAlpha(0.5);
 
-    this.signal([{ type: "END_SQUAD_TURN" }]);
+    this.signal("finish squad actions", [{ type: "END_SQUAD_TURN" }]);
   }
 
   async makeCellAttackable(playerSquad: MapSquad) {
-    console.log(`makeCellAttackable`);
     const enemies = this.targets(playerSquad.pos);
     enemies.forEach(async (e) => {
       const enemyChara = await this.getChara(e.id);
-      console.log(`making enemy clickable...`);
       enemyChara.container.removeAllListeners();
       enemyChara.onClick(() =>
         this.actionWindow(
@@ -1595,66 +1616,7 @@ export class MapScene extends Phaser.Scene {
             {
               title: "Attack Squad",
               action: async () => {
-                const baseX = 200;
-                const baseY = 200;
-                const scale = 0.5;
-
-                this.disableInput();
-                this.destroyUI();
-                this.closeActionWindow();
-
-                const leader = this.getSelectedSquadLeader(playerSquad.id);
-
-                const enemySquad = this.getSquad(enemyChara.unit.squad.id);
-                const enemyUnits = this.state.units
-                  .filter((u) => u.squad?.id === enemySquad.id)
-                  .toList()
-                  .toJS();
-
-                const enemy = new StaticBoardScene(
-                  enemySquad,
-                  enemyUnits,
-                  baseX + 10,
-                  baseY + 5,
-                  scale,
-                  true
-                );
-
-                this.scene.add("enemy_board", enemy, true);
-
-                const alliedUnits = this.state.units
-                  .filter((u) => u.squad?.id === playerSquad.id)
-                  .toList()
-                  .toJS();
-
-                const ally = new StaticBoardScene(
-                  playerSquad,
-                  alliedUnits,
-                  baseX + 200,
-                  baseY + 100,
-                  scale,
-                  false
-                );
-
-                this.scene.add("ally_board", ally, true);
-
-                const { portrait } = speech(
-                  leader,
-                  450,
-                  70,
-                  "Ready for Combat",
-                  this.uiContainer,
-                  this
-                );
-
-                await this.delay(3000);
-
-                this.scene.remove(portrait.scene.key);
-
-                ally.destroy(this);
-                enemy.destroy(this);
-
-                this.attack(playerSquad, e);
+                await this.attackEnemySquad(playerSquad, enemyChara, e);
 
                 //TODO: add transition
               },
@@ -1662,21 +1624,18 @@ export class MapScene extends Phaser.Scene {
             {
               title: "View",
               action: async () => {
-                this.clearAllTileEvents();
-                this.clearTiles();
-                this.closeActionWindow();
-                this.setSelectedUnit(e.id);
-                await this.refreshUI();
-                this.viewSquadDetails(this.getSquad(enemyChara.unit.squad.id));
+                this.signal("view enemy squad details", [
+                  { type: "VIEW_SQUAD_DETAILS", id: e.id },
+                ]);
               },
             },
 
             {
               title: "Cancel",
               action: () => {
-                this.clearAllTileEvents();
-                this.clearTiles();
-                this.closeActionWindow();
+                this.signal("close window that showed enemy squad options", [
+                  { type: "CLOSE_ACTION_PANEL" },
+                ]);
               },
             },
           ]
@@ -1685,8 +1644,74 @@ export class MapScene extends Phaser.Scene {
     });
   }
 
+  private async attackEnemySquad(
+    playerSquad: MapSquad,
+    enemyChara: Chara,
+    e: MapSquad
+  ) {
+    const baseX = 200;
+    const baseY = 200;
+    const scale = 0.5;
+
+    this.disableInput();
+    this.destroyUI();
+    this.closeActionWindow();
+
+    const leader = this.getSelectedSquadLeader(playerSquad.id);
+
+    const enemySquad = this.getSquad(enemyChara.unit.squad.id);
+    const enemyUnits = this.state.units
+      .filter((u) => u.squad?.id === enemySquad.id)
+      .toList()
+      .toJS();
+
+    const enemy = new StaticBoardScene(
+      enemySquad,
+      enemyUnits,
+      baseX + 10,
+      baseY + 5,
+      scale,
+      true
+    );
+
+    this.scene.add("enemy_board", enemy, true);
+
+    const alliedUnits = this.state.units
+      .filter((u) => u.squad?.id === playerSquad.id)
+      .toList()
+      .toJS();
+
+    const ally = new StaticBoardScene(
+      playerSquad,
+      alliedUnits,
+      baseX + 200,
+      baseY + 100,
+      scale,
+      false
+    );
+
+    this.scene.add("ally_board", ally, true);
+
+    const { portrait } = speech(
+      leader,
+      450,
+      70,
+      "Ready for Combat",
+      this.uiContainer,
+      this
+    );
+
+    await this.delay(3000);
+
+    this.scene.remove(portrait.scene.key);
+
+    ally.destroy(this);
+    enemy.destroy(this);
+
+    this.attack(playerSquad, e);
+  }
+
   renderCellMenu(squads: MapSquad[], city: City | undefined, cell: MapTile) {
-    console.log(`renderCellMenu`);
     let currentSquad: MapSquad | undefined = undefined;
 
     if (
@@ -1707,6 +1732,7 @@ export class MapScene extends Phaser.Scene {
             {
               title: "Move",
               action: () => {
+                this.clearAllTileTint();
                 if (currentSquad)
                   this.moveToTile(currentSquad.id, cell, async () => {
                     if (!currentSquad) return; // TODO: this is bad
@@ -1735,7 +1761,9 @@ export class MapScene extends Phaser.Scene {
             this.movedSquads.includes(sqd.id) ? " (Moved)" : ""
           }`,
           action: () => {
-            this.signal([{ type: "CLICK_SQUAD", unit: sqd }]);
+            this.signal("chose squad in cell menu", [
+              { type: "CLICK_SQUAD", unit: sqd },
+            ]);
           },
         }))
       )
@@ -1745,7 +1773,11 @@ export class MapScene extends Phaser.Scene {
               {
                 title: `City - ${city.name}`,
                 action: () => {
-                  this.signal([{ type: "CITY_CLICK", id: city.id }]);
+                  this.signal("chose city in cell menu", [
+                    { type: "CITY_CLICK", id: city.id },
+                    { type: "CLOSE_ACTION_PANEL" },
+                    { type: "CLEAR_TILES" },
+                  ]);
                 },
               },
             ]
@@ -1760,7 +1792,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   disableInput() {
-    console.log(`disableInput`);
     this.clearAllTileEvents();
     this.disableCellClick();
     this.disableCityClick();
@@ -1768,7 +1799,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   enableInput() {
-    console.log(`enableInput`);
     this.dragDisabled = false;
     this.enableCellClick();
     this.enableCityClick();
