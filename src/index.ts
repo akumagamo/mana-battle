@@ -50,14 +50,14 @@ const getTimeout = () => {
   }
 };
 
-setTimeout(() => {
-  WebFont.load({
-    google: {
-      families: ["Alata"],
-    },
-    fontactive: () => {
-      const game = new Phaser.Game(config);
-      game.scale.lockOrientation(Phaser.Scale.PORTRAIT);
-    },
-  });
-}, getTimeout());
+// setTimeout(() => {
+//   WebFont.load({
+//     google: {
+//       families: ["Alata"],
+//     },
+//     fontactive: () => {
+const game = new Phaser.Game(config);
+game.scale.lockOrientation(Phaser.Scale.PORTRAIT);
+// },
+// });
+// }, getTimeout());
