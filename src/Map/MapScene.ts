@@ -259,11 +259,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   private async destroySquad(target: string) {
-    this.movedSquads = this.movedSquads.filter((id) => id !== target);
-
-    this.state.mapSquads = this.state.mapSquads.map((s) =>
-      s.id === target ? { ...s, status: "defeated" } : s
-    );
     // this.state.forces = this.state.forces.map((force) => ({
     //   ...force,
     //   squads: force.squads.filter((s) => s !== target),
@@ -275,6 +270,12 @@ export class MapScene extends Phaser.Scene {
 
     chara.fadeOut(() => {
       this.scene.remove(chara.scene.key);
+
+      this.state.mapSquads = this.state.mapSquads.map((s) =>
+        s.id === target ? { ...s, status: "defeated" } : s
+      );
+
+      this.movedSquads = this.movedSquads.filter((id) => id !== target);
     });
   }
 
@@ -745,10 +746,7 @@ export class MapScene extends Phaser.Scene {
         } else {
           this.signal(
             "click on unit, either: not player turn, not in range or selected ally has moved",
-            [
-              { type: "CLEAR_TILES" },
-              { type: "SHOW_SQUAD_PANEL", unit: enemyUnit },
-            ]
+            [{ type: "SHOW_SQUAD_PANEL", unit: enemyUnit }]
           );
         }
       };

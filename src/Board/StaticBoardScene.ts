@@ -191,7 +191,21 @@ export default class StaticBoardScene extends Phaser.Scene {
   }
 
   onUnitClick(fn: (c: Chara) => void) {
-    this.unitList.forEach((chara) => chara.onClick(fn));
+    this.unitList.forEach((chara) => {
+      chara.onClick(() => {
+        const pos = this.squad.members[chara.unit.id];
+        this.highlightTile(pos);
+        fn(chara);
+      });
+    });
+  }
+
+  highlightTile({ x, y }: { x: number; y: number }): void {
+    this.tiles.forEach((tile) => tile.sprite.clearTint());
+
+    this.tiles
+      .filter((t) => t.boardX === x && t.boardY === y)
+      .map((t) => t.sprite.setTint(0x00cc00));
   }
 }
 

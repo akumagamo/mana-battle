@@ -1,5 +1,6 @@
 import { MapSquad } from "../../API/Map/Model";
 import BoardScene from "../../Board/StaticBoardScene";
+import { INVALID_STATE } from "../../errors";
 import button from "../../UI/button";
 import panel from "../../UI/panel";
 import { Unit } from "../../Unit/Model";
@@ -7,6 +8,9 @@ import { UnitDetailsBarScene } from "../../Unit/UnitDetailsBarScene";
 import { MapScene } from "../MapScene";
 
 export default (scene: MapScene, squad: MapSquad, units: Unit[]) => {
+  const leader = Object.values(squad.members).find((m) => m.leader);
+  if (!leader) throw new Error(INVALID_STATE);
+
   let charaStats = scene.add.container(0, 0);
   panel(0, 50, 1080, 340, scene.uiContainer, scene);
 
@@ -23,7 +27,9 @@ export default (scene: MapScene, squad: MapSquad, units: Unit[]) => {
     details.render(unit);
   });
 
-  details.render(units[0]);
+  boardScene.highlightTile(leader);
+
+  details.render(units.find((u) => u.id === leader.id));
 
   button(1050, 50, "Close", scene.uiContainer, scene, () => {
     boardScene.destroy(scene);
