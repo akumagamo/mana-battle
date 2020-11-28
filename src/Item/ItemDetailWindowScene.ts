@@ -1,8 +1,8 @@
-import * as Phaser from 'phaser';
-import * as api from '../DB';
-import {Container} from '../Models';
-import {INVALID_STATE} from '../errors';
-import {Item, Modifier} from '../Item/Model';
+import * as Phaser from "phaser";
+import * as api from "../DB";
+import { Container } from "../Models";
+import { INVALID_STATE } from "../errors";
+import { Item, Modifier } from "../Item/Model";
 export class ItemDetailWindowScene extends Phaser.Scene {
   x = 100;
   y = 100;
@@ -11,8 +11,8 @@ export class ItemDetailWindowScene extends Phaser.Scene {
   container: Container | null = null;
   selectecItemDetailsContainer: Container | null = null;
 
-  constructor() {
-    super('ItemDetailWindowScene');
+  constructor(public allowReplace = true) {
+    super("ItemDetailWindowScene");
   }
 
   create() {}
@@ -42,16 +42,17 @@ export class ItemDetailWindowScene extends Phaser.Scene {
 
     //this.btn(300, 0, 'X', () => this.clearChildren());
 
-    this.btn(150, 250, 'Replace', () =>
-      this.replaceItemList(item, unitId, onItemSelect),
-    );
+    if (this.allowReplace)
+      this.btn(150, 250, "Replace", () =>
+        this.replaceItemList(item, unitId, onItemSelect)
+      );
 
     //this.renderItemDetails();
   }
 
   renderBgLayer(container: Container) {
     let rect = new Phaser.Geom.Rectangle(this.x * -1, this.y * -1, 1280, 520);
-    let graphics = this.add.graphics({fillStyle: {color: 0x000000}});
+    let graphics = this.add.graphics({ fillStyle: { color: 0x000000 } });
     graphics.alpha = 0.3;
     graphics.fillRectShape(rect);
 
@@ -60,7 +61,7 @@ export class ItemDetailWindowScene extends Phaser.Scene {
     //this.itemDetail?.container?.add(graphics);
 
     graphics.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
-    graphics.on('pointerdown', () => {
+    graphics.on("pointerdown", () => {
       this.clearChildren();
       graphics.destroy();
     });
@@ -71,11 +72,11 @@ export class ItemDetailWindowScene extends Phaser.Scene {
     y: number,
     width: number,
     height: number,
-    parent: Container | null,
+    parent: Container | null
   ) {
     var rect = new Phaser.Geom.Rectangle(x, y, width, height);
     var graphics = this.add.graphics({
-      fillStyle: {color: 0xdeaa87},
+      fillStyle: { color: 0xdeaa87 },
       lineStyle: {
         width: 2,
         color: 0x000000,
@@ -94,13 +95,13 @@ export class ItemDetailWindowScene extends Phaser.Scene {
   replaceItemList(
     itemToReplace: Item,
     unitId: string,
-    onItemSelect: () => void,
+    onItemSelect: () => void
   ) {
     const otherItems = api
       .getItemList()
       .filter(
         (item) =>
-          item.slot === itemToReplace.slot && item.id !== itemToReplace.id,
+          item.slot === itemToReplace.slot && item.id !== itemToReplace.id
       );
 
     const baseX = 350;
@@ -123,7 +124,7 @@ export class ItemDetailWindowScene extends Phaser.Scene {
       var rect = new Phaser.Geom.Rectangle(0, 0, 300, 80);
       bg.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
 
-      bg.on('pointerdown', () => {
+      bg.on("pointerdown", () => {
         this.selectedItemDetails(item, unitId, baseX, baseY, onItemSelect);
       });
 
@@ -140,14 +141,14 @@ export class ItemDetailWindowScene extends Phaser.Scene {
     y: number,
     item: Item,
     size: number,
-    parent: Container | null,
+    parent: Container | null
   ) {
     const padding = 10;
     this.renderPanel(x, y, size + padding * 2, size + padding * 2, parent);
     const icon = this.add.image(
       x + size / 2 + padding,
       y + size / 2 + padding,
-      item.id,
+      item.id
     );
     icon.displayWidth = size;
     icon.displayHeight = size;
@@ -159,7 +160,7 @@ export class ItemDetailWindowScene extends Phaser.Scene {
     unitId: string,
     x: number,
     y: number,
-    onItemSelect: () => void,
+    onItemSelect: () => void
   ) {
     this.selectecItemDetailsContainer?.destroy();
     this.selectecItemDetailsContainer = this.add.container(0, 0);
@@ -174,7 +175,7 @@ export class ItemDetailWindowScene extends Phaser.Scene {
 
     this.itemStats(item, x + 370, y + 130, this.selectecItemDetailsContainer);
 
-    this.btn(x + 400, y + 250, 'Equip', () => {
+    this.btn(x + 400, y + 250, "Equip", () => {
       console.log(item);
       api.equipItem(item.id, unitId);
       this.clearChildren();
@@ -185,7 +186,7 @@ export class ItemDetailWindowScene extends Phaser.Scene {
   makeBackground(baseX: number, baseY: number) {
     var rect = new Phaser.Geom.Rectangle(-10, baseY + -10, 300, 80);
     var graphics = this.add.graphics({
-      fillStyle: {color: 0x0000ff},
+      fillStyle: { color: 0x0000ff },
     });
 
     graphics.alpha = 0.2;
@@ -195,15 +196,15 @@ export class ItemDetailWindowScene extends Phaser.Scene {
   }
 
   btn(x: number, y: number, text: string, onClick: () => void) {
-    const text_ = this.add.text(x, y, text, {color: '#000'});
-    const btn = this.add.image(x - 15, y - 10, 'panel');
+    const text_ = this.add.text(x, y, text, { color: "#000" });
+    const btn = this.add.image(x - 15, y - 10, "panel");
     btn.setOrigin(0, 0);
     this.container?.add(btn);
     this.container?.add(text_);
     btn.setInteractive();
     btn.displayWidth = text_.width + 30;
     btn.displayHeight = text_.height + 20;
-    btn.on('pointerdown', () => {
+    btn.on("pointerdown", () => {
       onClick();
     });
   }
@@ -212,15 +213,15 @@ export class ItemDetailWindowScene extends Phaser.Scene {
     x: number,
     y: number,
     str: string | number,
-    parent: Container | null,
+    parent: Container | null
   ) => {
     const text = this.add.text(
       x,
       y,
-      typeof str === 'number' ? str.toString() : str,
+      typeof str === "number" ? str.toString() : str,
       {
-        color: '#000',
-      },
+        color: "#000",
+      }
     );
 
     if (parent) parent.add(text);
@@ -229,14 +230,14 @@ export class ItemDetailWindowScene extends Phaser.Scene {
 
   col = (x: number, y: number, strs: (string | number)[]) =>
     strs.forEach((str, index) =>
-      this.write(x, y + this.rowHeight * index, str, null),
+      this.write(x, y + this.rowHeight * index, str, null)
     );
 
   itemStats(
     item: Item,
     baseX: number,
     baseY: number,
-    parent: Container | null,
+    parent: Container | null
   ) {
     (Object.keys(item.modifiers) as Modifier[])
       .filter((key) => {
@@ -251,7 +252,7 @@ export class ItemDetailWindowScene extends Phaser.Scene {
           baseX + 200,
           baseY + this.rowHeight * index,
           value.toString(),
-          parent,
+          parent
         );
       });
   }

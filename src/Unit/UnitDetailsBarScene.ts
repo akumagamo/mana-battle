@@ -16,12 +16,12 @@ export class UnitDetailsBarScene extends Phaser.Scene {
   itemDetail: ItemDetailWindowScene | null = null;
   onHatToggle: ((u: Unit) => void) | null = null;
 
-  constructor(public showToggleHat = false) {
+  constructor(public showToggleHat = false, public allowReplaceItems = true) {
     super("UnitDetailsBarScene");
   }
 
   create() {
-    this.itemDetail = new ItemDetailWindowScene();
+    this.itemDetail = new ItemDetailWindowScene(this.allowReplaceItems);
     this.scene.add("item-detail", this.itemDetail, true);
   }
 
@@ -144,6 +144,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
         const icon = this.add.image(x, y, slot.id);
         icon.displayWidth = iconSize;
         icon.displayHeight = iconSize;
+
         icon.setInteractive();
         icon.on("pointerdown", () => {
           this.itemDetail?.render(slot.id, unit.id, () => this.render(unit));
