@@ -1,4 +1,4 @@
-import { MapSquad } from "../../API/Map/Model";
+import { MapSquad, PLAYER_FORCE } from "../../API/Map/Model";
 import { Chara } from "../../Chara/Chara";
 import { INVALID_STATE } from "../../errors";
 import { MapScene } from "../MapScene";
@@ -26,6 +26,14 @@ export const renderSquad = (scene: MapScene, squad: MapSquad): void => {
     CHARA_MAP_SCALE,
     true
   );
+
+  const emblem = chara.add.image(
+    100,
+    -20,
+    squad.force === PLAYER_FORCE ? "ally_emblem" : "enemy_emblem"
+  );
+
+  chara.container.add(emblem);
 
   container.add(chara.container);
 
