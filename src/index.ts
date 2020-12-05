@@ -10,7 +10,6 @@ import CombatScene from "./Combat/CombatScene";
 import OptionsScene from "./Scenes/OptionsScene";
 import WorldScene from "./Scenes/World";
 import defaultData from "./defaultData";
-import WebFont from "webfontloader";
 
 console.log(`Starting up app. Some lessons to remember 📚:
   - avoid promises in rendering (this creates conflicts with Phaser's event manager)
@@ -40,26 +39,9 @@ const config: Phaser.Types.Core.GameConfig = {
   ],
 };
 
-const getTimeout = () => {
-  if (localStorage.getItem("player") === null) {
-    defaultData(true);
-    // TODO: improve this
-    // Forcing a small delay to allow writing data
-    // We can improve this by checking if all keys are available
-    return 50;
-  } else {
-    return 0;
-  }
-};
+if (localStorage.getItem("player") === null) {
+  defaultData(true);
+}
 
-// setTimeout(() => {
-//   WebFont.load({
-//     google: {
-//       families: ["Alata"],
-//     },
-//     fontactive: () => {
 const game = new Phaser.Game(config);
 game.scale.lockOrientation(Phaser.Scale.PORTRAIT);
-// },
-// });
-// }, getTimeout());
