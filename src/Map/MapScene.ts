@@ -145,9 +145,8 @@ export class MapScene extends Phaser.Scene {
   }
 
   signal(eventName: string, cmds: MapCommands[]) {
-    console.log(`💁‍♀️ SIGNAL::: ${eventName}`);
+    console.log(`💁‍♀️ SIGNAL::: ${eventName}`, cmds);
     cmds.forEach(async (cmd) => {
-      console.log(cmd);
       console.time(cmd.type);
       if (cmd.type === "DESTROY_TEAM") {
         this.destroySquad(cmd.target);

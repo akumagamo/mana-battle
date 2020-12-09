@@ -31,7 +31,7 @@ const tiles: CellNumber[][] = [
   [3, 3, 3, 3, 3, 0, 0, 2, 2, 2, 0, 0, 2, 2],
   [3, 3, 3, 3, 3, 3, 3, 2, 1, 2, 0, 0, 1, 2],
 ];
-const map: MapState = {
+const map: () => MapState = () => ({
   id: "greenHarbor",
   name: "Green Harbor",
   author: "Leonardo Farroco",
@@ -140,6 +140,6 @@ const map: MapState = {
     squad2: "DEFEND",
     squad3: "DEFEND",
   }),
-};
+});
 
 export default map;
