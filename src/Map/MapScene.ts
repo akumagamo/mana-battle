@@ -1296,6 +1296,7 @@ export class MapScene extends Phaser.Scene {
 
   closeActionWindow() {
     this.actionWindowContainer?.destroy();
+    this.enableInput();
   }
 
   // TODO: refactor, all action menus should start here
@@ -1380,6 +1381,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   actionWindow(x: number, y: number, actions: ActionWindowAction[]) {
+    this.dragDisabled = true;
     if (this.actionWindowContainer) this.actionWindowContainer.destroy();
     this.actionWindowContainer = this.add.container(x, y);
     actions.map(({ title, action }, index) => {

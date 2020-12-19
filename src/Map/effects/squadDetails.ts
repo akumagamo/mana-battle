@@ -45,7 +45,7 @@ export default (scene: MapScene, squad: MapSquad, units: Unit[]) => {
     charaStats.destroy();
 
     backdrop_.destroy();
-    scene.enableInput();
+    //scene.enableInput();
 
     container.destroy();
   });
