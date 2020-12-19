@@ -17,7 +17,6 @@ import {
   MapState,
   Force,
   ValidStep,
-  EnemyInRange,
   City,
   PLAYER_FORCE,
   CPU_FORCE,
@@ -659,6 +658,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   clickSquad(unit: MapSquad) {
+    this.moveCameraTo(unit.pos, 500);
     if (unit.force === PLAYER_FORCE) {
       this.handleClickOnOwnUnit(unit);
     } else {
@@ -717,17 +717,15 @@ export class MapScene extends Phaser.Scene {
     const selectedUnit = this.getSelectedUnit();
 
     if (!selectedUnit) {
-      // TODO: done rely on selected unit status (use state machine)
       this.signal("click on enemy unit, noone was selected", [
         { type: "SHOW_SQUAD_PANEL", unit: enemyUnit },
       ]);
     } else {
       let action = (selectedUnit: MapSquad, chara_: Chara) => {
-        const isInRange = S.elem(enemyUnit.id)(
-          S.map<EnemyInRange, string>((e) => e.enemy)(
-            selectedUnit.enemiesInRange
-          )
-        );
+        const isInRange =
+          selectedUnit.enemiesInRange
+            .map((e) => e.enemy)
+            .indexOf(enemyUnit.id) > -1;
 
         if (
           selectedUnit.force === PLAYER_FORCE &&
@@ -900,14 +898,14 @@ export class MapScene extends Phaser.Scene {
 
     this.destroyUI();
 
-    // panel(
-    //   BOTTOM_PANEL_X,
-    //   BOTTOM_PANEL_Y,
-    //   BOTTOM_PANEL_WIDTH,
-    //   BOTTOM_PANEL_HEIGHT,
-    //   uiContainer,
-    //   this,
-    // );
+    panel(
+      BOTTOM_PANEL_X,
+      BOTTOM_PANEL_Y,
+      BOTTOM_PANEL_WIDTH,
+      BOTTOM_PANEL_HEIGHT,
+      uiContainer,
+      this
+    );
 
     //UNIT INFORMATION
     if (this.selectedEntity && this.selectedEntity.type === "unit") {
@@ -956,13 +954,15 @@ export class MapScene extends Phaser.Scene {
 
   viewSquadDetails(id: string): void {
     const squad = this.getSquad(id);
+    this.disableInput();
     squadDetails(
       this,
       squad,
       this.state.units
         .toList()
         .filter((u) => Object.keys(squad.members).includes(u.id))
-        .toJS()
+        .toJS(),
+      () => this.enableInput()
     );
   }
 
@@ -1142,6 +1142,7 @@ export class MapScene extends Phaser.Scene {
     await this.showTurnTitle(force);
 
     this.healUnits(force);
+    this.movedSquads = [];
 
     if (force.id === CPU_FORCE) {
       this.disableInput();
@@ -1766,6 +1767,7 @@ export class MapScene extends Phaser.Scene {
           }`,
           action: () => {
             this.signal("chose squad in cell menu", [
+              { type: "CLEAR_TILES" },
               { type: "CLICK_SQUAD", unit: sqd },
             ]);
           },

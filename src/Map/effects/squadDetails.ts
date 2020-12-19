@@ -9,7 +9,12 @@ import { Unit } from "../../Unit/Model";
 import SmallUnitDetailsBar from "../../Unit/SmallUnitDetailsBar";
 import { MapScene } from "../MapScene";
 
-export default (scene: MapScene, squad: MapSquad, units: Unit[]) => {
+export default (
+  scene: MapScene,
+  squad: MapSquad,
+  units: Unit[],
+  onClose: () => void
+) => {
   const leader = Object.values(squad.members).find((m) => m.leader);
   if (!leader) throw new Error(INVALID_STATE);
 
@@ -22,8 +27,6 @@ export default (scene: MapScene, squad: MapSquad, units: Unit[]) => {
   let details: Container | null = null;
 
   const detailsBar = renderUnitDetailsBar(scene, details, container);
-
-  scene.disableInput();
 
   const boardScene = new BoardScene(squad, units, 200, 50, 0.7);
   scene.scene.add(`board-squad-${squad.id}`, boardScene, true);
@@ -41,13 +44,11 @@ export default (scene: MapScene, squad: MapSquad, units: Unit[]) => {
 
   button(1050, 250, "Close", container, scene, () => {
     boardScene.destroy(scene);
-
     charaStats.destroy();
-
     backdrop_.destroy();
-    //scene.enableInput();
-
     container.destroy();
+
+    onClose();
   });
 };
 
