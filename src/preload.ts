@@ -67,11 +67,14 @@ export function preload(this: {
     "steel_armor",
     "steel_shield",
     "steel_sword",
+    "leather_armor",
     "baldar_armor",
     "baldar_shield",
     "baldar_sword",
     "oaken_staff",
     "iron_spear",
+    "bow",
+    "robe",
   ];
   itemIcons.forEach((id: string) => {
     this.load.image(id, `${PUBLIC_URL}/items/${id}.png`);
