@@ -23,7 +23,7 @@ import {
   CPU_FORCE,
 } from "../API/Map/Model";
 import S from "sanctuary";
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../constants";
+import { SCREEN_WIDTH, SCREEN_HEIGHT, centerX, centerY } from "../constants";
 import { toMapSquad, Unit } from "../Unit/Model";
 import { Map, Set } from "immutable";
 import { getCity } from "../API/Map/utils";
@@ -1249,31 +1249,33 @@ export class MapScene extends Phaser.Scene {
   }
 
   async showTurnTitle(force: Force) {
-    const title = this.add.text(-200, 500, `${force.name} Turn`, {
+    const bg = this.add.image(centerX, centerY, "announce_bg");
+    const forceName = force.id === PLAYER_FORCE ? "Player" : "Enemy";
+    const title = this.add.text(centerX, centerY, `${forceName} Turn`, {
       fontSize: 36,
     });
+    title.setOrigin(0.5);
 
     return new Promise<void>((resolve) => {
       const timeline = this.tweens.createTimeline({
         onComplete: () => resolve(),
       });
       timeline.add({
-        targets: title,
-        x: 400,
-        duration: 300,
-      });
-      timeline.add({
-        targets: title,
-        x: 800,
-        duration: 1200,
-      });
-      timeline.add({
-        targets: title,
-        x: 2000,
+        targets: [title, bg],
+        alpha: 1,
         duration: 500,
       });
-
+      timeline.add({
+        targets: [title, bg],
+        alpha: 0,
+        duration: 1200,
+      });
       timeline.play();
+      timeline.on("complete", () => {
+        console.log("complete!!");
+        title.destroy();
+        bg.destroy();
+      });
     });
   }
 
