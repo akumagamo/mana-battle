@@ -1324,7 +1324,7 @@ export class MapScene extends Phaser.Scene {
             action: () => {
               this.signal("clicked Move in cell menu", [
                 { type: "CLOSE_ACTION_PANEL" },
-                { type: "CLEAR_TILES_TINTING" },
+                { type: "CLEAR_TILES" },
                 { type: "MOVE_SQUAD", mapTile, squad },
               ]);
             },
@@ -1612,11 +1612,14 @@ export class MapScene extends Phaser.Scene {
     const enemies = this.targets(playerSquad.pos);
     enemies.forEach(async (e) => {
       const enemyChara = await this.getChara(e.id);
-      enemyChara.container.removeAllListeners();
-      enemyChara.onClick(() =>
+      const enemySquad = this.getSquad(e.id);
+      const tile = this.getTileAt(enemySquad.pos.x, enemySquad.pos.y);
+
+      tile.tile.removeAllListeners();
+      tile.tile.on("pointerup", () =>
         this.actionWindow(
-          enemyChara.container.x + this.mapX || 0,
-          enemyChara.container.y + this.mapY || 0,
+          tile.tile.x + this.mapX || 0,
+          tile.tile.y + this.mapY || 0,
           [
             {
               title: "Attack Squad",
