@@ -769,14 +769,15 @@ export class MapScene extends Phaser.Scene {
     this.selectedEntity = { type: "city", id };
   }
 
-  showEnemyUnitMenu(
+  async showEnemyUnitMenu(
     enemySquad: MapSquad,
     enemyChara: Chara,
     selectedAlly: MapSquad
   ) {
     this.closeActionWindow();
-
     this.disableInput();
+
+    await this.moveCameraTo(selectedAlly.pos, 500);
 
     this.actionWindow(
       enemyChara.container.x + this.mapX || 0,
@@ -1506,7 +1507,7 @@ export class MapScene extends Phaser.Scene {
     return tile;
   }
 
-  showActionMenu({
+  async showActionMenu({
     chara,
     cell,
     onAttack,
@@ -1520,6 +1521,8 @@ export class MapScene extends Phaser.Scene {
     const targets = this.targets(cell);
 
     this.disableCellClick();
+
+    await this.moveCameraTo(cell, 500);
 
     const maybeAttack =
       targets.length > 0

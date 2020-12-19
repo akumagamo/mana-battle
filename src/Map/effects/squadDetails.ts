@@ -1,10 +1,12 @@
+import { Scene } from "phaser";
 import { MapSquad } from "../../API/Map/Model";
 import BoardScene from "../../Board/StaticBoardScene";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../constants";
 import { INVALID_STATE } from "../../errors";
+import { Container } from "../../Models";
 import button from "../../UI/button";
 import { Unit } from "../../Unit/Model";
-import { UnitDetailsBarScene } from "../../Unit/UnitDetailsBarScene";
+import SmallUnitDetailsBar from "../../Unit/SmallUnitDetailsBar";
 import { MapScene } from "../MapScene";
 
 export default (scene: MapScene, squad: MapSquad, units: Unit[]) => {
@@ -17,28 +19,28 @@ export default (scene: MapScene, squad: MapSquad, units: Unit[]) => {
 
   const container = scene.add.container();
 
+  let details: Container | null = null;
+
+  const detailsBar = renderUnitDetailsBar(scene, details, container);
+
   scene.disableInput();
-  const details = new UnitDetailsBarScene(false, false);
-  scene.scene.add("details-bar", details, true);
-  scene.scene.bringToTop("details-bar");
 
   const boardScene = new BoardScene(squad, units, 200, 50, 0.7);
   scene.scene.add(`board-squad-${squad.id}`, boardScene, true);
   boardScene.onUnitClick((chara) => {
     charaStats.removeAll();
-    const unit = chara.unit;
 
-    details.render(unit);
+    detailsBar(chara.unit);
   });
 
   boardScene.highlightTile(leader);
 
-  details.render(units.find((u) => u.id === leader.id));
+  const defaultUnit = units.find((u) => u.id === leader.id);
+
+  detailsBar(defaultUnit);
 
   button(1050, 250, "Close", container, scene, () => {
     boardScene.destroy(scene);
-
-    if (details) details.destroy(details);
 
     charaStats.destroy();
 
@@ -61,4 +63,16 @@ function backdrop(scene: MapScene) {
   //   onClose();
   // });
   return backdrop;
+}
+
+function renderUnitDetailsBar(
+  scene: Scene,
+  details: Container,
+  parent: Container
+) {
+  return function (unit: Unit) {
+    details?.destroy();
+    details = SmallUnitDetailsBar(10, 500, scene, unit);
+    parent.add(details);
+  };
 }

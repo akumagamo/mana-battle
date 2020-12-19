@@ -35,7 +35,7 @@ export class EditSquadScene extends Phaser.Scene {
 
     this.boardScene.makeUnitsClickable((c) => {
       this.unitDetails?.destroy();
-      this.unitDetails = SmallUnitDetailsBar(0, 650, this, c.unit.id);
+      this.unitDetails = SmallUnitDetailsBar(0, 650, this, c.unit);
     });
   }
 
