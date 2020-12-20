@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 import { Chara } from "../Chara/Chara";
 import { Squad } from "../Squad/Model";
-import { addUnitToSquad } from "../DB";
+import { addUnitToSquad, saveSquad } from "../DB";
 import UnitListScene from "../Unit/UnitListScene";
 import { Unit } from "../Unit/Model";
 import BoardScene, { BOARD_SCENE_KEY } from "../Board/InteractiveBoardScene";
@@ -30,7 +30,7 @@ export class EditSquadScene extends Phaser.Scene {
   }
 
   renderBoard(squad: Squad) {
-    this.boardScene = new BoardScene(squad);
+    this.boardScene = new BoardScene(squad, saveSquad);
     this.scene.add(BOARD_SCENE_KEY, this.boardScene, true);
 
     this.boardScene.makeUnitsClickable((c) => {

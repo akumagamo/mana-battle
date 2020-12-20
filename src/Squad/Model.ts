@@ -9,7 +9,7 @@ export type SquadMemberMap = {
   [id: string]: SquadMember;
 };
 
-export type ForceId = string
+export type ForceId = string;
 
 export type Squad = {
   id: string;

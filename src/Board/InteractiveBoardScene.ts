@@ -22,7 +22,10 @@ export default class BoardScene extends Phaser.Scene {
   tiles: BoardTile[] = [];
   unitList: Chara[] = [];
 
-  constructor(public squad: Squad) {
+  constructor(
+    public squad: Squad,
+    public onSquadUpdated: (squad: Squad) => void,
+  ) {
     super(BOARD_SCENE_KEY);
     console.log(`boardScene constructor`);
   }
@@ -44,6 +47,7 @@ export default class BoardScene extends Phaser.Scene {
       this.squad,
       x,
       y,
+      this.onSquadUpdated
     );
 
     this.squad.members = updatedBoard.members;
@@ -263,7 +267,7 @@ function getUnitPositionInScreen(squadMember: SquadMember) {
 }
 
 function isPointerInTile(pointer: {x: number; y: number}) {
-  return function(tile: BoardTile) {
+  return function (tile: BoardTile) {
     const dx = Math.abs(tile.sprite.x - pointer.x);
     const dy = Math.abs(tile.sprite.y - pointer.y);
     const deltaX = dx / tileWidth;

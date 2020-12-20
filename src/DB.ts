@@ -237,18 +237,19 @@ export const changeSquadMemberPosition = (
   squad: Squad,
   x: number,
   y: number,
+  onSquadUpdated: (squad:Squad)=>void
 ) => {
   console.log('change position', unit, squad, x, y);
   const {members} = squad;
 
   const updatedBoard = placeUnitInBoard(x, y, unit, members);
 
-  console.log(`ujpdated board`, updatedBoard);
+  console.log(`updated board`, updatedBoard);
 
   const updatedSquad = {...squad, members: updatedBoard.members};
 
   console.log(`will save updatedSquad`, updatedSquad);
-  saveSquad(updatedSquad);
+  onSquadUpdated(updatedSquad);
 
   console.log(`will return`, updatedBoard);
 

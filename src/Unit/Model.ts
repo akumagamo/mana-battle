@@ -44,7 +44,7 @@ export type Unit = {
   class: UnitClass;
   gender: Gender;
   movement: Movement;
-  squad: UnitSquadPosition | null;
+  squad: UnitSquadPosition | null; // TODO: make this just an id
   lvl: number;
   hp: number;
   currentHp: number;
