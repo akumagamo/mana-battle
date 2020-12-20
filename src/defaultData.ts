@@ -12,39 +12,18 @@ import {
 } from './Item/Model';
 import itemsJSON from './constants/items.json';
 import {idfy} from './utils/idfy';
-import {fromJSON} from './Unit/serializer';
 import {indexById} from './utils';
 import {SquadMap} from './Squad/Model';
 import {Player} from './Player/Model';
 import {Options} from './Models';
 import {BattleFieldMap, PLAYER_FORCE} from './API/Map/Model';
+import {fighterArcherSquad} from './Squad/mocks';
 
 export const classes: UnitClass[] = ['fighter', 'mage', 'archer'];
 
 export function randomItem<T>(items: Array<T>): T {
   return items[Math.floor(Math.random() * items.length)];
 }
-
-export var units: UnitMap = indexById(
-  Array.from({length: 20}, (_, i) => i).map((unitJSON) => fromJSON(unitJSON)),
-);
-
-function squad(n: number, leader: Unit) {
-  leader.squad = { id: n.toString(), x:2, y:2};
-
-  return {
-    id: n.toString(),
-    name: leader.name,
-    emblem: 'Emoji',
-    force: PLAYER_FORCE,
-    members: {
-      [leader.id]: {id: leader.id, leader: true, x: 2, y: 2},
-    },
-  };
-}
-
-export var squads: SquadMap = {};
-for (var j = 0; j < 10; j++) squads[j.toString()] = squad(j, units[j]);
 
 function makeItem(acc: Item[], itemData: any): Item[] {
   const {type, name} = itemData;
@@ -98,6 +77,13 @@ const options:Options ={
   soundEnabled: true,
   musicEnabled: true
 }
+
+const squadA = fighterArcherSquad(PLAYER_FORCE, 'player_1_', 'player_1_')
+const squadB = fighterArcherSquad(PLAYER_FORCE, 'player_2_', 'player_2_')
+
+
+const units = {...squadA.units, ...squadB.units}
+const squads = {...squadA.squad, ...squadB.squad}
 
 const data: [
   string,

@@ -24,7 +24,7 @@ export default (chara: Chara, damage: number, isKilled: boolean) => {
   });
 
   // TODO: this should move to the parent scene
-  const dmg = chara.parent.add.text(-25, 0, damage.toString(), {fontSize: 48});
+  const dmg = chara.parent.add.text(-25, 0, damage.toString(), {fontSize: '48'});
   dmg.setShadow(2, 2, '#000');
   dmg.setStroke('#000000', 2);
 

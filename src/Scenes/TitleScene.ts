@@ -6,6 +6,7 @@ import button from "../UI/button";
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../constants";
 import { Chara } from "../Chara/Chara";
 import { Container } from "../Models";
+import {makeUnit} from "../Unit/Jobs";
 
 export default class TitleScene extends Phaser.Scene {
   music: Phaser.Sound.BaseSound | null = null;
@@ -31,9 +32,9 @@ export default class TitleScene extends Phaser.Scene {
     this.container.add(bg);
 
     this.charas = [
-      new Chara("3", this, getUnit("3"), 250, 500, 1.3, false, true),
-      new Chara("1", this, getUnit("1"), 350, 520, 1.5, false, true),
-      new Chara("2", this, getUnit("2"), 450, 550, 1.6, false, true),
+      new Chara("3", this, makeUnit('fighter', 3, 1), 250, 500, 1.3, false, true),
+      new Chara("1", this, makeUnit('mage', 1, 1), 350, 520, 1.5, false, true),
+      new Chara("2", this, makeUnit('archer', 2, 1), 450, 550, 1.6, false, true),
     ];
 
     this.charas.map((c) => {

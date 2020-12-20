@@ -137,7 +137,6 @@ export class ListSquadsScene extends Phaser.Scene {
           squad: {
             id: (squads.length + 1).toString(),
             name: "",
-            emblem: "",
             members: {},
             force: PLAYER_FORCE,
           },

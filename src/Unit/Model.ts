@@ -1,9 +1,9 @@
 import {Modifier, ItemSlot, ItemMap, ItemType} from '../Item/Model';
 import {sum} from '../utils/math';
 import {Container} from '../Models';
-import {getItem, getItems} from '../DB';
+import {getItems} from '../DB';
 import {UnitAttacks} from './Skills';
-import {City, ForceId, MapSquad} from '../API/Map/Model';
+import {MapSquad} from '../API/Map/Model';
 import {Squad} from '../Squad/Model';
 import {Vector} from 'matter';
 import {List} from 'immutable';

@@ -326,7 +326,6 @@ export const createSquad = (leader: Unit) => {
   const newSquad = {
     id: newId,
     name: leader.name,
-    emblem: 'Emoji',
     force: PLAYER_FORCE,
     members: {
       [leader.id]: {id: leader.id, leader: true, x: defaultX, y: defaultY},

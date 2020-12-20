@@ -5,10 +5,14 @@ import {Elem, Gender, HAIR_STYLES, Movement, Unit, UnitClass} from './Model';
 import {baseEquips} from './serializer';
 import {getUnitAttacks} from './Skills';
 
-export function makeUnit(class_: UnitClass, id: number, lvl: number): Unit {
+export function makeUnit(
+  class_: UnitClass,
+  id: number | string,
+  lvl: number,
+): Unit {
   return {
     name: randomItem(maleNames),
-    id: id.toString(),
+    id: typeof id === 'string' ? id : id.toString(),
     class: class_,
     equips: baseEquips[class_],
     lvl,
