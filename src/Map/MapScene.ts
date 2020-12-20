@@ -945,12 +945,13 @@ export class MapScene extends Phaser.Scene {
     text(20, 610, squad.name, uiContainer, this);
     text(1000, 610, `${squad.range} cells`, uiContainer, this);
 
-    button(200, 620, 'Squad Details', this.uiContainer, this, () =>
-      this.viewSquadDetails(squad.id),
-    );
+    if (squad.force !== PLAYER_FORCE)
+      button(200, 620, 'Squad Details', this.uiContainer, this, () =>
+        this.viewSquadDetails(squad.id),
+      );
 
     if (squad.force === PLAYER_FORCE)
-      button(400, 620, 'Edit Formation', this.uiContainer, this, () => {
+      button(200, 620, 'Edit Formation', this.uiContainer, this, () => {
         const boardScene = new BoardScene(squad, (updatedSquad) =>
           this.signal('changed unit position on board, updating', [
             {
@@ -1004,6 +1005,9 @@ export class MapScene extends Phaser.Scene {
           .map((id) => this.state.mapSquads.find((s) => s.id === id))
           .forEach((sqd) => {
             if (typeof sqd === 'undefined') return;
+
+            // TODO: place unit icon. Currently this is hard because we use
+            // scenes for charas. make each row persistable
 
             posY = posY += 60;
 
@@ -1679,10 +1683,7 @@ export class MapScene extends Phaser.Scene {
     });
   }
 
-  private async attackEnemySquad(
-    playerSquad: MapSquad,
-    enemySquad: MapSquad,
-  ) {
+  private async attackEnemySquad(playerSquad: MapSquad, enemySquad: MapSquad) {
     const baseX = 200;
     const baseY = 200;
     const scale = 0.5;
