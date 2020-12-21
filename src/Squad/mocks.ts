@@ -64,7 +64,7 @@ export function fighterArcherSquad(
         [unitIdPrefix + 4]: {
           id: unitIdPrefix + 4,
           x: 1,
-          y: 3,
+          y: 1,
           leader: false,
         },
         [unitIdPrefix + 5]: {

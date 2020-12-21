@@ -3,7 +3,7 @@ import {Chara} from '../Chara/Chara';
 import {getSquads} from '../DB';
 import {INVALID_STATE} from '../errors';
 import button from '../UI/button';
-import {Container, Graphics, Image, Pointer} from '../Models';
+import {Container, Image, Pointer} from '../Models';
 import panel from '../UI/panel';
 import text from '../UI/text';
 import {
@@ -792,13 +792,14 @@ export class MapScene extends Phaser.Scene {
             this.signal('view enemy', [
               {type: 'CLEAR_TILES'},
               {type: 'CLOSE_ACTION_PANEL'},
+              {type: 'HIGHLIGHT_CELL', pos: enemySquad.pos},
             ]);
           },
         },
         {
           title: 'Cancel',
           action: () => {
-            this.signal('view enemy', [{type: 'CLOSE_ACTION_PANEL'}]);
+            this.signal('cancel window', [{type: 'CLOSE_ACTION_PANEL'}]);
           },
         },
       ],
@@ -861,8 +862,6 @@ export class MapScene extends Phaser.Scene {
 
     const chara = await this.getChara(selectedAlly.id);
     await this.moveUnit(chara, enemy.steps);
-
-    const enemyChara = await this.getChara(enemySquad.id);
 
     this.attackEnemySquad(selectedAlly, enemySquad);
   }
@@ -1430,7 +1429,7 @@ export class MapScene extends Phaser.Scene {
 
   // TODO: simplify interface
   // wtf: moveToTile and moveunit???
-  async moveToTile(squadId: string, mapTile: MapTile):Promise<void> {
+  async moveToTile(squadId: string, mapTile: MapTile): Promise<void> {
     return new Promise((resolve) => {
       const {x, y} = mapTile;
 
@@ -1641,7 +1640,6 @@ export class MapScene extends Phaser.Scene {
   async makeCellAttackable(playerSquad: MapSquad, onCancel: () => void) {
     const enemies = this.targets(playerSquad.pos);
     enemies.forEach(async (e) => {
-      const enemyChara = await this.getChara(e.id);
       const enemySquad = this.getSquad(e.id);
       const tile = this.getTileAt(enemySquad.pos.x, enemySquad.pos.y);
 

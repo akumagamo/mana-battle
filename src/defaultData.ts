@@ -1,4 +1,4 @@
-import {UnitClass, Unit, UnitMap} from './Unit/Model';
+import {UnitClass, UnitMap} from './Unit/Model';
 import {
   Item,
   ItemType,
