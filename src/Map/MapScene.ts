@@ -1283,7 +1283,7 @@ export class MapScene extends Phaser.Scene {
     const bg = this.add.image(centerX, centerY, 'announce_bg');
     const forceName = force.id === PLAYER_FORCE ? 'Player' : 'Enemy';
     const title = this.add.text(centerX, centerY, `${forceName} Turn`, {
-      fontSize: '36',
+      fontSize: '36px',
     });
     title.setOrigin(0.5);
 
