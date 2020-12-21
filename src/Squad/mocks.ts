@@ -1,5 +1,5 @@
 import {maleNames} from '../constants/names';
-import {randomItem} from '../defaultData';
+import {randomItem} from '../utils';
 import {makeUnit} from '../Unit/Jobs';
 import {Squad} from './Model';
 

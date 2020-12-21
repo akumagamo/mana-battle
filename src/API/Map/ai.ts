@@ -3,7 +3,7 @@
  *
  */
 
-import {randomItem} from '../../defaultData';
+import {randomItem} from '../../utils';
 import {MapSquad} from './Model';
 
 /**

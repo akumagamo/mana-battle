@@ -1,8 +1,14 @@
 import {Unit, HAIR_STYLES} from './Model';
 import {maleNames} from '../constants/names';
-import {randomItem, classes} from '../defaultData';
+import { classes} from '../defaultData';
+import {randomItem } from '../utils';
 import {SKIN_COLORS, HAIR_COLORS} from '../Chara/animations/constants';
 import {getUnitAttacks} from './Skills';
+import {baseEquips} from './Jobs';
+
+
+
+
 /**
  * @todo replace with reading data from the database (JSON) and generating a valid unit
  * @param {number} n
@@ -35,29 +41,6 @@ export function fromJSON(n: number): Unit {
   };
 }
 
-export const baseEquips = {
-  mage: {
-    ornament: 'amulet',
-    chest: 'robe',
-    mainHand: 'oaken_staff',
-    offHand: 'none',
-    head: 'wiz_hat',
-  },
-  fighter: {
-    ornament: 'amulet',
-    chest: 'iron_armor',
-    mainHand: 'iron_sword',
-    offHand: 'iron_shield',
-    head: 'iron_helm',
-  },
-  archer: {
-    ornament: 'amulet',
-    chest: 'leather_armor',
-    mainHand: 'bow',
-    offHand: 'none',
-    head: 'archer_hat',
-  },
-};
 
 export function toJSON(_: Unit) {
   throw new Error('Not implemented.');

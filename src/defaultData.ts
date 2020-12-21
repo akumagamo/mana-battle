@@ -21,9 +21,6 @@ import {fighterArcherSquad} from './Squad/mocks';
 
 export const classes: UnitClass[] = ['fighter', 'mage', 'archer'];
 
-export function randomItem<T>(items: Array<T>): T {
-  return items[Math.floor(Math.random() * items.length)];
-}
 
 function makeItem(acc: Item[], itemData: any): Item[] {
   const {type, name} = itemData;
