@@ -1,5 +1,4 @@
 import {Elem, Unit, UnitClass} from './Model';
-import * as DB from '../DB';
 
 export type Attack = {
   name: string;

@@ -260,14 +260,31 @@ export class MapScene extends Phaser.Scene {
 
     const chara = await this.getChara(target);
 
-    chara.fadeOut(() => {
-      this.scene.remove(chara.scene.key);
+    const forceId = this.state.mapSquads.find((s) => s.id === target).force;
 
-      this.state.mapSquads = this.state.mapSquads.map((s) =>
-        s.id === target ? {...s, status: 'defeated'} : s,
-      );
+    const squadId = this.state.mapSquads.find((s) => s.id === target).id;
+
+    chara.fadeOut(async () => {
+
+      await this.delay(100);
+
+      this.state.forces = this.state.forces.map((force) => {
+        if (force.id === forceId)
+          return {...force, squads: force.squads.filter((id) => id !== target)};
+        else return force;
+      });
 
       this.movedSquads = this.movedSquads.filter((id) => id !== target);
+
+      this.charas = this.charas.filter((c) => c.unit.squad.id !== target);
+
+      this.state.mapSquads = this.state.mapSquads.filter(
+        (s) => s.id !== target,
+      );
+      this.state.units = this.state.units.filter((u) => u.squad.id !== squadId);
+
+      chara.container.destroy()
+      this.scene.remove(chara.scene.key);
     });
   }
 
@@ -843,7 +860,11 @@ export class MapScene extends Phaser.Scene {
       moveBelow: true,
       data: {
         squads: this.state.mapSquads,
-        units: this.state.units,
+        units: this.state.units.map(
+          (u) => 
+          // make player units overpowered
+          u.id.startsWith('player') ? {...u, str: 999, dex: 999, hp: 999, currentHp: 999} : u,
+        ),
         top: isPlayer ? target.id : starter.id,
         bottom: isPlayer ? starter.id : target.id,
         onCombatFinish: combatCallback,
@@ -1479,7 +1500,7 @@ export class MapScene extends Phaser.Scene {
     }, 50);
     this.clearTiles();
     this.movedSquads = [];
-    this.charas.forEach((u) => u.container?.setAlpha(1));
+    this.charas.forEach((u) => u.container?.setAlpha(1));// TODO: name this "restore"
     this.switchForce();
     this.startForceTurn();
   }
