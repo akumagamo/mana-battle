@@ -1,5 +1,5 @@
-import { Unit } from "../../Unit/Model";
-import { TurnUnit, isFromAnotherSquad, isAlive, transpose } from "./turns";
+import {Unit} from '../../Unit/Model';
+import {TurnUnit, isFromAnotherSquad, isAlive, transpose} from './turns';
 
 export function getMeleeTarget(current: Unit, units: TurnUnit[]) {
   //TODO: treatment for when multiple units are in the same distance
@@ -8,8 +8,8 @@ export function getMeleeTarget(current: Unit, units: TurnUnit[]) {
     .filter(isFromAnotherSquad(current))
     .filter(isAlive)
     .map((u) => {
-      if (u.squad === null) throw new Error("Null squad");
-      return { ...u, squad: transpose(u.squad) };
+      if (u.squad === null) throw new Error('Null squad');
+      return {...u, squad: transpose(u.squad)};
     })
     .map((u) => ({
       distance:

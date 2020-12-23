@@ -5,7 +5,7 @@ import text from './text';
 const defaultTextColor = '#ffffff';
 const defaultTextSize = 28;
 
-const activeFill = 0x2c0f10;
+const activeFill = 0x222222;
 const activeTextColor = '#ffffff';
 
 export default (
@@ -32,8 +32,8 @@ export default (
 
   const defaultFill = () => {
     if (!disabled)
-      btn.fillGradientStyle(0x894245, 0x562726, 0x301212, 0x2c0f10, 1);
-    else btn.fillGradientStyle(0x999999, 0x999999, 0x666666, 0x666666, 1);
+      btn.fillGradientStyle(0x000000, 0x222222, 0x000000, 0x444444, 0.8);
+    else btn.fillGradientStyle(0x888888, 0x888888, 0x888888, 0x888888, 1);
   };
   btn.lineStyle(2, 0xcdc0b7, 1);
 
@@ -42,8 +42,8 @@ export default (
   fill();
 
   // const border = scene.add.graphics();
-  // border.lineStyle(1, 0xFFDF00, 0.7);
-  // border.strokeRect(rectX-1, rectY-1, rectWidth+1, rectHeight+2);
+  // border.lineStyle(1, 0xffffff, 1);
+  // border.strokeRect(rectX - 1, rectY - 1, rectWidth + 1, rectHeight + 2);
 
   const clickZone = scene.add.zone(rectX, rectY, rectWidth, rectHeight);
   clickZone.setInteractive();

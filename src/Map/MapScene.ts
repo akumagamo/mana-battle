@@ -376,7 +376,7 @@ export class MapScene extends Phaser.Scene {
       else return y;
     };
 
-    return new Promise<void>((resolve) =>
+    return new Promise<void>((resolve) => {
       this.tweens.add({
         targets: this.mapContainer,
         x: tx(),
@@ -384,13 +384,18 @@ export class MapScene extends Phaser.Scene {
         duration: duration,
         ease: 'cubic.out',
         onComplete: () => {
-          this.mapX = tx();
-          this.mapY = ty();
-
           resolve();
         },
-      }),
-    );
+      });
+
+      this.tweens.add({
+        targets: this,
+        mapX: tx(),
+        mapY: ty(),
+        duration: duration,
+        ease: 'cubic.out',
+      });
+    });
   }
 
   setWorldBounds() {
@@ -405,7 +410,7 @@ export class MapScene extends Phaser.Scene {
     const container = this.add.container();
     const text_ = this.add.text(x, y, text, {
       fontSize: '36px',
-      color: '#000',
+      color: '#fff',
     });
     text_.setOrigin(0.5);
     panel(
@@ -600,6 +605,8 @@ export class MapScene extends Phaser.Scene {
     });
   }
 
+  // TODO: call this only once, and control on/off with boolean
+  // as this takes 150ms to run
   makeCellsInteractive() {
     this.clearAllTileEvents();
     this.tiles.forEach((tile) => this.makeInteractive(tile));
@@ -649,8 +656,8 @@ export class MapScene extends Phaser.Scene {
     return {...pos, y: pos.y + CHARA_VERTICAL_OFFSET};
   }
 
-  clickSquad(unit: MapSquad) {
-    this.moveCameraTo(unit.pos, 500);
+  async clickSquad(unit: MapSquad) {
+    await this.moveCameraTo(unit.pos, 100);
     if (unit.force === PLAYER_FORCE) {
       this.handleClickOnOwnUnit(unit);
     } else {
@@ -771,7 +778,6 @@ export class MapScene extends Phaser.Scene {
     this.closeActionWindow();
     this.disableInput();
 
-    await this.moveCameraTo(selectedAlly.pos, 500);
 
     this.actionWindow(
       enemyChara.container.x + this.mapX || 0,
@@ -1247,7 +1253,7 @@ export class MapScene extends Phaser.Scene {
       return;
     }
 
-    this.moveCameraTo(currentSquad.pos, 200);
+    this.moveCameraTo(currentSquad.pos, 500);
     this.setSelectedUnit(currentSquad.id);
     this.refreshUI();
 

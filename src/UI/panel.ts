@@ -11,12 +11,14 @@ export default (
 ) => {
   var rect = new Phaser.Geom.Rectangle(x, y, width, height);
   var graphics = scene.add.graphics({
-    fillStyle: {color: 0xdeaa87},
+    fillStyle: {color: 0x000000},
     lineStyle: {
       width: 2,
-      color: 0x000000,
+      color: 0xaaaaaa,
     },
   });
+
+  graphics.setAlpha(0.8);
 
   graphics.strokeRectShape(rect);
 
