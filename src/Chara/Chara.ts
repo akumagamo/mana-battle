@@ -1,16 +1,16 @@
-import * as Phaser from "phaser";
+import * as Phaser from 'phaser';
 
-import { Unit } from "../Unit/Model";
-import { Container, Pointer, Image } from "../Models";
-import run from "./animations/run";
+import {Unit} from '../Unit/Model';
+import {Container, Pointer, Image} from '../Models';
+import run from './animations/run';
 
-import defaultPose from "./animations/defaultPose";
-import stand from "./animations/stand";
-import flinch from "./animations/flinch";
-import slash from "./animations/slash";
-import bowAttack from "./animations/bowAttack";
-import initial from "./animations/initial";
-import text from "../UI/text";
+import defaultPose from './animations/defaultPose';
+import stand from './animations/stand';
+import flinch from './animations/flinch';
+import slash from './animations/slash';
+import bowAttack from './animations/bowAttack';
+import initial from './animations/initial';
+import text from '../UI/text';
 
 export class Chara extends Phaser.Scene {
   container: Container = {} as Container;
@@ -46,7 +46,7 @@ export class Chara extends Phaser.Scene {
     public front: boolean = true,
     public animated = true,
     public headOnly = false,
-    public showHpBar = false
+    public showHpBar = false,
   ) {
     super(key);
 
@@ -105,7 +105,7 @@ export class Chara extends Phaser.Scene {
         x,
         y,
         width + borderWidth * 2,
-        height + borderWidth * 2
+        height + borderWidth * 2,
       );
 
       this.hpBar.fillStyle(0xffffff);
@@ -120,8 +120,8 @@ export class Chara extends Phaser.Scene {
       this.container.add(this.hpBar);
 
       const hp = text(-30, -95, this.unit.currentHp, this.container, this);
-      hp.setColor("#ffffff");
-      hp.setShadow(1, 1, "#000000", 10);
+      hp.setColor('#ffffff');
+      hp.setShadow(1, 1, '#000000', 10);
       hp.setFontSize(40);
     }
 
@@ -132,7 +132,7 @@ export class Chara extends Phaser.Scene {
 
   private maybeRenderInsignea() {
     if (this.unit.leader) {
-      const insignea = this.add.image(50, 0, "insignea");
+      const insignea = this.add.image(50, 0, 'insignea');
       this.container.add(insignea);
     }
   }
@@ -140,20 +140,20 @@ export class Chara extends Phaser.Scene {
   onClick(fn: (chara: Chara) => void) {
     this.container.setInteractive();
 
-    this.container.on("pointerdown", (_pointer: Pointer) => {
+    this.container.on('pointerdown', (_pointer: Pointer) => {
       fn(this);
     });
   }
 
   enableDrag(
     dragStart: (unit: Unit, x: number, y: number, chara: Chara) => void,
-    dragEnd: (unit: Unit, x: number, y: number, chara: Chara) => void
+    dragEnd: (unit: Unit, x: number, y: number, chara: Chara) => void,
   ) {
     this.container.setInteractive();
     this.input.setDraggable(this.container);
 
     this.input.on(
-      "drag",
+      'drag',
       (_pointer: Pointer, obj: Container, x: number, y: number) => {
         this.container.setDepth(Infinity);
 
@@ -161,20 +161,20 @@ export class Chara extends Phaser.Scene {
         obj.y = y;
 
         dragStart(this.unit, x, y, this);
-      }
+      },
     );
 
     this.container.on(
-      "dragend",
+      'dragend',
       (_pointer: Pointer, _dragX: number, dragY: number) => {
         this.container.setDepth(dragY);
         dragEnd(this.unit, this.container.x || 0, this.container.y || 0, this);
-      }
+      },
     );
   }
 
   handleClick(fn: (chara: Chara, pointer: Pointer) => void) {
-    this.container.on("pointerdown", (pointer: Pointer) => {
+    this.container.on('pointerdown', (pointer: Pointer) => {
       fn(this, pointer);
     });
   }
@@ -213,40 +213,45 @@ export class Chara extends Phaser.Scene {
     run(this);
   }
 
-  fadeOut(onComplete: Function) {
+  fadeOut(callback: Function) {
+    const duration = 500;
+
+    this.time.addEvent({
+      delay: duration*2,
+      callback,
+    });
     this.container.iterate(
       (child: Phaser.GameObjects.Image | Phaser.GameObjects.Container) => {
         this.tweens.addCounter({
           from: 255,
           to: 0,
-          duration: 500,
+          duration,
           onComplete: () => {
             this.tweens.add({
               targets: this.container,
               alpha: 0,
-              duration: 500,
-              onComplete,
+              duration,
             });
           },
           onUpdate: function (tween) {
             var value = Math.floor(tween.getValue());
 
-            if (child.type === "Container") {
+            if (child.type === 'Container') {
               (child as Phaser.GameObjects.Container).iterate(
                 (grand: Phaser.GameObjects.Image) => {
                   grand.setTint(
-                    Phaser.Display.Color.GetColor(value, value, value)
+                    Phaser.Display.Color.GetColor(value, value, value),
                   );
-                }
+                },
               );
             } else {
               (child as Phaser.GameObjects.Image).setTint(
-                Phaser.Display.Color.GetColor(value, value, value)
+                Phaser.Display.Color.GetColor(value, value, value),
               );
             }
           },
         });
-      }
+      },
     );
   }
 }
