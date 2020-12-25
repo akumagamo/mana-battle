@@ -11,38 +11,28 @@ export default (scene: MapScene, cell: MapTile) => {
 
   //scene.clearTiles();
 
-  console.time('>>closewindow');
   scene.closeActionWindow();
-  console.timeEnd('>>closewindow');
   const {x, y} = cell;
 
-  const squads = scene.state.mapSquads.filter(
+  const squad = scene.state.mapSquads.find(
     (s) => s.pos.x === x && s.pos.y === y,
   );
-  const city = scene.state.cities.find((c) => c.x === x && c.y === y);
+  // const city = scene.state.cities.find((c) => c.x === x && c.y === y);
 
-  // TODO: select city if nothing is there
-  if (squads.length === 1 && !city) {
-    console.time('>>branch1');
+  if (squad)
     scene.signal('there was just a squad in the cell, select it', [
-      {type: 'CLICK_SQUAD', unit: squads[0]},
+      {type: 'CLICK_SQUAD', unit: squad},
     ]);
+  // }
+  // else if (city) {
+  //   scene.renderCellMenu(squads, city, cell);
 
-    console.timeEnd('>>branch1');
-  } else if (squads.length > 0 || city) {
-    console.time('>>branch2');
-    scene.renderCellMenu(squads, city, cell);
+  // } else {
+  //   const selectedUnit = scene.getSelectedUnit();
 
-    console.timeEnd('>>branch2');
-  } else {
-    console.time('>>branch3');
-    const selectedUnit = scene.getSelectedUnit();
+  //   if (!selectedUnit) return;
 
-    if (!selectedUnit) return;
-
-    if (selectedUnit.force === PLAYER_FORCE)
-      scene.showCellMenu(selectedUnit, cell);
-
-    console.timeEnd('>>branch3');
-  }
+  //   if (selectedUnit.force === PLAYER_FORCE)
+  //     scene.showCellMenu(selectedUnit, cell);
+  // }
 };
