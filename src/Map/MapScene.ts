@@ -538,6 +538,11 @@ export class MapScene extends Phaser.Scene {
       //TODO: remove functor from enemiesInRange
       squad.enemiesInRange = move.enemiesInRange;
       squad.validSteps = move.validSteps;
+      squad.steps = move.steps;
+      squad.pathFinder = (source) => (target) =>
+        move
+          .pathFinder(source)(target)
+          .map(([x, y]) => ({x, y}));
     });
   }
 
@@ -881,6 +886,7 @@ export class MapScene extends Phaser.Scene {
     });
   };
 
+  // TODO: remove, we can use composition to achieve same effect
   async moveToEnemyUnit(enemySquad: MapSquad, selectedAlly: MapSquad) {
     const enemy = selectedAlly.enemiesInRange.find(
       (e) => e.enemy === enemySquad.id,
@@ -947,16 +953,6 @@ export class MapScene extends Phaser.Scene {
 
     // Squad List (Left Navbar)
     this.playerSquadList(uiContainer);
-
-    if (this.currentForce === PLAYER_FORCE) {
-      button(1150, 650, 'End Turn', uiContainer, this, () => {
-        this.endTurn();
-      });
-
-      button(850, 650, 'Next Ally', uiContainer, this, () => {
-        this.selectNextAlly();
-      });
-    }
   }
 
   private selectedCityInfo(uiContainer: Phaser.GameObjects.Container) {
@@ -986,7 +982,7 @@ export class MapScene extends Phaser.Scene {
         this.viewSquadDetails(squad.id),
       );
 
-    if (squad.force === PLAYER_FORCE)
+    if (squad.force === PLAYER_FORCE) {
       button(200, baseY, 'Edit Formation', this.uiContainer, this, () => {
         const boardScene = new BoardScene(squad, (updatedSquad) =>
           this.signal('changed unit position on board, updating', [
@@ -1016,6 +1012,15 @@ export class MapScene extends Phaser.Scene {
           this.scene.remove('editSquadInMap');
         });
       });
+
+      button(1150, baseY, 'End Turn', uiContainer, this, () => {
+        this.endTurn();
+      });
+
+      button(850, baseY, 'Next Ally', uiContainer, this, () => {
+        this.selectNextAlly();
+      });
+    }
   }
 
   viewSquadDetails(id: string): void {
@@ -1536,6 +1541,9 @@ export class MapScene extends Phaser.Scene {
   }
 
   // TODO: simplify interface (require only ids)
+  /**
+   * Moves a squad alongside a path
+   */
   async moveUnit(chara: Chara, path: Vector[]) {
     let squad = this.state.mapSquads.find(
       (s) => this.charaKey(s.id) === chara.key,

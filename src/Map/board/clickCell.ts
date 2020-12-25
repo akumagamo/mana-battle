@@ -1,7 +1,7 @@
 import {PLAYER_FORCE} from '../../API/Map/Model';
 import {MapScene, MapTile} from '../MapScene';
 
-export default (scene: MapScene, cell: MapTile) => {
+export default async (scene: MapScene, cell: MapTile) => {
   // The CLICK_CELL event has happened.
   // Here are the possible scenarios:
   // 1 - The user doesn't have a own unit selected. In scene case, check
@@ -11,7 +11,7 @@ export default (scene: MapScene, cell: MapTile) => {
 
   //scene.clearTiles();
 
-  scene.closeActionWindow();
+  //scene.closeActionWindow();
   const {x, y} = cell;
 
   const squad = scene.state.mapSquads.find(
@@ -23,6 +23,19 @@ export default (scene: MapScene, cell: MapTile) => {
     scene.signal('there was just a squad in the cell, select it', [
       {type: 'CLICK_SQUAD', unit: squad},
     ]);
+
+  const selectedSquad = scene.getSelectedUnit();
+
+  if (selectedSquad && selectedSquad.force === PLAYER_FORCE) {
+    const path = selectedSquad.steps.some((step) => step.x === x && step.y === y);
+    if (path) {
+      scene.moveUnit(
+        await scene.getChara(selectedSquad.id),
+        selectedSquad.pathFinder(selectedSquad.pos)({x, y}),
+      );
+    }
+  }
+
   // }
   // else if (city) {
   //   scene.renderCellMenu(squads, city, cell);

@@ -6,7 +6,7 @@ import {UnitAttacks} from './Skills';
 import {MapSquad} from '../API/Map/Model';
 import {Squad} from '../Squad/Model';
 import {Vector} from 'matter';
-import {List} from 'immutable';
+import {List, Set} from 'immutable';
 
 export type UnitMap = {[x: string]: Unit};
 
@@ -80,7 +80,9 @@ export function toMapSquad(squad: Squad, pos: Vector): MapSquad {
     pos: {x: pos.x, y: pos.y},
     range: 5,
     validSteps: List(),
+    steps: Set(),
     enemiesInRange: [],
+    pathFinder: () => () => [],
     status: 'alive',
   };
 }
