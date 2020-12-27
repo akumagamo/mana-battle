@@ -13,8 +13,10 @@ import initial from './animations/initial';
 import text from '../UI/text';
 
 export class Chara extends Phaser.Scene {
-  container: Container = {} as Container;
+
+  /** Container around Chara, doesn't rotate (useful for adding UI elements)*/
   charaWrapper: Container = {} as Container;
+  container: Container = {} as Container;
 
   //body parts
 

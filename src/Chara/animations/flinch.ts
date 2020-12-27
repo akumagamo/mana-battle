@@ -1,3 +1,4 @@
+import text from '../../UI/text';
 import {Chara} from '../Chara';
 
 export default (chara: Chara, damage: number, isKilled: boolean) => {
@@ -24,20 +25,23 @@ export default (chara: Chara, damage: number, isKilled: boolean) => {
   });
 
   // TODO: this should move to the parent scene
-  const dmg = chara.parent.add.text(-25, 0, damage.toString(), {fontSize: '48px'});
+  const dmg = text(
+    chara.container.x - 50,
+    chara.container.y + 0,
+    damage.toString(),
+    chara.charaWrapper,
+    chara.parent,
+  );
+  dmg.setScale(2);
   dmg.setShadow(2, 2, '#000');
   dmg.setStroke('#000000', 2);
 
-  chara.container.add(dmg);
-
   chara.parent.tweens.add({
     targets: dmg,
-    y: -200,
+    y: -100,
     alpha: 0,
     duration: 3000,
     ease: 'Expo',
-    onComplete: () => {
-      dmg.destroy();
-    },
+    onComplete: () => dmg.destroy(),
   });
 };
