@@ -803,7 +803,7 @@ export class MapScene extends Phaser.Scene {
     this.selectedEntity = {type: 'city', id};
   }
 
-  attack = (starter: MapSquad, target: MapSquad) => {
+  attack = async (starter: MapSquad, target: MapSquad) => {
     this.turnOff();
 
     const isPlayer = starter.force === PLAYER_FORCE;
@@ -1120,12 +1120,31 @@ export class MapScene extends Phaser.Scene {
 
   private returnToTitleButton(uiContainer: Phaser.GameObjects.Container) {
     button(1100, 50, 'Return to Title', uiContainer, this, () => {
-      this.turnOff();
+      // this.turnOff();
 
-      this.scene.transition({
-        target: 'TitleScene',
-        duration: 0,
-        moveBelow: true,
+      // this.scene.transition({
+      //   target: 'TitleScene',
+      //   duration: 0,
+      //   moveBelow: true,
+      // });
+
+      const bg = panel(
+        0,
+        0,
+        SCREEN_WIDTH,
+        SCREEN_HEIGHT,
+        this.uiContainer,
+        this,
+      );
+
+      bg.setAlpha(0);
+      this.add.tween({
+        targets: bg,
+        duration: 1000,
+        alpha: 1,
+        onComplete: () => {
+          this.scene.start('TitleScene');
+        },
       });
     });
   }
@@ -1628,6 +1647,17 @@ export class MapScene extends Phaser.Scene {
 
     ally.destroy(this);
     enemy.destroy(this);
+
+    const transition = panel(
+      0,
+      0,
+      SCREEN_WIDTH,
+      SCREEN_HEIGHT,
+      this.uiContainer,
+      this,
+    );
+    transition.setAlpha(0);
+    await this.tween({targets: transition, alpha: 1, duration: 500});
 
     this.attack(playerSquad, enemySquad);
   }

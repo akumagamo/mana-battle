@@ -12,6 +12,8 @@ import {Squad} from '../Squad/Model';
 import {Vector} from '../API/Map/Model';
 import {Map} from 'immutable';
 import {invertBoardPosition} from '../API/Combat/utils';
+import panel from '../UI/panel';
+import {SCREEN_HEIGHT, SCREEN_WIDTH} from '../constants';
 
 const COMBAT_CHARA_SCALE = 1;
 const WALK_DURATION = 500;
@@ -32,7 +34,7 @@ export default class CombatScene extends Phaser.Scene {
   currentTurn = 0;
   container: Container | null = null;
   onCombatFinish: (<CMD>(cmd: CMD[]) => void) | null = null;
-  squads: Squad[]  = []
+  squads: Squad[] = [];
 
   constructor() {
     super('CombatScene');
@@ -49,7 +51,7 @@ export default class CombatScene extends Phaser.Scene {
   }
 
   // LIFECYCLE METHODS
-  create(data: {
+  async create(data: {
     top: string;
     bottom: string;
     conflictId: string;
@@ -59,7 +61,7 @@ export default class CombatScene extends Phaser.Scene {
   }) {
     if (this.container) this.container.destroy();
 
-    this.squads = data.squads
+    this.squads = data.squads;
 
     this.onCombatFinish = data.onCombatFinish;
 
@@ -111,9 +113,32 @@ export default class CombatScene extends Phaser.Scene {
         });
     });
 
-    setTimeout(() => {
-      this.turn();
-    }, 1000);
+    await this.transition();
+
+    this.turn();
+  }
+
+  transition(fadeOut = true) {
+    return new Promise((resolve) => {
+      const transition = panel(
+        0,
+        0,
+        SCREEN_WIDTH,
+        SCREEN_HEIGHT,
+        this.add.container(),
+        this,
+      );
+      transition.setAlpha(fadeOut ? 1 : 0);
+      this.tweens.add({
+        targets: transition,
+        duration: 500,
+        alpha: fadeOut ? 0 : 1,
+        onComplete: () => {
+          transition.destroy();
+          resolve();
+        },
+      });
+    });
   }
 
   turnOff() {
@@ -121,7 +146,7 @@ export default class CombatScene extends Phaser.Scene {
     this.removeChildren();
     this.container?.destroy();
     this.scene.stop();
-    this.squads = []
+    this.squads = [];
   }
   removeChildren() {
     this.charas.forEach((chara) => {
@@ -184,24 +209,25 @@ export default class CombatScene extends Phaser.Scene {
       this.currentTurn = 0;
       this.turn();
     } else if (cmd.type === 'END_COMBAT') {
-      this.retreatUnits().then((updatedUnits: Unit[]) => {
-        const units = updatedUnits.map((unit) => ({
-          type: 'UPDATE_UNIT',
-          unit: {...unit, exp: unit.exp + 40},
-        }));
-        //this.scene.start('MapScene', [...units, ]);
+      const updatedUnits = await this.retreatUnits();
 
-        if (this.onCombatFinish) {
-          console.log(`onCombatFinish END_COMBAT`);
-          this.onCombatFinish([{type: 'END_UNIT_TURN'}].concat(units));
-        }
+      const units = updatedUnits.map((unit) => ({
+        type: 'UPDATE_UNIT',
+        unit: {...unit, exp: unit.exp + 40},
+      }));
+      //this.scene.start('MapScene', [...units, ]);
 
-        this.turnOff();
-      });
+      console.log(`onCombatFinish END_COMBAT`);
+      await this.transition(false);
+      this.onCombatFinish([{type: 'END_UNIT_TURN'}].concat(units));
+
+      this.turnOff();
     } else if (cmd.type === 'VICTORY') {
       console.log('Winning Team:', cmd.target);
 
       console.log(`onCombatFinish VICTORY`);
+
+      await this.transition(false)
 
       if (this.onCombatFinish) {
         this.onCombatFinish(
@@ -236,7 +262,8 @@ export default class CombatScene extends Phaser.Scene {
 
     if (!target.container) throw new Error(INVALID_STATE);
 
-    const pos = this.squads.find(sqd=>sqd.id === target.unit.squad.id).members[target.unit.id]
+    const pos = this.squads.find((sqd) => sqd.id === target.unit.squad.id)
+      .members[target.unit.id];
 
     const {x, y} = cartesianToIsometricBattle(
       targetIsTop,

@@ -13,6 +13,7 @@ export default class MapListScene extends Phaser.Scene {
   }
   preload = preload;
   create() {
+
     const container = this.add.container(100, 100);
 
     maps.forEach((map_, index) => {
@@ -39,7 +40,6 @@ export default class MapListScene extends Phaser.Scene {
           target: "MapScene",
           duration: 1000,
           moveBelow: true,
-          remove: true,
           data: commands,
         });
       });
