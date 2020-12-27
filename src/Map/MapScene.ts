@@ -900,7 +900,10 @@ export class MapScene extends Phaser.Scene {
   async refreshUI() {
     this.destroyUI();
 
+
     if (this.mode.type === 'NOTHING_SELECTED') return;
+
+    console.log(`refreshUI`)
 
     const {uiContainer} = this.getContainers();
 
@@ -970,10 +973,19 @@ export class MapScene extends Phaser.Scene {
           this.showMoveControls(squad);
         });
 
-      if (mode !== 'SELECTING_ATTACK_TARGET')
-        button(200, baseY, 'Attack', this.uiContainer, this, () => {
-          this.showAttackControls();
-        });
+      if (mode !== 'SELECTING_ATTACK_TARGET') {
+        button(
+          200,
+          baseY,
+          'Attack',
+          this.uiContainer,
+          this,
+          () => {
+            this.showAttackControls();
+          },
+          this.getTargets(squad.pos).length < 1,
+        );
+      }
 
       if (mode === 'SQUAD_SELECTED')
         button(300, baseY, 'Edit Formation', this.uiContainer, this, () => {
@@ -1028,16 +1040,18 @@ export class MapScene extends Phaser.Scene {
               break;
             case 'MOVING_SQUAD':
               const {start, id} = this.mode;
-              await this.moveSquadTo(squad.id, start);
-
-              this.signal('cancelled movement"', [
-                {type: 'CLEAR_TILES_TINTING'},
-                {type: 'HIGHLIGHT_CELL', pos: start},
+              this.signal('cancelled movement - update pos"', [
                 {
                   type: 'UPDATE_SQUAD_POS',
                   id,
                   pos: start,
                 },
+              ]);
+              await this.moveSquadTo(squad.id, start);
+
+              this.signal('cancelled movement - animation ended"', [
+                {type: 'CLEAR_TILES_TINTING'},
+                {type: 'HIGHLIGHT_CELL', pos: start},
               ]);
 
               this.changeMode({type: 'SQUAD_SELECTED', id});
@@ -1677,15 +1691,14 @@ export class MapScene extends Phaser.Scene {
     this.refreshUI();
   }
 
-  async moveSquadTo(id: string, target: Vector, instant = false) {
+  async moveSquadTo(id: string, target: Vector) {
     const source = this.getSquad(id);
 
     const path = getPathTo(this.state.cells)(source.pos)(
       target,
     ).map(([x, y]) => ({x, y}));
 
-    if (!instant) await this.moveUnit(id, path);
-    else await this.moveUnit(id, path);
+    await this.moveUnit(id, path);
   }
 
   showMoveControls(squad: MapSquad) {

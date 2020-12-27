@@ -37,10 +37,10 @@ export default async (scene: MapScene, cell: MapTile) => {
 
         if (isWalkable) {
           await scene.moveSquadTo(selectedSquad.id, {x, y});
-
           scene.signal('squad moved, updating position', [
             {type: 'UPDATE_SQUAD_POS', id: selectedSquad.id, pos: {x, y}},
           ]);
+          scene.refreshUI();
         }
       }
       break;
