@@ -1,5 +1,6 @@
 import {PLAYER_FORCE} from '../../API/Map/Model';
 import {MapScene, MapTile} from '../MapScene';
+import {fromJS} from 'immutable';
 
 export default async (scene: MapScene, cell: MapTile) => {
   // The CLICK_CELL event has happened.
@@ -14,27 +15,47 @@ export default async (scene: MapScene, cell: MapTile) => {
   //scene.closeActionWindow();
   const {x, y} = cell;
 
-  const squad = scene.state.mapSquads.find(
-    (s) => s.pos.x === x && s.pos.y === y,
-  );
-  // const city = scene.state.cities.find((c) => c.x === x && c.y === y);
+  const select = () => {
+    const squad = scene.squadAt(x, y);
 
-  if (squad)
+    if (!squad) return;
+
+    scene.changeMode({type: 'SQUAD_SELECTED', id: squad.id});
     scene.signal('there was just a squad in the cell, select it', [
       {type: 'CLICK_SQUAD', unit: squad},
     ]);
+  };
+  // const city = scene.state.cities.find((c) => c.x === x && c.y === y);
 
-  const selectedSquad = scene.getSelectedUnit();
+  console.log(`clicked on cell, mode is `, scene.mode.type);
+  switch (scene.mode.type) {
+    case 'MOVING_SQUAD':
+      const selectedSquad = scene.getSelectedSquad();
 
-  if (selectedSquad && selectedSquad.force === PLAYER_FORCE) {
-    const path = selectedSquad.steps.some((step) => step.x === x && step.y === y);
-    if (path) {
-      scene.moveUnit(
-        await scene.getChara(selectedSquad.id),
-        selectedSquad.pathFinder(selectedSquad.pos)({x, y}),
-      );
-    }
+      if (selectedSquad && selectedSquad.force === PLAYER_FORCE) {
+        const isWalkable = scene.moveableCells.has(fromJS({x, y}));
+
+        if (isWalkable) {
+          await scene.moveSquadTo(selectedSquad.id, {x, y});
+
+          scene.signal('squad moved, updating position', [
+            {type: 'UPDATE_SQUAD_POS', id: selectedSquad.id, pos: {x, y}},
+          ]);
+        }
+      }
+      break;
+    case 'SELECTING_ATTACK_TARGET':
+      scene.attackEnemySquad(scene.getSelectedSquad(), scene.squadAt(x, y));
+      break;
+    default:
+      select();
   }
+
+  // if (path) {
+  //   scene.signal('squad moved, updating position', [
+  //     {type: 'UPDATE_SQUAD_POS', id: selectedSquad.id, pos: {x, y}},
+  //   ]);
+  // }
 
   // }
   // else if (city) {

@@ -1,3 +1,5 @@
+import {Vector} from "matter";
+
 export function random(min: number, max: number) {
   return Math.floor(Math.random() * max + min);
 }
@@ -16,4 +18,8 @@ export const maybeZero = (v:number|undefined|null)=> v ? v : 0
 
 export function randomItem<T>(items: Array<T>): T {
   return items[Math.floor(Math.random() * items.length)];
+}
+
+export function getDistance(a:Vector, b:Vector){
+  return Math.abs(a.x - b.x) + Math.abs(a.y - b.y)
 }
