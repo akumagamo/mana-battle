@@ -11,9 +11,7 @@ export function squadInfo(
   id: string): void {
   const squad = scene.squadIO(id);
 
-
   text(20, baseY, squad.name, uiContainer, scene);
-  text(1000, baseY, `${squad.range} cells`, uiContainer, scene);
 
   if (squad.force !== PLAYER_FORCE) {
     button(200, baseY, 'Squad Details', scene.uiContainer, scene, () => scene.viewSquadDetails(squad.id)
