@@ -119,7 +119,7 @@ export default class CombatScene extends Phaser.Scene {
   }
 
   transition(fadeOut = true) {
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
       const transition = panel(
         0,
         0,
