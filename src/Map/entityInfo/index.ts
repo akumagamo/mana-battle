@@ -7,14 +7,14 @@ import city from './city';
 import {squadInfo} from './squadInfo';
 
 const BOTTOM_PANEL_WIDTH = SCREEN_WIDTH;
-const BOTTOM_PANEL_HEIGHT = 60;
+const BOTTOM_PANEL_HEIGHT = 80;
 const BOTTOM_PANEL_X = 0;
 export const BOTTOM_PANEL_Y = SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT;
 
 export default (scene: MapScene, uiContainer: Container): void => {
   if (scene.mode.type === 'NOTHING_SELECTED') return;
 
-  const baseY = BOTTOM_PANEL_Y + 10;
+  const baseY = BOTTOM_PANEL_Y + 25;
 
   panel(
     BOTTOM_PANEL_X,

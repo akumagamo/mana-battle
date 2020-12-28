@@ -3,7 +3,6 @@ import button from '../../UI/button';
 import text from '../../UI/text';
 import {MapScene} from '../MapScene';
 import playerSquad from './playerSquad';
-import {BOTTOM_PANEL_Y} from './index';
 
 export function squadInfo(
   scene: MapScene,

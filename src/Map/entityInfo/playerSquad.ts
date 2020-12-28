@@ -13,10 +13,12 @@ export default (
   squad: MapSquad,
   uiContainer: Phaser.GameObjects.Container,
 ) => {
+
+  const baseX = 300;
   const mode = scene.mode.type;
   if (mode !== 'MOVING_SQUAD' && mode !== 'SELECTING_ATTACK_TARGET')
     button(
-      100,
+      baseX+100,
       baseY,
       'Move',
       scene.uiContainer,
@@ -29,7 +31,7 @@ export default (
 
   if (mode !== 'SELECTING_ATTACK_TARGET') {
     button(
-      200,
+      baseX + 200,
       baseY,
       'Attack',
       scene.uiContainer,
@@ -42,9 +44,8 @@ export default (
   }
 
   if (mode === 'SQUAD_SELECTED')
-    button(300, baseY, 'Formation', scene.uiContainer, scene, () => {
+    button(baseX + 300, baseY, 'Formation', scene.uiContainer, scene, () => {
       scene.changeMode({type: 'CHANGING_SQUAD_FORMATION'});
-      scene.refreshUI();
       const container = scene.add.container();
       panel(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, container, scene);
       let details: Container | null = null;
@@ -81,12 +82,11 @@ export default (
         container.destroy();
 
         scene.changeMode({type: 'SQUAD_SELECTED', id: squad.id});
-        scene.refreshUI();
       });
     });
 
   if (mode === 'MOVING_SQUAD')
-    button(300, baseY, 'Wait', uiContainer, scene, () => {
+    button(baseX + 300, baseY, 'Wait', uiContainer, scene, () => {
       scene.signal('clicked "end squad turn"', [
         {type: 'END_SQUAD_TURN', id: squad.id},
       ]);
@@ -100,7 +100,6 @@ export default (
           scene.signal('cancelled squad targeting"', [
             {type: 'CLEAR_TILES_TINTING'},
           ]);
-          scene.refreshUI();
           break;
         case 'MOVING_SQUAD':
           const {start, id} = scene.mode;
@@ -118,16 +117,14 @@ export default (
           ]);
 
           scene.changeMode({type: 'SQUAD_SELECTED', id});
-
-          scene.refreshUI();
           break;
       }
     });
 
-  if (mode === 'SQUAD_SELECTED')
-    button(850, baseY, 'Next Ally', uiContainer, scene, () => {
-      scene.selectNextAlly();
-    });
+  // if (mode === 'SQUAD_SELECTED')
+  //   button(850, baseY, 'Next Ally', uiContainer, scene, () => {
+  //     scene.selectNextAlly();
+  //   });
 
   if (mode !== 'MOVING_SQUAD' && mode !== 'SELECTING_ATTACK_TARGET')
     button(1150, baseY, 'End Turn', uiContainer, scene, async () => {

@@ -49,7 +49,7 @@ export function preload(this: {
     );
   });
 
-  const ui = ["arrow_right", "panel", "announce_bg"];
+  const ui = ["arrow_right", "panel", "announce_bg", "button_move", "button_attack"];
   ui.forEach((id: string) => {
     this.load.image(id, `${PUBLIC_URL}/ui/${id}.svg`);
   });

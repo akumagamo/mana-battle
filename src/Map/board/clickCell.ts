@@ -1,13 +1,16 @@
-import {PLAYER_FORCE} from '../../API/Map/Model';
+import {CPU_FORCE, PLAYER_FORCE} from '../../API/Map/Model';
 import {MapScene, MapTile} from '../MapScene';
 import {fromJS} from 'immutable';
+import {getDistance} from '../../utils';
 
 export default async (scene: MapScene, cell: MapTile) => {
   const {x, y} = cell;
 
-  const select = () => {
-    const squad = scene.squadAt(x, y);
+  const squad = scene.squadAt(x, y);
 
+  const city = scene.state.cities.find((c) => c.x === x && c.y === y);
+
+  const select = () => {
     if (squad) {
       scene.changeMode({type: 'SQUAD_SELECTED', id: squad.id});
       scene.signal('there was just a squad in the cell, select it', [
@@ -15,7 +18,6 @@ export default async (scene: MapScene, cell: MapTile) => {
       ]);
       return;
     }
-    const city = scene.state.cities.find((c) => c.x === x && c.y === y);
 
     if (city) {
       const selectCity = () => {
@@ -23,7 +25,6 @@ export default async (scene: MapScene, cell: MapTile) => {
           {type: 'SELECT_CITY', id: city.id},
         ]);
         scene.changeMode({type: 'CITY_SELECTED', id: city.id});
-        scene.refreshUI();
       };
       switch (scene.mode.type) {
         case 'NOTHING_SELECTED':
@@ -55,7 +56,12 @@ export default async (scene: MapScene, cell: MapTile) => {
       }
       break;
     case 'SELECTING_ATTACK_TARGET':
-      scene.attackEnemySquad(scene.getSelectedSquad(), scene.squadAt(x, y));
+      if (
+        squad &&
+        squad.force === CPU_FORCE &&
+        getDistance(squad.pos, scene.getSquad(scene.mode.id).pos) === 1
+      )
+        scene.attackEnemySquad(scene.getSelectedSquad(), scene.squadAt(x, y));
       break;
     default:
       select();
