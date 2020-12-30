@@ -1,4 +1,3 @@
-import {Set} from 'immutable';
 import {SCREEN_HEIGHT, SCREEN_WIDTH} from '../../constants';
 import {Container} from '../../Models';
 import panel from '../../UI/panel';

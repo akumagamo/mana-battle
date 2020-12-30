@@ -1,6 +1,5 @@
 import {CPU_FORCE, PLAYER_FORCE} from '../../API/Map/Model';
 import {MapScene, MapTile} from '../MapScene';
-import {fromJS} from 'immutable';
 import {getDistance} from '../../utils';
 import {makeVector} from '../makeVector';
 

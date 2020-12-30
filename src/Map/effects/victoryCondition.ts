@@ -1,7 +1,7 @@
 import {City, CPU_FORCE} from '../../API/Map/Model';
 import {SCREEN_HEIGHT, SCREEN_WIDTH} from '../../constants';
 import {MapScene} from '../MapScene';
-import * as S from 'sanctuary';
+import  S from 'sanctuary';
 
 export default (scene: MapScene) => {
   const title = scene.label(SCREEN_WIDTH / 2, 60, 'Victory Condition');

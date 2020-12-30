@@ -3,8 +3,6 @@ import {Container} from '../Models';
 import text from './text';
 
 const defaultTextColor = '#ffffff';
-const defaultTextSize = 28;
-
 const activeFill = 0x222222;
 const activeTextColor = '#ffffff';
 

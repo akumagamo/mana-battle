@@ -656,7 +656,7 @@ export class MapScene extends Phaser.Scene {
       {type: 'HIGHLIGHT_CELL', pos: squad.pos},
     ]);
     if (squad.force === PLAYER_FORCE) {
-      this.handleClickOnOwnUnit(squad);
+      this.handleClickOnOwnUnit();
     } else {
       this.handleClickOnEnemyUnit(squad);
     }
@@ -732,7 +732,7 @@ export class MapScene extends Phaser.Scene {
     return `unit-${squadId}`;
   }
 
-  handleClickOnOwnUnit(squad: MapSquad) {
+  handleClickOnOwnUnit() {
     this.refreshUI();
   }
 
@@ -856,56 +856,6 @@ export class MapScene extends Phaser.Scene {
         .toJS(),
       () => this.enableInput(),
     );
-  }
-
-  private renderPlayerSquadList(uiContainer: Phaser.GameObjects.Container) {
-    panel(0, 0, 200, SCREEN_HEIGHT - 100, this.uiContainer, this);
-    let posY = 0;
-    this.state.forces
-      .filter((f) => f.id === PLAYER_FORCE)
-      .map((force) => {
-        force.squads
-          .map((id) => this.state.mapSquads.find((s) => s.id === id))
-          .forEach((sqd) => {
-            if (typeof sqd === 'undefined') return;
-
-            // TODO: place unit icon. Currently this is hard because we use
-            // scenes for charas. make each row persistable
-
-            posY = posY += 60;
-
-            button(
-              20,
-              posY,
-              this.getSquad(sqd.id).name,
-              uiContainer,
-              this,
-              () => {
-                this.signal('clicked dispatched squad list button', [
-                  {type: 'CLICK_SQUAD', unit: sqd},
-                  {
-                    type: 'MOVE_CAMERA_TO',
-                    x: sqd.pos.x,
-                    y: sqd.pos.y,
-                    duration: 500,
-                  },
-                ]);
-
-                this.refreshUI();
-              },
-              this.movedSquads.includes(sqd.id),
-            );
-          });
-      });
-
-    button(20, posY + 60, '+ Dispatch', uiContainer, this, () => {
-      this.signal('opened dispatch squad list', [
-        {type: 'CLEAR_TILES_TINTING'},
-        {type: 'CLEAR_TILES_EVENTS'},
-      ]);
-      this.disableMapInput();
-      this.renderDispatchWindow();
-    });
   }
 
   private returnToTitleButton(uiContainer: Phaser.GameObjects.Container) {
@@ -1436,14 +1386,14 @@ export class MapScene extends Phaser.Scene {
     this.refreshUI();
   }
 
-  makeWalkableGrid(cells: Set<VectorRec>) {
+  makeWalkableGrid(cells: Set<VectorRec>): number[][] {
     let grid = this.state.cells.map((c) => c.map(() => 1));
 
-    cells.forEach((rec) => {
-      grid[rec.get('y')][rec.get('x')] = 0;
-    });
+    return cells.toJS().reduce((grid_, {x, y}) => {
+      grid_[y][x] = 0;
 
-    return grid;
+      return grid_;
+    }, grid);
   }
 
   async moveSquadTo(id: string, target: Vector) {
