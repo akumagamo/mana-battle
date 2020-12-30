@@ -2,6 +2,7 @@ import {CPU_FORCE, PLAYER_FORCE} from '../../API/Map/Model';
 import {MapScene, MapTile} from '../MapScene';
 import {fromJS} from 'immutable';
 import {getDistance} from '../../utils';
+import {makeVector} from '../makeVector';
 
 export default async (scene: MapScene, cell: MapTile) => {
   const {x, y} = cell;
@@ -41,15 +42,16 @@ export default async (scene: MapScene, cell: MapTile) => {
 
   switch (scene.mode.type) {
     case 'MOVING_SQUAD':
-      const selectedSquad = scene.getSelectedSquad();
+      const {id} = scene.mode;
+      const selectedSquad = scene.getSquad(id);
 
       if (selectedSquad && selectedSquad.force === PLAYER_FORCE) {
-        const isWalkable = scene.moveableCells.has(fromJS({x, y}));
+        const isWalkable = scene.moveableCells.has(makeVector({x, y}));
 
         if (isWalkable) {
           await scene.moveSquadTo(selectedSquad.id, {x, y});
           scene.signal('squad moved, updating position', [
-            {type: 'UPDATE_SQUAD_POS', id: selectedSquad.id, pos: {x, y}},
+            {type: 'UPDATE_SQUAD_POS', id, pos: {x, y}},
           ]);
           scene.refreshUI();
         }

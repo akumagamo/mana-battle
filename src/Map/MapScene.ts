@@ -22,7 +22,7 @@ import {
 } from '../API/Map/Model';
 import {SCREEN_WIDTH, SCREEN_HEIGHT, centerX, centerY} from '../constants';
 import {toMapSquad, Unit} from '../Unit/Model';
-import {Map, Set, fromJS} from 'immutable';
+import {Map, Set} from 'immutable';
 import {getCity} from '../API/Map/utils';
 import victoryCondition from './effects/victoryCondition';
 import speech from '../UI/speech';
@@ -33,6 +33,7 @@ import renderSquads, {renderSquad} from './board/renderSquads';
 import entityInfo from './entityInfo';
 import squadDetails from './effects/squadDetails';
 import {Squad} from '../Squad/Model';
+import {makeVector, VectorRec} from './makeVector';
 
 const WALKABLE_CELL_TINT = 0x88aa88;
 const ENEMY_IN_CELL_TINT = 0xff2222;
@@ -107,7 +108,8 @@ const DEFAULT_MODE: Mode = {type: 'NOTHING_SELECTED'};
 export class MapScene extends Phaser.Scene {
   charas: Chara[] = [];
   tiles: MapTile[] = [];
-  moveableCells = Set();
+  moveableCells: Set<VectorRec> = Set();
+  walkableGrid: number[][] = [[]];
   tileIndex: MapTile[][] = [[]];
   citySprites: Image[] = [];
   mode: Mode = DEFAULT_MODE;
@@ -670,21 +672,26 @@ export class MapScene extends Phaser.Scene {
       [0, 1],
     ];
 
-    const enemies = Set(fromJS(this.getEnemies().map((e) => e.pos)));
+    const enemies = Set(
+      this.getEnemies()
+        .map((e) => e.pos)
+        .map(makeVector),
+    );
 
-    let cells = Set() as Set<Map<string, number>>;
+    let cells: Set<VectorRec> = Set();
+
     const getCells = ({x, y}: {x: number; y: number}, distance: number) =>
       dirs.forEach(([xx, yy]) => {
-        const vector = {x: xx + x, y: yy + y};
+        const vector = makeVector({x: xx + x, y: yy + y});
 
         if (
           vector.x < 0 ||
           vector.y < 0 ||
           this.tileAt(vector.x, vector.y).type !== 0 ||
-          enemies.has(fromJS(vector))
+          enemies.has(vector)
         )
           return;
-        cells = cells.add(fromJS(vector));
+        cells = cells.add(vector);
 
         if (distance > 0) getCells(vector, distance - 1);
       });
@@ -698,6 +705,8 @@ export class MapScene extends Phaser.Scene {
 
       this.tintClickableCells(tile);
     });
+
+    this.walkableGrid = this.makeWalkableGrid(this.moveableCells);
     //this.highlightAttackableCells(squad);
   }
 
@@ -1427,10 +1436,20 @@ export class MapScene extends Phaser.Scene {
     this.refreshUI();
   }
 
+  makeWalkableGrid(cells: Set<VectorRec>) {
+    let grid = this.state.cells.map((c) => c.map(() => 1));
+
+    cells.forEach((rec) => {
+      grid[rec.get('y')][rec.get('x')] = 0;
+    });
+
+    return grid;
+  }
+
   async moveSquadTo(id: string, target: Vector) {
     const source = this.getSquad(id);
 
-    const path = getPathTo(this.state.cells)(source.pos)(
+    const path = getPathTo(this.walkableGrid)(source.pos)(
       target,
     ).map(([x, y]) => ({x, y}));
 
