@@ -12,8 +12,8 @@ import {Squad} from '../Squad/Model';
 import {Vector} from '../API/Map/Model';
 import {Map} from 'immutable';
 import {invertBoardPosition} from '../API/Combat/utils';
-import panel from '../UI/panel';
-import {SCREEN_HEIGHT, SCREEN_WIDTH} from '../constants';
+import annoucement from '../UI/annoucement';
+import {fadeIn, fadeOut} from '../UI/Transition';
 
 const COMBAT_CHARA_SCALE = 1;
 const WALK_DURATION = 500;
@@ -59,6 +59,7 @@ export default class CombatScene extends Phaser.Scene {
     units: Map<string, Unit>;
     onCombatFinish: <CMD>(cmd: CMD[]) => void;
   }) {
+
     if (this.container) this.container.destroy();
 
     this.squads = data.squads;
@@ -113,32 +114,11 @@ export default class CombatScene extends Phaser.Scene {
         });
     });
 
-    await this.transition();
+    await fadeIn(this);
+
+    await annoucement(this, 'Fight it out!');
 
     this.turn();
-  }
-
-  transition(fadeOut = true) {
-    return new Promise<void>((resolve) => {
-      const transition = panel(
-        0,
-        0,
-        SCREEN_WIDTH,
-        SCREEN_HEIGHT,
-        this.add.container(),
-        this,
-      );
-      transition.setAlpha(fadeOut ? 1 : 0);
-      this.tweens.add({
-        targets: transition,
-        duration: 500,
-        alpha: fadeOut ? 0 : 1,
-        onComplete: () => {
-          transition.destroy();
-          resolve();
-        },
-      });
-    });
   }
 
   turnOff() {
@@ -218,7 +198,7 @@ export default class CombatScene extends Phaser.Scene {
       //this.scene.start('MapScene', [...units, ]);
 
       console.log(`onCombatFinish END_COMBAT`);
-      await this.transition(false);
+      await fadeOut(this);
       this.onCombatFinish([{type: 'END_UNIT_TURN'}].concat(units));
 
       this.turnOff();
@@ -227,8 +207,7 @@ export default class CombatScene extends Phaser.Scene {
 
       console.log(`onCombatFinish VICTORY`);
 
-      await this.transition(false)
-
+      await fadeOut(this);
       if (this.onCombatFinish) {
         this.onCombatFinish(
           this.charas

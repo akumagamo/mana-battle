@@ -19,7 +19,7 @@ console.log(`Starting up app. Some lessons to remember 📚:
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  backgroundColor: "#125555",
+  backgroundColor: "#000000",
   width: SCREEN_WIDTH,
   height: SCREEN_HEIGHT,
   scale: {

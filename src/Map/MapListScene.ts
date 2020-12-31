@@ -36,6 +36,8 @@ export default class MapListScene extends Phaser.Scene {
           },
         ];
 
+
+
         this.scene.transition({
           target: "MapScene",
           duration: 1000,

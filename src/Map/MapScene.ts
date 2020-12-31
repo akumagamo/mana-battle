@@ -20,7 +20,7 @@ import {
   PLAYER_FORCE,
   CPU_FORCE,
 } from '../API/Map/Model';
-import {SCREEN_WIDTH, SCREEN_HEIGHT, centerX, centerY} from '../constants';
+import {SCREEN_WIDTH, SCREEN_HEIGHT} from '../constants';
 import {toMapSquad, Unit} from '../Unit/Model';
 import {Map, Set} from 'immutable';
 import {getCity} from '../API/Map/utils';
@@ -34,6 +34,9 @@ import entityInfo from './entityInfo';
 import squadDetails from './effects/squadDetails';
 import {Squad} from '../Squad/Model';
 import {makeVector, VectorRec} from './makeVector';
+import annoucement from '../UI/annoucement';
+import {delay, tween} from '../Scenes/utils';
+import {fadeIn, fadeOut} from '../UI/Transition';
 
 const WALKABLE_CELL_TINT = 0x88aa88;
 const ENEMY_IN_CELL_TINT = 0xff2222;
@@ -237,7 +240,7 @@ export class MapScene extends Phaser.Scene {
     //   this.endTurn();
     // }
     else if (this.currentForce === CPU_FORCE) {
-      await this.delay(500);
+      await delay(this, 500);
       this.runAi();
     } else {
       console.log(`=== PLAYER ===`);
@@ -250,7 +253,7 @@ export class MapScene extends Phaser.Scene {
     //   squads: force.squads.filter((s) => s !== target),
     // }));
 
-    await this.delay(100);
+    await delay(this, 100);
 
     const chara = await this.getChara(target);
 
@@ -259,7 +262,7 @@ export class MapScene extends Phaser.Scene {
     const squadId = this.state.mapSquads.find((s) => s.id === target).id;
 
     chara.fadeOut(async () => {
-      await this.delay(100);
+      await delay(this, 100);
 
       this.state.forces = this.state.forces.map((force) => {
         if (force.id === forceId)
@@ -308,7 +311,8 @@ export class MapScene extends Phaser.Scene {
     this.state = state;
   }
 
-  create(data: MapCommands[]) {
+  async create(data: MapCommands[]) {
+
     if (process.env.NODE_ENV !== 'production') {
       //@ts-ignore
       window.mapScene = this;
@@ -331,33 +335,21 @@ export class MapScene extends Phaser.Scene {
     this.renderStructures();
 
     renderSquads(this);
+
+    await fadeIn(this)
+
     this.refreshUI();
 
     this.makeWorldDraggable();
     this.setWorldBounds();
+
+
 
     this.startForceTurn();
     // if (!this.hasShownVictoryCondition) {
     //   this.showVictoryCondition();
     //   this.hasShownVictoryCondition = true;
     // }
-  }
-
-  tween(options: any) {
-    return new Promise<void>((resolve) =>
-      this.tweens.add({
-        ...options,
-        onComplete: resolve,
-      }),
-    );
-  }
-  delay(delay: number) {
-    return new Promise<void>((resolve) =>
-      this.time.addEvent({
-        delay,
-        callback: resolve,
-      }),
-    );
   }
 
   showVictoryCondition() {
@@ -475,7 +467,7 @@ export class MapScene extends Phaser.Scene {
       },
     );
 
-    this.input.on('dragend', (pointer: Pointer) => {
+    this.input.on('dragend', async (pointer: Pointer) => {
       const timeDelta = pointer.upTime - pointer.downTime;
       const posDelta =
         Math.abs(pointer.upX - pointer.downX) +
@@ -493,9 +485,8 @@ export class MapScene extends Phaser.Scene {
         posDelta > minPosDelta
       ) {
         this.disableCellClick();
-        this.delay(20).then(() => {
-          this.enableCellClick();
-        });
+        await delay(this, 20);
+        this.enableCellClick();
       }
       this.isDragging = false;
     });
@@ -610,7 +601,7 @@ export class MapScene extends Phaser.Scene {
       return this.getUnit(this.mode.id);
   }
   makeInteractive(cell: MapTile) {
-    cell.tile.on('pointerup', (pointer: Pointer) => {
+    cell.tile.on('pointerup', async (pointer: Pointer) => {
       if (!this.cellClickDisabled)
         this.signal('regular click cell', [
           {type: 'CLICK_CELL', cell},
@@ -619,7 +610,7 @@ export class MapScene extends Phaser.Scene {
 
       var ping = this.add.circle(pointer.upX, pointer.upY, 20, 0xffff66);
 
-      this.tween({
+      await tween(this, {
         targets: ping,
         alpha: 0,
         duration: 500,
@@ -750,6 +741,9 @@ export class MapScene extends Phaser.Scene {
   }
 
   attack = async (starter: MapSquad, target: MapSquad) => {
+
+    await fadeOut(this);
+
     this.turnOff();
 
     const isPlayer = starter.force === PLAYER_FORCE;
@@ -783,22 +777,18 @@ export class MapScene extends Phaser.Scene {
       );
     };
 
-    this.scene.transition({
-      target: 'CombatScene',
-      duration: 0,
-      moveBelow: true,
-      data: {
-        squads: this.state.mapSquads,
-        units: this.state.units.map((u) =>
-          // make player units overpowered
-          u.id.startsWith('player')
-            ? {...u, str: 999, dex: 999, hp: 999, currentHp: 999}
-            : u,
-        ),
-        top: isPlayer ? target.id : starter.id,
-        bottom: isPlayer ? starter.id : target.id,
-        onCombatFinish: combatCallback,
-      },
+
+    this.scene.start('CombatScene', {
+      squads: this.state.mapSquads,
+      units: this.state.units.map((u) =>
+        // make player units overpowered
+        u.id.startsWith('player')
+          ? {...u, str: 999, dex: 999, hp: 999, currentHp: 999}
+          : u,
+      ),
+      top: isPlayer ? target.id : starter.id,
+      bottom: isPlayer ? starter.id : target.id,
+      onCombatFinish: combatCallback,
     });
   };
 
@@ -841,7 +831,7 @@ export class MapScene extends Phaser.Scene {
 
     entityInfo(this, uiContainer);
 
-    this.returnToTitleButton(uiContainer);
+    this.returnToTitleButton();
   }
 
   viewSquadDetails(id: string): void {
@@ -858,34 +848,10 @@ export class MapScene extends Phaser.Scene {
     );
   }
 
-  private returnToTitleButton(uiContainer: Phaser.GameObjects.Container) {
-    button(1100, 50, 'Return to Title', uiContainer, this, () => {
-      // this.turnOff();
-
-      // this.scene.transition({
-      //   target: 'TitleScene',
-      //   duration: 0,
-      //   moveBelow: true,
-      // });
-
-      const bg = panel(
-        0,
-        0,
-        SCREEN_WIDTH,
-        SCREEN_HEIGHT,
-        this.uiContainer,
-        this,
-      );
-
-      bg.setAlpha(0);
-      this.add.tween({
-        targets: bg,
-        duration: 1000,
-        alpha: 1,
-        onComplete: () => {
-          this.scene.start('TitleScene');
-        },
-      });
+  private returnToTitleButton() {
+    button(1100, 50, 'Return to Title', this.uiContainer, this, () => {
+      this.turnOff();
+      this.scene.start('TitleScene');
     });
   }
 
@@ -914,7 +880,7 @@ export class MapScene extends Phaser.Scene {
         container.destroy();
         this.enableInput();
 
-        await this.delay(100);
+        await delay(this, 100);
 
         this.changeMode({type: 'SQUAD_SELECTED', id: sqd.id});
 
@@ -994,7 +960,7 @@ export class MapScene extends Phaser.Scene {
 
     if (force.id === CPU_FORCE) {
       this.disableMapInput();
-      await this.delay(300);
+      await delay(this, 300);
       this.runAi();
     } else {
       this.enableInput();
@@ -1095,34 +1061,10 @@ export class MapScene extends Phaser.Scene {
   }
 
   async showTurnTitle(force: Force) {
-    const bg = this.add.image(centerX, centerY, 'announce_bg');
     const forceName = force.id === PLAYER_FORCE ? 'Player' : 'Enemy';
-    const title = this.add.text(centerX, centerY, `${forceName} Turn`, {
-      fontSize: '36px',
-    });
-    title.setOrigin(0.5);
+    const message = `${forceName} Turn`;
 
-    return new Promise<void>((resolve) => {
-      const timeline = this.tweens.createTimeline({
-        onComplete: () => resolve(),
-      });
-      timeline.add({
-        targets: [title, bg],
-        alpha: 1,
-        duration: 500,
-      });
-      timeline.add({
-        targets: [title, bg],
-        alpha: 0,
-        duration: 1200,
-      });
-      timeline.play();
-      timeline.on('complete', () => {
-        console.log('complete!!');
-        title.destroy();
-        bg.destroy();
-      });
-    });
+    return await annoucement(this, message);
   }
 
   tilesInRange(x: number, y: number, range: number) {
@@ -1352,23 +1294,12 @@ export class MapScene extends Phaser.Scene {
       this,
     );
 
-    await this.delay(3000);
+    await delay(this, 3000);
 
     this.scene.remove(portrait.scene.key);
 
     ally.destroy(this);
     enemy.destroy(this);
-
-    const transition = panel(
-      0,
-      0,
-      SCREEN_WIDTH,
-      SCREEN_HEIGHT,
-      this.uiContainer,
-      this,
-    );
-    transition.setAlpha(0);
-    await this.tween({targets: transition, alpha: 1, duration: 500});
 
     this.attack(playerSquad, enemySquad);
   }
