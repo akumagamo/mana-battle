@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import {preload} from '../preload';
 import button from '../UI/button';
 import maps from '../maps';
-import {MapCommands} from './MapScene';
+import {MapCommands} from "./MapCommands";
 import {toMapSquad} from '../Unit/Model';
 import {getCity} from '../API/Map/utils';
 import {getSquads, getUnits} from '../DB';

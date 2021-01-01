@@ -21,7 +21,7 @@ import {
   CPU_FORCE,
 } from '../API/Map/Model';
 import {SCREEN_WIDTH, SCREEN_HEIGHT} from '../constants';
-import {toMapSquad, Unit} from '../Unit/Model';
+import {toMapSquad} from '../Unit/Model';
 import {Map, Set} from 'immutable';
 import {getCity} from '../API/Map/utils';
 import victoryCondition from './effects/victoryCondition';
@@ -38,6 +38,8 @@ import announcement from '../UI/announcement';
 import {delay, tween} from '../Scenes/utils';
 import {fadeIn, fadeOut} from '../UI/Transition';
 import {getDistance} from '../utils';
+import {MapCommands} from './MapCommands';
+import {Mode, DEFAULT_MODE} from './Mode';
 
 const WALKABLE_CELL_TINT = 0x88aa88;
 const ENEMY_IN_CELL_TINT = 0xff2222;
@@ -63,50 +65,6 @@ export type MapTile = {
   type: number;
   tile: Image;
 };
-
-export type MapCommands =
-  | {type: 'UPDATE_STATE'; target: MapState}
-  | {type: 'UPDATE_SQUAD_POS'; id: string; pos: Vector}
-  | {type: 'UPDATE_UNIT'; unit: Unit}
-  | {
-      type: 'DESTROY_TEAM';
-      target: string;
-    }
-  | {
-      type: 'CLICK_CELL';
-      cell: MapTile;
-    }
-  | {
-      type: 'CLICK_SQUAD';
-      unit: MapSquad;
-    }
-  | {type: 'CLEAR_TILES'}
-  | {type: 'MOVE_CAMERA_TO'; x: number; y: number; duration: number}
-  | {type: 'CLEAR_TILES_EVENTS'}
-  | {type: 'CLEAR_TILES_TINTING'}
-  | {type: 'RESET_SQUAD_POSITION'; unit: MapSquad}
-  | {type: 'SHOW_TARGETABLE_CELLS'; unit: MapSquad}
-  | {type: 'HIGHLIGHT_CELL'; pos: Vector}
-  | {type: 'SELECT_CITY'; id: string}
-  | {type: 'SET_SELECTED_UNIT'; id: string}
-  | {type: 'VIEW_SQUAD_DETAILS'; id: string}
-  | {type: 'END_SQUAD_TURN'; id: string}
-  | {type: 'REFRESH_UI'}
-  | {type: 'CITY_CLICK'; id: string}
-  | {type: 'END_FORCE_TURN'}
-  | {type: 'CAPTURE_CITY'; id: string; force: string}
-  | {type: 'RUN_TURN'}
-  | {type: 'MOVE_SQUAD'; mapTile: MapTile; squad: MapSquad};
-
-type Mode =
-  | {type: 'NOTHING_SELECTED'}
-  | {type: 'SQUAD_SELECTED'; id: string}
-  | {type: 'CITY_SELECTED'; id: string}
-  | {type: 'MOVING_SQUAD'; start: Vector; id: string}
-  | {type: 'SELECTING_ATTACK_TARGET'; id: string}
-  | {type: 'CHANGING_SQUAD_FORMATION'};
-
-const DEFAULT_MODE: Mode = {type: 'NOTHING_SELECTED'};
 
 export class MapScene extends Phaser.Scene {
   charas: Chara[] = [];
@@ -147,7 +105,8 @@ export class MapScene extends Phaser.Scene {
 
   cellHighlight: Phaser.GameObjects.Rectangle | null = null;
 
-  // ----- Phaser --------------------
+  squadsToRemove: Set<string> = Set();
+
   constructor() {
     super('MapScene');
   }
@@ -157,7 +116,7 @@ export class MapScene extends Phaser.Scene {
     cmds.forEach(async (cmd) => {
       console.time(cmd.type);
       if (cmd.type === 'DESTROY_TEAM') {
-        this.destroySquad(cmd.target);
+        this.markSquadForRemoval(cmd.target);
       } else if (cmd.type === 'UPDATE_STATE') {
         this.updateState(cmd.target);
       } else if (cmd.type === 'UPDATE_SQUAD_POS') {
@@ -251,38 +210,15 @@ export class MapScene extends Phaser.Scene {
     }
   }
 
-  private async destroySquad(target: string) {
-    this.state.forces = this.state.forces.map((force) => ({
-      ...force,
-      squads: force.squads.filter((s) => s !== target),
-    }));
-
-    await delay(this, 100);
-
-    const chara = await this.getChara(target);
-
-    const forceId = this.state.mapSquads.find((s) => s.id === target).force;
-
-    const squadId = this.state.mapSquads.find((s) => s.id === target).id;
+  private markSquadForRemoval(id: string) {
+    this.squadsToRemove = this.squadsToRemove.add(id);
+  }
+  private async destroySquad(id: string) {
+    const chara = await this.getChara(id);
 
     await chara.fadeOut();
-    await delay(this, 100);
 
-    this.state.forces = this.state.forces.map((force) => {
-      if (force.id === forceId)
-        return {...force, squads: force.squads.filter((id) => id !== target)};
-      else return force;
-    });
-
-    this.movedSquads = this.movedSquads.filter((id) => id !== target);
-
-    this.charas = this.charas.filter((c) => c.unit.squad.id !== target);
-
-    this.state.mapSquads = this.state.mapSquads.filter((s) => s.id !== target);
-    this.state.units = this.state.units.filter((u) => u.squad.id !== squadId);
-
-    chara.container.destroy();
-    this.scene.remove(chara.scene.key);
+    await this.removeSquadFromState(id);
   }
 
   private selectCity(id: string) {
@@ -317,6 +253,7 @@ export class MapScene extends Phaser.Scene {
       //@ts-ignore
       window.mapScene = this;
     }
+
     this.sound.stopAll();
     const music = this.sound.add('map1');
 
@@ -337,16 +274,37 @@ export class MapScene extends Phaser.Scene {
 
     await fadeIn(this);
 
-    this.refreshUI();
-
     this.makeWorldDraggable();
     this.setWorldBounds();
+
+    await Promise.all(this.squadsToRemove.map((id) => this.destroySquad(id)));
+    this.squadsToRemove = Set();
 
     this.startForceTurn();
     // if (!this.hasShownVictoryCondition) {
     //   this.showVictoryCondition();
     //   this.hasShownVictoryCondition = true;
     // }
+  }
+
+  async removeSquadFromState(id: string) {
+    this.state.forces = this.state.forces.map((force) => ({
+      ...force,
+      squads: force.squads.filter((s) => s !== id),
+    }));
+
+    const squadId = this.state.mapSquads.find((s) => s.id === id).id;
+
+    this.movedSquads = this.movedSquads.remove(id);
+
+    this.state.mapSquads = this.state.mapSquads.filter((s) => s.id !== id);
+    this.state.units = this.state.units.filter((u) => u.squad.id !== squadId);
+
+    const chara = await this.getChara(id)
+    chara.container.destroy();
+    this.scene.remove(chara.scene.key);
+
+    this.charas = this.charas.filter((c) => c.unit.squad.id !== id);
   }
 
   showVictoryCondition() {
