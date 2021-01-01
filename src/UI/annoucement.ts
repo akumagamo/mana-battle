@@ -13,6 +13,14 @@ class Announcement extends Phaser.Scene {
         this.scene.remove('annoucement');
       },
     });
+
+    bg.setAlpha(0);
+    title.setAlpha(0);
+    timeline.add({
+      targets: [title, bg],
+      alpha: 1,
+      duration: 500,
+    });
     timeline.add({
       targets: [title, bg],
       alpha: 1,

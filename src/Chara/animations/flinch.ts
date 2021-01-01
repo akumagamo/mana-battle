@@ -1,5 +1,5 @@
-import text from '../../UI/text';
 import {Chara} from '../Chara';
+import {displayDamage} from './displayDamage';
 
 export default (chara: Chara, damage: number, isKilled: boolean) => {
   const FLINCH_DURATION = 200;
@@ -25,23 +25,6 @@ export default (chara: Chara, damage: number, isKilled: boolean) => {
   });
 
   // TODO: this should move to the parent scene
-  const dmg = text(
-    chara.container.x - 50,
-    chara.container.y + 0,
-    damage.toString(),
-    chara.charaWrapper,
-    chara.parent,
-  );
-  dmg.setScale(2);
-  dmg.setShadow(2, 2, '#000');
-  dmg.setStroke('#000000', 2);
-
-  chara.parent.tweens.add({
-    targets: dmg,
-    y: -100,
-    alpha: 0,
-    duration: 3000,
-    ease: 'Expo',
-    onComplete: () => dmg.destroy(),
-  });
+  displayDamage(chara, damage);
 };
+

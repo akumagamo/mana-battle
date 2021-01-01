@@ -14,6 +14,8 @@ import {Map} from 'immutable';
 import {invertBoardPosition} from '../API/Combat/utils';
 import annoucement from '../UI/annoucement';
 import {fadeIn, fadeOut} from '../UI/Transition';
+import {displayExperience} from '../Chara/animations/displayExperience';
+import {displayLevelUp} from '../Chara/animations/displayLevelUp';
 
 const COMBAT_CHARA_SCALE = 1;
 const WALK_DURATION = 500;
@@ -26,6 +28,7 @@ const getBoardCoords = (isTopSquad: boolean) => ({x, y}: Vector) => {
   };
 };
 
+const MAX_XP = 100;
 export default class CombatScene extends Phaser.Scene {
   charas: Chara[] = [];
   top = '';
@@ -59,7 +62,6 @@ export default class CombatScene extends Phaser.Scene {
     units: Map<string, Unit>;
     onCombatFinish: <CMD>(cmd: CMD[]) => void;
   }) {
-
     if (this.container) this.container.destroy();
 
     this.squads = data.squads;
@@ -189,17 +191,11 @@ export default class CombatScene extends Phaser.Scene {
       this.currentTurn = 0;
       this.turn();
     } else if (cmd.type === 'END_COMBAT') {
-      const updatedUnits = await this.retreatUnits();
+      console.log(`Combat reached its end`);
 
-      const units = updatedUnits.map((unit) => ({
-        type: 'UPDATE_UNIT',
-        unit: {...unit, exp: unit.exp + 40},
-      }));
-      //this.scene.start('MapScene', [...units, ]);
+      await this.combatEnd();
 
       console.log(`onCombatFinish END_COMBAT`);
-      await fadeOut(this);
-      this.onCombatFinish([{type: 'END_UNIT_TURN'}].concat(units));
 
       this.turnOff();
     } else if (cmd.type === 'VICTORY') {
@@ -207,19 +203,69 @@ export default class CombatScene extends Phaser.Scene {
 
       console.log(`onCombatFinish VICTORY`);
 
-      await fadeOut(this);
-      if (this.onCombatFinish) {
-        this.onCombatFinish(
-          this.charas
-            .map((chara) => chara.unit)
-            .map((unit) => ({type: 'UPDATE_UNIT', unit})),
-        );
-      }
+      await this.combatEnd();
 
       this.turnOff();
     } else console.error(`Unknown command:`, cmd);
   }
 
+  async combatEnd() {
+    // TODO: move to combat API
+    const xps = this.charas.map((chara) => {
+
+      // TODO: combat calc function
+      const xpGain = 42;
+
+      const newXp = chara.unit.exp + xpGain;
+
+      const lvls = Math.floor(newXp / MAX_XP);
+
+      return {
+        chara,
+        lvls,
+        newXp: newXp > MAX_XP ? newXp % MAX_XP : newXp,
+        xpGain,
+      };
+    });
+
+    await this.displayExperienceGain(xps);
+
+    this.retreatUnits();
+    await fadeOut(this);
+
+    // TODO: move to event emitter
+    if (this.onCombatFinish) {
+      this.onCombatFinish(
+        xps
+          .map((xp) => ({
+            unit: xp.chara.unit,
+            lvls: xp.lvls,
+            newXp: xp.newXp,
+          }))
+          .map(({unit, lvls, newXp}) => ({
+            ...unit,
+            lvl: unit.lvl + lvls,
+            exp: newXp,
+          }))
+          .map((unit) => ({type: 'UPDATE_UNIT', unit})),
+      );
+    }
+  }
+  async displayExperienceGain(
+    xps: {chara: Chara; lvls: number; newXp: number; xpGain: number}[],
+  ) {
+    await Promise.all(
+      xps.map(
+        async ({chara, xpGain}) => await displayExperience(chara, xpGain),
+      ),
+    );
+
+    return await Promise.all(
+      xps
+        .filter(({lvls}) => lvls > 0)
+        .map(async ({chara}) => await displayLevelUp(chara)),
+    );
+  }
   // UNIT METHODS
 
   getChara(id: string) {
@@ -280,8 +326,8 @@ export default class CombatScene extends Phaser.Scene {
     });
   }
 
-  retreatUnits() {
-    this.charas.forEach((chara) => {
+  async retreatUnits() {
+    return this.charas.map((chara) => {
       chara.clearAnimations();
       chara.run();
 
@@ -306,15 +352,8 @@ export default class CombatScene extends Phaser.Scene {
       };
 
       this.tweens.add(config);
-    });
 
-    return new Promise((resolve: (u: Unit[]) => void) => {
-      const timeEvents = {
-        delay: 1000,
-        callback: () => resolve(this.charas.map((u) => u.unit)),
-      };
-
-      this.time.addEvent(timeEvents);
+      return chara;
     });
   }
 

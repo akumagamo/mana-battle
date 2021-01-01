@@ -4,7 +4,6 @@ import {SCREEN_HEIGHT, SCREEN_WIDTH} from '../constants';
 
 class Transition extends Phaser.Scene {
   create({fadeIn, resolve}: {fadeIn: boolean; resolve: () => void}) {
-    console.log(`resolve`, resolve.toString());
     const black = panel(
       0,
       0,

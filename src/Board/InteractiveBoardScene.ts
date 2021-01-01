@@ -165,6 +165,8 @@ export default class BoardScene extends Phaser.Scene {
   addUnitToBoard(squadMember: SquadMember) {
     const {x, y} = getUnitPositionInScreen(squadMember);
 
+    // TODO: make the unit list a parameter
+    // This causes problems when viewing the list on a map scene
     const unit = getUnit(squadMember.id);
 
     if (!unit) throw new Error('Invalid member supplied.');

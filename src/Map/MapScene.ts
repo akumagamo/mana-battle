@@ -940,7 +940,7 @@ export class MapScene extends Phaser.Scene {
     this.cellClickDisabled = false;
   }
 
-  switchForce() {
+  async switchForce() {
     const force = this.state?.forces.find(
       (force) => force.id !== this.currentForce,
     );
@@ -948,13 +948,14 @@ export class MapScene extends Phaser.Scene {
     this.currentForce = force.id;
     this.charas.forEach((c) => (c.container.alpha = 1));
     this.movedSquads = Set();
+
+    await this.showTurnTitle(force);
     this.startForceTurn();
   }
 
   async startForceTurn() {
     const force = this.getForce(this.currentForce);
 
-    await this.showTurnTitle(force);
 
     this.healUnits(force);
 

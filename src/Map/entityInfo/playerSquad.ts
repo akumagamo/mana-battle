@@ -13,12 +13,11 @@ export default (
   squad: MapSquad,
   uiContainer: Phaser.GameObjects.Container,
 ) => {
-
   const baseX = 300;
   const mode = scene.mode.type;
   if (mode !== 'MOVING_SQUAD' && mode !== 'SELECTING_ATTACK_TARGET')
     button(
-      baseX+100,
+      baseX + 100,
       baseY,
       'Move',
       scene.uiContainer,
@@ -39,7 +38,7 @@ export default (
       () => {
         scene.showAttackControls(squad);
       },
-      scene.getTargets(squad.pos).length < 1,
+      scene.getTargets(squad.pos).length < 1 || scene.movedSquads.has(squad.id),
     );
   }
 
@@ -72,7 +71,12 @@ export default (
       scene.disableMapInput();
       boardScene.makeUnitsClickable((c) => {
         details?.destroy();
-        details = SmallUnitDetailsBar(10, SCREEN_HEIGHT - 100, scene, c.unit);
+        details = SmallUnitDetailsBar(
+          10,
+          SCREEN_HEIGHT - 100,
+          scene,
+          scene.state.units.find((u) => u.id === c.unit.id),
+        );
         container.add(details);
       });
       button(1100, 300, 'Return', container, scene, () => {
