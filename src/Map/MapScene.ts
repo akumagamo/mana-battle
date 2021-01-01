@@ -34,9 +34,10 @@ import entityInfo from './entityInfo';
 import squadDetails from './effects/squadDetails';
 import {Squad} from '../Squad/Model';
 import {makeVector, VectorRec} from './makeVector';
-import annoucement from '../UI/annoucement';
+import announcement from '../UI/announcement';
 import {delay, tween} from '../Scenes/utils';
 import {fadeIn, fadeOut} from '../UI/Transition';
+import {getDistance} from '../utils';
 
 const WALKABLE_CELL_TINT = 0x88aa88;
 const ENEMY_IN_CELL_TINT = 0xff2222;
@@ -86,14 +87,13 @@ export type MapCommands =
   | {type: 'RESET_SQUAD_POSITION'; unit: MapSquad}
   | {type: 'SHOW_TARGETABLE_CELLS'; unit: MapSquad}
   | {type: 'HIGHLIGHT_CELL'; pos: Vector}
-  | {type: 'CLOSE_ACTION_PANEL'}
   | {type: 'SELECT_CITY'; id: string}
   | {type: 'SET_SELECTED_UNIT'; id: string}
   | {type: 'VIEW_SQUAD_DETAILS'; id: string}
   | {type: 'END_SQUAD_TURN'; id: string}
   | {type: 'REFRESH_UI'}
   | {type: 'CITY_CLICK'; id: string}
-  | {type: 'END_FORCE_TURN'; id: string}
+  | {type: 'END_FORCE_TURN'}
   | {type: 'CAPTURE_CITY'; id: string; force: string}
   | {type: 'RUN_TURN'}
   | {type: 'MOVE_SQUAD'; mapTile: MapTile; squad: MapSquad};
@@ -123,7 +123,6 @@ export class MapScene extends Phaser.Scene {
   missionContainer = {} as Container;
   uiContainer = {} as Container;
 
-  actionWindowContainer: null | Container = null;
   state = {} as MapState;
 
   currentForce: string = PLAYER_FORCE;
@@ -187,14 +186,12 @@ export class MapScene extends Phaser.Scene {
         this.showClickableCellsForUnit(cmd.unit);
       } else if (cmd.type === 'HIGHLIGHT_CELL') {
         this.highlightCell(cmd);
-      } else if (cmd.type === 'CLOSE_ACTION_PANEL') {
-        this.closeActionWindow();
       } else if (cmd.type === 'VIEW_SQUAD_DETAILS') {
         this.viewSquadDetails(cmd.id);
       } else if (cmd.type === 'REFRESH_UI') {
         this.refreshUI();
       } else if (cmd.type === 'END_SQUAD_TURN') {
-        this.endSquadTurn(cmd.id);
+        await this.endSquadTurn(cmd.id);
       } else if (cmd.type === 'RUN_TURN') {
         this.startForceTurn();
       } else if (cmd.type === 'CITY_CLICK') {
@@ -224,34 +221,41 @@ export class MapScene extends Phaser.Scene {
     chara?.container.setAlpha(0.5);
 
     this.clearAllTileTint();
-    this.changeMode({type: 'SQUAD_SELECTED', id});
 
-    // const aliveIds = getSquadsFromForce(this.state)(this.currentForce).map(
-    //   (u) => u.id,
-    // );
+    if (this.getSquad(id).force === PLAYER_FORCE)
+      this.changeMode({type: 'SQUAD_SELECTED', id});
+
+    const forceSquadsIds = Set(
+      getSquadsFromForce(this.state)(this.currentForce).map((u) => u.id),
+    );
     const defeatedForces = this.getDefeatedForces();
 
-    if (defeatedForces.includes(PLAYER_FORCE)) {
-      alert(`Player loses!`);
+    if (defeatedForces.has(PLAYER_FORCE)) {
+      await announcement(this, 'Defeat');
+      await fadeOut(this);
+      this.scene.start('TitleScene');
+      this.turnOff();
     } else if (defeatedForces.includes(CPU_FORCE)) {
-      alert(`Player wins!`);
-    }
-    // else if (Set(aliveIds).equals(Set(this.movedSquads))) {
-    //   this.endTurn();
-    // }
-    else if (this.currentForce === CPU_FORCE) {
-      await delay(this, 500);
-      this.runAi();
+      await announcement(this, 'Victory');
+      await fadeOut(this);
+      this.scene.start('TitleScene');
+      this.turnOff();
+    } else if (forceSquadsIds.equals(this.movedSquads)) {
+      this.signal('all squads performed actions, switching', [
+        {type: 'END_FORCE_TURN'},
+      ]);
+    } else if (this.currentForce === CPU_FORCE) {
+      await this.runAi();
     } else {
       console.log(`=== PLAYER ===`);
     }
   }
 
   private async destroySquad(target: string) {
-    // this.state.forces = this.state.forces.map((force) => ({
-    //   ...force,
-    //   squads: force.squads.filter((s) => s !== target),
-    // }));
+    this.state.forces = this.state.forces.map((force) => ({
+      ...force,
+      squads: force.squads.filter((s) => s !== target),
+    }));
 
     await delay(this, 100);
 
@@ -261,27 +265,24 @@ export class MapScene extends Phaser.Scene {
 
     const squadId = this.state.mapSquads.find((s) => s.id === target).id;
 
-    chara.fadeOut(async () => {
-      await delay(this, 100);
+    await chara.fadeOut();
+    await delay(this, 100);
 
-      this.state.forces = this.state.forces.map((force) => {
-        if (force.id === forceId)
-          return {...force, squads: force.squads.filter((id) => id !== target)};
-        else return force;
-      });
-
-      this.movedSquads = this.movedSquads.filter((id) => id !== target);
-
-      this.charas = this.charas.filter((c) => c.unit.squad.id !== target);
-
-      this.state.mapSquads = this.state.mapSquads.filter(
-        (s) => s.id !== target,
-      );
-      this.state.units = this.state.units.filter((u) => u.squad.id !== squadId);
-
-      chara.container.destroy();
-      this.scene.remove(chara.scene.key);
+    this.state.forces = this.state.forces.map((force) => {
+      if (force.id === forceId)
+        return {...force, squads: force.squads.filter((id) => id !== target)};
+      else return force;
     });
+
+    this.movedSquads = this.movedSquads.filter((id) => id !== target);
+
+    this.charas = this.charas.filter((c) => c.unit.squad.id !== target);
+
+    this.state.mapSquads = this.state.mapSquads.filter((s) => s.id !== target);
+    this.state.units = this.state.units.filter((u) => u.squad.id !== squadId);
+
+    chara.container.destroy();
+    this.scene.remove(chara.scene.key);
   }
 
   private selectCity(id: string) {
@@ -312,7 +313,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   async create(data: MapCommands[]) {
-
     if (process.env.NODE_ENV !== 'production') {
       //@ts-ignore
       window.mapScene = this;
@@ -327,7 +327,6 @@ export class MapScene extends Phaser.Scene {
     this.mapContainer = this.add.container(this.mapX, this.mapY);
     this.uiContainer = this.add.container();
     this.missionContainer = this.add.container();
-    this.actionWindowContainer = this.add.container();
 
     this.signal('startup', data);
 
@@ -336,14 +335,12 @@ export class MapScene extends Phaser.Scene {
 
     renderSquads(this);
 
-    await fadeIn(this)
+    await fadeIn(this);
 
     this.refreshUI();
 
     this.makeWorldDraggable();
     this.setWorldBounds();
-
-
 
     this.startForceTurn();
     // if (!this.hasShownVictoryCondition) {
@@ -539,17 +536,15 @@ export class MapScene extends Phaser.Scene {
     else return city;
   };
 
-  getDefeatedForces(): string[] {
+  getDefeatedForces(): Set<string> {
     return this.state.forces
       .map((f) => f.id)
       .reduce((xs, x) => {
-        const allDefeated = this.state.mapSquads
-          .filter((u) => u.force === x)
-          .every((u) => u.status === 'defeated');
+        const squads = this.state.mapSquads.filter((u) => u.force === x);
 
-        if (allDefeated) return xs.concat([x]);
+        if (squads.length < 1) return xs.add(x);
         else return xs;
-      }, [] as string[]);
+      }, Set() as Set<string>);
   }
 
   getCurrentForce() {
@@ -731,7 +726,7 @@ export class MapScene extends Phaser.Scene {
     switch (this.mode.type) {
       case 'SELECTING_ATTACK_TARGET':
         const selectedUnit = this.getSquad(this.mode.id);
-        if (this.getDistance(selectedUnit.pos, enemyUnit.pos) === 1) {
+        if (getDistance(selectedUnit.pos, enemyUnit.pos) === 1) {
           this.attackEnemySquad(selectedUnit, enemyUnit);
         }
         break;
@@ -741,7 +736,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   attack = async (starter: MapSquad, target: MapSquad) => {
-
     await fadeOut(this);
 
     this.turnOff();
@@ -754,29 +748,27 @@ export class MapScene extends Phaser.Scene {
           let sqdId = x.unit.squad?.id || '';
 
           if (!xs[sqdId]) {
-            xs[sqdId] = [];
+            xs[sqdId] = 0;
           }
 
-          xs[sqdId].push(x.unit.currentHp);
+          xs[sqdId] += x.unit.currentHp;
         }
 
         return xs;
-      }, {} as {[x: string]: number[]});
+      }, {} as {[x: string]: number});
 
       let defeated = Map(squads)
-        .filter((v) => v.every((n) => n === 0))
+        .filter((v) => v === 0)
         .keySeq()
         .map((target) => ({type: 'DESTROY_TEAM', target}))
         .toJS();
 
       this.scene.start(
         'MapScene',
-        cmds
-          .concat(defeated)
-          .concat([{type: 'END_SQUAD_TURN', id: starter.id}]),
+        cmds.concat(defeated),
+        //.concat([{type: 'END_SQUAD_TURN'}]),
       );
     };
-
 
     this.scene.start('CombatScene', {
       squads: this.state.mapSquads,
@@ -941,13 +933,13 @@ export class MapScene extends Phaser.Scene {
   }
 
   async switchForce() {
-    const force = this.state?.forces.find(
+    this.movedSquads = Set();
+    this.charas.forEach((u) => u.container?.setAlpha(1)); // TODO: name this "restore"
+
+    const force = this.state.forces.find(
       (force) => force.id !== this.currentForce,
     );
-    if (!force) throw new Error(INVALID_STATE);
     this.currentForce = force.id;
-    this.charas.forEach((c) => (c.container.alpha = 1));
-    this.movedSquads = Set();
 
     await this.showTurnTitle(force);
     this.startForceTurn();
@@ -956,18 +948,23 @@ export class MapScene extends Phaser.Scene {
   async startForceTurn() {
     const force = this.getForce(this.currentForce);
 
-
     this.healUnits(force);
 
     if (force.id === CPU_FORCE) {
       this.disableMapInput();
-      await delay(this, 300);
-      this.runAi();
+      await this.runAi();
     } else {
       this.enableInput();
       const unit = this.state.mapSquads.filter(
         (u) => u.force === PLAYER_FORCE,
       )[0];
+
+      if (this.movedSquads.has(unit.id)) {
+        return this.signal('squad has already moved, finishing its turn', [
+          {type: 'END_SQUAD_TURN', id: unit.id},
+        ]);
+      }
+
       this.clickSquad(unit);
 
       const squad = this.getPlayerSquads()[0];
@@ -1002,22 +999,21 @@ export class MapScene extends Phaser.Scene {
   }
 
   getAliveSquadsFromForce(forceId: string) {
-    return getSquadsFromForce(this.state)(forceId).filter(
-      (u) => u.status === 'alive',
-    );
+    return getSquadsFromForce(this.state)(forceId);
   }
   /**
    * @TODO: refactor to make this return a list of ai actions
    * its hard to debug by going into other methods
    */
   async runAi() {
-    const remainingUnits = this.getAliveSquadsFromForce(CPU_FORCE).filter(
+    await delay(this, 500);
+    const remainingUnits = getSquadsFromForce(this.state)(CPU_FORCE).filter(
       (u) => !this.movedSquads.includes(u.id),
     );
 
     const [currentSquad] = remainingUnits;
     if (!currentSquad) {
-      return this.switchForce();
+      return await this.switchForce();
     }
 
     let aiMode = this.state.ai.get(currentSquad.id);
@@ -1051,29 +1047,11 @@ export class MapScene extends Phaser.Scene {
     }
   }
 
-  checkTurnEnd() {
-    const force = this.getCurrentForce();
-
-    const aliveUnits = this.getAliveSquadsFromForce(force.id);
-
-    //this.getValidMoves();
-
-    if (this.movedSquads.size === aliveUnits.length) this.endTurn();
-  }
-
   async showTurnTitle(force: Force) {
     const forceName = force.id === PLAYER_FORCE ? 'Player' : 'Enemy';
     const message = `${forceName} Turn`;
 
-    return await annoucement(this, message);
-  }
-
-  tilesInRange(x: number, y: number, range: number) {
-    return this.tiles.filter((tile) => this.getDistance({x, y}, tile) <= range);
-  }
-
-  getDistance(source: Vector, target: Vector) {
-    return Math.abs(target.x - source.x) + Math.abs(target.y - source.y);
+    return await announcement(this, message);
   }
 
   clearTiles() {
@@ -1081,13 +1059,6 @@ export class MapScene extends Phaser.Scene {
 
     //if (this.cellHighlight) this.cellHighlight.destroy();
     //  this.clearAllTileEvents();
-  }
-
-  closeActionWindow() {
-    if (this.actionWindowContainer) {
-      this.actionWindowContainer.destroy();
-      this.enableInput();
-    }
   }
 
   showCityInfo(id: string) {
@@ -1143,16 +1114,6 @@ export class MapScene extends Phaser.Scene {
       //TODO: having onMoveComplete/resolve AND this firing signals makes no sense
       resolve();
     });
-  }
-  endTurn() {
-    setTimeout(() => {
-      this.refreshUI();
-    }, 50);
-    this.clearTiles();
-    this.movedSquads = Set();
-    this.charas.forEach((u) => u.container?.setAlpha(1)); // TODO: name this "restore"
-
-    this.switchForce();
   }
 
   selectNextAlly() {
@@ -1245,7 +1206,6 @@ export class MapScene extends Phaser.Scene {
 
     this.disableMapInput();
     this.destroyUI();
-    this.closeActionWindow();
 
     this.movedSquads = this.movedSquads.add(playerSquad.id);
 

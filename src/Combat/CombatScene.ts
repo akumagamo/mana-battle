@@ -12,7 +12,7 @@ import {Squad} from '../Squad/Model';
 import {Vector} from '../API/Map/Model';
 import {Map} from 'immutable';
 import {invertBoardPosition} from '../API/Combat/utils';
-import annoucement from '../UI/annoucement';
+import announcement from '../UI/announcement';
 import {fadeIn, fadeOut} from '../UI/Transition';
 import {displayExperience} from '../Chara/animations/displayExperience';
 import {displayLevelUp} from '../Chara/animations/displayLevelUp';
@@ -118,7 +118,7 @@ export default class CombatScene extends Phaser.Scene {
 
     await fadeIn(this);
 
-    await annoucement(this, 'Fight it out!');
+    await announcement(this, 'Fight it out!');
 
     this.turn();
   }

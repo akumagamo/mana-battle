@@ -52,7 +52,7 @@ export function preload(this: {
   const ui = [
     'arrow_right',
     'panel',
-    'announce_bg',
+    'announcement_bg',
     'button_move',
     'button_attack',
   ];

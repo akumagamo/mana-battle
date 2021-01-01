@@ -2,15 +2,15 @@ import {centerX, centerY} from '../constants';
 
 class Announcement extends Phaser.Scene {
   create({message, resolve}: {message: string; resolve: () => void}) {
-    const bg = this.add.image(centerX, centerY, 'announce_bg');
+    const bg = this.add.image(centerX, centerY, 'announcement_bg');
     const title = this.add.text(centerX, centerY, message, {
       fontSize: '36px',
     });
     title.setOrigin(0.5);
     const timeline = this.tweens.createTimeline({
       onComplete: () => {
+        this.scene.remove('announcement');
         resolve();
-        this.scene.remove('annoucement');
       },
     });
 
@@ -36,8 +36,9 @@ class Announcement extends Phaser.Scene {
 }
 
 export default (scene: Phaser.Scene, message: string) => {
+  console.log(`CALLING ANNOUNCEMENT`, message);
   return new Promise<void>((resolve) =>
-    scene.scene.add('annoucement', Announcement, true, {
+    scene.scene.add('announcement', Announcement, true, {
       message,
       resolve: () => resolve(),
     }),

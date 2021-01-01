@@ -89,13 +89,6 @@ export default (
       });
     });
 
-  if (mode === 'MOVING_SQUAD')
-    button(baseX + 300, baseY, 'Wait', uiContainer, scene, () => {
-      scene.signal('clicked "end squad turn"', [
-        {type: 'END_SQUAD_TURN', id: squad.id},
-      ]);
-    });
-
   if (mode == 'SELECTING_ATTACK_TARGET' || mode === 'MOVING_SQUAD')
     button(1150, baseY, 'Cancel', uiContainer, scene, async () => {
       switch (scene.mode.type) {
@@ -125,15 +118,10 @@ export default (
       }
     });
 
-  // if (mode === 'SQUAD_SELECTED')
-  //   button(850, baseY, 'Next Ally', uiContainer, scene, () => {
-  //     scene.selectNextAlly();
-  //   });
-
-  if (mode !== 'MOVING_SQUAD' && mode !== 'SELECTING_ATTACK_TARGET')
-    button(1150, baseY, 'End Turn', uiContainer, scene, async () => {
-      scene.signal('clicked end team turn button', [
-        {type: 'END_FORCE_TURN', id: squad.force},
+  if (mode === 'MOVING_SQUAD' || mode == 'SQUAD_SELECTED')
+    button(baseX + 700, baseY, 'Wait', uiContainer, scene, () => {
+      scene.signal('clicked "end squad turn"', [
+        {type: 'END_SQUAD_TURN', id: squad.id},
       ]);
     });
 };

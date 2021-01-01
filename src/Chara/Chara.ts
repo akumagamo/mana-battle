@@ -13,7 +13,6 @@ import initial from './animations/initial';
 import text from '../UI/text';
 
 export class Chara extends Phaser.Scene {
-
   /** Container around Chara, doesn't rotate (useful for adding UI elements)*/
   charaWrapper: Container = {} as Container;
   container: Container = {} as Container;
@@ -215,45 +214,47 @@ export class Chara extends Phaser.Scene {
     run(this);
   }
 
-  fadeOut(callback: Function) {
-    const duration = 500;
+  async fadeOut() {
+    return new Promise<void>((resolve) => {
+      const duration = 500;
 
-    this.time.addEvent({
-      delay: duration*2,
-      callback,
+      this.time.addEvent({
+        delay: duration * 2,
+        callback: resolve,
+      });
+      this.container.iterate(
+        (child: Phaser.GameObjects.Image | Phaser.GameObjects.Container) => {
+          this.tweens.addCounter({
+            from: 255,
+            to: 0,
+            duration,
+            onComplete: () => {
+              this.tweens.add({
+                targets: this.container,
+                alpha: 0,
+                duration,
+              });
+            },
+            onUpdate: function (tween) {
+              var value = Math.floor(tween.getValue());
+
+              if (child.type === 'Container') {
+                (child as Phaser.GameObjects.Container).iterate(
+                  (grand: Phaser.GameObjects.Image) => {
+                    grand.setTint(
+                      Phaser.Display.Color.GetColor(value, value, value),
+                    );
+                  },
+                );
+              } else {
+                (child as Phaser.GameObjects.Image).setTint(
+                  Phaser.Display.Color.GetColor(value, value, value),
+                );
+              }
+            },
+          });
+        },
+      );
     });
-    this.container.iterate(
-      (child: Phaser.GameObjects.Image | Phaser.GameObjects.Container) => {
-        this.tweens.addCounter({
-          from: 255,
-          to: 0,
-          duration,
-          onComplete: () => {
-            this.tweens.add({
-              targets: this.container,
-              alpha: 0,
-              duration,
-            });
-          },
-          onUpdate: function (tween) {
-            var value = Math.floor(tween.getValue());
-
-            if (child.type === 'Container') {
-              (child as Phaser.GameObjects.Container).iterate(
-                (grand: Phaser.GameObjects.Image) => {
-                  grand.setTint(
-                    Phaser.Display.Color.GetColor(value, value, value),
-                  );
-                },
-              );
-            } else {
-              (child as Phaser.GameObjects.Image).setTint(
-                Phaser.Display.Color.GetColor(value, value, value),
-              );
-            }
-          },
-        });
-      },
-    );
   }
 }
