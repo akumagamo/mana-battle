@@ -39,7 +39,7 @@ export const renderSquad = (scene: MapScene, squad: MapSquad): void => {
 
   scene.charas.push(chara);
 
-  if (scene.movedSquads.includes(squad.id)) chara.container.setAlpha(0.5);
+  if (scene.inactiveSquads.includes(squad.id)) chara.container.setAlpha(0.5);
 };
 
 export default (scene: MapScene): void => {

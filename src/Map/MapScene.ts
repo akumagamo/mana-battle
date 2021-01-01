@@ -84,10 +84,7 @@ export class MapScene extends Phaser.Scene {
   state = {} as MapState;
 
   currentForce: string = PLAYER_FORCE;
-  /** Units moved by a force in a given turn
-   * Why can't I think on a better name for this?
-   * */
-  movedSquads: Set<string> = Set();
+  inactiveSquads: Set<string> = Set();
 
   dragState: null | Vector = null;
 
@@ -174,10 +171,10 @@ export class MapScene extends Phaser.Scene {
   }
 
   private async endSquadTurn(id: string) {
-    this.movedSquads = this.movedSquads.add(id);
+    this.inactiveSquads = this.inactiveSquads.add(id);
 
     const chara = await this.getChara(id);
-    chara?.container.setAlpha(0.5);
+    chara.container.setAlpha(0.5);
 
     this.clearAllTileTint();
 
@@ -199,7 +196,7 @@ export class MapScene extends Phaser.Scene {
       await fadeOut(this);
       this.scene.start('TitleScene');
       this.turnOff();
-    } else if (forceSquadsIds.equals(this.movedSquads)) {
+    } else if (forceSquadsIds.equals(this.inactiveSquads)) {
       this.signal('all squads performed actions, switching', [
         {type: 'END_FORCE_TURN'},
       ]);
@@ -295,12 +292,12 @@ export class MapScene extends Phaser.Scene {
 
     const squadId = this.state.mapSquads.find((s) => s.id === id).id;
 
-    this.movedSquads = this.movedSquads.remove(id);
+    this.inactiveSquads = this.inactiveSquads.remove(id);
 
     this.state.mapSquads = this.state.mapSquads.filter((s) => s.id !== id);
     this.state.units = this.state.units.filter((u) => u.squad.id !== squadId);
 
-    const chara = await this.getChara(id)
+    const chara = await this.getChara(id);
     chara.container.destroy();
     this.scene.remove(chara.scene.key);
 
@@ -891,7 +888,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   async switchForce() {
-    this.movedSquads = Set();
+    this.inactiveSquads = Set();
     this.charas.forEach((u) => u.container?.setAlpha(1)); // TODO: name this "restore"
 
     const force = this.state.forces.find(
@@ -917,7 +914,7 @@ export class MapScene extends Phaser.Scene {
         (u) => u.force === PLAYER_FORCE,
       )[0];
 
-      if (this.movedSquads.has(unit.id)) {
+      if (this.inactiveSquads.has(unit.id)) {
         return this.signal('squad has already moved, finishing its turn', [
           {type: 'END_SQUAD_TURN', id: unit.id},
         ]);
@@ -966,7 +963,7 @@ export class MapScene extends Phaser.Scene {
   async runAi() {
     await delay(this, 500);
     const remainingUnits = getSquadsFromForce(this.state)(CPU_FORCE).filter(
-      (u) => !this.movedSquads.includes(u.id),
+      (u) => !this.inactiveSquads.includes(u.id),
     );
 
     const [currentSquad] = remainingUnits;
@@ -977,7 +974,7 @@ export class MapScene extends Phaser.Scene {
     let aiMode = this.state.ai.get(currentSquad.id);
 
     if (aiMode === 'DEFEND') {
-      this.movedSquads = this.movedSquads.add(currentSquad.id);
+      this.inactiveSquads = this.inactiveSquads.add(currentSquad.id);
 
       this.signal('finish ai squad turn (defend)', [
         {type: 'END_SQUAD_TURN', id: currentSquad.id},
@@ -994,14 +991,12 @@ export class MapScene extends Phaser.Scene {
       //const enemySquad = this.squadIO(enemyInRange.enemy);
       //this.moveToEnemyUnit(enemySquad, currentSquad);
     } else {
-      const {x, y} = (currentSquad.validSteps.first() as ValidStep).steps[1];
-
-      const tile = this.getTileAt(x, y);
-
-      await this.moveToTile(currentSquad.id, tile);
-      this.signal('finish ai turn, no enemy in range', [
-        {type: 'END_SQUAD_TURN', id: currentSquad.id},
-      ]);
+      // const {x, y} = (currentSquad.validSteps.first() as ValidStep).steps[1];
+      // const tile = this.getTileAt(x, y);
+      //await this.moveToTile(currentSquad.id, tile);
+      // this.signal('finish ai turn, no enemy in range', [
+      //   {type: 'END_SQUAD_TURN', id: currentSquad.id},
+      // ]);
     }
   }
 
@@ -1028,55 +1023,9 @@ export class MapScene extends Phaser.Scene {
     this.label(SCREEN_WIDTH / 2, 520, 'Merano Castle');
   }
 
-  // TODO: simplify interface
-  // wtf: moveToTile and moveunit???
-  async moveToTile(squadId: string, mapTile: MapTile): Promise<void> {
-    return new Promise(async (resolve) => {
-      const {x, y} = mapTile;
-
-      // Move unit to tile
-      const chara = this.charas.find((c) => c.key === this.charaKey(squadId));
-      const force = this.getCurrentForce();
-
-      if (!chara || !force) throw new Error(INVALID_STATE);
-
-      this.tiles.forEach((tile) =>
-        walkableTiles.includes(tile.type) ? tile.tile.clearTint() : null,
-      );
-
-      this.clearTiles();
-
-      this.movedSquads = this.movedSquads.add(squadId);
-
-      const mapSquad = this.squadIO(squadId);
-      const step = mapSquad.validSteps.find((step) =>
-        Map(step.target).equals(Map({x, y})),
-      );
-
-      if (!step) throw new Error(INVALID_STATE);
-
-      await this.moveUnit(squadId, step.steps);
-
-      const city = this.cityAt(x, y);
-      if (city && city.force !== mapSquad.force)
-        this.signal('unit moved to enemy city, capturing', [
-          {type: 'CAPTURE_CITY', id: city.id, force: mapSquad.force},
-        ]);
-
-      this.signal('unit moved, update position', [
-        {type: 'UPDATE_SQUAD_POS', id: squadId, pos: {x, y}},
-      ]);
-
-      this.refreshUI();
-
-      //TODO: having onMoveComplete/resolve AND this firing signals makes no sense
-      resolve();
-    });
-  }
-
   selectNextAlly() {
     const squad = this.getPlayerSquads().find(
-      (sqd) => !this.movedSquads.has(sqd.id),
+      (sqd) => !this.inactiveSquads.has(sqd.id),
     );
 
     if (squad) {
@@ -1092,18 +1041,17 @@ export class MapScene extends Phaser.Scene {
   async moveUnit(squadId: string, path: Vector[]) {
     const chara = await this.getChara(squadId);
 
-    const tweens = path
-      .filter((_, index) => index > 0)
-      .map((pos) => {
-        const target = this.getCellPositionOnScreen(pos);
-        return {
-          targets: chara.container,
-          x: target.x,
-          y: target.y,
-          duration: SQUAD_MOVE_DURATION,
-          ease: 'Cubic',
-        };
-      });
+    const [, ...tail] = path;
+    const tweens = tail.map((pos) => {
+      const {x, y} = this.getCellPositionOnScreen(pos);
+      return {
+        targets: chara.container,
+        x,
+        y,
+        duration: SQUAD_MOVE_DURATION,
+        ease: 'Cubic',
+      };
+    });
 
     if (tweens.length > 0)
       return new Promise<void>((resolve) => {
@@ -1165,7 +1113,7 @@ export class MapScene extends Phaser.Scene {
     this.disableMapInput();
     this.destroyUI();
 
-    this.movedSquads = this.movedSquads.add(playerSquad.id);
+    this.inactiveSquads = this.inactiveSquads.add(playerSquad.id);
 
     const bg = panel(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, this.uiContainer, this);
     bg.setAlpha(0.4);

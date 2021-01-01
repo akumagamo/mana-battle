@@ -25,7 +25,7 @@ export default (
       () => {
         scene.showMoveControls(squad);
       },
-      scene.movedSquads.has(squad.id),
+      scene.inactiveSquads.has(squad.id),
     );
 
   if (mode !== 'SELECTING_ATTACK_TARGET') {
@@ -38,7 +38,7 @@ export default (
       () => {
         scene.showAttackControls(squad);
       },
-      scene.getTargets(squad.pos).length < 1 || scene.movedSquads.has(squad.id),
+      scene.getTargets(squad.pos).length < 1 || scene.inactiveSquads.has(squad.id),
     );
   }
 
