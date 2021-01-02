@@ -1,10 +1,10 @@
 import S from 'sanctuary';
-import {Unit, UnitSquadPosition} from '../../Unit/Model';
-import {getUnitAttack, getUnitDamage} from '../../Unit/Skills';
-import {INVALID_STATE} from '../../errors';
+import {Unit, UnitSquadPosition} from '../Unit/Model';
+import {getUnitAttack, getUnitDamage} from '../Unit/Skills';
+import {INVALID_STATE} from '../errors';
 import {invertBoardPosition} from './utils';
 import {getMeleeTarget} from './getMeleeTarget';
-import {random} from '../../utils';
+import {random} from '../utils';
 import {Set} from 'immutable';
 
 const sortInitiative = (unit: TurnUnit) => random(1, 6) + unit.unit.dex;
@@ -39,26 +39,24 @@ export type Fireball = {
   updatedTarget: Unit;
   updatedSource: Unit;
 };
-export type Victory = {type: 'VICTORY'; target: string};
+export type Victory = {type: 'VICTORY'; target: string; units: Unit[]};
 export type EndCombat = {type: 'END_COMBAT'; units: Unit[]};
 export type EndTurn = {type: 'END_TURN'};
 export type RestartTurns = {type: 'RESTART_TURNS'};
 export type DisplayXP = {
   type: 'DISPLAY_XP';
-  xp: number;
-  lvls: number;
-  id: string;
+  xpInfo: XPInfo[]
 };
 
-const displayXPCmd = ({
-  xp,
-  lvls,
-  id,
-}: {
+export type XPInfo = {
+
   xp: number;
   lvls: number;
   id: string;
-}): DisplayXP => ({type: 'DISPLAY_XP', xp, lvls, id});
+
+}
+
+const displayXPCmd = (xpInfo: XPInfo[]): DisplayXP => ({type: 'DISPLAY_XP', xpInfo});
 
 export type Command =
   | Move
@@ -140,68 +138,74 @@ export const runTurn = (
 
   const {squad} = unit;
 
-  const victory: () => Victory = () => ({type: 'VICTORY', target: squad.id});
+  const victory = (units: Unit[]): Victory => ({type: 'VICTORY', target: squad.id, units});
 
-  const endCombat: (cmds: Command[]) => Command[] = (cmds: Command[]) => {
-    const squadXp = squads.map((squadId) => {
-      const enemyUnits = units.filter((u) => u.unit.squad.id !== squadId);
+  const {unitsWithXp, cmds: xpCmds} = calcXp(squads, updatedUnits)
 
-      //TODO: adjust xp based on enemy level
-      const deadEnemies = enemyUnits
-        .map((u) => (u.unit.currentHp < 1 ? 1 : 0))
-        .reduce((xs, x) => xs + x, 0);
-
-      const xpAmount = deadEnemies * 40;
-
-      return {squadId, xpAmount};
-    });
-
-    const MAX_XP = 100;
-
-    const xpInfo: {
-      unit: UnitInSquad;
-      xp: number;
-      lvls: number;
-    }[] = updatedUnits.map((u) => {
-      const {unit} = u;
-
-      const {xpAmount} = squadXp.find((s) => s.squadId === unit.squad.id);
-
-      if (xpAmount < 1) return {xp: 0, lvls: 0, unit};
-
-      const newXp = unit.exp + xpAmount;
-
-      const lvls = Math.floor(newXp / MAX_XP);
-
-      return {
-        unit: {
-          ...unit,
-          lvl: unit.lvl + lvls,
-          xp: newXp,
-        },
-
-        xp: xpAmount,
-        lvls,
-      };
-    });
-
-    const xps = xpInfo
-      .filter(({xp, lvls}) => xp > 0 || lvls > 0)
-      .map(({xp, lvls, unit}) => displayXPCmd({xp, lvls, id: unit.id}));
-
-    return cmds
-      .concat(xps)
-      .concat([{type: 'END_COMBAT', units: xpInfo.map((u) => u.unit)}]);
+  const endCombat: (cmds: Command[]) => Command[] = (commands: Command[]) => {
+    return commands
+      .concat(xpCmds)
+      .concat([{type: 'END_COMBAT', units: unitsWithXp.map(u => u.unit)}]);
   };
 
   if (isVictory(current, updatedUnits)) {
-    return turnCommands.concat([victory()]);
+    return turnCommands.concat(xpCmds).concat([victory(updatedUnits.map(u => u.unit))]);
   } else if (noAttacksRemaining(updatedUnits)) {
     return endCombat(turnCommands);
   } else {
     return runTurn(nextTurn, squads, updatedUnits, turnCommands);
   }
 };
+
+
+function calcXp(squads: Set<string>, units: TurnUnit[]): {unitsWithXp: {xp: number, lvls: number, unit: UnitInSquad}[], cmds: Command[]} {
+
+  const squadXp = squads.map((squadId) => {
+    const enemyUnits = units.filter((u) => u.unit.squad.id !== squadId);
+
+    const deadEnemies = enemyUnits
+      .map((u) => (u.unit.currentHp < 1 ? 1 : 0))
+      .reduce((xs, x) => xs + x, 0);
+
+    const xpAmount = deadEnemies * 40;
+
+    return {squadId, xpAmount};
+  });
+
+  const MAX_XP = 100;
+
+  const unitsWithXp = units.map((u) => {
+    const {unit} = u;
+
+    const {xpAmount} = squadXp.find((s) => s.squadId === unit.squad.id);
+
+    if (xpAmount < 1) return {xp: 0, lvls: 0, unit};
+
+    const newXp = unit.exp + xpAmount;
+
+    const lvls = Math.floor(newXp / MAX_XP);
+
+    return {
+      unit: {
+        ...unit,
+        lvl: unit.lvl + lvls,
+        xp: newXp,
+      },
+
+      xp: xpAmount,
+      lvls,
+    };
+  });
+
+  const xps: XPInfo[] = unitsWithXp.filter(({xp, lvls}) => xp > 0 || lvls > 0)
+    .map(({unit, xp, lvls}) => ({id: unit.id, xp, lvls}))
+
+  return {
+    unitsWithXp,
+    cmds: xps.length > 0 ? [displayXPCmd(xps)] : []
+  }
+
+}
 
 function meleeAttackSingleTarget(
   current: TurnUnit,

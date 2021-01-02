@@ -1,5 +1,5 @@
 import { Scene } from "phaser";
-import { MapSquad } from "../../API/Map/Model";
+import { MapSquad } from "../Model";
 import BoardScene from "../../Board/StaticBoardScene";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../constants";
 import { INVALID_STATE } from "../../errors";

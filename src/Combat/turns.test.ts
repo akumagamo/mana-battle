@@ -1,11 +1,12 @@
 import {initiativeList, runCombat} from './turns';
-import {assignSquad} from '../../Unit/Model';
-import {makeUnit} from '../../Unit/Jobs';
+import {assignSquad} from '../Unit/Model';
+import {makeUnit} from '../Unit/Jobs';
 import {makeTurnUnit} from './makeTurnUnit';
-import * as utils from '../../utils';
+import * as utils from '../utils';
 
-jest.mock('../../utils');
+jest.mock('../utils');
 
+//@ts-ignore
 utils.random.mockImplementation(() => 1);
 
 test('Should sort by initiave correctly', () => {

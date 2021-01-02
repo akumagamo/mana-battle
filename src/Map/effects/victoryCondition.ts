@@ -1,5 +1,5 @@
-import {City, CPU_FORCE} from '../../API/Map/Model';
-import {SCREEN_HEIGHT, SCREEN_WIDTH} from '../../constants';
+import {City} from '../Model';
+import {CPU_FORCE, SCREEN_HEIGHT, SCREEN_WIDTH} from '../../constants';
 import {MapScene} from '../MapScene';
 import S from 'sanctuary';
 import {delay, tween} from '../../Scenes/utils';

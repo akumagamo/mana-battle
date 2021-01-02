@@ -6,7 +6,7 @@ import { BoardTile } from "./Model";
 import { Graphics } from "../Models";
 import { Unit } from "../Unit/Model";
 import { Vector } from "matter";
-import { invertBoardPosition } from "../API/Combat/utils";
+import { invertBoardPosition } from "../Combat/utils";
 
 const BOARD_WIDTH = 250;
 const BOARD_HEIGHT = 150;

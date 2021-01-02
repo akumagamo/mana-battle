@@ -1,4 +1,4 @@
-import {tileMap, translateTiles} from '../../API/Map/Model';
+import {tileMap, translateTiles} from '../Model';
 import {cellSize, MapScene} from '../MapScene';
 
 export default (scene: MapScene) => {

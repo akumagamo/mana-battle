@@ -1,4 +1,4 @@
-import { makeUnit } from "../../Unit/Jobs";
+import { makeUnit } from "../Unit/Jobs";
 import { getMeleeTarget } from "./getMeleeTarget";
 import { makeTurnUnit } from "./makeTurnUnit";
 

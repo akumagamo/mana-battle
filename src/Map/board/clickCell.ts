@@ -1,7 +1,7 @@
-import {CPU_FORCE, PLAYER_FORCE} from '../../API/Map/Model';
 import {MapScene, MapTile} from '../MapScene';
 import {getDistance} from '../../utils';
 import {makeVector} from '../makeVector';
+import {CPU_FORCE, PLAYER_FORCE} from '../../constants';
 
 export default async (scene: MapScene, cell: MapTile) => {
   const {x, y} = cell;

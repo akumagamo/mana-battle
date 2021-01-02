@@ -1,16 +1,16 @@
-import {PLAYER_FORCE} from '../../API/Map/Model';
+import {PLAYER_FORCE} from '../../constants';
 import {Container} from '../../Models';
 import button from '../../UI/button';
 import text from '../../UI/text';
 import {MapScene} from '../MapScene';
 
-export default (
+export default async (
   scene: MapScene,
   uiContainer: Container,
   baseY: number,
   id: string,
-): void => {
-  const city = scene.cityIO(id);
+): Promise<void> => {
+  const city = await scene.getCity(id);
 
   text(20, baseY, city.name, uiContainer, scene);
 
@@ -20,12 +20,16 @@ export default (
       scene.renderDispatchWindow();
     });
 
-  if (city.force)
+  if (city.force){
+
+    const force = await scene.getForce(city.force)
     text(
       1000,
       baseY,
-      `Controlled by ${scene.getForce(city.force).name}`,
+      `Controlled by ${force.name}`,
       uiContainer,
       scene,
     );
+
+  }
 };

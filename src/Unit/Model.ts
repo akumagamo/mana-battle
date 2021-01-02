@@ -3,7 +3,7 @@ import {sum} from '../utils/math';
 import {Container} from '../Models';
 import {getItems} from '../DB';
 import {UnitAttacks} from './Skills';
-import {MapSquad} from '../API/Map/Model';
+import {MapSquad} from '../Map/Model';
 import {Squad} from '../Squad/Model';
 import {Vector} from 'matter';
 import {List, Set} from 'immutable';

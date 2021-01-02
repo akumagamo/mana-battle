@@ -2,11 +2,9 @@ import {
   Vector,
   MapSquad,
   MapState
-} from '../API/Map/Model';
+} from './Model';
 import {Unit} from '../Unit/Model';
 import {MapTile} from './MapScene';
-
-
 export type MapCommands = {type: 'UPDATE_STATE'; target: MapState;} |
 {type: 'UPDATE_SQUAD_POS'; id: string; pos: Vector;} |
 {type: 'UPDATE_UNIT'; unit: Unit;} |

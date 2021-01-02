@@ -2,7 +2,7 @@ import * as PF from 'pathfinding';
 import {Vector, TurnManager, MapSquad, Step} from './Model';
 import {MapState} from './Model';
 import {Map, Range, List, Set} from 'immutable';
-import {INVALID_STATE} from '../../errors';
+import {INVALID_STATE} from '../errors';
 
 const makeVector = (x: number) => (y: number) => ({x, y});
 

@@ -2,13 +2,12 @@ import {Map} from 'immutable';
 import {
   CellNumber,
   City,
-  CPU_FORCE,
   MapState,
-  PLAYER_FORCE,
-} from '../API/Map/Model';
+} from '../Map/Model';
 import {getSquads} from '../DB';
 import {makeUnit} from '../Unit/Jobs';
 import {assignSquad, toMapSquad} from '../Unit/Model';
+import {CPU_FORCE, PLAYER_FORCE} from '../constants';
 
 const enemyCastle: City = {
   id: 'castle2',

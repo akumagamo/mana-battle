@@ -10,7 +10,7 @@ const BOTTOM_PANEL_HEIGHT = 80;
 const BOTTOM_PANEL_X = 0;
 export const BOTTOM_PANEL_Y = SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT;
 
-export default (scene: MapScene, uiContainer: Container): void => {
+export default (scene: MapScene, uiContainer: Container): Promise<void> => {
   if (scene.mode.type === 'NOTHING_SELECTED') return;
 
   const baseY = BOTTOM_PANEL_Y + 25;

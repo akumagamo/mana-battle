@@ -1,14 +1,14 @@
-import {PLAYER_FORCE} from '../../API/Map/Model';
+import {PLAYER_FORCE} from '../../constants';
 import button from '../../UI/button';
 import text from '../../UI/text';
 import {MapScene} from '../MapScene';
 import playerSquad from './playerSquad';
 
-export function squadInfo(
+export async  function squadInfo(
   scene: MapScene,
   uiContainer: Phaser.GameObjects.Container,
   baseY: number,
-  id: string): void {
+  id: string): Promise<void> {
   const squad = scene.squadIO(id);
 
   text(20, baseY, squad.name, uiContainer, scene);

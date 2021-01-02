@@ -3,15 +3,15 @@ import {Chara} from '../Chara/Chara';
 import {cartesianToIsometricBattle} from '../utils/isometric';
 import {INVALID_STATE} from '../errors';
 import {Unit} from '../Unit/Model';
-import {Command, runCombat} from '../API/Combat/turns';
+import {Command, runCombat, XPInfo} from './turns';
 import plains from '../Backgrounds/plains';
 import {Container} from '../Models';
 import fireball from '../Chara/animations/spells/fireball';
 import castSpell from '../Chara/animations/castSpell';
 import {Squad} from '../Squad/Model';
-import {Vector} from '../API/Map/Model';
+import {Vector} from '../Map/Model';
 import {Map} from 'immutable';
-import {invertBoardPosition} from '../API/Combat/utils';
+import {invertBoardPosition} from './utils';
 import announcement from '../UI/announcement';
 import {fadeIn, fadeOut} from '../UI/Transition';
 import {displayExperience} from '../Chara/animations/displayExperience';
@@ -28,7 +28,6 @@ const getBoardCoords = (isTopSquad: boolean) => ({x, y}: Vector) => {
   };
 };
 
-const MAX_XP = 100;
 export default class CombatScene extends Phaser.Scene {
   charas: Chara[] = [];
   top = '';
@@ -190,10 +189,15 @@ export default class CombatScene extends Phaser.Scene {
     } else if (cmd.type === 'RESTART_TURNS') {
       this.currentTurn = 0;
       this.turn();
+    } else if(cmd.type === "DISPLAY_XP"){
+
+      await this.displayExperienceGain(cmd.xpInfo)
+      step();
+
     } else if (cmd.type === 'END_COMBAT') {
       console.log(`Combat reached its end`);
 
-      await this.combatEnd();
+      await this.combatEnd(cmd.units);
 
       console.log(`onCombatFinish END_COMBAT`);
 
@@ -203,69 +207,38 @@ export default class CombatScene extends Phaser.Scene {
 
       console.log(`onCombatFinish VICTORY`);
 
-      await this.combatEnd();
+      await this.combatEnd(cmd.units);
 
       this.turnOff();
     } else console.error(`Unknown command:`, cmd);
   }
 
-  async combatEnd() {
-    // TODO: move to combat API
-    const xps = this.charas.map((chara) => {
-      // TODO: combat calc function
-      const xpGain = 42;
-
-      const newXp = chara.unit.exp + xpGain;
-
-      const lvls = Math.floor(newXp / MAX_XP);
-
-      return {
-        chara,
-        lvls,
-        newXp: newXp > MAX_XP ? newXp % MAX_XP : newXp,
-        xpGain,
-      };
-    });
-
-    await this.displayExperienceGain(xps);
+  async combatEnd(units:Unit[]) {
 
     this.retreatUnits();
     await fadeOut(this);
 
-    // TODO, this is now eing done in the API
-    // just provide the update units to the callback
-    // (don't make it accept comands, but rather the updated units,
-    // who won, etc)
+    // TODO add battle result ( who won, who was destroyed)
     if (this.onCombatFinish) {
       this.onCombatFinish(
-        xps
-          .map((xp) => ({
-            unit: xp.chara.unit,
-            lvls: xp.lvls,
-            newXp: xp.newXp,
-          }))
-          .map(({unit, lvls, newXp}) => ({
-            ...unit,
-            lvl: unit.lvl + lvls,
-            exp: newXp,
-          }))
+        units
           .map((unit) => ({type: 'UPDATE_UNIT', unit})),
       );
     }
   }
   async displayExperienceGain(
-    xps: {chara: Chara; lvls: number; newXp: number; xpGain: number}[],
+    xps: XPInfo[],
   ) {
     await Promise.all(
       xps.map(
-        async ({chara, xpGain}) => await displayExperience(chara, xpGain),
+        async ({id, xp}) => await displayExperience(this.getChara(id), xp),
       ),
     );
 
     return await Promise.all(
       xps
         .filter(({lvls}) => lvls > 0)
-        .map(async ({chara}) => await displayLevelUp(chara)),
+        .map(async ({id}) => await displayLevelUp(this.getChara(id))),
     );
   }
   // UNIT METHODS

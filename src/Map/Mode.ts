@@ -1,4 +1,4 @@
-import {Vector} from '../API/Map/Model';
+import {Vector} from './Model';
 
 export type Mode = {type: 'NOTHING_SELECTED';} |
 {type: 'SQUAD_SELECTED'; id: string;} |

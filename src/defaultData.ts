@@ -16,8 +16,9 @@ import {indexById} from './utils';
 import {SquadMap} from './Squad/Model';
 import {Player} from './Player/Model';
 import {Options} from './Models';
-import {BattleFieldMap, PLAYER_FORCE} from './API/Map/Model';
+import {BattleFieldMap} from './Map/Model';
 import {fighterArcherSquad} from './Squad/mocks';
+import {PLAYER_FORCE} from './constants';
 
 export const classes: UnitClass[] = ['fighter', 'mage', 'archer'];
 

@@ -4,10 +4,9 @@ import button from '../UI/button';
 import maps from '../maps';
 import {MapCommands} from "./MapCommands";
 import {toMapSquad} from '../Unit/Model';
-import {getCity} from '../API/Map/utils';
 import {getSquads, getUnits} from '../DB';
 import {Container} from '../Models';
-import {MapState} from '../API/Map/Model';
+import {MapState} from './Model';
 import {fadeIn} from '../UI/Transition';
 
 export default class MapListScene extends Phaser.Scene {
@@ -44,7 +43,7 @@ export default class MapListScene extends Phaser.Scene {
             mapSquads: map.mapSquads.concat([
               toMapSquad(
                 Object.values(getSquads())[0],
-                getCity('castle1', map),
+                map.cities.find(c=>c.id ===  'castle1'),
               ),
             ]),
             units: map.units.merge(alliedUnits),

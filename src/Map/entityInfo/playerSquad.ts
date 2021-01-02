@@ -1,4 +1,4 @@
-import {MapSquad} from '../../API/Map/Model';
+import {MapSquad} from '../Model';
 import BoardScene from '../../Board/InteractiveBoardScene';
 import {SCREEN_HEIGHT, SCREEN_WIDTH} from '../../constants';
 import {Container} from '../../Models';

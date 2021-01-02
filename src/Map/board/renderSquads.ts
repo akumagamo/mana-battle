@@ -1,7 +1,8 @@
-import { MapSquad, PLAYER_FORCE } from "../../API/Map/Model";
+import { MapSquad} from "../Model";
 import { Chara } from "../../Chara/Chara";
 import { INVALID_STATE } from "../../errors";
 import { MapScene } from "../MapScene";
+import {PLAYER_FORCE} from "../../constants";
 
 const CHARA_MAP_SCALE = 0.45;
 

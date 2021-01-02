@@ -5,8 +5,9 @@ import {Unit, UnitMap, UnitSquadPosition} from './Unit/Model';
 import {removeIdFromMap} from './utils';
 import {INVALID_STATE} from './errors';
 import {Options} from './Models';
-import {BattleFieldMap, PLAYER_FORCE} from './API/Map/Model';
+import {BattleFieldMap} from './Map/Model';
 import {getUnitAttacks} from './Unit/Skills';
+import {PLAYER_FORCE} from './constants';
 
 const get = (str: string) => JSON.parse(localStorage.getItem(str) || '{}');
 const set = (str: string, data: any) =>

@@ -5,11 +5,10 @@ import BoardScene from "../Board/StaticBoardScene";
 import { Pointer, Image, Text } from "../Models";
 import button from "../UI/button";
 import panel from "../UI/panel";
-import { SCREEN_WIDTH } from "../constants";
+import { PLAYER_FORCE, SCREEN_WIDTH } from "../constants";
 import text from "../UI/text";
 import S from "sanctuary";
 import menu from "../Backgrounds/menu";
-import { PLAYER_FORCE } from "../API/Map/Model";
 export class ListSquadsScene extends Phaser.Scene {
   boardScenes: BoardScene[] = [];
   controls: (Image | Text)[] = [];

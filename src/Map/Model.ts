@@ -1,12 +1,9 @@
-import {Squad} from '../../Squad/Model';
-import {Unit} from '../../Unit/Model';
+import {Squad} from '../Squad/Model';
+import {Unit} from '../Unit/Model';
 import {Map, List, Set} from 'immutable';
 export type UnitId = string;
 export type ForceId = string;
 export type CityId = string;
-
-export const PLAYER_FORCE = 'PLAYER_FORCE';
-export const CPU_FORCE = 'CPU_FORCE';
 
 export type CellNumber =
   | 0
@@ -25,6 +22,7 @@ export type CellNumber =
   | 13
   | 14
   | 15;
+
 export type AICommand = 'DEFEND' | 'ATTACK';
 export type MapState = {
   id: string;

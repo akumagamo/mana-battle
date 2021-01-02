@@ -1,4 +1,4 @@
-import {Unit} from '../../Unit/Model';
+import {Unit} from '../Unit/Model';
 import {TurnUnit, isFromAnotherSquad, isAlive, transpose} from './turns';
 
 export function getMeleeTarget(current: Unit, units: TurnUnit[]) {
