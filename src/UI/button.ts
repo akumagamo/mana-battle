@@ -1,10 +1,10 @@
-import {Scene} from 'phaser';
-import {Container} from '../Models';
-import text from './text';
+import { Scene } from "phaser";
+import { Container } from "../Models";
+import text from "./text";
 
-const defaultTextColor = '#ffffff';
+const defaultTextColor = "#ffffff";
 const activeFill = 0x222222;
-const activeTextColor = '#ffffff';
+const activeTextColor = "#ffffff";
 
 export default (
   x: number,
@@ -14,15 +14,17 @@ export default (
   scene: Scene,
   onClick: () => void,
   disabled = false,
+  width?: number,
+  height?: number
 ) => {
   const text_ = text(x, y, label, container, scene);
-  text_.setShadow(2, 2, '#000');
-  text_.setColor('#fff');
+  text_.setShadow(2, 2, "#000");
+  text_.setColor("#fff");
 
   const rectX = x - 15;
   const rectY = y - 10;
-  const rectWidth = text_.width + 30;
-  const rectHeight = text_.height + 20;
+  const rectWidth = width ? width : text_.width + 30;
+  const rectHeight = height ? height : text_.height + 20;
 
   const btn = scene.add.graphics();
 
@@ -51,29 +53,29 @@ export default (
   container.bringToTop(text_);
 
   container.add(clickZone);
-  clickZone.on('pointerdown', () => {
+  clickZone.on("pointerdown", () => {
     if (disabled) return;
     btn.fillStyle(activeFill);
     fill();
-    text_.setColor('#ffffff');
+    text_.setColor("#ffffff");
   });
-  clickZone.on('pointerup', () => {
+  clickZone.on("pointerup", () => {
     if (disabled) return;
     defaultFill();
     fill();
-    text_.setColor('#000000');
-    scene.sound.add('click1').play();
+    text_.setColor("#000000");
+    scene.sound.add("click1").play();
     onClick();
   });
 
-  clickZone.on('pointerover', () => {
+  clickZone.on("pointerover", () => {
     if (disabled) return;
     btn.fillStyle(activeFill);
     fill();
     text_.setColor(activeTextColor);
   });
 
-  clickZone.on('pointerout', () => {
+  clickZone.on("pointerout", () => {
     if (disabled) return;
     defaultFill();
     fill();

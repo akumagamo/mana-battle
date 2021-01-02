@@ -18,15 +18,15 @@ test("generates units", () => {
   const unit1Id = `${squadId}_unit_0`;
   const unit2Id = `${squadId}_unit_1`;
 
-  expect(Object.keys(squad.members)).toBe([unit1Id, unit2Id]);
+  expect(Object.keys(squad.members)).toStrictEqual([unit1Id, unit2Id]);
 
-  expect(squad.members[unit1Id]).toBe({
+  expect(squad.members[unit1Id]).toStrictEqual({
     id: unit1Id,
     x: 2,
     y: 1,
     leader: true,
   });
-  expect(squad.members[unit2Id]).toBe({
+  expect(squad.members[unit2Id]).toStrictEqual({
     id: unit2Id,
     x: 2,
     y: 2,
@@ -39,6 +39,6 @@ test("generates units", () => {
   expect(units[unit1Id].lvl).toBe(22);
   expect(units[unit2Id].lvl).toBe(22);
 
-  expect(units[unit1Id].squad).toBe({ id: squadId, x: 2, y: 1 });
-  expect(units[unit2Id].squad).toBe({ id: squadId, x: 2, y: 1 });
+  expect(units[unit1Id].squad).toStrictEqual({ id: squadId, x: 2, y: 1 });
+  expect(units[unit2Id].squad).toStrictEqual({ id: squadId, x: 2, y: 2 });
 });

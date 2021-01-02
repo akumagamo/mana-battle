@@ -55,6 +55,7 @@ export function preload(this: {
     'announcement_bg',
     'button_move',
     'button_attack',
+    'close_btn'
   ];
   ui.forEach((id: string) => {
     this.load.image(id, `${PUBLIC_URL}/ui/${id}.svg`);

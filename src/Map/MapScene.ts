@@ -765,46 +765,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   renderDispatchWindow() {
-    let container = this.add.container();
-    panel(100, 100, 500, 500, container, this);
-
-    let x = 120;
-    let y = 120;
-
-    button(500, 120, "Close", container, this, () => {
-      container.destroy();
-      this.enableInput();
-    });
-
-    let currentSquads = Set(this.getPlayerSquads().map((s) => s.id));
-
-    // TODO: avoid listing defeated squads
-    let squadsToRender = Object.values(getSquads()).filter(
-      (sqd) => !currentSquads.has(sqd.id)
-    );
-
-    squadsToRender.forEach((sqd, i) => {
-      button(x, y + 70 * i, sqd.name, container, this, async () => {
-        this.dispatchSquad(sqd);
-        container.destroy();
-        this.enableInput();
-
-        await delay(this, 100);
-
-        this.changeMode({ type: "SQUAD_SELECTED", id: sqd.id });
-
-        let squad = this.squadIO(sqd.id);
-        this.signal("clicked dispatch squad button", [
-          { type: "CLICK_SQUAD", unit: squad },
-          {
-            type: "MOVE_CAMERA_TO",
-            x: squad.pos.x,
-            y: squad.pos.y,
-            duration: 500,
-          },
-        ]);
-      });
-    });
+    
   }
 
   getSquad(squadId: string) {
