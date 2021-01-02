@@ -52,7 +52,7 @@ const map: () => MapState = () => {
           },
           force: CPU_FORCE,
         },
-        {x: 3, y: 6},
+        {x: 6, y: 4},
       ),
       toMapSquad(
         {
