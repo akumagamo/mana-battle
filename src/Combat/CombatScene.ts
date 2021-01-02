@@ -212,7 +212,6 @@ export default class CombatScene extends Phaser.Scene {
   async combatEnd() {
     // TODO: move to combat API
     const xps = this.charas.map((chara) => {
-
       // TODO: combat calc function
       const xpGain = 42;
 
@@ -233,7 +232,10 @@ export default class CombatScene extends Phaser.Scene {
     this.retreatUnits();
     await fadeOut(this);
 
-    // TODO: move to event emitter
+    // TODO, this is now eing done in the API
+    // just provide the update units to the callback
+    // (don't make it accept comands, but rather the updated units,
+    // who won, etc)
     if (this.onCombatFinish) {
       this.onCombatFinish(
         xps

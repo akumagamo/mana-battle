@@ -15,7 +15,6 @@ import {
   MapSquad,
   MapState,
   Force,
-  ValidStep,
   City,
   PLAYER_FORCE,
   CPU_FORCE,
@@ -628,7 +627,7 @@ export class MapScene extends Phaser.Scene {
         if (
           vector.x < 0 ||
           vector.y < 0 ||
-          this.tileAt(vector.x, vector.y).type !== 0 ||
+          !walkableTiles.includes(this.tileAt(vector.x, vector.y).type) ||
           enemies.has(vector)
         )
           return;
