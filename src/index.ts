@@ -45,3 +45,44 @@ if (localStorage.getItem("player") === null) {
 
 const game = new Phaser.Game(config);
 game.scale.lockOrientation(Phaser.Scale.PORTRAIT);
+
+if (process.env.NODE_ENV !== "production") {
+  //@ts-ignore
+  window.game = game;
+
+  mapTest();
+}
+
+function wait(n: number) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, n);
+  });
+}
+
+async function mapTest() {
+  await wait(3000);
+
+  //@ts-ignore
+  window.title.mapsEvent();
+
+  await wait(1500);
+
+  //@ts-ignore
+  window.mapListScene.onMapSelected(0);
+
+  await wait(2000);
+  //@ts-ignore
+  window.moveButton();
+
+  await wait(1000);
+
+  //@ts-ignore
+  window.clickCell( 5, 6 );
+
+  await wait(1000);
+
+  //@ts-ignore
+  window.clickWait();
+}

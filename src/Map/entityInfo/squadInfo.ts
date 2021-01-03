@@ -9,7 +9,7 @@ export async  function squadInfo(
   uiContainer: Phaser.GameObjects.Container,
   baseY: number,
   id: string): Promise<void> {
-  const squad = scene.squadIO(id);
+  const squad = scene.getSquad(id);
 
   text(20, baseY, squad.name, uiContainer, scene);
 

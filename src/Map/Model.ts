@@ -32,9 +32,10 @@ export type MapState = {
   cells: CellNumber[][];
   forces: Force[];
   cities: City[];
-  mapSquads: MapSquad[];
+  squads: MapSquad[];
   units: Map<string, Unit>;
   ai: Map<string, AICommand>;
+  dispatchedSquads: Set<string>;
 };
 export type Force = {
   id: ForceId;

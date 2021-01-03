@@ -40,6 +40,7 @@ export default class StaticBoardScene extends Phaser.Scene {
   }
 
   create() {
+    //this.events.on('destroy', ()=>this.destroy(this.scene.scene));)
     this.tiles = this.placeTiles({
       mapWidth: 3,
       mapHeight: 3,
@@ -50,19 +51,15 @@ export default class StaticBoardScene extends Phaser.Scene {
     //this.makeOverlay();
   }
 
-  destroy(parentScene: Phaser.Scene) {
-    // For some reason, this.scene returns null after the scene is recreated...
-    // so I am passing the "parent" scene as a reference
-    console.log(`lets remove a board`, this);
+  turnOff() {
+    // TODO: check if necessary
     this.tiles.forEach((tile) => tile.sprite.destroy());
 
     this.unitList.forEach((chara) => {
       const key = this.makeUnitKey(chara.unit);
-      parentScene.scene.remove(key);
+      this.scene.remove(key);
     });
-
-    console.log(`removing board scene`, this.scene.key);
-    parentScene.scene.remove(makeId(this.squad));
+    this.scene.remove(makeId(this.squad));
   }
 
   makeOverlay() {

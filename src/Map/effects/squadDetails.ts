@@ -43,7 +43,7 @@ export default (
   detailsBar(defaultUnit);
 
   button(1050, 250, "Close", container, scene, () => {
-    boardScene.destroy(scene);
+    boardScene.turnOff();
     charaStats.destroy();
     backdrop_.destroy();
     container.destroy();

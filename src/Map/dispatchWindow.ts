@@ -40,12 +40,10 @@ export default (scene: MapScene) => {
     scene.enableInput();
   });
 
-  // TODO: store defeated squads on the state and use them to filter
-  let currentSquads = Set(scene.getPlayerSquads().map((s) => s.id));
 
   // TODO: avoid listing defeated squads
-  let squadsToRender = Object.values(getSquads()).filter(
-    (sqd) => !currentSquads.has(sqd.id)
+  let squadsToRender = scene.getPlayerSquads().filter(
+    (sqd) => !scene.state.dispatchedSquads.has(sqd.id)
   );
 
   squadsToRender.forEach((sqd, i) => {
@@ -59,7 +57,7 @@ export default (scene: MapScene) => {
 
       scene.changeMode({ type: "SQUAD_SELECTED", id: sqd.id });
 
-      let squad = scene.squadIO(sqd.id);
+      let squad = scene.getSquad(sqd.id);
       scene.signal("clicked dispatch squad button", [
         { type: "CLICK_SQUAD", unit: squad },
         {

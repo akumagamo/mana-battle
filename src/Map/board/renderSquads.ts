@@ -1,8 +1,8 @@
-import { MapSquad} from "../Model";
+import { MapSquad } from "../Model";
 import { Chara } from "../../Chara/Chara";
 import { INVALID_STATE } from "../../errors";
 import { MapScene } from "../MapScene";
-import {PLAYER_FORCE} from "../../constants";
+import { PLAYER_FORCE } from "../../constants";
 
 const CHARA_MAP_SCALE = 0.45;
 
@@ -44,7 +44,7 @@ export const renderSquad = (scene: MapScene, squad: MapSquad): void => {
 };
 
 export default (scene: MapScene): void => {
-  scene.state.mapSquads
-    .filter((u) => u.status === "alive")
-    .forEach((unit) => renderSquad(scene, unit));
+  scene.state.dispatchedSquads.forEach((id) =>
+    renderSquad(scene, scene.getSquad(id))
+  );
 };

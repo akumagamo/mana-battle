@@ -1,4 +1,4 @@
-import {Map} from 'immutable';
+import {Map, Set} from 'immutable';
 import {
   CellNumber,
   City,
@@ -38,8 +38,9 @@ const map: () => MapState = () => {
     name: 'Green Harbor',
     author: 'Leonardo Farroco',
     description: 'The first map',
+    dispatchedSquads: Set(),
     cells: tiles,
-    mapSquads: [
+    squads: [
       toMapSquad(
         {
           id: 'squad1',

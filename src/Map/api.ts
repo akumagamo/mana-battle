@@ -10,10 +10,12 @@ export const getDistance = (vec1: Vector) => (vec2: Vector) =>
   Math.abs(vec1.x - vec2.x) + Math.abs(vec1.y - vec2.y);
 
 export const squadsFromForce = (state: MapState) => (id: string) =>
-  state.mapSquads.filter((u) => u.force === id);
+  state.squads
+    .filter((u) => u.force === id)
+    .filter((sqd) => state.dispatchedSquads.has(sqd.id));
 
 export const getSquad = (state: MapState) => (id: string) =>
-  state.mapSquads.find((s) => s.id === id);
+  state.squads.find((s) => s.id === id);
 
 export const getForce = (state: MapState) => (id: string) =>
   state.forces.find((s) => s.id === id);
