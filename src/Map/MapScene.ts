@@ -250,7 +250,7 @@ export class MapScene extends Phaser.Scene {
       window.mapScene = this;
 
       //@ts-ignore
-      window.clickCell = (x,y) => clickCell(this, {x,y});
+      window.clickCell = (x, y) => clickCell(this, { x, y });
     }
 
     this.sound.stopAll();
@@ -678,12 +678,13 @@ export class MapScene extends Phaser.Scene {
 
     this.scene.start("CombatScene", {
       squads: this.state.squads,
-      units: this.state.units.map((u) =>
-        // make player units overpowered
-        u.id.startsWith("player")
-          ? { ...u, str: 999, dex: 999, hp: 999, currentHp: 999 }
-          : u
-      ),
+      units: this.state.units,
+      // GOD mode
+      // .map((u) =>
+      //   u.id.startsWith("player")
+      //     ? { ...u, str: 999, dex: 999, hp: 999, currentHp: 999 }
+      //     : u
+      // ),
       top: isPlayer ? target.id : starter.id,
       bottom: isPlayer ? starter.id : target.id,
       onCombatFinish: combatCallback,
@@ -758,7 +759,7 @@ export class MapScene extends Phaser.Scene {
   }
   squadAt(x: number, y: number) {
     return this.state.dispatchedSquads
-      .map(id=>this.getSquad(id))
+      .map((id) => this.getSquad(id))
       .find((s) => s.pos.x === x && s.pos.y === y);
   }
 
@@ -781,7 +782,7 @@ export class MapScene extends Phaser.Scene {
     const force = await this.getForce(PLAYER_FORCE);
     let mapSquad = toMapSquad(squad, await this.getCity(force.initialPosition));
 
-    this.state.dispatchedSquads = this.state.dispatchedSquads.add(squad.id)
+    this.state.dispatchedSquads = this.state.dispatchedSquads.add(squad.id);
 
     force.squads.push(squad.id);
 
