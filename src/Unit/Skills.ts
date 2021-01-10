@@ -1,6 +1,6 @@
-import { getItem } from "../DB";
-import { random } from "../utils/math";
+import {random} from "../utils/random";
 import { Elem, Unit, UnitClass } from "./Model";
+import { atk, attrMod, mAtk } from "./mods";
 
 export type Attack = {
   name: string;
@@ -10,12 +10,6 @@ export type Attack = {
 };
 
 type Row = "front" | "middle" | "back";
-
-const mods = (unit: Unit) => getItem(unit.equips.mainHand).modifiers;
-const atk = (unit: Unit) => mods(unit).atk;
-const mAtk = (unit: Unit) => mods(unit).m_atk;
-
-const attrMod = (attr: number) => Math.floor((attr - 10) / 2);
 
 // TODO: should get total str (including other equips)
 // TODO: should avoid getting items from DB

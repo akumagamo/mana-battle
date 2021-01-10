@@ -6,6 +6,7 @@ import { preload } from "../preload";
 import { createUnit, CreateUnitCmd } from "./cmds/createUnit";
 import { speak, SpeakCmd } from "./cmds/speak";
 import { wait, WaitCmd } from "./cmds/wait";
+import { walk, WalkCmd } from "./cmds/walk";
 
 type TheaterBackground = "plains" | "woods";
 
@@ -14,7 +15,7 @@ interface TheaterSceneConfig {
   steps: TheaterCmd[];
 }
 
-type TheaterCmd = CreateUnitCmd | WaitCmd | SpeakCmd;
+type TheaterCmd = CreateUnitCmd | WaitCmd | SpeakCmd | WalkCmd;
 
 export const startTheaterScene = (
   parent: Phaser.Scene,
@@ -49,6 +50,8 @@ export default class TheaterScene extends Phaser.Scene {
           return wait(this, step);
         case "SPEAK":
           return speak(this, step);
+        case "WALK":
+          return walk(this, step);
         default:
           return;
       }

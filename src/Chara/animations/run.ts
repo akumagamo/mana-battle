@@ -4,7 +4,7 @@ import upAndDown from "./upAndDown";
 
 // TODO: ^^^^ these constants belong to something that we may call "default pose"
 
-const front = (chara: Chara) => {
+const front = (chara: Chara, speed: number) => {
   chara.clearAnimations();
 
   chara.add.tween({
@@ -13,7 +13,7 @@ const front = (chara: Chara) => {
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
-    duration: 500,
+    duration: 500 * speed,
   });
 
   chara.add.tween({
@@ -22,7 +22,7 @@ const front = (chara: Chara) => {
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
-    duration: 500,
+    duration: 500 * speed,
   });
 
   chara.add.tween({
@@ -31,7 +31,7 @@ const front = (chara: Chara) => {
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
-    duration: 500,
+    duration: 500 * speed,
   });
 
   chara.add.tween({
@@ -40,7 +40,7 @@ const front = (chara: Chara) => {
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
-    duration: 500,
+    duration: 500 * speed,
   });
 
   chara.add.tween({
@@ -48,11 +48,11 @@ const front = (chara: Chara) => {
     y: chara.charaWrapper.y - 20,
     yoyo: true,
     repeat: -1,
-    duration: 100,
+    duration: 100 * speed,
   });
 };
 
-const back = (chara: Chara) => {
+const back = (chara: Chara, speed: number) => {
   chara.clearAnimations();
 
   const bounce = upAndDown(chara);
@@ -65,7 +65,7 @@ const back = (chara: Chara) => {
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
-    duration: 500,
+    duration: 500 * speed,
   });
 
   chara.add.tween({
@@ -74,7 +74,7 @@ const back = (chara: Chara) => {
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
-    duration: 500,
+    duration: 500 * speed,
   });
 
   chara.add.tween({
@@ -83,7 +83,7 @@ const back = (chara: Chara) => {
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
-    duration: 500,
+    duration: 500 * speed,
   });
 
   chara.add.tween({
@@ -92,14 +92,14 @@ const back = (chara: Chara) => {
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
-    duration: 500,
+    duration: 500 * speed,
   });
 };
 
-export default (chara: Chara) => {
+export default (chara: Chara, speed: number) => {
   if (chara.front) {
-    front(chara);
+    front(chara, speed);
   } else {
-    back(chara);
+    back(chara, speed);
   }
 };

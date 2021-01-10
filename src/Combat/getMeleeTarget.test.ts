@@ -2,6 +2,9 @@ import { makeUnit } from "../Unit/Jobs";
 import { getMeleeTarget } from "./getMeleeTarget";
 import { makeTurnUnit } from "./makeTurnUnit";
 
+jest.mock("../utils");
+jest.mock("../Unit/mods");
+
 test("Should get correct melee targets", () => {
   // Team 1 facing right =>
   //  [ 0, _, 1],

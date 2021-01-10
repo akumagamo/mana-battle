@@ -1,4 +1,4 @@
-import {random} from '../utils/math';
+import {random} from "../utils/random";
 
 export default (scene: Phaser.Scene) => (
   x: number,

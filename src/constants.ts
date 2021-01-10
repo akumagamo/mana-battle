@@ -17,3 +17,8 @@ export const SCENES = {
   CREATE_SQUAD_SCENE: "CreateSquadScene",
   EDIT_SQUAD_SCENE: "EditSquadScene",
 };
+
+export const lipsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras id velit at 
+lectus ullamcorper ultricies.  Nulla placerat posuere metus eget consectetur.
+Sed velit mauris, fringilla eu magna vitae, volutpat consectetur augue.
+`;

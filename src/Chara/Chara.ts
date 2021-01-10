@@ -193,8 +193,8 @@ export class Chara extends Phaser.Scene {
     });
   }
 
-  run() {
-    run(this);
+  run(speed: number) {
+    run(this, speed);
   }
 
   async fadeOut() {

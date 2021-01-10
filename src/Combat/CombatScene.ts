@@ -312,7 +312,7 @@ export default class CombatScene extends Phaser.Scene {
     const target = this.getChara(targetId);
 
     unit.clearAnimations();
-    unit.run();
+    unit.run(1);
 
     if (!target.unit.squad) throw new Error(INVALID_STATE);
 
@@ -362,7 +362,7 @@ export default class CombatScene extends Phaser.Scene {
   async retreatUnits() {
     return this.charas.map((chara) => {
       chara.clearAnimations();
-      chara.run();
+      chara.run(1);
 
       if (!chara.unit.squad) throw new Error(INVALID_STATE);
 
@@ -495,7 +495,7 @@ export default class CombatScene extends Phaser.Scene {
   returnToPosition(id: string) {
     const chara = this.getChara(id);
     chara.clearAnimations();
-    chara.run();
+    chara.run(1);
 
     if (!chara.unit.squad) throw new Error(INVALID_STATE);
     const coords = getBoardCoords(this.top === chara.unit.squad.id)(

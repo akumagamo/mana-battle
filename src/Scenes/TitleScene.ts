@@ -3,7 +3,7 @@ import { getSquads, getOptions, getUnits, disbandSquad } from "../DB";
 import defaultData from "../defaultData";
 import { preload } from "../preload";
 import button from "../UI/button";
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../constants";
+import { SCREEN_WIDTH, SCREEN_HEIGHT, lipsum } from "../constants";
 import { Chara } from "../Chara/Chara";
 import { Container } from "../Models";
 import { makeUnit } from "../Unit/Jobs";
@@ -137,8 +137,7 @@ export default class TitleScene extends Phaser.Scene {
           {
             type: "SPEAK",
             id: Object.values(getUnits())[2].id,
-            text: `Mussum Ipsum, cacilds vidis litro abertis. In elementis mé pra quem é amistosis
-quis leo.  Em pé sem cair, deitado sem dormir, sentado sem cochilar e fazendo pose.`,
+            text: lipsum,
           },
           { type: "WAIT", duration: 500 },
           {
@@ -149,6 +148,12 @@ quis leo.  Em pé sem cair, deitado sem dormir, sentado sem cochilar e fazendo p
             front: true,
             pose: "stand",
             showWeapon: true,
+          },
+          {
+            type: "WALK",
+            id: Object.values(getUnits())[0].id,
+            x: 600,
+            y: 600,
           },
         ],
       });
