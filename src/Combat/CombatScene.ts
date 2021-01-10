@@ -18,6 +18,7 @@ import { displayExperience } from "../Chara/animations/displayExperience";
 import { displayLevelUp } from "../Chara/animations/displayLevelUp";
 import StaticBoardScene from "../Board/StaticBoardScene";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
+import panel from "../UI/panel";
 
 const COMBAT_CHARA_SCALE = 1;
 const WALK_DURATION = 500;
@@ -39,6 +40,14 @@ export default class CombatScene extends Phaser.Scene {
   container: Container | null = null;
   onCombatFinish: (<CMD>(cmd: CMD[]) => void) | null = null;
   squads: Squad[] = [];
+  miniSquads: {
+    top: StaticBoardScene | null;
+    bottom: StaticBoardScene | null;
+  } = {
+    top: null,
+    bottom: null,
+  };
+  miniSquadCharas: Chara[] = [];
 
   constructor() {
     super("CombatScene");
@@ -134,8 +143,15 @@ export default class CombatScene extends Phaser.Scene {
   ) {
     const pos = {
       [top]: { x: SCREEN_WIDTH - 430, y: -20, top: true },
-      [bottom]: { x: -50, y: SCREEN_HEIGHT - 250, top: false },
+      [bottom]: { x: -80, y: SCREEN_HEIGHT - 230, top: false },
     };
+
+    const panel_ = (id: string) =>
+      panel(pos[id].x + 80, pos[id].y, 360, 230, this.container, this);
+
+    panel_(top).setAlpha(0.3);
+    panel_(bottom).setAlpha(0.3);
+
     const render = (squadId: string) =>
       new StaticBoardScene(
         squads.find((s) => s.id === squadId),
@@ -149,11 +165,20 @@ export default class CombatScene extends Phaser.Scene {
         pos[squadId].top
       );
 
-    [top, bottom].forEach((id) => {
-      const scene = render(id);
+    this.miniSquads.top = render(top);
+    this.miniSquads.bottom = render(bottom);
 
-      this.scene.add(`minisquad_${id}`, scene, true);
-    });
+    this.scene.add(this.miniSquadId(top), this.miniSquads.top, true);
+    this.scene.add(this.miniSquadId(bottom), this.miniSquads.bottom, true);
+
+    const push = (c: Chara) => this.miniSquadCharas.push(c);
+
+    this.miniSquads.top.unitList.forEach(push);
+    this.miniSquads.bottom.unitList.forEach(push);
+  }
+
+  private miniSquadId(id: string): string {
+    return `minisquad_${id}`;
   }
 
   turnOff() {
@@ -169,6 +194,13 @@ export default class CombatScene extends Phaser.Scene {
       this.scene.remove(chara);
     });
     this.charas = [];
+
+    this.miniSquads.top.turnOff();
+    this.miniSquads.bottom.turnOff();
+
+    this.scene.remove(this.miniSquads.top);
+    this.scene.remove(this.miniSquads.bottom);
+    this.miniSquadCharas = [];
   }
 
   // COMBAT FLOW METHODS
@@ -373,7 +405,14 @@ export default class CombatScene extends Phaser.Scene {
     return new Promise<void>((resolve) => {
       source.slash(resolve);
       target.flinch(damage, updatedTarget.currentHp === 0);
+      this.updateMinisquadHP(targetId, updatedTarget.currentHp);
     });
+  }
+
+  updateMinisquadHP(id: string, hp: number) {
+    const chara = this.miniSquadCharas.find((c) => c.unit.id === id);
+
+    chara.renderHPBar(hp);
   }
 
   bowAttack(

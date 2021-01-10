@@ -79,10 +79,30 @@ async function mapTest() {
   await wait(1000);
 
   //@ts-ignore
-  window.clickCell( 5, 6 );
+  window.clickCell(5, 6);
 
   await wait(1000);
 
   //@ts-ignore
   window.clickWait();
+
+  await wait(6000);
+
+  //@ts-ignore
+  window.moveButton();
+
+  await wait(1000);
+
+  //@ts-ignore
+  window.clickCell(6, 5);
+
+  await wait(1000);
+
+  //@ts-ignore
+  window.clickAttack();
+
+  await wait(1000);
+
+  //@ts-ignore
+  window.clickCell(6, 4);
 }

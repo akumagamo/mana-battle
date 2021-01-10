@@ -16,11 +16,10 @@ export default (
 ) => {
   const baseX = 300;
   const mode = scene.mode.type;
-  if (mode !== "MOVING_SQUAD" && mode !== "SELECTING_ATTACK_TARGET"){
-
+  if (mode !== "MOVING_SQUAD" && mode !== "SELECTING_ATTACK_TARGET") {
     const event = () => {
-        scene.showMoveControls(squad);
-      }
+      scene.showMoveControls(squad);
+    };
     button(
       baseX + 100,
       baseY,
@@ -31,19 +30,21 @@ export default (
       scene.inactiveSquads.has(squad.id)
     );
     //@ts-ignore
-    window.moveButton = event
+    window.moveButton = event;
   }
 
   if (mode !== "SELECTING_ATTACK_TARGET") {
+    const event = () => scene.showAttackControls(squad);
+
+    //@ts-ignore
+    window.clickAttack = event;
     button(
       baseX + 200,
       baseY,
       "Attack",
       scene.uiContainer,
       scene,
-      () => {
-        scene.showAttackControls(squad);
-      },
+      event,
       scene.getTargets(squad.pos).length < 1 ||
         scene.inactiveSquads.has(squad.id)
     );
@@ -125,18 +126,16 @@ export default (
       }
     });
 
-  if (mode === "MOVING_SQUAD" || mode == "SQUAD_SELECTED"){
-
+  if (mode === "MOVING_SQUAD" || mode == "SQUAD_SELECTED") {
     const event = () => {
       scene.signal('clicked "end squad turn"', [
         { type: "END_SQUAD_TURN", id: squad.id },
       ]);
-    }
-    button(baseX + 700, baseY, "Wait", uiContainer, scene, event );
+    };
+    button(baseX + 700, baseY, "Wait", uiContainer, scene, event);
 
     //@ts-ignore
-    window.clickWait = event
-
+    window.clickWait = event;
   }
 
   button(50, 40, "Organize", uiContainer, scene, () => {
@@ -155,8 +154,8 @@ export default (
       },
     });
   });
-    button(250, 40, 'Dispatch', uiContainer, scene, () => {
-      scene.disableMapInput();
-      dispatchWindow(scene);
-    });
+  button(250, 40, "Dispatch", uiContainer, scene, () => {
+    scene.disableMapInput();
+    dispatchWindow(scene);
+  });
 };

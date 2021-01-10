@@ -1,16 +1,16 @@
-import * as Phaser from 'phaser';
+import * as Phaser from "phaser";
 
-import {Unit} from '../Unit/Model';
-import {Container, Pointer, Image} from '../Models';
-import run from './animations/run';
+import { Unit } from "../Unit/Model";
+import { Container, Pointer, Image } from "../Models";
+import run from "./animations/run";
 
-import defaultPose from './animations/defaultPose';
-import stand from './animations/stand';
-import flinch from './animations/flinch';
-import slash from './animations/slash';
-import bowAttack from './animations/bowAttack';
-import initial from './animations/initial';
-import text from '../UI/text';
+import defaultPose from "./animations/defaultPose";
+import stand from "./animations/stand";
+import flinch from "./animations/flinch";
+import slash from "./animations/slash";
+import bowAttack from "./animations/bowAttack";
+import initial from "./animations/initial";
+import text from "../UI/text";
 
 export class Chara extends Phaser.Scene {
   /** Container around Chara, doesn't rotate (useful for adding UI elements)*/
@@ -35,7 +35,7 @@ export class Chara extends Phaser.Scene {
   leftHandEquip: Image | null = null;
   hat: Image | null = null;
 
-  hpBar: Phaser.GameObjects.Graphics | null;
+  hpBarContainer: Container | null;
 
   constructor(
     public key: string,
@@ -47,7 +47,7 @@ export class Chara extends Phaser.Scene {
     public front: boolean = true,
     public animated = true,
     public headOnly = false,
-    public showHpBar = false,
+    public showHpBar = false
   ) {
     super(key);
 
@@ -92,38 +92,7 @@ export class Chara extends Phaser.Scene {
     //
 
     if (this.showHpBar) {
-      const x = -50;
-      const y = -40;
-
-      const width = 100;
-      const height = 16;
-      const borderWidth = 2;
-
-      this.hpBar = new Phaser.GameObjects.Graphics(this);
-
-      this.hpBar.fillStyle(0x000000);
-      this.hpBar.fillRect(
-        x,
-        y,
-        width + borderWidth * 2,
-        height + borderWidth * 2,
-      );
-
-      this.hpBar.fillStyle(0xffffff);
-      this.hpBar.fillRect(x + borderWidth, y + borderWidth, width, height);
-
-      this.hpBar.fillStyle(0x00ff00);
-
-      var d = Math.floor(width * (this.unit.currentHp / this.unit.hp));
-
-      this.hpBar.fillRect(x + borderWidth, y + borderWidth, d, height);
-
-      this.container.add(this.hpBar);
-
-      const hp = text(-30, -95, this.unit.currentHp, this.container, this);
-      hp.setColor('#ffffff');
-      hp.setShadow(1, 1, '#000000', 10);
-      hp.setFontSize(40);
+      this.renderHPBar(this.unit.currentHp);
     }
 
     this.container.scale = this.scaleSizing;
@@ -131,9 +100,48 @@ export class Chara extends Phaser.Scene {
     this.container.name = this.unit.id;
   }
 
+  public renderHPBar(hpAmount: number) {
+    if (this.hpBarContainer) this.hpBarContainer.destroy();
+
+    if (hpAmount < 1) return;
+
+    const x = -50;
+    const y = -40;
+
+    this.hpBarContainer = this.add.container(x, y);
+
+    this.container.add(this.hpBarContainer);
+
+    const width = 100;
+    const height = 16;
+    const borderWidth = 2;
+
+    const hpBar = new Phaser.GameObjects.Graphics(this);
+    this.hpBarContainer.add(hpBar);
+
+    hpBar.fillStyle(0x000000);
+    hpBar.fillRect(0, 0, width + borderWidth * 2, height + borderWidth * 2);
+
+    hpBar.fillStyle(0xffffff);
+    hpBar.fillRect(borderWidth, borderWidth, width, height);
+
+    hpBar.fillStyle(0x00ff00);
+
+    var d = Math.floor(width * (hpAmount / this.unit.hp));
+
+    hpBar.fillRect(borderWidth, borderWidth, d, height);
+
+    const hp = text(30, -40, hpAmount, this.hpBarContainer, this);
+    this.hpBarContainer.add(hp);
+
+    hp.setColor("#ffffff");
+    hp.setShadow(1, 1, "#000000", 10);
+    hp.setFontSize(40);
+  }
+
   private maybeRenderInsignea() {
     if (this.unit.leader) {
-      const insignea = this.add.image(50, 0, 'insignea');
+      const insignea = this.add.image(50, 0, "insignea");
       this.container.add(insignea);
     }
   }
@@ -141,20 +149,20 @@ export class Chara extends Phaser.Scene {
   onClick(fn: (chara: Chara) => void) {
     this.container.setInteractive();
 
-    this.container.on('pointerdown', (_pointer: Pointer) => {
+    this.container.on("pointerdown", (_pointer: Pointer) => {
       fn(this);
     });
   }
 
   enableDrag(
     dragStart: (unit: Unit, x: number, y: number, chara: Chara) => void,
-    dragEnd: (unit: Unit, x: number, y: number, chara: Chara) => void,
+    dragEnd: (unit: Unit, x: number, y: number, chara: Chara) => void
   ) {
     this.container.setInteractive();
     this.input.setDraggable(this.container);
 
     this.input.on(
-      'drag',
+      "drag",
       (_pointer: Pointer, obj: Container, x: number, y: number) => {
         this.container.setDepth(Infinity);
 
@@ -162,20 +170,20 @@ export class Chara extends Phaser.Scene {
         obj.y = y;
 
         dragStart(this.unit, x, y, this);
-      },
+      }
     );
 
     this.container.on(
-      'dragend',
+      "dragend",
       (_pointer: Pointer, _dragX: number, dragY: number) => {
         this.container.setDepth(dragY);
         dragEnd(this.unit, this.container.x || 0, this.container.y || 0, this);
-      },
+      }
     );
   }
 
   handleClick(fn: (chara: Chara, pointer: Pointer) => void) {
-    this.container.on('pointerdown', (pointer: Pointer) => {
+    this.container.on("pointerdown", (pointer: Pointer) => {
       fn(this, pointer);
     });
   }
@@ -199,6 +207,7 @@ export class Chara extends Phaser.Scene {
   }
 
   flinch(damage: number, isKilled: boolean) {
+    if (this.showHpBar) this.renderHPBar(damage);
     flinch(this, damage, isKilled);
   }
 
@@ -238,22 +247,22 @@ export class Chara extends Phaser.Scene {
             onUpdate: function (tween) {
               var value = Math.floor(tween.getValue());
 
-              if (child.type === 'Container') {
+              if (child.type === "Container") {
                 (child as Phaser.GameObjects.Container).iterate(
                   (grand: Phaser.GameObjects.Image) => {
                     grand.setTint(
-                      Phaser.Display.Color.GetColor(value, value, value),
+                      Phaser.Display.Color.GetColor(value, value, value)
                     );
-                  },
+                  }
                 );
               } else {
                 (child as Phaser.GameObjects.Image).setTint(
-                  Phaser.Display.Color.GetColor(value, value, value),
+                  Phaser.Display.Color.GetColor(value, value, value)
                 );
               }
             },
           });
-        },
+        }
       );
     });
   }
