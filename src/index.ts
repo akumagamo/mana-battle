@@ -56,7 +56,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 function wait(n: number) {
-  return new Promise((resolve) => {
+  return new Promise<void>((resolve) => {
     setTimeout(() => {
       resolve();
     }, n);
