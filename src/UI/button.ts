@@ -53,6 +53,7 @@ export default (
   container.bringToTop(text_);
 
   container.add(clickZone);
+
   clickZone.on("pointerdown", () => {
     if (disabled) return;
     btn.fillStyle(activeFill);

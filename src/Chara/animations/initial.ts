@@ -1,4 +1,4 @@
-import {Chara} from '../Chara';
+import { Chara } from "../Chara";
 import {
   LEFT_FOOT_FRONT_X,
   LEFT_FOOT_FRONT_Y,
@@ -24,16 +24,16 @@ import {
   HEAD_BACK_Y,
   LEFT_HAND_BACK_Y,
   LEFT_HAND_BACK_X,
-} from './constants';
+} from "./constants";
 
 const shouldRenderHair = (chara: Chara) =>
-  !chara.unit.style.displayHat || chara.unit.equips.head === 'none';
-  
+  !chara.unit.style.displayHat || chara.unit.equips.head === "none";
+
 const shouldRenderHat = (chara: Chara) =>
-  chara.unit.style.displayHat && chara.unit.equips.head !== 'none';
+  chara.unit.style.displayHat && chara.unit.equips.head !== "none";
 
 function front(chara: Chara, headOnly = false) {
-  const {skinColor, hair, hairColor} = chara.unit.style;
+  const { skinColor, hair, hairColor } = chara.unit.style;
   const renderHair = (gx: number, gy: number) => {
     if (!shouldRenderHair(chara)) return null;
     const hairSprite = chara.add.image(gx, gy, hair);
@@ -42,14 +42,14 @@ function front(chara: Chara, headOnly = false) {
     return hairSprite;
   };
   const renderHead = (gx: number, gy: number) => {
-    const head = chara.add.image(gx, gy, 'head');
+    const head = chara.add.image(gx, gy, "head");
     head.setTint(skinColor);
     chara.container?.add(head);
     return head;
   };
 
   const renderFoot = (footX: number, footY: number) => {
-    const foot = chara.add.image(footX, footY, 'foot');
+    const foot = chara.add.image(footX, footY, "foot");
     chara.container?.add(foot);
     return foot;
   };
@@ -63,7 +63,7 @@ function front(chara: Chara, headOnly = false) {
   };
 
   const renderHand = (handX: number, handY: number) => {
-    const hand = chara.add.image(handX, handY, 'hand');
+    const hand = chara.add.image(handX, handY, "hand");
     hand.setTint(skinColor);
     chara.container?.add(hand);
     return hand;
@@ -92,12 +92,12 @@ function front(chara: Chara, headOnly = false) {
 
   chara.mainHandContainer = chara.add.container(
     RIGHT_HAND_FRONT_X,
-    RIGHT_HAND_FRONT_Y,
+    RIGHT_HAND_FRONT_Y
   );
 
   chara.offHandContainer = chara.add.container(
     LEFT_HAND_FRONT_X,
-    LEFT_HAND_FRONT_Y,
+    LEFT_HAND_FRONT_Y
   );
 
   chara.container?.add(chara.mainHandContainer);
@@ -105,11 +105,21 @@ function front(chara: Chara, headOnly = false) {
   chara.mainHandContainer.add(chara.rightHand);
   chara.offHandContainer.add(chara.leftHand);
 
-  if (chara.unit.class === 'mage') {
+  if (chara.showWeapon) renderFrontWeapon(chara);
+
+  chara.container.sendToBack(chara.offHandContainer);
+  chara.container?.bringToTop(chara.head);
+  if (chara.hair) chara.container?.bringToTop(chara.hair);
+  if (chara.hat) chara.container?.bringToTop(chara.hat);
+
+  chara.container.bringToTop(chara.mainHandContainer);
+}
+function renderFrontWeapon(chara: Chara) {
+  if (chara.unit.class === "mage") {
     chara.rightHandEquip = chara.add.image(
       23,
       17,
-      `equips/${chara.unit.equips.mainHand}`,
+      `equips/${chara.unit.equips.mainHand}`
     );
 
     chara.rightHandEquip.setScale(-0.3, 0.3);
@@ -119,11 +129,11 @@ function front(chara: Chara, headOnly = false) {
 
     chara.mainHandContainer.add(chara.rightHandEquip);
     chara.mainHandContainer.sendToBack(chara.rightHandEquip);
-  } else if (chara.unit.class === 'fighter') {
+  } else if (chara.unit.class === "fighter") {
     chara.rightHandEquip = chara.add.image(
       23,
       17,
-      `equips/${chara.unit.equips.mainHand}`,
+      `equips/${chara.unit.equips.mainHand}`
     );
 
     chara.rightHandEquip.setScale(0.2);
@@ -131,11 +141,11 @@ function front(chara: Chara, headOnly = false) {
 
     chara.mainHandContainer.add(chara.rightHandEquip);
     chara.mainHandContainer.sendToBack(chara.rightHandEquip);
-  } else if (chara.unit.class === 'archer') {
+  } else if (chara.unit.class === "archer") {
     chara.leftHandEquip = chara.add.image(
       0,
       0,
-      `equips/${chara.unit.equips.mainHand}`,
+      `equips/${chara.unit.equips.mainHand}`
     );
 
     chara.offHandContainer.add(chara.leftHandEquip);
@@ -143,36 +153,21 @@ function front(chara: Chara, headOnly = false) {
     chara.leftHand.setPosition(5, 0);
     chara.offHandContainer.sendToBack(chara.leftHandEquip);
   }
-  // if (chara.unit.equips.mainHand === 'iron_spear') {
-  //   chara.rightHandEquip.setPosition(60, -10);
-  //   chara.rightHandEquip.setScale(-1, 1);
-  //   chara.rightHandEquip.setOrigin(0.5);
-  //   chara.rightHandEquip.setRotation(0.5);
-  //   chara.rightHand.setPosition(-2, 10);
-  //   chara.leftHand.setPosition(5, 10);
-  // }
-  //
-  chara.container.sendToBack(chara.offHandContainer);
-  chara.container?.bringToTop(chara.head);
-  if (chara.hair) chara.container?.bringToTop(chara.hair);
-  if (chara.hat) chara.container?.bringToTop(chara.hat);
-
-  chara.container.bringToTop(chara.mainHandContainer);
-
 }
+
 function back(chara: Chara, headOnly = false) {
-  const {skinColor, hair, hairColor} = chara.unit.style;
+  const { skinColor, hair, hairColor } = chara.unit.style;
   const renderHair = (gx: number, gy: number) => {
     if (!shouldRenderHair(chara)) return null;
 
-    const hairSprite = chara.add.image(gx, gy, 'back_' + hair);
+    const hairSprite = chara.add.image(gx, gy, "back_" + hair);
     hairSprite.setTint(hairColor);
     chara.container?.add(hairSprite);
     return hairSprite;
   };
 
   function renderHead(gx: number, gy: number) {
-    const head = chara.add.image(gx, gy, 'back_head');
+    const head = chara.add.image(gx, gy, "back_head");
     head.setTint(skinColor);
     chara.container?.add(head);
 
@@ -180,7 +175,7 @@ function back(chara: Chara, headOnly = false) {
   }
 
   function renderFoot(footX: number, footY: number) {
-    const foot = chara.add.image(footX, footY, 'foot');
+    const foot = chara.add.image(footX, footY, "foot");
 
     foot.scaleX = -1;
     foot.rotation = 0.6;
@@ -198,7 +193,7 @@ function back(chara: Chara, headOnly = false) {
   }
 
   function renderHand(handX: number, handY: number) {
-    const hand = chara.add.image(handX, handY, 'hand');
+    const hand = chara.add.image(handX, handY, "hand");
 
     hand.setTint(skinColor);
     chara.container?.add(hand);
@@ -216,11 +211,10 @@ function back(chara: Chara, headOnly = false) {
 
   chara.mainHandContainer = chara.add.container(
     RIGHT_HAND_BACK_X,
-    RIGHT_HAND_BACK_Y,
+    RIGHT_HAND_BACK_Y
   );
 
   chara.container?.add(chara.mainHandContainer);
-
 
   chara.head = renderHead(HEAD_BACK_X, HEAD_BACK_Y);
   chara.hair = renderHair(HEAD_FRONT_X, HEAD_FRONT_Y);
@@ -234,56 +228,17 @@ function back(chara: Chara, headOnly = false) {
   chara.trunk = renderTrunk(chara.unit.class, TRUNK_BACK_X, TRUNK_BACK_Y);
   chara.rightHand = renderHand(0, 0);
 
-
   chara.offHandContainer = chara.add.container(
     LEFT_HAND_BACK_X,
-    LEFT_HAND_BACK_Y,
+    LEFT_HAND_BACK_Y
   );
 
   chara.container?.add(chara.offHandContainer);
   chara.mainHandContainer.add(chara.rightHand);
   chara.offHandContainer.add(chara.leftHand);
 
-  if (chara.unit.class === 'mage') {
-    chara.rightHandEquip = chara.add.image(
-      13,
-      17,
-      `equips/${chara.unit.equips.mainHand}`,
-    );
-
-    chara.rightHandEquip.setScale(-0.3, 0.3);
-    chara.rightHandEquip.setOrigin(0.45, 0.7);
-    chara.rightHandEquip.setRotation(-0.2);
-    chara.rightHandEquip.setPosition(3, 17);
-
-    chara.mainHandContainer.add(chara.rightHandEquip);
-    chara.mainHandContainer.sendToBack(chara.rightHandEquip);
-  } else if (chara.unit.class === 'fighter') {
-    chara.rightHandEquip = chara.add.image(
-      -10,
-      15,
-      `equips/${chara.unit.equips.mainHand}`,
-    );
-
-    chara.rightHandEquip.setScale(-0.2, 0.2);
-    chara.rightHandEquip.setOrigin(1, 1);
-
-    chara.mainHandContainer.add(chara.rightHandEquip);
-    chara.mainHandContainer.sendToBack(chara.rightHandEquip);
-  } else if (chara.unit.class === 'archer') {
-    chara.leftHandEquip = chara.add.image(
-      0,
-      20,
-      `equips/${chara.unit.equips.mainHand}`,
-    );
-    chara.leftHandEquip.rotation = 1;
-
-    chara.offHandContainer.add(chara.leftHandEquip);
-    chara.offHandContainer.sendToBack(chara.leftHandEquip);
-    chara.leftHand.setPosition(5, 0);
-    chara.offHandContainer.sendToBack(chara.leftHandEquip);
-
-    chara.offHandContainer.sendToBack(chara.leftHandEquip);
+  if (chara.showWeapon) {
+    renderBackWeapon(chara);
   }
 
   chara.container?.bringToTop(chara.head);
@@ -300,3 +255,46 @@ export default (chara: Chara, headOnly = false) => {
   if (chara.front) front(chara, headOnly);
   else back(chara, headOnly);
 };
+
+function renderBackWeapon(chara: Chara) {
+  if (chara.unit.class === "mage") {
+    chara.rightHandEquip = chara.add.image(
+      13,
+      17,
+      `equips/${chara.unit.equips.mainHand}`
+    );
+
+    chara.rightHandEquip.setScale(-0.3, 0.3);
+    chara.rightHandEquip.setOrigin(0.45, 0.7);
+    chara.rightHandEquip.setRotation(-0.2);
+    chara.rightHandEquip.setPosition(3, 17);
+
+    chara.mainHandContainer.add(chara.rightHandEquip);
+    chara.mainHandContainer.sendToBack(chara.rightHandEquip);
+  } else if (chara.unit.class === "fighter") {
+    chara.rightHandEquip = chara.add.image(
+      -10,
+      15,
+      `equips/${chara.unit.equips.mainHand}`
+    );
+
+    chara.rightHandEquip.setScale(-0.2, 0.2);
+    chara.rightHandEquip.setOrigin(1, 1);
+
+    chara.mainHandContainer.add(chara.rightHandEquip);
+    chara.mainHandContainer.sendToBack(chara.rightHandEquip);
+  } else if (chara.unit.class === "archer") {
+    chara.leftHandEquip = chara.add.image(
+      0,
+      20,
+      `equips/${chara.unit.equips.mainHand}`
+    );
+    chara.leftHandEquip.rotation = 1;
+
+    chara.offHandContainer.add(chara.leftHandEquip);
+    chara.offHandContainer.sendToBack(chara.leftHandEquip);
+    chara.leftHand.setPosition(5, 0);
+    chara.offHandContainer.sendToBack(chara.leftHandEquip);
+    chara.offHandContainer.sendToBack(chara.leftHandEquip);
+  }
+}

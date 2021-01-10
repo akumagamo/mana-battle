@@ -1,10 +1,5 @@
 import Phaser from "phaser";
-import {
-  getSquads,
-  getOptions,
-  getUnits,
-  disbandSquad,
-} from "../DB";
+import { getSquads, getOptions, getUnits, disbandSquad } from "../DB";
 import defaultData from "../defaultData";
 import { preload } from "../preload";
 import button from "../UI/button";
@@ -14,6 +9,7 @@ import { Container } from "../Models";
 import { makeUnit } from "../Unit/Jobs";
 import { fadeOut } from "../UI/Transition";
 import { Set } from "immutable";
+import { startTheaterScene } from "../Theater/TheaterScene";
 
 export default class TitleScene extends Phaser.Scene {
   music: Phaser.Sound.BaseSound | null = null;
@@ -114,6 +110,49 @@ export default class TitleScene extends Phaser.Scene {
     //     },
     //   });
     // });
+    button(20, 290, "Theater test", this.container, this, () => {
+      startTheaterScene(this, {
+        background: "plains",
+        steps: [
+          {
+            type: "CREATE_UNIT",
+            unit: Object.values(getUnits())[0],
+            x: 100,
+            y: 100,
+            front: true,
+            pose: "stand",
+            showWeapon: false,
+          },
+          { type: "WAIT", duration: 500 },
+          {
+            type: "CREATE_UNIT",
+            unit: Object.values(getUnits())[2],
+            x: 200,
+            y: 200,
+            front: true,
+            pose: "stand",
+            showWeapon: true,
+          },
+          { type: "WAIT", duration: 500 },
+          {
+            type: "SPEAK",
+            id: Object.values(getUnits())[2].id,
+            text: `Mussum Ipsum, cacilds vidis litro abertis. In elementis mé pra quem é amistosis
+quis leo.  Em pé sem cair, deitado sem dormir, sentado sem cochilar e fazendo pose.`,
+          },
+          { type: "WAIT", duration: 500 },
+          {
+            type: "CREATE_UNIT",
+            unit: Object.values(getUnits())[3],
+            x: 300,
+            y: 300,
+            front: true,
+            pose: "stand",
+            showWeapon: true,
+          },
+        ],
+      });
+    });
 
     button(20, 650, "Erase Data", this.container, this, () => {
       defaultData(true);
@@ -133,7 +172,7 @@ export default class TitleScene extends Phaser.Scene {
     //    remove: true,
     //  });
     //});
-    
+
     button(SCREEN_WIDTH / 2, 620, "Options", this.container, this, () => {
       this.scene.transition({
         target: "OptionsScene",

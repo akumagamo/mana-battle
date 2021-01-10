@@ -19,6 +19,8 @@ const attrMod = (attr: number) => Math.floor((attr - 10) / 2);
 
 // TODO: should get total str (including other equips)
 // TODO: should avoid getting items from DB
+// TODO: unit should have atk attr. it should be recalc when
+// changing items
 const slash = (times: number) => (unit: Unit): Attack => {
   return {
     name: "Slash",

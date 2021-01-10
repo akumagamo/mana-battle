@@ -2,6 +2,7 @@ import { Scene } from "phaser";
 import { Chara } from "../Chara/Chara";
 import { Container } from "../Models";
 import { Unit } from "../Unit/Model";
+import {animatedText} from "./animatedText";
 import panel from "./panel";
 import text from "./text";
 
@@ -40,13 +41,8 @@ export default (
 
   const speechText = text(x + 150, y + 50, "", container, scene);
 
-  scene.time.addEvent({
-    repeat: text_.length,
-    delay: 25,
-    callback: () => {
-      speechText.text = text_.slice(0, speechText.text.length + 1);
-    },
-  });
+  animatedText(scene, text_, speechText);
 
   return { bg, portrait, speechText };
 };
+

@@ -48,7 +48,8 @@ export class Chara extends Phaser.Scene {
     public front: boolean = true,
     public animated = true,
     public headOnly = false,
-    public showHpBar = false
+    public showHpBar = false,
+    public showWeapon = true
   ) {
     super(key);
 

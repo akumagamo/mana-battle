@@ -10,6 +10,7 @@ import CombatScene from "./Combat/CombatScene";
 import OptionsScene from "./Scenes/OptionsScene";
 import WorldScene from "./Scenes/World";
 import defaultData from "./defaultData";
+import TheaterScene from "./Theater/TheaterScene";
 
 console.log(`Starting up app. Some lessons to remember 📚:
   - avoid promises in rendering (this creates conflicts with Phaser's event manager)
@@ -36,6 +37,7 @@ const config: Phaser.Types.Core.GameConfig = {
     CombatScene,
     OptionsScene,
     WorldScene,
+    TheaterScene,
   ],
 };
 
@@ -50,7 +52,7 @@ if (process.env.NODE_ENV !== "production") {
   //@ts-ignore
   window.game = game;
 
-  mapTest();
+  //mapTest();
 }
 
 function wait(n: number) {
