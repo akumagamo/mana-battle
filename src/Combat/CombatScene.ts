@@ -404,9 +404,18 @@ export default class CombatScene extends Phaser.Scene {
 
     return new Promise<void>((resolve) => {
       source.slash(resolve);
-      target.flinch(damage, updatedTarget.currentHp === 0);
-      this.updateMinisquadHP(targetId, updatedTarget.currentHp);
+      this.damageUnit(target, damage, updatedTarget, targetId);
     });
+  }
+
+  private damageUnit(
+    chara: Chara,
+    damage: number,
+    updatedTarget: Unit,
+    targetId: string
+  ) {
+    chara.flinch(damage, updatedTarget.currentHp === 0);
+    this.updateMinisquadHP(targetId, updatedTarget.currentHp);
   }
 
   updateMinisquadHP(id: string, hp: number) {
@@ -446,7 +455,7 @@ export default class CombatScene extends Phaser.Scene {
         onComplete: () => {
           arrow.destroy();
 
-          target.flinch(damage, updatedTarget.currentHp === 0);
+          this.damageUnit(target, damage, updatedTarget, targetId);
         },
       });
     });
@@ -477,7 +486,7 @@ export default class CombatScene extends Phaser.Scene {
         duration: 700,
         onComplete: () => {
           fb.destroy();
-          target.flinch(damage, updatedTarget.currentHp === 0);
+          this.damageUnit(target, damage, updatedTarget, targetId);
         },
       });
     });

@@ -137,7 +137,7 @@ export default class StaticBoardScene extends Phaser.Scene {
     y = y * this.scaleSizing + this.y;
 
     const key = this.makeUnitKey(unit);
-    return new Chara(
+    const c = new Chara(
       key,
       this,
       unit,
@@ -149,6 +149,10 @@ export default class StaticBoardScene extends Phaser.Scene {
       false,
       true
     );
+
+    if (c.unit.currentHp < 1) c.tint(222222);
+
+    return c;
   }
 
   placeUnits() {

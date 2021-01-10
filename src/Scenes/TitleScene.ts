@@ -2,8 +2,6 @@ import Phaser from "phaser";
 import {
   getSquads,
   getOptions,
-  getUnit,
-  getSquad,
   getUnits,
   disbandSquad,
 } from "../DB";
@@ -15,7 +13,7 @@ import { Chara } from "../Chara/Chara";
 import { Container } from "../Models";
 import { makeUnit } from "../Unit/Jobs";
 import { fadeOut } from "../UI/Transition";
-import {Set} from "immutable";
+import { Set } from "immutable";
 
 export default class TitleScene extends Phaser.Scene {
   music: Phaser.Sound.BaseSound | null = null;
@@ -33,12 +31,10 @@ export default class TitleScene extends Phaser.Scene {
     this.container?.destroy();
   }
   create() {
-
-    this.events.once('shutdown', ()=>this.turnOff())
+    this.events.once("shutdown", () => this.turnOff());
 
     //@ts-ignore
-    window.title = this
-
+    window.title = this;
 
     this.container = this.add.container(0, 0);
     const bg = this.add.image(0, 0, "backgrounds/sunset");
@@ -96,15 +92,6 @@ export default class TitleScene extends Phaser.Scene {
       });
     });
 
-    button(20, 110, "Edit Squad 0", this.container, this, () => {
-      this.scene.transition({
-        target: "EditSquadScene",
-        duration: 0,
-        moveBelow: true,
-        data: { squad: getSquads()[0] },
-      });
-    });
-
     button(20, 170, "List Squads", this.container, this, () => {
       this.scene.start("ListSquadsScene", {
         units: Object.values(getUnits()),
@@ -114,19 +101,19 @@ export default class TitleScene extends Phaser.Scene {
       });
     });
 
-    button(20, 230, "Maps", this.container, this, this.mapsEvent);
+    button(20, 230, "Maps", this.container, this, () => this.mapsEvent());
 
-    button(20, 290, "Combat", this.container, this, () => {
-      this.scene.start("CombatScene", {
-        top: "1",
-        bottom: "2",
-        squads: [getSquad("1"), getSquad("2")],
-        units: [getUnit("1"), getUnit("2")],
-        onCombatFinish: () => {
-          this.scene.start("TitleScene");
-        },
-      });
-    });
+    // button(20, 290, "Combat", this.container, this, () => {
+    //   this.scene.start("CombatScene", {
+    //     top: "1",
+    //     bottom: "2",
+    //     squads: [getSquad("1"), getSquad("2")],
+    //     units: [getUnit("1"), getUnit("2")],
+    //     onCombatFinish: () => {
+    //       this.scene.start("TitleScene");
+    //     },
+    //   });
+    // });
 
     button(20, 650, "Erase Data", this.container, this, () => {
       defaultData(true);
@@ -146,6 +133,7 @@ export default class TitleScene extends Phaser.Scene {
     //    remove: true,
     //  });
     //});
+    
     button(SCREEN_WIDTH / 2, 620, "Options", this.container, this, () => {
       this.scene.transition({
         target: "OptionsScene",
@@ -160,4 +148,3 @@ export default class TitleScene extends Phaser.Scene {
     this.scene.start("MapListScene");
   }
 }
-

@@ -10,8 +10,9 @@ import flinch from "./animations/flinch";
 import slash from "./animations/slash";
 import bowAttack from "./animations/bowAttack";
 import initial from "./animations/initial";
-import text from "../UI/text";
+import hpBar from "./hpBar";
 
+const CHARA_INACTIVE_COLOR = 222222;
 export class Chara extends Phaser.Scene {
   /** Container around Chara, doesn't rotate (useful for adding UI elements)*/
   charaWrapper: Container = {} as Container;
@@ -103,40 +104,12 @@ export class Chara extends Phaser.Scene {
   public renderHPBar(hpAmount: number) {
     if (this.hpBarContainer) this.hpBarContainer.destroy();
 
-    if (hpAmount < 1) return;
+    if (hpAmount < 1) {
+      this.tint(CHARA_INACTIVE_COLOR);
+      return;
+    }
 
-    const x = -50;
-    const y = -40;
-
-    this.hpBarContainer = this.add.container(x, y);
-
-    this.container.add(this.hpBarContainer);
-
-    const width = 100;
-    const height = 16;
-    const borderWidth = 2;
-
-    const hpBar = new Phaser.GameObjects.Graphics(this);
-    this.hpBarContainer.add(hpBar);
-
-    hpBar.fillStyle(0x000000);
-    hpBar.fillRect(0, 0, width + borderWidth * 2, height + borderWidth * 2);
-
-    hpBar.fillStyle(0xffffff);
-    hpBar.fillRect(borderWidth, borderWidth, width, height);
-
-    hpBar.fillStyle(0x00ff00);
-
-    var d = Math.floor(width * (hpAmount / this.unit.hp));
-
-    hpBar.fillRect(borderWidth, borderWidth, d, height);
-
-    const hp = text(30, -40, hpAmount, this.hpBarContainer, this);
-    this.hpBarContainer.add(hp);
-
-    hp.setColor("#ffffff");
-    hp.setShadow(1, 1, "#000000", 10);
-    hp.setFontSize(40);
+    this.hpBarContainer = hpBar(this, this.container, hpAmount, this.unit.hp);
   }
 
   private maybeRenderInsignea() {
@@ -231,39 +204,41 @@ export class Chara extends Phaser.Scene {
         delay: duration * 2,
         callback: resolve,
       });
-      this.container.iterate(
-        (child: Phaser.GameObjects.Image | Phaser.GameObjects.Container) => {
-          this.tweens.addCounter({
-            from: 255,
-            to: 0,
+      this.tweens.addCounter({
+        from: 255,
+        to: 0,
+        duration,
+        onComplete: () => {
+          this.tweens.add({
+            targets: this.container,
+            alpha: 0,
             duration,
-            onComplete: () => {
-              this.tweens.add({
-                targets: this.container,
-                alpha: 0,
-                duration,
-              });
-            },
-            onUpdate: function (tween) {
-              var value = Math.floor(tween.getValue());
-
-              if (child.type === "Container") {
-                (child as Phaser.GameObjects.Container).iterate(
-                  (grand: Phaser.GameObjects.Image) => {
-                    grand.setTint(
-                      Phaser.Display.Color.GetColor(value, value, value)
-                    );
-                  }
-                );
-              } else {
-                (child as Phaser.GameObjects.Image).setTint(
-                  Phaser.Display.Color.GetColor(value, value, value)
-                );
-              }
-            },
           });
-        }
-      );
+        },
+        onUpdate: (tween) => {
+          var value = Math.floor(tween.getValue());
+
+          this.tint(value);
+        },
+      });
     });
+  }
+
+  tint(value: number) {
+    this.container.iterate(
+      (child: Phaser.GameObjects.Image | Phaser.GameObjects.Container) => {
+        if (child.type === "Container") {
+          (child as Phaser.GameObjects.Container).iterate(
+            (grand: Phaser.GameObjects.Image) => {
+              grand.setTint(Phaser.Display.Color.GetColor(value, value, value));
+            }
+          );
+        } else {
+          (child as Phaser.GameObjects.Image).setTint(
+            Phaser.Display.Color.GetColor(value, value, value)
+          );
+        }
+      }
+    );
   }
 }

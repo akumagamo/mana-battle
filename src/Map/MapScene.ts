@@ -6,7 +6,6 @@ import { Container, Image, Pointer } from "../Models";
 import panel from "../UI/panel";
 import {
   squadsFromForce as getSquadsFromForce,
-  getSquad,
   getPathTo,
 } from "./api";
 import { Vector, MapSquad, MapState, Force, City } from "./Model";

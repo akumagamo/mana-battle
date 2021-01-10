@@ -1,5 +1,5 @@
-import {Chara} from '../Chara';
-import {displayDamage} from './displayDamage';
+import { Chara } from "../Chara";
+import { displayDamage } from "./displayDamage";
 
 export default (chara: Chara, damage: number, isKilled: boolean) => {
   const FLINCH_DURATION = 200;
@@ -11,8 +11,11 @@ export default (chara: Chara, damage: number, isKilled: boolean) => {
     yoyo: !isKilled,
     duration: isKilled ? FLINCH_DURATION / 2 : FLINCH_DURATION,
     onComplete: () => {
-      // TODO: the scene should not have the power to control this
-      if (isKilled) chara.die();
+      chara.time.addEvent({
+        delay: 20,
+        // TODO: the scene should not have the power to control this
+        callback: () => (isKilled ? chara.die() : null),
+      });
     },
   });
 
@@ -27,4 +30,3 @@ export default (chara: Chara, damage: number, isKilled: boolean) => {
   // TODO: this should move to the parent scene
   displayDamage(chara, damage);
 };
-
