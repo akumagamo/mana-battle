@@ -31,7 +31,8 @@ export const baseEquips = {
 export function makeUnit(
   class_: UnitClass,
   id: number | string,
-  lvl: number
+  lvl: number,
+  overrides: Object = {}
 ): Unit {
   const baseStats: {
     [job in UnitClass]: { hp: number; str: number; dex: number; int: number };
@@ -76,5 +77,6 @@ export function makeUnit(
     },
     ...baseStats[class_],
     currentHp: baseStats[class_].hp,
+    ...overrides,
   };
 }

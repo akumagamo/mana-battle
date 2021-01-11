@@ -11,6 +11,7 @@ import OptionsScene from "./Scenes/OptionsScene";
 import WorldScene from "./Scenes/World";
 import defaultData from "./defaultData";
 import TheaterScene from "./Theater/TheaterScene";
+import CharaCreationScene from "./CharaCreation/CharaCreationScene";
 
 console.log(`Starting up app. Some lessons to remember 📚:
   - avoid promises in rendering (this creates conflicts with Phaser's event manager)
@@ -38,6 +39,7 @@ const config: Phaser.Types.Core.GameConfig = {
     OptionsScene,
     WorldScene,
     TheaterScene,
+    CharaCreationScene,
   ],
 };
 

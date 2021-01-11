@@ -10,6 +10,7 @@ import { makeUnit } from "../Unit/Jobs";
 import { fadeOut } from "../UI/Transition";
 import { Set } from "immutable";
 import { startTheaterScene } from "../Theater/TheaterScene";
+import { startCharaCreationScene } from "../CharaCreation/CharaCreationScene";
 
 export default class TitleScene extends Phaser.Scene {
   music: Phaser.Sound.BaseSound | null = null;
@@ -95,6 +96,10 @@ export default class TitleScene extends Phaser.Scene {
         dispatched: Set(),
         onDisbandSquad: (id: string) => disbandSquad(id),
       });
+    });
+
+    button(20, 370, "Create Character", this.container, this, () => {
+      startCharaCreationScene(this, null);
     });
 
     button(20, 230, "Maps", this.container, this, () => this.mapsEvent());

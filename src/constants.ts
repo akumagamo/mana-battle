@@ -16,6 +16,7 @@ export const SCENES = {
   LIST_UNITS_SCENE: "ListUnitsScene",
   CREATE_SQUAD_SCENE: "CreateSquadScene",
   EDIT_SQUAD_SCENE: "EditSquadScene",
+  CHARA_CREATION_SCENE: "CharaCreationScene",
 };
 
 export const lipsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras id velit at 

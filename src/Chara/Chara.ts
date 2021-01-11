@@ -242,4 +242,11 @@ export class Chara extends Phaser.Scene {
       }
     );
   }
+  setSkinColor(value: number) {
+    this.head.setTint(value);
+    this.leftHand.setTint(value);
+    this.rightHand.setTint(value);
+    this.leftFoot.setTint(value);
+    this.rightFoot.setTint(value);
+  }
 }
