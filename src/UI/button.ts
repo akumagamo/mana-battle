@@ -15,7 +15,8 @@ export default (
   onClick: () => void,
   disabled = false,
   width?: number,
-  height?: number
+  height?: number,
+  active?: boolean
 ) => {
   const text_ = text(x, y, label, container, scene);
   text_.setShadow(2, 2, "#000");
@@ -41,10 +42,11 @@ export default (
   btn.strokeRect(rectX, rectY, rectWidth, rectHeight);
   fill();
 
-  // const border = scene.add.graphics();
-  // border.lineStyle(1, 0xffffff, 1);
-  // border.strokeRect(rectX - 1, rectY - 1, rectWidth + 1, rectHeight + 2);
-
+  const border = scene.add.graphics();
+  if (active) {
+    border.lineStyle(4, 0xd4af37, 1);
+    border.strokeRect(rectX - 1, rectY - 1, rectWidth + 1, rectHeight + 2);
+  }
   const clickZone = scene.add.zone(rectX, rectY, rectWidth, rectHeight);
   clickZone.setInteractive();
   clickZone.setOrigin(0);
@@ -83,5 +85,13 @@ export default (
     text_.setColor(defaultTextColor);
   });
 
-  return btn;
+  const elems = [text_, btn, clickZone, border];
+
+  return { btn, destroy: () => elems.map((e) => e.destroy()) };
+};
+
+export const setActive = (btn: Phaser.GameObjects.Graphics) => {
+  console.log(`setting active`);
+  btn.fillStyle(activeFill);
+  btn.fill();
 };

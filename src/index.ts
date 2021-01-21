@@ -41,6 +41,10 @@ const config: Phaser.Types.Core.GameConfig = {
     TheaterScene,
     CharaCreationScene,
   ],
+  dom: {
+    createContainer: true,
+  },
+  parent: "content",
 };
 
 if (localStorage.getItem("player") === null) {

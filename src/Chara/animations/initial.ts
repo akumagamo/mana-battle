@@ -1,3 +1,4 @@
+import { Gender } from "../../Unit/Model";
 import { Chara } from "../Chara";
 import {
   LEFT_FOOT_FRONT_X,
@@ -41,8 +42,8 @@ function front(chara: Chara, headOnly = false) {
     chara.container?.add(hairSprite);
     return hairSprite;
   };
-  const renderHead = (gx: number, gy: number) => {
-    const head = chara.add.image(gx, gy, "head");
+  const renderHead = (gx: number, gy: number, gender: Gender) => {
+    const head = chara.add.image(gx, gy, `chara/head_${gender}`);
     head.setTint(skinColor);
     chara.container?.add(head);
     return head;
@@ -78,7 +79,7 @@ function front(chara: Chara, headOnly = false) {
     return hat;
   }
 
-  chara.head = renderHead(HEAD_FRONT_X, HEAD_FRONT_Y);
+  chara.head = renderHead(HEAD_FRONT_X, HEAD_FRONT_Y, chara.unit.gender);
   chara.hair = renderHair(HEAD_FRONT_X, HEAD_FRONT_Y);
   chara.hat = renderHat(HEAD_FRONT_X, HEAD_FRONT_Y);
 

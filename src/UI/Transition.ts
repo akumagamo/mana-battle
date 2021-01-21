@@ -1,16 +1,16 @@
-import * as Phaser from 'phaser';
-import panel from '../UI/panel';
-import {SCREEN_HEIGHT, SCREEN_WIDTH} from '../constants';
+import * as Phaser from "phaser";
+import panel from "../UI/panel";
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
 
 class Transition extends Phaser.Scene {
-  create({fadeIn, resolve}: {fadeIn: boolean; resolve: () => void}) {
+  create({ fadeIn, resolve }: { fadeIn: boolean; resolve: () => void }) {
     const black = panel(
       0,
       0,
       SCREEN_WIDTH,
       SCREEN_HEIGHT,
       this.add.container(),
-      this,
+      this
     );
 
     black.setAlpha(fadeIn ? 1 : 0);
@@ -34,10 +34,10 @@ class Transition extends Phaser.Scene {
 
 const transition = (scene: Phaser.Scene, fadeIn: boolean) => {
   return new Promise<void>((resolve) =>
-    scene.scene.add('transition', Transition, true, {
+    scene.scene.add("transition" + Math.random().toString(), Transition, true, {
       resolve: () => resolve(),
       fadeIn,
-    }),
+    })
   );
 };
 

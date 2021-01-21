@@ -3,14 +3,16 @@ import { getSquads, getOptions, getUnits, disbandSquad } from "../DB";
 import defaultData from "../defaultData";
 import { preload } from "../preload";
 import button from "../UI/button";
-import { SCREEN_WIDTH, SCREEN_HEIGHT, lipsum } from "../constants";
+import { SCREEN_WIDTH, SCREEN_HEIGHT, lipsum, SCENES } from "../constants";
 import { Chara } from "../Chara/Chara";
 import { Container } from "../Models";
 import { makeUnit } from "../Unit/Jobs";
-import { fadeOut } from "../UI/Transition";
+import { fadeIn, fadeOut } from "../UI/Transition";
 import { Set } from "immutable";
 import { startTheaterScene } from "../Theater/TheaterScene";
-import { startCharaCreationScene } from "../CharaCreation/CharaCreationScene";
+import CharaCreationScene, {
+  startCharaCreationScene,
+} from "../CharaCreation/CharaCreationScene";
 
 export default class TitleScene extends Phaser.Scene {
   music: Phaser.Sound.BaseSound | null = null;
@@ -173,15 +175,45 @@ export default class TitleScene extends Phaser.Scene {
       window.document.body.requestFullscreen();
     });
 
-    //button(SCREEN_WIDTH / 2, 550, 'New Game', this.container, this, () => {
-    //  this.cameras.main.fadeOut(1000, 0, 0, 0);
-    //  this.scene.transition({
-    //    target: 'WorldScene',
-    //    duration: 1000,
-    //    moveBelow: true,
-    //    remove: true,
-    //  });
-    //});
+    button(
+      SCREEN_WIDTH / 2,
+      550,
+      "New Game",
+      this.container,
+      this,
+      async () => {
+        await fadeOut(this);
+        const scene = new CharaCreationScene({});
+        this.scene.add(SCENES.CHARA_CREATION_SCENE, scene, true);
+        const unit = await scene.createUnitForm();
+        startTheaterScene(this, {
+          background: "plains",
+          steps: [
+            {
+              type: "CREATE_UNIT",
+              unit,
+              x: 100,
+              y: 100,
+              front: true,
+              pose: "stand",
+              showWeapon: false,
+            },
+            { type: "WAIT", duration: 500 },
+            {
+              type: "SPEAK",
+              id: unit.id,
+              text: lipsum,
+            },
+            {
+              type: "WALK",
+              id: unit.id,
+              x: 600,
+              y: 600,
+            },
+          ],
+        });
+      }
+    );
 
     button(SCREEN_WIDTH / 2, 620, "Options", this.container, this, () => {
       this.scene.transition({

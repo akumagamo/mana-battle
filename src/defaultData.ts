@@ -21,6 +21,11 @@ import { fighterArcherSquad } from "./Squad/generator";
 import { PLAYER_FORCE } from "./constants";
 
 export const classes: UnitClass[] = ["fighter", "mage", "archer"];
+export const classLabels: { [label in UnitClass]: string } = {
+  fighter: "Fighter",
+  mage: "Mage",
+  archer: "Archer",
+};
 
 function makeItem(acc: Item[], itemData: any): Item[] {
   const { type, name } = itemData;
@@ -75,14 +80,14 @@ const options: Options = {
   musicEnabled: true,
 };
 
-const squadA = fighterArcherSquad(PLAYER_FORCE, "player_1_", 1);
-const squadB = fighterArcherSquad(PLAYER_FORCE, "player_2_", 1);
+// const squadA = fighterArcherSquad(PLAYER_FORCE, "player_1_", 1);
+// const squadB = fighterArcherSquad(PLAYER_FORCE, "player_2_", 1);
 
-const units = { ...squadA.units, ...squadB.units };
-const squads = {
-  [squadA.squad.id]: squadA.squad,
-  [squadB.squad.id]: squadB.squad,
-};
+// const units = { ...squadA.units, ...squadB.units };
+// const squads = {
+//   [squadA.squad.id]: squadA.squad,
+//   [squadB.squad.id]: squadB.squad,
+// };
 
 const data: [
   string,
@@ -96,8 +101,16 @@ const data: [
     | BattleFieldMap
   )
 ][] = [
-  ["units", units],
-  ["squads", squads],
+  [
+    "units",
+    {},
+    //units
+  ],
+  [
+    "squads",
+    {},
+    //squads
+  ],
   ["items", items],
   ["itemTypes", itemTypeSlots],
   ["player", player],
