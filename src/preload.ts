@@ -23,7 +23,8 @@ export function preload(this: {
     "backgrounds/squad_edit",
     "chara/head_male",
     "chara/head_female",
-    "hair/female/1"
+    "hair/female/1",
+    "hair/male/1",
   ].forEach((str) => this.load.image(str, PUBLIC_URL + "/" + str + ".svg"));
 
   // @ts-ignore

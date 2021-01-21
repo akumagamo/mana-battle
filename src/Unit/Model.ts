@@ -165,7 +165,15 @@ export function getUnitsWithoutSquad(map: UnitMap) {
   );
 }
 
-export const HAIR_STYLES = ["dark1", "long1", "split", "long2", "split2", "hair/female/1"];
+export const HAIR_STYLES = [
+  "dark1",
+  "long1",
+  "split",
+  "long2",
+  "split2",
+  "hair/female/1",
+  "hair/male/1",
+];
 
 export type Skill = {
   name: string;
