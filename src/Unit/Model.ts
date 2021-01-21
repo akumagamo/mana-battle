@@ -172,6 +172,7 @@ export const HAIR_STYLES = [
   "long2",
   "split2",
   "hair/female/1",
+  "hair/female/2",
   "hair/male/1",
 ];
 

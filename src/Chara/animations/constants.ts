@@ -34,13 +34,15 @@ export const TRUNK_BACK_Y = 55;
 export const HAIR_COLOR_DARK_BROWN = 0x654321;
 export const HAIR_COLOR_BLACK = 0x333333;
 export const HAIR_COLOR_WHITE = 0xffffff;
-export const HAIR_COLOR_BLONDE = 0xe5d091;
+export const HAIR_COLOR_BLONDE = 0xfaf0be;
 export const HAIR_COLOR_ORANGE = 0xc6554d;
 export const HAIR_COLOR_DARK_ORANGE = 0xd45500ff
 export const HAIR_COLOR_PINK = 0xcc82bd;
 export const HAIR_COLOR_BLUE = 0x6087c8;
 export const HAIR_COLOR_GREEN = 0x7ba75c;
 export const HAIR_COLOR_RED = 0x960d0b
+
+
 
 export const HAIR_COLORS = [
   HAIR_COLOR_DARK_BROWN,

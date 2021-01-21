@@ -24,6 +24,7 @@ export function preload(this: {
     "chara/head_male",
     "chara/head_female",
     "hair/female/1",
+    "hair/female/2",
     "hair/male/1",
   ].forEach((str) => this.load.image(str, PUBLIC_URL + "/" + str + ".svg"));
 
