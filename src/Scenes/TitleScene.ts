@@ -186,7 +186,35 @@ export default class TitleScene extends Phaser.Scene {
         const scene = new CharaCreationScene({});
         this.scene.add(SCENES.CHARA_CREATION_SCENE, scene, true);
         const unit = await scene.createUnitForm();
-        startTheaterScene(this, {
+        await startTheaterScene(this, {
+          background: "castle",
+          steps: [
+            {
+              type: "CREATE_UNIT",
+              unit,
+              x: 100,
+              y: 100,
+              front: true,
+              pose: "stand",
+              showWeapon: false,
+            },
+            { type: "WAIT", duration: 500 },
+            {
+              type: "SPEAK",
+              id: unit.id,
+              text: lipsum,
+            },
+            {
+              type: "WALK",
+              id: unit.id,
+              x: 600,
+              y: 600,
+            },
+            { type: "WAIT", duration: 500 },
+            { type: "FINISH" },
+          ],
+        });
+        await startTheaterScene(this, {
           background: "plains",
           steps: [
             {
@@ -210,6 +238,8 @@ export default class TitleScene extends Phaser.Scene {
               x: 600,
               y: 600,
             },
+            { type: "WAIT", duration: 500 },
+            { type: "FINISH" },
           ],
         });
       }

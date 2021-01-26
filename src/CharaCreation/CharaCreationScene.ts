@@ -38,7 +38,6 @@ export default class CharaCreationScene extends Phaser.Scene {
   unit: Unit | null = null;
   chara: Chara | null = null;
   container: Container | null = null;
-  refreshHair: (gender: string) => void = () => {};
 
   async create(_data: SceneCommands) {
     await fadeIn(this);
@@ -53,17 +52,15 @@ export default class CharaCreationScene extends Phaser.Scene {
         y: number,
         label: string,
         prop: "hair" | "hairColor" | "skinColor",
-        items: any[],
-        filter: any
+        index: any[]
       ) =>
         this.propSelector(
           baseX,
           y,
-          items.indexOf(this.unit.style[prop]),
+          index.indexOf(this.unit.style[prop]),
           label,
           prop,
-          items,
-          filter
+          index
         );
       this.initialState();
 
@@ -81,21 +78,9 @@ export default class CharaCreationScene extends Phaser.Scene {
         300
       );
 
-      prop(baseY + panelHeight, "Skin Color", "skinColor", SKIN_COLORS, null);
-      prop(
-        baseY + panelHeight * 2,
-        "Hair Color",
-        "hairColor",
-        HAIR_COLORS,
-        null
-      );
-      prop(
-        baseY + panelHeight * 3,
-        "Hair Style",
-        "hair",
-        HAIR_STYLES,
-        (s: string) => s.indexOf(`/${this.unit.gender}/`) > -1
-      );
+      prop(baseY + panelHeight, "Skin Color", "skinColor", SKIN_COLORS);
+      prop(baseY + panelHeight * 2, "Hair Color", "hairColor", HAIR_COLORS);
+      prop(baseY + panelHeight * 3, "Hair Style", "hair", HAIR_STYLES);
 
       this.radio(
         baseX,
@@ -109,7 +94,6 @@ export default class CharaCreationScene extends Phaser.Scene {
       this.confirmButton(resolve);
     });
   }
-
   private confirmButton(resolve: (value: Unit | PromiseLike<Unit>) => void) {
     const img = this.add.image(
       SCREEN_WIDTH - 100,
@@ -229,11 +213,6 @@ export default class CharaCreationScene extends Phaser.Scene {
           };
           elems.map((e) => e.destroy());
           this.radio(x, y, label, prop, items, labelIndex, width);
-
-          if (prop === "gender") {
-            this.refreshHair(value);
-          }
-
           this.refreshChara();
         },
         false,
@@ -256,15 +235,9 @@ export default class CharaCreationScene extends Phaser.Scene {
     index: number,
     label: string,
     prop: "hair" | "skinColor" | "hairColor",
-    items: any[],
-    pattern?: string
+    items: any[]
   ) {
     const panel_ = this.panel(x, y, label);
-
-    const validItems = pattern
-      ? items.filter(this.filterPattern(pattern))
-      : items;
-
     const style = text(
       baseX + 100,
       y + 60,
@@ -280,8 +253,8 @@ export default class CharaCreationScene extends Phaser.Scene {
       this.container,
       this,
       () => {
-        destroy();
-        this.refreshProp(label, index - 1, prop, validItems, x, y, pattern);
+        refresh();
+        this.refreshProp(label, index - 1, prop, items, x, y);
       },
       index < 1
     );
@@ -292,33 +265,18 @@ export default class CharaCreationScene extends Phaser.Scene {
       this.container,
       this,
       () => {
-        destroy();
-        this.refreshProp(label, index + 1, prop, validItems, x, y, pattern);
+        refresh();
+        this.refreshProp(label, index + 1, prop, items, x, y);
       },
-      index >= validItems.length - 1
+      index >= items.length - 1
     );
 
-    function destroy() {
+    function refresh() {
       style.destroy();
       panel_.destroy();
       prev.destroy();
       next.destroy();
     }
-
-    if (prop === "hair")
-      this.refreshHair = (v: string) => {
-        destroy();
-        this.refreshProp(label, 0, prop, HAIR_STYLES, x, y, v);
-        const hair = HAIR_STYLES.filter(this.filterPattern(v))[0];
-        this.unit = { ...this.unit, style: { ...this.unit.style, hair } };
-        this.refreshChara();
-      };
-  }
-
-  private filterPattern(
-    pattern: string
-  ): (value: any, index: number, array: any[]) => unknown {
-    return (a) => a.indexOf(`/${pattern}/`) > -1;
   }
 
   private refreshProp(
@@ -327,8 +285,7 @@ export default class CharaCreationScene extends Phaser.Scene {
     currentProp: "hair" | "skinColor" | "hairColor",
     items: string[] | number[],
     x: number,
-    y: number,
-    pattern?: string
+    y: number
   ) {
     this.unit = {
       ...this.unit,
@@ -338,7 +295,7 @@ export default class CharaCreationScene extends Phaser.Scene {
       },
     };
     this.refreshChara();
-    this.propSelector(x, y, index, label, currentProp, items, pattern);
+    this.propSelector(x, y, index, label, currentProp, items);
   }
 
   refreshChara() {

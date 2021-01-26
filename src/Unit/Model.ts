@@ -171,9 +171,9 @@ export const HAIR_STYLES = [
   "split",
   "long2",
   "split2",
-  "hair/female/1",
-  "hair/female/2",
-  "hair/male/1",
+  "female1",
+  "female2",
+  "male1",
 ];
 
 export type Skill = {

@@ -19,13 +19,11 @@ export function preload(this: {
     "head",
     "arrow",
     "backgrounds/plain",
+    "backgrounds/castle",
     "backgrounds/sunset",
     "backgrounds/squad_edit",
     "chara/head_male",
     "chara/head_female",
-    "hair/female/1",
-    "hair/female/2",
-    "hair/male/1",
   ].forEach((str) => this.load.image(str, PUBLIC_URL + "/" + str + ".svg"));
 
   // @ts-ignore
@@ -35,7 +33,16 @@ export function preload(this: {
     endFrame: 7,
   });
 
-  const hairs = ["dark1", "long1", "long2", "split", "split2"];
+  const hairs = [
+    "dark1",
+    "long1",
+    "long2",
+    "split",
+    "split2",
+    "male1",
+    "female1",
+    "female2",
+  ];
   hairs.forEach((str) => {
     this.load.image(str, PUBLIC_URL + "/hair/" + str + ".svg");
     this.load.image("back_" + str, PUBLIC_URL + "/hair/back_" + str + ".svg");
@@ -178,4 +185,6 @@ export function preload(this: {
   this.load.image("map_select", `${PUBLIC_URL}/scenes/map_select.png`);
 
   this.load.html("nameform", "assets/chara-creation/input.html");
+
+  this.load.image("castlebg", `${PUBLIC_URL}/backgrounds/castlebg.png`);
 }
