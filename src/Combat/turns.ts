@@ -1,4 +1,3 @@
-import S from "sanctuary";
 import { Unit, UnitSquadPosition } from "../Unit/Model";
 import { getUnitAttack, getUnitDamage } from "../Unit/Skills";
 import { INVALID_STATE } from "../errors";
@@ -389,13 +388,10 @@ function rangedSpellSingleTarget(
 }
 
 function isVictory(current: TurnUnit, units: TurnUnit[]) {
-  const teamDefeated = S.pipe([
-    S.map(S.prop("unit")),
-    S.filter(isFromAnotherSquad(current.unit)),
-    S.all((e: Unit) => !isAlive(e)),
-  ])(units);
-
-  return teamDefeated;
+  return units
+    .map((u) => u.unit)
+    .filter(isFromAnotherSquad(current.unit))
+    .every((enemy) => !isAlive(enemy));
 }
 
 function noAttacksRemaining(units: TurnUnit[]) {

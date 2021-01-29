@@ -6,7 +6,6 @@ import button from "../UI/button";
 import panel from "../UI/panel";
 import { PLAYER_FORCE, SCREEN_WIDTH } from "../constants";
 import text from "../UI/text";
-import S from "sanctuary";
 import menu from "../Backgrounds/menu";
 import { Unit } from "../Unit/Model";
 import { Set } from "immutable";
@@ -83,12 +82,12 @@ export class ListSquadsScene extends Phaser.Scene {
 
     const dispatched = this.dispatched.has(squad.id);
 
-    container.setAlpha( dispatched ? 0.3 : 1) 
+    container.setAlpha(dispatched ? 0.3 : 1);
 
     button(
       200,
       10,
-      'Edit',
+      "Edit",
       container,
       this,
       () => {
@@ -97,12 +96,20 @@ export class ListSquadsScene extends Phaser.Scene {
       dispatched
     );
 
-    button(1000, 10, "Disband Squad", container, this, () => {
-      this.onDisbandSquad(squad.id);
-      //api.disbandSquad(squad.id);
-      container.destroy();
-      this.refresh();
-    },dispatched);
+    button(
+      1000,
+      10,
+      "Disband Squad",
+      container,
+      this,
+      () => {
+        this.onDisbandSquad(squad.id);
+        //api.disbandSquad(squad.id);
+        container.destroy();
+        this.refresh();
+      },
+      dispatched
+    );
   }
 
   renderBoard(squad: Squad, x: number, y: number) {
@@ -126,13 +133,9 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   squadSceneIO(id: string, fn: (board: BoardScene) => void) {
-    const scene = S.find<BoardScene>((e) => e.squad.id === id)(
-      this.boardScenes
-    );
+    const board = this.boardScenes.find((e) => e.squad.id === id);
 
-    S.map<BoardScene, void>((board) => {
-      fn(board);
-    })(scene);
+    fn(board);
   }
   selectSquad(sqd: Squad) {
     this.squadSceneIO(sqd.id, (squadScene) => {
@@ -145,7 +148,6 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   renderControls() {
-
     // TODO: add onReturn event
     button(
       SCREEN_WIDTH - 100,

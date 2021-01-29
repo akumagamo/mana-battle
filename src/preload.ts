@@ -1,16 +1,9 @@
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./constants";
 import { classes } from "./defaultData";
 
 const PUBLIC_URL = "assets";
 
-export function preload(this: {
-  load: {
-    image: (key: string, path: string) => void;
-    audio: (key: string, path: string) => void;
-    html: (key: string, path: string) => void;
-  };
-  preload: () => void;
-  create: (this: { preload: () => void; create: () => void }) => void;
-}) {
+export function preload(this: Phaser.Scene) {
   [
     "insignea",
     "tile",
@@ -187,4 +180,43 @@ export function preload(this: {
   this.load.html("nameform", "assets/chara-creation/input.html");
 
   this.load.image("castlebg", `${PUBLIC_URL}/backgrounds/castlebg.png`);
+
+  progressBar(this);
+}
+
+function progressBar(scene: Phaser.Scene) {
+  const width = 400;
+  const height = 50;
+  const x = SCREEN_WIDTH / 2 - width / 2;
+  const y = SCREEN_HEIGHT / 2;
+  const padding = 10;
+  let progressBar = scene.add.graphics();
+  let progressBox = scene.add.graphics();
+  progressBox.fillStyle(0x222222, 0.8);
+  progressBox.fillRect(x, y, width, height);
+
+  const percentText = scene.add.text(x, y, "0%", {
+    font: "18px monospace",
+    fill: "#ffffff",
+  });
+
+  scene.load.on("progress", (value: number) => {
+    progressBar.clear();
+    progressBar.fillStyle(0xffffff, 1);
+    progressBar.fillRect(
+      x + padding,
+      y + padding,
+      width * value - padding * 2,
+      height - padding * 2
+    );
+    percentText.setText((value * 100).toFixed().toString() + "%");
+  });
+
+  scene.load.on("fileprogress", (file: Phaser.Loader.File) => {
+    console.log(file);
+    console.log(file.src);
+  });
+  scene.load.on("complete", function () {
+    console.log("complete");
+  });
 }
