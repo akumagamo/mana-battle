@@ -71,17 +71,7 @@ export default class TitleScene extends Phaser.Scene {
     });
     this.charas.map((c) => this.container?.add(c.container));
 
-    if (!this.music) {
-      this.sound.stopAll();
-
-      if (getOptions().musicEnabled) {
-        this.music = this.sound.add("title");
-
-        //@ts-ignore TODO: check ts declaration
-        this.music.setVolume(0.1);
-        this.music.play();
-      }
-    }
+    this.changeMusic("title");
 
     button(20, 50, "List Units", this.container, this, () => {
       this.scene.transition({
@@ -182,9 +172,19 @@ export default class TitleScene extends Phaser.Scene {
       this.container,
       this,
       async () => {
-        await fadeOut(this);
+        //@ts-ignore
+        this.tweens.add({
+          targets: this.music,
+          volume: 0,
+          duration: 1000,
+          onComplete: () => {
+            this.changeMusic("jshaw_dream_of_first_flight");
+          },
+        });
+        await fadeOut(this, 2000);
         const scene = new CharaCreationScene({});
         this.scene.add(SCENES.CHARA_CREATION_SCENE, scene, true);
+
         const unit = await scene.createUnitForm();
         await startTheaterScene(this, {
           background: "castle",
@@ -252,6 +252,18 @@ export default class TitleScene extends Phaser.Scene {
         moveBelow: true,
       });
     });
+  }
+
+  private changeMusic(key: string) {
+    if (this.music) this.music.destroy();
+
+    if (getOptions().musicEnabled) {
+      this.music = this.sound.add(key);
+
+      //@ts-ignore TODO: check ts declaration
+      this.music.setVolume(0.3);
+      this.music.play();
+    }
   }
 
   async mapsEvent() {

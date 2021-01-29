@@ -3,7 +3,15 @@ import panel from "../UI/panel";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
 
 class Transition extends Phaser.Scene {
-  create({ fadeIn, resolve }: { fadeIn: boolean; resolve: () => void }) {
+  create({
+    fadeIn,
+    resolve,
+    duration,
+  }: {
+    fadeIn: boolean;
+    resolve: () => void;
+    duration: number | null;
+  }) {
     const black = panel(
       0,
       0,
@@ -25,22 +33,28 @@ class Transition extends Phaser.Scene {
     timeline.add({
       targets: black,
       alpha: fadeIn ? 0 : 1,
-      duration: 500,
+      duration: duration ? duration : 500,
     });
 
     timeline.play();
   }
 }
 
-const transition = (scene: Phaser.Scene, fadeIn: boolean) => {
+const transition = (
+  scene: Phaser.Scene,
+  fadeIn: boolean,
+  duration: number | null
+) => {
   return new Promise<void>((resolve) =>
     scene.scene.add("transition" + Math.random().toString(), Transition, true, {
       resolve: () => resolve(),
+      duration,
       fadeIn,
     })
   );
 };
 
-export const fadeIn = (scene: Phaser.Scene) => transition(scene, true);
+export const fadeIn = (scene: Phaser.Scene) => transition(scene, true, null);
 
-export const fadeOut = (scene: Phaser.Scene) => transition(scene, false);
+export const fadeOut = (scene: Phaser.Scene, duration?: number) =>
+  transition(scene, false, duration);
