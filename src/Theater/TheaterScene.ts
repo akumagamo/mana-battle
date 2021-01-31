@@ -1,25 +1,16 @@
-import { Map } from "immutable";
-import plains from "../Backgrounds/plains";
-import { Chara } from "../Chara/Chara";
-import { Container } from "../Models";
-import { preload } from "../preload";
-import { fadeOut } from "../UI/Transition";
-import { createUnit, CreateUnitCmd } from "./cmds/createUnit";
-import { speak, SpeakCmd } from "./cmds/speak";
-import { wait, WaitCmd } from "./cmds/wait";
-import { walk, WalkCmd } from "./cmds/walk";
-
-type TheaterBackground = "plains" | "woods" | "castle";
-
-interface TheaterSceneConfig {
-  background: TheaterBackground;
-  steps: TheaterCmd[];
-  resolve?: () => void;
-}
-
-type Finish = { type: "FINISH" };
-
-type TheaterCmd = CreateUnitCmd | WaitCmd | SpeakCmd | WalkCmd | Finish;
+import { Map } from 'immutable';
+import plains from '../Backgrounds/plains';
+import { Chara } from '../Chara/Chara';
+import { Container } from '../Models';
+import { preload } from '../preload';
+import { fadeOut } from '../UI/Transition';
+import { createUnit } from './cmds/createUnit';
+import { speak } from './cmds/speak';
+import { wait } from './cmds/wait';
+import { walk } from './cmds/walk';
+import { Answer, question } from './cmds/question';
+import { flipUnit } from './cmds/flipUnit';
+import { Background, Cmd, SceneConfig } from './Models';
 
 /**
  * This helps us transform a whole scene into a Promise, by injecting a `resolve`
@@ -27,17 +18,17 @@ type TheaterCmd = CreateUnitCmd | WaitCmd | SpeakCmd | WalkCmd | Finish;
  */
 export const startTheaterScene = async (
   parent: Phaser.Scene,
-  config: TheaterSceneConfig
+  config: SceneConfig
 ) =>
   new Promise<void>((res) => {
     config.resolve = res;
 
-    parent.scene.start("TheaterScene", config);
+    parent.scene.start('TheaterScene', config);
   });
 
 export default class TheaterScene extends Phaser.Scene {
   constructor() {
-    super("TheaterScene");
+    super('TheaterScene');
   }
   preload = preload;
   charas: Map<string, Chara> = Map();
@@ -45,50 +36,63 @@ export default class TheaterScene extends Phaser.Scene {
   container: Container | null = null;
   resolve: () => void | null = null;
 
-  create(data: TheaterSceneConfig) {
+  create(data: SceneConfig) {
     this.container = this.add.container();
 
     this.renderBackground(data.background);
     this.playScript(data.steps, data.resolve);
   }
 
-  async playScript(steps: TheaterCmd[], resolve: () => void) {
+  async playScript(steps: Cmd[], resolve: (answers: Answer[]) => void) {
     return await steps.reduce(async (prev, step) => {
-      await prev;
+      const answers = await prev;
       switch (step.type) {
-        case "CREATE_UNIT":
-          return createUnit(this, step);
-        case "WAIT":
-          return wait(this, step);
-        case "SPEAK":
-          return speak(this, step);
-        case "WALK":
-          return walk(this, step);
-        case "FINISH":
+        case 'CREATE_UNIT':
+          createUnit(this, step);
+          return Promise.resolve(answers);
+        case 'WAIT':
+          await wait(this, step);
+          return Promise.resolve(answers);
+        case 'SPEAK':
+          await speak(this, step);
+          return Promise.resolve(answers);
+        case 'WALK':
+          await walk(this, step);
+          return Promise.resolve(answers);
+        case 'FINISH':
           await fadeOut(this);
           this.charas.forEach((c) => this.scene.remove(c));
           this.container.destroy();
-          return resolve();
+          return resolve(answers);
+        case 'FLIP':
+          flipUnit(this, step);
+          return Promise.resolve(answers);
+        case 'QUESTION':
+          const answer = await question(this, step);
+          return Promise.resolve(answers.concat([answer]));
         default:
-          return;
+          return Promise.resolve(answers);
       }
-    }, Promise.resolve());
+    }, Promise.resolve([] as Answer[]));
   }
 
   charaKey(id: string): string {
     return `theater_${id}`;
   }
 
-  renderBackground(bg: TheaterBackground) {
+  renderBackground(bg: Background) {
     switch (bg) {
-      case "plains":
+      case 'plains':
         return plains(this, this.container);
 
-      case "woods":
+      case 'woods':
         return plains(this, this.container);
 
-      case "castle":
-        return this.add.image(0, 0, "castlebg").setOrigin(0);
+      case 'castle':
+        return this.add.image(0, 0, 'castlebg').setOrigin(0);
+
+      case 'backgrounds/throne_room':
+        return this.add.image(0, 0, 'backgrounds/throne_room').setOrigin(0);
 
       default:
         return plains(this, this.container);

@@ -11,11 +11,6 @@ export function progressBar(scene: Phaser.Scene) {
   progressBox.fillStyle(0x222222, 0.8);
   progressBox.fillRect(x, y, width, height);
 
-  const percentText = scene.add.text(x, y, "0%", {
-    font: "22px monospace",
-    fill: "#ffffff",
-  });
-
   scene.load.on("progress", (value: number) => {
     progressBar.clear();
     progressBar.fillStyle(0xffffff, 1);
@@ -25,7 +20,6 @@ export function progressBar(scene: Phaser.Scene) {
       width * value - padding * 2,
       height - padding * 2
     );
-    percentText.setText((value * 100).toFixed().toString() + "%");
   });
 
   scene.load.on("fileprogress", (file: Phaser.Loader.File) => {

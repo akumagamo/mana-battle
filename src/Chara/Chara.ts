@@ -1,16 +1,16 @@
-import * as Phaser from "phaser";
+import * as Phaser from 'phaser';
 
-import { Unit } from "../Unit/Model";
-import { Container, Pointer, Image } from "../Models";
-import run from "./animations/run";
+import { Unit } from '../Unit/Model';
+import { Container, Pointer, Image } from '../Models';
+import run from './animations/run';
 
-import defaultPose from "./animations/defaultPose";
-import stand from "./animations/stand";
-import flinch from "./animations/flinch";
-import slash from "./animations/slash";
-import bowAttack from "./animations/bowAttack";
-import initial from "./animations/initial";
-import hpBar from "./hpBar";
+import defaultPose from './animations/defaultPose';
+import stand from './animations/stand';
+import flinch from './animations/flinch';
+import slash from './animations/slash';
+import bowAttack from './animations/bowAttack';
+import initial from './animations/initial';
+import hpBar from './hpBar';
 
 const CHARA_INACTIVE_COLOR = 222222;
 export class Chara extends Phaser.Scene {
@@ -115,7 +115,7 @@ export class Chara extends Phaser.Scene {
 
   private maybeRenderInsignea() {
     if (this.unit.leader) {
-      const insignea = this.add.image(50, 0, "insignea");
+      const insignea = this.add.image(50, 0, 'insignea');
       this.container.add(insignea);
     }
   }
@@ -123,7 +123,7 @@ export class Chara extends Phaser.Scene {
   onClick(fn: (chara: Chara) => void) {
     this.container.setInteractive();
 
-    this.container.on("pointerdown", (_pointer: Pointer) => {
+    this.container.on('pointerdown', (_pointer: Pointer) => {
       fn(this);
     });
   }
@@ -136,7 +136,7 @@ export class Chara extends Phaser.Scene {
     this.input.setDraggable(this.container);
 
     this.input.on(
-      "drag",
+      'drag',
       (_pointer: Pointer, obj: Container, x: number, y: number) => {
         this.container.setDepth(Infinity);
 
@@ -148,7 +148,7 @@ export class Chara extends Phaser.Scene {
     );
 
     this.container.on(
-      "dragend",
+      'dragend',
       (_pointer: Pointer, _dragX: number, dragY: number) => {
         this.container.setDepth(dragY);
         dragEnd(this.unit, this.container.x || 0, this.container.y || 0, this);
@@ -157,7 +157,7 @@ export class Chara extends Phaser.Scene {
   }
 
   handleClick(fn: (chara: Chara, pointer: Pointer) => void) {
-    this.container.on("pointerdown", (pointer: Pointer) => {
+    this.container.on('pointerdown', (pointer: Pointer) => {
       fn(this, pointer);
     });
   }
@@ -228,7 +228,7 @@ export class Chara extends Phaser.Scene {
   tint(value: number) {
     this.container.iterate(
       (child: Phaser.GameObjects.Image | Phaser.GameObjects.Container) => {
-        if (child.type === "Container") {
+        if (child.type === 'Container') {
           (child as Phaser.GameObjects.Container).iterate(
             (grand: Phaser.GameObjects.Image) => {
               grand.setTint(Phaser.Display.Color.GetColor(value, value, value));
@@ -248,5 +248,11 @@ export class Chara extends Phaser.Scene {
     this.rightHand.setTint(value);
     this.leftFoot.setTint(value);
     this.rightFoot.setTint(value);
+  }
+
+  flip() {
+    this.front = !this.front;
+    this.charaWrapper.destroy();
+    this.create();
   }
 }

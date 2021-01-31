@@ -1,9 +1,9 @@
-import { Chara } from "../../Chara/Chara";
-import { Unit } from "../../Unit/Model";
-import TheaterScene from "../TheaterScene";
+import { Chara } from '../../Chara/Chara';
+import { Unit } from '../../Unit/Model';
+import TheaterScene from '../TheaterScene';
 
-export type CreateUnitCmd = {
-  type: "CREATE_UNIT";
+export type CreateUnit = {
+  type: 'CREATE_UNIT';
   unit: Unit;
   x: number;
   y: number;
@@ -13,7 +13,7 @@ export type CreateUnitCmd = {
 };
 export const createUnit = (
   scene: TheaterScene,
-  { unit, x, y, front, showWeapon }: CreateUnitCmd
+  { unit, x, y, front, showWeapon }: CreateUnit
 ) => {
   const key = scene.charaKey(unit.id);
   const chara = new Chara(
@@ -29,6 +29,8 @@ export const createUnit = (
     false,
     showWeapon
   );
+
+  scene.container.add(chara.charaWrapper);
 
   scene.charas = scene.charas.set(key, chara);
 };

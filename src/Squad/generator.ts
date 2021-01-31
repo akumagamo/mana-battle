@@ -1,6 +1,6 @@
 import { maleNames } from "../constants/names";
 import { randomItem } from "../utils";
-import { makeUnit } from "../Unit/Jobs";
+import { makeUnit } from "../Unit/makeUnit";
 import { Squad, SquadMemberMap } from "./Model";
 import { Unit, UnitClass } from "../Unit/Model";
 

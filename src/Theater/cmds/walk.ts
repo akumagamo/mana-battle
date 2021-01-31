@@ -1,13 +1,13 @@
 import { getDistance } from "../../utils";
 import TheaterScene from "../TheaterScene";
-export type WalkCmd = {
+export type Walk = {
   type: "WALK";
   id: string;
   x: number;
   y: number;
 };
 
-export const walk = async (scene: TheaterScene, { id, x, y }: WalkCmd) => {
+export const walk = async (scene: TheaterScene, { id, x, y }: Walk) => {
   const chara = scene.charas.get(scene.charaKey(id));
 
   chara.run(3);

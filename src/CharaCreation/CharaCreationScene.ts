@@ -8,7 +8,7 @@ import button from "../UI/button";
 import panel from "../UI/panel";
 import text from "../UI/text";
 import { fadeIn } from "../UI/Transition";
-import { makeUnit } from "../Unit/Jobs";
+import { makeUnit } from "../Unit/makeUnit";
 import { genderLabels, genders, HAIR_STYLES, Unit } from "../Unit/Model";
 
 const { CHARA_CREATION_SCENE } = SCENES;

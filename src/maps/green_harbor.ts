@@ -5,7 +5,7 @@ import {
   MapState,
 } from '../Map/Model';
 import {getSquads} from '../DB';
-import {makeUnit} from '../Unit/Jobs';
+import { makeUnit } from "../Unit/makeUnit";
 import {assignSquad, toMapSquad} from '../Unit/Model';
 import {CPU_FORCE, PLAYER_FORCE} from '../constants';
 

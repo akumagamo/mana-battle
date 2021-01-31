@@ -1,6 +1,6 @@
 import { initiativeList, runCombat } from "./turns";
 import { assignSquad } from "../Unit/Model";
-import { makeUnit } from "../Unit/Jobs";
+import { makeUnit } from "../Unit/makeUnit";
 import { makeTurnUnit } from "./makeTurnUnit";
 
 jest.mock("../utils/random");

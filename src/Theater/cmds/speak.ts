@@ -5,13 +5,13 @@ import panel from "../../UI/panel";
 import text from "../../UI/text";
 import TheaterScene from "../TheaterScene";
 
-export type SpeakCmd = {
+export type Speak= {
   type: "SPEAK";
   id: string;
   text: string;
 };
 
-export const speak = (scene: TheaterScene, { id, text: text_ }: SpeakCmd) => {
+export const speak = (scene: TheaterScene, { id, text: text_ }: Speak) => {
   const chara = scene.charas.get(scene.charaKey(id));
 
   const PANEL_HEIGHT = 200;
