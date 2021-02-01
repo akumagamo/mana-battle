@@ -3,21 +3,13 @@ import { getSquads, getOptions, getUnits, disbandSquad } from "../DB";
 import defaultData from "../defaultData";
 import { preload } from "../preload";
 import button from "../UI/button";
-import {
-  SCREEN_WIDTH,
-  SCREEN_HEIGHT,
-  lipsum,
-  SCENES,
-  PUBLIC_URL,
-} from "../constants";
+import { SCREEN_WIDTH, SCREEN_HEIGHT, lipsum } from "../constants";
 import { Chara, loadCharaAssets } from "../Chara/Chara";
 import { Container } from "../Models";
-import { fadeIn, fadeOut } from "../UI/Transition";
+import { fadeOut } from "../UI/Transition";
 import { Set } from "immutable";
 import { startTheaterScene } from "../Theater/TheaterScene";
-import CharaCreationScene, {
-  startCharaCreationScene,
-} from "../CharaCreation/CharaCreationScene";
+import { startCharaCreationScene } from "../CharaCreation/CharaCreationScene";
 import chapter_1_intro from "../Theater/Chapters/chapter_1_intro";
 import { makeUnit } from "../Unit/makeUnit";
 
@@ -73,10 +65,10 @@ export default class TitleScene extends Phaser.Scene {
       ),
     ];
 
-    this.charas.map((c) => {
-      c.charaWrapper.scaleX = c.charaWrapper.scaleX * -1;
+    this.charas.forEach((c) => {
+      c.container.scaleX = c.container.scaleX * -1;
     });
-    this.charas.map((c) => this.container?.add(c.container));
+    this.charas.forEach((c) => this.container?.add(c.container));
 
     this.changeMusic("title");
 

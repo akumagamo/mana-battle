@@ -34,8 +34,8 @@ export default (unit: Unit): SceneConfig => ({
     {
       type: "CREATE_UNIT",
       unit,
-      x: SCREEN_WIDTH,
-      y: SCREEN_HEIGHT,
+      x: SCREEN_WIDTH + 50,
+      y: SCREEN_HEIGHT + 50,
       front: false,
       pose: "stand",
       showWeapon: false,
@@ -72,7 +72,7 @@ export default (unit: Unit): SceneConfig => ({
       type: "QUESTION",
       title: "spell_affinity",
       id: priest.id,
-      question: `You find a powerful magic scroll. What you do with it?.`,
+      question: `You find a powerful magic scroll. What you do with it?`,
       options: [
         { answer: "I keep it for myself.", value: 0.5 },
         { answer: "I study it.", value: 0 },

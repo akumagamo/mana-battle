@@ -57,7 +57,7 @@ const back = (chara: Chara, speed: number) => {
 
   const bounce = upAndDown(chara);
 
-  bounce(chara.charaWrapper, -12, 500);
+  bounce(chara.charaWrapper, -12, 300);
 
   chara.add.tween({
     targets: chara.leftFoot,
