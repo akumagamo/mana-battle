@@ -8,6 +8,8 @@ export const centerY = SCREEN_HEIGHT / 2 - 100;
 export const tileWidth = 128;
 export const tileHeight = 64;
 
+export const PUBLIC_URL = 'assets';
+
 export const SCENES = {
   TITLE_SCENE: "TitleScene",
   MAP_LIST_SCENE: "MapListScene",

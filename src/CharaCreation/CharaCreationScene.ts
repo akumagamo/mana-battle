@@ -1,28 +1,23 @@
 import { SKIN_COLORS, HAIR_COLORS } from "../Chara/animations/constants";
 import { Chara } from "../Chara/Chara";
-import { SCENES, SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
+import { PUBLIC_URL, SCENES, SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
 import { classes, classLabels } from "../defaultData";
 import { Container } from "../Models";
 import { preload } from "../preload";
 import button from "../UI/button";
 import panel from "../UI/panel";
 import text from "../UI/text";
-import { fadeIn } from "../UI/Transition";
 import { makeUnit } from "../Unit/makeUnit";
 import { genderLabels, genders, HAIR_STYLES, Unit } from "../Unit/Model";
 
 const { CHARA_CREATION_SCENE } = SCENES;
 
-interface CharaCreationSceneConfig {}
-
-type SceneCommands = null;
-
-export const startCharaCreationScene = (
-  parent: Phaser.Scene,
-  config: CharaCreationSceneConfig
-) => {
-  parent.scene.start(CHARA_CREATION_SCENE, config);
-};
+// export const startCharaCreationScene = (
+//   parent: Phaser.Scene,
+//   config: CharaCreationSceneConfig
+// ) => {
+//   parent.scene.start(CHARA_CREATION_SCENE, config);
+// };
 
 const BTN_MARGIN = 10;
 const BTN_SIZE = 40;
@@ -32,19 +27,37 @@ const baseY = 50;
 const panelWidth = 600;
 const panelHeight = 120;
 
+export const startCharaCreationScene = async (parent: Phaser.Scene) =>
+  new Promise<CharaCreationScene>((resolve) => {
+    const scene = new CharaCreationScene(resolve);
+
+    parent.scene.add(CHARA_CREATION_SCENE, scene, true);
+  });
+
 export default class CharaCreationScene extends Phaser.Scene {
-  preload = preload;
+  constructor(public resolve: (scene: CharaCreationScene) => void) {
+    super(CHARA_CREATION_SCENE);
+  }
+  preload() {
+    const id = "jshaw_dream_of_first_flight";
+    this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
+    preload.bind(this)();
+    this.load.on("complete", () => {
+      this.resolve(this);
+    });
+  }
 
   unit: Unit | null = null;
   chara: Chara | null = null;
   container: Container | null = null;
 
-  async create(_data: SceneCommands) {
-    await fadeIn(this);
-  }
-
   createUnitForm() {
     return new Promise<Unit>(async (resolve) => {
+      this.sound.stopAll();
+      const music = this.sound.add("jshaw_dream_of_first_flight");
+      music.play();
+      this.cameras.main.fadeIn(1000);
+
       this.bg();
       this.container = this.add.container();
 

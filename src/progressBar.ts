@@ -27,5 +27,7 @@ export function progressBar(scene: Phaser.Scene) {
   });
   scene.load.on("complete", function () {
     console.log("complete!");
+    progressBar.destroy();
+    progressBox.destroy();
   });
 }

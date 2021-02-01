@@ -1,15 +1,15 @@
-import { Chara } from '../../Chara/Chara';
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../../constants';
-import { delay } from '../../Scenes/utils';
-import { animatedText } from '../../UI/animatedText';
-import button from '../../UI/button';
-import panel from '../../UI/panel';
-import text from '../../UI/text';
-import TheaterScene from '../TheaterScene';
+import { Chara } from "../../Chara/Chara";
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../constants";
+import { delay } from "../../Scenes/utils";
+import { animatedText } from "../../UI/animatedText";
+import button from "../../UI/button";
+import panel from "../../UI/panel";
+import text from "../../UI/text";
+import TheaterScene from "../TheaterScene";
 
 export type Answer = { answer: string; value: number };
 export type Question = {
-  type: 'QUESTION';
+  type: "QUESTION";
   id: string;
   /** Question identifier */
   title: string;
@@ -30,7 +30,7 @@ export const question = async (
   panel(0, 0, SCREEN_WIDTH, PANEL_HEIGHT, container, scene);
 
   const head = new Chara(
-    'head',
+    "head",
     scene,
     chara.unit,
     100,
@@ -44,7 +44,7 @@ export const question = async (
   container.add(head.container);
 
   text(190, 20, chara.unit.name, container, scene);
-  const unitText = text(190, 60, '', container, scene);
+  const unitText = text(190, 60, "", container, scene);
 
   // const clickZone = scene.add.zone(0, y, SCREEN_WIDTH, PANEL_HEIGHT);
   // clickZone.setInteractive();
@@ -56,11 +56,11 @@ export const question = async (
 
   return new Promise<Answer>(async (resolve) => {
     options.forEach(({ answer, value }, index) => {
-      const y = 90 + index * 30;
+      const y = -450 + index * 60;
 
-      button(190, y, answer, container, scene, () => {
+      button(800, y, answer, container, scene, () => {
         container.destroy();
-        scene.scene.remove('head');
+        scene.scene.remove("head");
         resolve({ answer, value });
       });
     });

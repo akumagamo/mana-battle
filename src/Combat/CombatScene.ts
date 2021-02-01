@@ -17,7 +17,7 @@ import { fadeIn, fadeOut } from "../UI/Transition";
 import { displayExperience } from "../Chara/animations/displayExperience";
 import { displayLevelUp } from "../Chara/animations/displayLevelUp";
 import StaticBoardScene from "../Board/StaticBoardScene";
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
+import { PUBLIC_URL, SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
 import panel from "../UI/panel";
 
 const COMBAT_CHARA_SCALE = 1;
@@ -60,6 +60,39 @@ export default class CombatScene extends Phaser.Scene {
       }
 
       return u;
+    });
+  }
+
+  preload() {
+    [
+      "backgrounds/plain",
+      "backgrounds/castle",
+      "backgrounds/sunset",
+      "backgrounds/squad_edit",
+    ].forEach((str) => this.load.image(str, PUBLIC_URL + "/" + str + ".svg"));
+    ["backgrounds/throne_room"].forEach((str) =>
+      this.load.image(str, PUBLIC_URL + "/" + str + ".jpg")
+    );
+
+    this.load.spritesheet("fire", `${PUBLIC_URL}/fire.svg`, {
+      frameWidth: 50,
+      frameHeight: 117,
+      endFrame: 7,
+    });
+
+    const props = [
+      "props/grass",
+      "props/bush",
+      "props/far_tree_1",
+      "props/branch",
+    ];
+    props.forEach((id: string) => {
+      this.load.image(id, `${PUBLIC_URL}/${id}.svg`);
+    });
+
+    const mp3s = ["combat1", "sword_hit", "arrow_critical", "fireball"];
+    mp3s.forEach((id: string) => {
+      this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
     });
   }
 

@@ -1,4 +1,4 @@
-import {Unit, HAIR_STYLES} from './Model';
+import {Unit, HAIR_STYLES, genders} from './Model';
 import {maleNames} from '../constants/names';
 import { classes} from '../defaultData';
 import {randomItem } from '../utils';
@@ -14,15 +14,15 @@ import {baseEquips} from './Jobs';
  * @param {number} n
  */
 export function fromJSON(n: number): Unit {
-  const class_ = randomItem(classes);
+  const job = randomItem(classes);
   return {
     id: n.toString(),
     name: randomItem(maleNames),
-    class: class_,
+    class: job,
     movement: 'plain',
     elem: 'neutral',
-    gender: randomItem(['male', 'female']),
-    equips: baseEquips[class_],
+    gender: randomItem(genders),
+    equips: baseEquips[job],
     squad: null,
     lvl: 1,
     hp: 50,
@@ -37,7 +37,7 @@ export function fromJSON(n: number): Unit {
       hair: randomItem(HAIR_STYLES),
       displayHat: randomItem([true, false]),
     },
-    attacks: getUnitAttacks(class_),
+    attacks: getUnitAttacks(job),
   };
 }
 

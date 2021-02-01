@@ -87,6 +87,11 @@ function front(chara: Chara, headOnly = false) {
 
   chara.leftFoot = renderFoot(LEFT_FOOT_FRONT_X, LEFT_FOOT_FRONT_Y);
   chara.rightFoot = renderFoot(RIGHT_FOOT_FRONT_X, RIGHT_FOOT_FRONT_Y);
+  if (chara.unit.class === "mage") {
+    chara.leftFoot.visible = false;
+    chara.rightFoot.visible = false;
+  }
+
   chara.leftHand = renderHand(0, 0);
   chara.trunk = renderTrunk(chara.unit.class, TRUNK_FRONT_X, TRUNK_FRONT_Y);
   chara.rightHand = renderHand(0, 0);
@@ -225,6 +230,14 @@ function back(chara: Chara, headOnly = false) {
 
   chara.leftFoot = renderFoot(LEFT_FOOT_BACK_X, LEFT_FOOT_BACK_Y);
   chara.rightFoot = renderFoot(RIGHT_FOOT_BACK_X, RIGHT_FOOT_BACK_Y);
+
+  chara.leftFoot.setScale(1, 1);
+  chara.rightFoot.setScale(1, 1);
+
+  if (chara.unit.class === "mage") {
+    chara.leftFoot.visible = false;
+    chara.rightFoot.visible = false;
+  }
   chara.leftHand = renderHand(0, 0);
   chara.trunk = renderTrunk(chara.unit.class, TRUNK_BACK_X, TRUNK_BACK_Y);
   chara.rightHand = renderHand(0, 0);

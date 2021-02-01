@@ -1,16 +1,17 @@
-import { Map } from 'immutable';
-import plains from '../Backgrounds/plains';
-import { Chara } from '../Chara/Chara';
-import { Container } from '../Models';
-import { preload } from '../preload';
-import { fadeOut } from '../UI/Transition';
-import { createUnit } from './cmds/createUnit';
-import { speak } from './cmds/speak';
-import { wait } from './cmds/wait';
-import { walk } from './cmds/walk';
-import { Answer, question } from './cmds/question';
-import { flipUnit } from './cmds/flipUnit';
-import { Background, Cmd, SceneConfig } from './Models';
+import { Map } from "immutable";
+import plains from "../Backgrounds/plains";
+import { Chara } from "../Chara/Chara";
+import { Container } from "../Models";
+import { fadeOut } from "../UI/Transition";
+import { createUnit } from "./cmds/createUnit";
+import { speak } from "./cmds/speak";
+import { wait } from "./cmds/wait";
+import { walk } from "./cmds/walk";
+import { Answer, question } from "./cmds/question";
+import { flipUnit } from "./cmds/flipUnit";
+import { Background, Cmd, SceneConfig } from "./Models";
+import { PUBLIC_URL } from "../constants";
+import { progressBar } from "../progressBar";
 
 /**
  * This helps us transform a whole scene into a Promise, by injecting a `resolve`
@@ -20,54 +21,77 @@ export const startTheaterScene = async (
   parent: Phaser.Scene,
   config: SceneConfig
 ) =>
-  new Promise<void>((res) => {
-    config.resolve = res;
+  new Promise<void>((resolve) => {
+    const scene = new TheaterScene(resolve);
 
-    parent.scene.start('TheaterScene', config);
+    parent.scene.add("TheaterScene", scene, true, config);
   });
 
 export default class TheaterScene extends Phaser.Scene {
-  constructor() {
-    super('TheaterScene');
+  constructor(public resolve: () => void) {
+    super("TheaterScene");
   }
-  preload = preload;
+  preload() {
+    progressBar(this);
+    [
+      "backgrounds/plain",
+      "backgrounds/castle",
+      "backgrounds/squad_edit",
+    ].forEach((str) => this.load.image(str, PUBLIC_URL + "/" + str + ".svg"));
+    ["backgrounds/throne_room"].forEach((str) =>
+      this.load.image(str, PUBLIC_URL + "/" + str + ".jpg")
+    );
+    const props = [
+      "props/grass",
+      "props/bush",
+      "props/far_tree_1",
+      "props/branch",
+    ];
+    props.forEach((id: string) => {
+      this.load.image(id, `${PUBLIC_URL}/${id}.svg`);
+    });
+    const mp3s = ["jshaw_dream_of_first_flight"];
+    mp3s.forEach((id: string) => {
+      this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
+    });
+  }
   charas: Map<string, Chara> = Map();
 
   container: Container | null = null;
-  resolve: () => void | null = null;
 
   create(data: SceneConfig) {
     this.container = this.add.container();
 
     this.renderBackground(data.background);
-    this.playScript(data.steps, data.resolve);
+    this.playScript(data.steps, this.resolve);
   }
 
   async playScript(steps: Cmd[], resolve: (answers: Answer[]) => void) {
     return await steps.reduce(async (prev, step) => {
       const answers = await prev;
       switch (step.type) {
-        case 'CREATE_UNIT':
+        case "CREATE_UNIT":
           createUnit(this, step);
           return Promise.resolve(answers);
-        case 'WAIT':
+        case "WAIT":
           await wait(this, step);
           return Promise.resolve(answers);
-        case 'SPEAK':
+        case "SPEAK":
           await speak(this, step);
           return Promise.resolve(answers);
-        case 'WALK':
+        case "WALK":
           await walk(this, step);
           return Promise.resolve(answers);
-        case 'FINISH':
+        case "FINISH":
           await fadeOut(this);
           this.charas.forEach((c) => this.scene.remove(c));
           this.container.destroy();
+          this.scene.remove(this);
           return resolve(answers);
-        case 'FLIP':
+        case "FLIP":
           flipUnit(this, step);
           return Promise.resolve(answers);
-        case 'QUESTION':
+        case "QUESTION":
           const answer = await question(this, step);
           return Promise.resolve(answers.concat([answer]));
         default:
@@ -82,17 +106,17 @@ export default class TheaterScene extends Phaser.Scene {
 
   renderBackground(bg: Background) {
     switch (bg) {
-      case 'plains':
+      case "plains":
         return plains(this, this.container);
 
-      case 'woods':
+      case "woods":
         return plains(this, this.container);
 
-      case 'castle':
-        return this.add.image(0, 0, 'castlebg').setOrigin(0);
+      case "castle":
+        return this.add.image(0, 0, "castlebg").setOrigin(0);
 
-      case 'backgrounds/throne_room':
-        return this.add.image(0, 0, 'backgrounds/throne_room').setOrigin(0);
+      case "backgrounds/throne_room":
+        return this.add.image(0, 0, "backgrounds/throne_room").setOrigin(0);
 
       default:
         return plains(this, this.container);

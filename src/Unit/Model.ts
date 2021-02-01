@@ -19,8 +19,11 @@ export const statLabels: {
   int: "Intelligence",
 };
 
-export type Gender = "male" | "female";
-export const genders: Gender[] = ["male", "female"];
+export enum Gender {
+  Male = "male",
+  Female = "female"
+}
+export const genders: Gender[] = [Gender.Male, Gender.Female];
 export const genderLabels: { [gender in Gender]: string } = {
   male: "Male",
   female: "Female",
