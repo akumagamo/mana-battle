@@ -3,7 +3,12 @@ import { getSquads, getOptions, getUnits, disbandSquad } from "../DB";
 import defaultData from "../defaultData";
 import { preload } from "../preload";
 import button from "../UI/button";
-import { SCREEN_WIDTH, SCREEN_HEIGHT, lipsum } from "../constants";
+import {
+  SCREEN_WIDTH,
+  SCREEN_HEIGHT,
+  lipsum,
+  PLAYER_FORCE,
+} from "../constants";
 import { Chara, loadCharaAssets } from "../Chara/Chara";
 import { Container } from "../Models";
 import { fadeOut } from "../UI/Transition";
@@ -12,6 +17,11 @@ import { startTheaterScene } from "../Theater/TheaterScene";
 import { startCharaCreationScene } from "../CharaCreation/CharaCreationScene";
 import chapter_1_intro from "../Theater/Chapters/chapter_1_intro";
 import { makeUnit } from "../Unit/makeUnit";
+import { MapCommands } from "../Map/MapCommands";
+import maps from "../maps";
+import { startMapScene } from "../Map/MapScene";
+import { makeSquad, updateMember } from "../Squad/Model";
+import { toMapSquad } from "../Unit/Model";
 
 export default class TitleScene extends Phaser.Scene {
   music: Phaser.Sound.BaseSound | null = null;
@@ -185,6 +195,41 @@ export default class TitleScene extends Phaser.Scene {
         console.log(`the unit`, unit);
         const answers = await startTheaterScene(this, chapter_1_intro(unit));
         console.log(`>>>`, answers);
+
+        const alliedUnits = { [unit.id]: unit };
+
+        const firstSquad = updateMember(makeSquad("1", PLAYER_FORCE), {
+          id: unit.id,
+          x: 2,
+          y: 2,
+          leader: true,
+        });
+
+        const squads = [firstSquad];
+
+        const map = maps[0]();
+        let commands: MapCommands[] = [
+          {
+            type: "UPDATE_STATE",
+            target: {
+              ...map,
+              dispatchedSquads: Set(["1"].concat(map.squads.map((u) => u.id))),
+              squads: map.squads.concat(
+                squads.map((s) =>
+                  toMapSquad(
+                    s,
+                    map.cities.find((c) => c.id === "castle1")
+                  )
+                )
+              ),
+
+              units: map.units.merge(alliedUnits),
+            },
+          },
+        ];
+
+        const outcome = await startMapScene(this, commands);
+        console.log(outcome);
       }
     );
 

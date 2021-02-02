@@ -55,6 +55,16 @@ export type MapTile = {
   tile: Image;
 };
 
+export const startMapScene = async (
+  parent: Phaser.Scene,
+  cmds: MapCommands[]
+) =>
+  new Promise<void>((resolve) => {
+    const scene = new MapScene(resolve);
+
+    parent.scene.add("MapScene", scene, true, cmds);
+  });
+
 export class MapScene extends Phaser.Scene {
   charas: Chara[] = [];
   tiles: MapTile[] = [];
@@ -93,7 +103,7 @@ export class MapScene extends Phaser.Scene {
 
   squadsToRemove: Set<string> = Set();
 
-  constructor() {
+  constructor(public resolve: () => void) {
     super("MapScene");
   }
 
@@ -142,7 +152,9 @@ export class MapScene extends Phaser.Scene {
       this.load.image(id, `${PUBLIC_URL}/art/castles/${id}.jpg`);
     });
 
-
+    this.load.once("complete", () => {
+      this.resolve();
+    });
   }
 
   signal(eventName: string, cmds: MapCommands[]) {

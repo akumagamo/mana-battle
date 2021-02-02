@@ -13,10 +13,6 @@ import { Background, Cmd, SceneConfig } from "./Models";
 import { PUBLIC_URL } from "../constants";
 import { progressBar } from "../progressBar";
 
-/**
- * This helps us transform a whole scene into a Promise, by injecting a `resolve`
- * into the scene parameters.
- */
 export const startTheaterScene = async (
   parent: Phaser.Scene,
   config: SceneConfig

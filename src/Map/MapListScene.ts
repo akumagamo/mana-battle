@@ -17,10 +17,6 @@ export default class MapListScene extends Phaser.Scene {
   preload = preload;
 
   create() {
-
-    //@ts-ignore
-    window.mapListScene = this;
-
     const bg = this.add.image(0, 0, "map_select");
     bg.setOrigin(0);
     const container = this.add.container(100, 100);
