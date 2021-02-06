@@ -29,13 +29,30 @@ export const makeSquad = (id: string, force: string) => ({
   force,
 });
 
-export const updateMember = (squad: Squad, member: SquadMember): Squad => ({
-  ...squad,
-  members: Object.entries({ ...squad.members, [member.id]: member }).reduce(
-    (xs, [k, v]) => ({
-      ...xs,
-      [k]: { ...v, leader: k === member.id ? member.leader : !member.leader },
-    }),
-    {}
-  ),
-});
+/**
+ * Adds a new member or updates an existing one.
+ * If the new member is a leader, it will replace the existing one in the squad.
+ */
+export const updateMember = (squad: Squad, member: SquadMember): Squad => {
+  const updatedMap = {
+    ...squad.members,
+    [member.id]: member,
+  } as SquadMemberMap;
+
+  if (member.leader)
+    return {
+      ...squad,
+      members: Object.entries(updatedMap).reduce(
+        (xs, [id, x]) => ({
+          ...xs,
+          [x.id]: { ...x, leader: member.id === id },
+        }),
+        {} as SquadMemberMap
+      ),
+    };
+  else
+    return {
+      ...squad,
+      members: updatedMap,
+    };
+};
