@@ -3,25 +3,14 @@ import { getSquads, getOptions, getUnits, disbandSquad } from "../DB";
 import defaultData from "../defaultData";
 import { preload } from "../preload";
 import button from "../UI/button";
-import {
-  SCREEN_WIDTH,
-  SCREEN_HEIGHT,
-  lipsum,
-  PLAYER_FORCE,
-} from "../constants";
+import { SCREEN_WIDTH, SCREEN_HEIGHT, lipsum } from "../constants";
 import { Chara, loadCharaAssets } from "../Chara/Chara";
 import { Container } from "../Models";
 import { fadeOut } from "../UI/Transition";
 import { Set } from "immutable";
 import { startTheaterScene } from "../Theater/TheaterScene";
-import { startCharaCreationScene } from "../CharaCreation/CharaCreationScene";
-import chapter_1_intro from "../Theater/Chapters/chapter_1_intro";
 import { makeUnit } from "../Unit/makeUnit";
-import { MapCommands } from "../Map/MapCommands";
-import maps from "../maps";
-import { startMapScene } from "../Map/MapScene";
-import { makeSquad, updateMember } from "../Squad/Model";
-import { toMapSquad } from "../Unit/Model";
+import { storyManager } from "./storyManager";
 
 export default class TitleScene extends Phaser.Scene {
   music: Phaser.Sound.BaseSound | null = null;
@@ -82,28 +71,28 @@ export default class TitleScene extends Phaser.Scene {
 
     this.changeMusic("title");
 
-    button(20, 50, "List Units", this.container, this, () => {
-      this.scene.transition({
-        target: "ListUnitsScene",
-        duration: 0,
-        moveBelow: true,
-      });
-    });
+    //     button(20, 50, "List Units", this.container, this, () => {
+    //       this.scene.transition({
+    //         target: "ListUnitsScene",
+    //         duration: 0,
+    //         moveBelow: true,
+    //       });
+    //     });
 
-    button(20, 170, "List Squads", this.container, this, () => {
-      this.scene.start("ListSquadsScene", {
-        units: Object.values(getUnits()),
-        squads: Object.values(getSquads()),
-        dispatched: Set(),
-        onDisbandSquad: (id: string) => disbandSquad(id),
-      });
-    });
+    //     button(20, 170, "List Squads", this.container, this, () => {
+    //       this.scene.start("ListSquadsScene", {
+    //         units: Object.values(getUnits()),
+    //         squads: Object.values(getSquads()),
+    //         dispatched: Set(),
+    //         onDisbandSquad: (id: string) => disbandSquad(id),
+    //       });
+    //     });
 
     //     button(20, 370, "Create Character", this.container, this, () => {
     //       startCharaCreationScene(this, null);
     //     });
 
-    button(20, 230, "Maps", this.container, this, () => this.mapsEvent());
+    //    button(20, 230, "Maps", this.container, this, () => this.mapsEvent());
 
     // button(20, 290, "Combat", this.container, this, () => {
     //   this.scene.start("CombatScene", {
@@ -116,58 +105,10 @@ export default class TitleScene extends Phaser.Scene {
     //     },
     //   });
     // });
-    button(20, 290, "Theater test", this.container, this, () => {
-      startTheaterScene(this, {
-        background: "plains",
-        steps: [
-          {
-            type: "CREATE_UNIT",
-            unit: Object.values(getUnits())[0],
-            x: 100,
-            y: 100,
-            front: true,
-            pose: "stand",
-            showWeapon: false,
-          },
-          { type: "WAIT", duration: 500 },
-          {
-            type: "CREATE_UNIT",
-            unit: Object.values(getUnits())[2],
-            x: 200,
-            y: 200,
-            front: true,
-            pose: "stand",
-            showWeapon: true,
-          },
-          { type: "WAIT", duration: 500 },
-          {
-            type: "SPEAK",
-            id: Object.values(getUnits())[2].id,
-            text: lipsum,
-          },
-          { type: "WAIT", duration: 500 },
-          {
-            type: "CREATE_UNIT",
-            unit: Object.values(getUnits())[3],
-            x: 300,
-            y: 300,
-            front: true,
-            pose: "stand",
-            showWeapon: true,
-          },
-          {
-            type: "WALK",
-            id: Object.values(getUnits())[0].id,
-            x: 600,
-            y: 600,
-          },
-        ],
-      });
-    });
 
-    button(20, 650, "Erase Data", this.container, this, () => {
-      defaultData(true);
-      alert("Data erased!");
+    button(20, 650, "Load Game", this.container, this, () => {
+      // defaultData(true);
+      // alert("Data erased!");
     });
 
     button(220, 650, "Go Fullscreen", this.container, this, () => {
@@ -181,55 +122,7 @@ export default class TitleScene extends Phaser.Scene {
       this.container,
       this,
       async () => {
-        this.tweens.add({
-          targets: this.music,
-          volume: 0,
-          duration: 1000,
-        });
-        await fadeOut(this);
-
-        this.container.destroy();
-        const scene = await startCharaCreationScene(this);
-
-        const unit = await scene.createUnitForm();
-        console.log(`the unit`, unit);
-        const answers = await startTheaterScene(this, chapter_1_intro(unit));
-        console.log(`>>>`, answers);
-
-        const alliedUnits = { [unit.id]: unit };
-
-        const firstSquad = updateMember(makeSquad("1", PLAYER_FORCE), {
-          id: unit.id,
-          x: 2,
-          y: 2,
-          leader: true,
-        });
-
-        const squads = [firstSquad];
-
-        const map = maps[0]();
-        let commands: MapCommands[] = [
-          {
-            type: "UPDATE_STATE",
-            target: {
-              ...map,
-              dispatchedSquads: Set(["1"].concat(map.squads.map((u) => u.id))),
-              squads: map.squads.concat(
-                squads.map((s) =>
-                  toMapSquad(
-                    s,
-                    map.cities.find((c) => c.id === "castle1")
-                  )
-                )
-              ),
-
-              units: map.units.merge(alliedUnits),
-            },
-          },
-        ];
-
-        const outcome = await startMapScene(this, commands);
-        console.log(outcome);
+        await storyManager(this);
       }
     );
 

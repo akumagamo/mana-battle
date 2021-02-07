@@ -2,7 +2,7 @@ import { PUBLIC_URL } from "./constants";
 import { progressBar } from "./progressBar";
 
 export function preload(this: Phaser.Scene) {
-  ["backgrounds/sunset"].forEach((str) =>
+  ["backgrounds/sunset", "tile"].forEach((str) =>
     this.load.image(str, PUBLIC_URL + "/" + str + ".svg")
   );
   const ui = [

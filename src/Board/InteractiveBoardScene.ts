@@ -1,12 +1,11 @@
-import * as Phaser from 'phaser';
-import {Chara} from '../Chara/Chara';
-import {Image} from '../Models';
-import {SquadMember, Squad} from '../Squad/Model';
-import {cartesianToIsometric} from '../utils/isometric';
-import {getUnit, changeSquadMemberPosition} from '../DB';
-import {Unit} from '../Unit/Model';
-import {tileWidth, tileHeight} from '../constants';
-import {INVALID_STATE} from '../errors';
+import * as Phaser from "phaser";
+import { Chara } from "../Chara/Chara";
+import { Image } from "../Models";
+import { SquadMember, Squad, changeSquadMemberPosition } from "../Squad/Model";
+import { cartesianToIsometric } from "../utils/isometric";
+import { Unit, UnitIndex } from "../Unit/Model";
+import { tileWidth, tileHeight } from "../constants";
+import { INVALID_STATE } from "../errors";
 
 type BoardTile = {
   sprite: Image;
@@ -16,7 +15,7 @@ type BoardTile = {
   boardY: number;
 };
 
-export const BOARD_SCENE_KEY = 'BoardScene';
+export const BOARD_SCENE_KEY = "BoardScene";
 
 export default class BoardScene extends Phaser.Scene {
   tiles: BoardTile[] = [];
@@ -25,6 +24,7 @@ export default class BoardScene extends Phaser.Scene {
   constructor(
     public squad: Squad,
     public onSquadUpdated: (squad: Squad) => void,
+    public unitIndex: UnitIndex
   ) {
     super(BOARD_SCENE_KEY);
     console.log(`boardScene constructor`);
@@ -38,10 +38,18 @@ export default class BoardScene extends Phaser.Scene {
     this.placeUnits();
   }
   findTileByXY(x: number, y: number) {
-    return this.tiles.find(isPointerInTile({x, y: y + 100}));
+    return this.tiles.find(isPointerInTile({ x, y: y + 100 }));
   }
 
-  changeUnitPositionInBoard({unit, x, y}: {unit: Unit; x: number; y: number}) {
+  changeUnitPositionInBoard({
+    unit,
+    x,
+    y,
+  }: {
+    unit: Unit;
+    x: number;
+    y: number;
+  }) {
     const updatedBoard = changeSquadMemberPosition(
       this.squad.members[unit.id],
       this.squad,
@@ -63,7 +71,7 @@ export default class BoardScene extends Phaser.Scene {
 
     if (!chara) return;
 
-    const {unit} = chara;
+    const { unit } = chara;
 
     const pos = getUnitPositionInScreen(this.squad.members[unit.id]);
 
@@ -71,27 +79,27 @@ export default class BoardScene extends Phaser.Scene {
       targets: chara?.container,
       x: pos.x,
       y: pos.y,
-      ease: 'Cubic',
+      ease: "Cubic",
       duration: 400,
       repeat: 0,
       paused: false,
       yoyo: false,
     });
     // TODO: optimize, fire only once if multiple units were move at the same time
-    tween.on('complete', () => {
+    tween.on("complete", () => {
       this.sortUnitsByDepth();
     });
   }
 
   onUnitDragEnd = (unit: Unit, x: number, y: number) => {
-    const {squad} = this;
+    const { squad } = this;
 
     const boardSprite = this.findTileByXY(x, y);
 
     const squadMember = squad.members[unit.id];
 
     if (!squadMember)
-      throw new Error('Invalid state. Unit should be in board object.');
+      throw new Error("Invalid state. Unit should be in board object.");
 
     const isMoved = (boardSprite: BoardTile) =>
       squadMember.x !== boardSprite.boardX ||
@@ -104,14 +112,14 @@ export default class BoardScene extends Phaser.Scene {
         y: boardSprite.boardY,
       });
     } else {
-      const {x, y} = getUnitPositionInScreen(squadMember);
+      const { x, y } = getUnitPositionInScreen(squadMember);
 
       // return to original position
       this.tweens.add({
         targets: this.getChara(unit)?.container,
         x: x,
         y: y,
-        ease: 'Cubic',
+        ease: "Cubic",
         duration: 400,
         repeat: 0,
         paused: false,
@@ -124,10 +132,10 @@ export default class BoardScene extends Phaser.Scene {
       });
     }
   };
-  private getChara(unit: {id: string}) {
+  private getChara(unit: { id: string }) {
     return this.unitList.find((chara) => chara.key === this.makeUnitKey(unit));
   }
-  placeTiles({mapWidth, mapHeight}: {mapWidth: number; mapHeight: number}) {
+  placeTiles({ mapWidth, mapHeight }: { mapWidth: number; mapHeight: number }) {
     var grid: null[][] = [[]];
     let tiles: BoardTile[] = [];
 
@@ -138,9 +146,9 @@ export default class BoardScene extends Phaser.Scene {
 
     grid.forEach((row, yIndex) => {
       row.forEach((_, xIndex) => {
-        var {x, y} = cartesianToIsometric(xIndex, yIndex);
+        var { x, y } = cartesianToIsometric(xIndex, yIndex);
 
-        const tileSprite = this.add.image(x, y, 'tile');
+        const tileSprite = this.add.image(x, y, "tile");
         tileSprite.depth = y;
 
         tileSprite.setInteractive();
@@ -155,7 +163,7 @@ export default class BoardScene extends Phaser.Scene {
       });
     });
 
-    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+    this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
       this.tiles.filter(isPointerInTile(pointer)).forEach((tile) => {});
     });
 
@@ -163,13 +171,11 @@ export default class BoardScene extends Phaser.Scene {
   }
 
   addUnitToBoard(squadMember: SquadMember) {
-    const {x, y} = getUnitPositionInScreen(squadMember);
+    const { x, y } = getUnitPositionInScreen(squadMember);
 
-    // TODO: make the unit list a parameter
-    // This causes problems when viewing the list on a map scene
-    const unit = getUnit(squadMember.id);
+    const unit = this.getUnit(squadMember.id);
 
-    if (!unit) throw new Error('Invalid member supplied.');
+    if (!unit) throw new Error("Invalid member supplied.");
 
     const key = this.makeUnitKey(unit);
     const chara = new Chara(key, this, unit, x, y, 1, true);
@@ -179,17 +185,21 @@ export default class BoardScene extends Phaser.Scene {
     return chara;
   }
 
+  getUnit(id: string) {
+    return this.unitIndex.get(id);
+  }
+
   makeUnitsClickable(fn: (u: Chara) => void) {
     this.unitList.map((chara) => {
       chara.onClick((c) => {
         const member = Object.values(this.squad.members).find(
-          (mem) => mem.id === chara.unit.id,
+          (mem) => mem.id === chara.unit.id
         );
 
         if (!member) throw new Error(INVALID_STATE);
 
         const tile = this.tiles.find(
-          (t) => t.boardX === member.x && t.boardY === member.y,
+          (t) => t.boardX === member.x && t.boardY === member.y
         );
         if (tile) this.highlightTile(tile);
         fn(c);
@@ -212,10 +222,10 @@ export default class BoardScene extends Phaser.Scene {
     boardSprite.sprite.setTint(0x00cc00);
   }
   placeUnits() {
-    const {squad} = this;
+    const { squad } = this;
 
     Object.values(squad.members).forEach((member) =>
-      this.placeUnit({member: member, fromOutside: false}),
+      this.placeUnit({ member: member, fromOutside: false })
     );
   }
 
@@ -237,13 +247,13 @@ export default class BoardScene extends Phaser.Scene {
     }
   }
 
-  private makeUnitKey(unit: {id: string}) {
+  private makeUnitKey(unit: { id: string }) {
     return `board-${unit.id}`;
   }
 
   sortUnitsByDepth() {
     this.unitList.forEach((chara) =>
-      chara.container.setDepth(chara.container?.y),
+      chara.container.setDepth(chara.container?.y)
     );
 
     this.unitList
@@ -254,7 +264,7 @@ export default class BoardScene extends Phaser.Scene {
     this.tiles.forEach((tile) => tile.sprite.destroy());
 
     this.unitList.forEach((chara) =>
-      this.scene.remove(this.makeUnitKey(chara.unit)),
+      this.scene.remove(this.makeUnitKey(chara.unit))
     );
 
     this.scene.remove();
@@ -262,13 +272,13 @@ export default class BoardScene extends Phaser.Scene {
 }
 
 function getUnitPositionInScreen(squadMember: SquadMember) {
-  const {x, y} = cartesianToIsometric(squadMember.x, squadMember.y);
+  const { x, y } = cartesianToIsometric(squadMember.x, squadMember.y);
 
   //FIXME: unit should be rendered at origin 0.5
-  return {x, y: y - 230};
+  return { x, y: y - 230 };
 }
 
-function isPointerInTile(pointer: {x: number; y: number}) {
+function isPointerInTile(pointer: { x: number; y: number }) {
   return function (tile: BoardTile) {
     const dx = Math.abs(tile.sprite.x - pointer.x);
     const dy = Math.abs(tile.sprite.y - pointer.y);

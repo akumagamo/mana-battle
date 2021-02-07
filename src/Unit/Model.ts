@@ -6,9 +6,11 @@ import { UnitAttacks } from "./Skills";
 import { MapSquad } from "../Map/Model";
 import { Squad } from "../Squad/Model";
 import { Vector } from "matter";
-import { List, Set } from "immutable";
+import { List, Map, Set } from "immutable";
 
 export type UnitMap = { [x: string]: Unit };
+
+export type UnitIndex =  Map<string, Unit>;
 
 export type Stat = "str" | "dex" | "int";
 export const statLabels: {

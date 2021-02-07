@@ -5,7 +5,7 @@ import button from '../UI/button';
 import panel from '../UI/panel';
 import text from '../UI/text';
 
-export default class TitleScene extends Phaser.Scene {
+export default class OptionsScene extends Phaser.Scene {
   constructor() {
     super('OptionsScene');
   }

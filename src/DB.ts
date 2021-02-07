@@ -232,73 +232,7 @@ export const addUnitToSquad = (
   }
 };
 
-// TODO: add new fn for units coming from outside the board
-export const changeSquadMemberPosition = (
-  unit: SquadMember,
-  squad: Squad,
-  x: number,
-  y: number,
-  onSquadUpdated: (squad:Squad)=>void
-) => {
-  console.log('change position', unit, squad, x, y);
-  const {members} = squad;
 
-  const updatedBoard = placeUnitInBoard(x, y, unit, members);
-
-  console.log(`updated board`, updatedBoard);
-
-  const updatedSquad = {...squad, members: updatedBoard.members};
-
-  console.log(`will save updatedSquad`, updatedSquad);
-  onSquadUpdated(updatedSquad);
-
-  console.log(`will return`, updatedBoard);
-
-  return updatedBoard;
-};
-
-function placeUnitInBoard(
-  x: number,
-  y: number,
-  unit: SquadMember,
-  members: SquadMemberMap,
-) {
-  const newEntry: SquadMember = {
-    leader: unit.leader,
-    x,
-    y,
-    id: unit.id,
-  };
-
-  const unitInTargetPosition = Object.values(members).find(
-    (member) => member.x === x && member.y === y,
-  );
-
-  if (unitInTargetPosition) {
-    const unitToReplace: SquadMember = {
-      ...unitInTargetPosition,
-      x: unit.x,
-      y: unit.y,
-    };
-
-    return {
-      members: {
-        ...members,
-        [unit.id]: newEntry,
-        [unitInTargetPosition.id]: unitToReplace,
-      },
-      updatedUnits: [
-        {id: unit.id, x, y},
-        {id: unitInTargetPosition.id, x: unit.x, y: unit.y},
-      ],
-    };
-  } else {
-    return {
-      members: {...members, [unit.id]: newEntry},
-      updatedUnits: [{id: unit.id, x, y}],
-    };
-  }
-}
 
 export const removeUnitFromSquad = (unitId: string, squad: Squad) => {
   const unit = getUnit(unitId);

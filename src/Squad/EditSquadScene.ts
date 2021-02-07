@@ -3,7 +3,7 @@ import { Chara } from "../Chara/Chara";
 import { Squad } from "../Squad/Model";
 import { addUnitToSquad, saveSquad } from "../DB";
 import UnitListScene from "../Unit/UnitListScene";
-import { Unit } from "../Unit/Model";
+import { Unit, UnitIndex } from "../Unit/Model";
 import BoardScene, { BOARD_SCENE_KEY } from "../Board/InteractiveBoardScene";
 import button from "../UI/button";
 import menu from "../Backgrounds/menu";
@@ -19,18 +19,18 @@ export class EditSquadScene extends Phaser.Scene {
     super("EditSquadScene");
   }
 
-  create({ squad }: { squad: Squad }) {
+  create({ squad, unitIndex }: { squad: Squad; unitIndex: UnitIndex }) {
     menu(this);
 
-    this.renderBoard(squad);
+    this.renderBoard(squad, unitIndex);
 
     this.renderUnitList();
 
     this.renderReturnBtn();
   }
 
-  renderBoard(squad: Squad) {
-    this.boardScene = new BoardScene(squad, saveSquad);
+  renderBoard(squad: Squad, unitIndex: UnitIndex) {
+    this.boardScene = new BoardScene(squad, saveSquad, unitIndex);
     this.scene.add(BOARD_SCENE_KEY, this.boardScene, true);
 
     this.boardScene.makeUnitsClickable((c) => {

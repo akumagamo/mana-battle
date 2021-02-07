@@ -72,7 +72,7 @@ export default (
               }),
             },
           },
-        ])
+        ]), scene.state.units
       );
 
       scene.scene.add("editSquadInMap", boardScene, true);

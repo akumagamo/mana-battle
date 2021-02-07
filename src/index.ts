@@ -1,7 +1,14 @@
 import "phaser";
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from "./constants";
 import TitleScene from "./Scenes/TitleScene";
+import OptionsScene from "./Scenes/OptionsScene";
+import WorldScene from "./Scenes/World";
 import defaultData from "./defaultData";
+import { EditSquadScene } from "./Squad/EditSquadScene";
+import { ListSquadsScene } from "./Squad/ListSquadsScene";
+import { ListUnitsScene } from "./Unit/ListUnits";
+import MapListScene from "./Map/MapListScene";
+import CombatScene from "./Combat/CombatScene";
 
 (() => {
   const config: Phaser.Types.Core.GameConfig = {
@@ -13,18 +20,19 @@ import defaultData from "./defaultData";
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,
     },
-    scene: TitleScene
-      //EditSquadScene,
-      //ListSquadsScene,
-      //ListUnitsScene,
+    scene: [
+      TitleScene,
+      EditSquadScene,
+      ListSquadsScene,
+      ListUnitsScene,
       //MapScene,
-      //MapListScene,
-      //CombatScene,
-      //OptionsScene,
-      //WorldScene,
+      MapListScene,
+      CombatScene,
+      OptionsScene,
+      WorldScene,
       //TheaterScene,
       //CharaCreationScene,
-    ,
+    ],
     dom: {
       createContainer: true,
     },
