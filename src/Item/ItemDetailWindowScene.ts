@@ -30,7 +30,7 @@ export class ItemDetailWindowScene extends Phaser.Scene {
 
     this.renderPanel(0, 0, 300, 300, this.container);
 
-    const item = api.getItem(itemId);
+    const item = api.getItemFromDB(itemId);
 
     if (!item) throw new Error(INVALID_STATE);
 

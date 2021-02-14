@@ -6,9 +6,11 @@ import { PLAYER_FORCE } from "../../constants";
 
 const CHARA_MAP_SCALE = 0.45;
 
-export const renderSquad = (scene: MapScene, squad: MapSquad): void => {
+export const renderSquad = (scene: MapScene, mapSquad: MapSquad): void => {
   const { container } = scene.getContainers();
-  const squadLeader = Object.values(squad.members).find((mem) => mem.leader);
+  const squadLeader = mapSquad.squad.members.find(
+    (mem) => mem.id === mapSquad.squad.leader
+  );
 
   if (!squadLeader) throw new Error(INVALID_STATE);
 
@@ -16,10 +18,10 @@ export const renderSquad = (scene: MapScene, squad: MapSquad): void => {
 
   if (!leader) throw new Error(INVALID_STATE);
 
-  const { x, y } = scene.getCellPositionOnScreen(squad.pos);
+  const { x, y } = scene.getCellPositionOnScreen(mapSquad.pos);
 
   const chara = new Chara(
-    scene.charaKey(squad.id),
+    scene.charaKey(mapSquad.squad.id),
     scene,
     leader,
     x,
@@ -31,7 +33,7 @@ export const renderSquad = (scene: MapScene, squad: MapSquad): void => {
   const emblem = chara.add.image(
     100,
     -20,
-    squad.force === PLAYER_FORCE ? "ally_emblem" : "enemy_emblem"
+    mapSquad.squad.force === PLAYER_FORCE ? "ally_emblem" : "enemy_emblem"
   );
 
   chara.container.add(emblem);
@@ -40,7 +42,8 @@ export const renderSquad = (scene: MapScene, squad: MapSquad): void => {
 
   scene.charas.push(chara);
 
-  if (scene.inactiveSquads.includes(squad.id)) chara.container.setAlpha(0.5);
+  if (scene.inactiveSquads.includes(mapSquad.squad.id))
+    chara.container.setAlpha(0.5);
 };
 
 export default (scene: MapScene): void => {

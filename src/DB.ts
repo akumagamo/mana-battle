@@ -1,115 +1,100 @@
-import {Squad, SquadMember, SquadMemberMap, SquadMap} from './Squad/Model';
-import {unitsWithoutSquadSelector} from './Unit/selectors';
-import {Item, itemTypeSlots, ItemTypeSlots, ItemMap} from './Item/Model';
-import {Unit, UnitMap, UnitSquadPosition} from './Unit/Model';
-import {removeIdFromMap} from './utils';
-import {INVALID_STATE} from './errors';
-import {Options} from './Models';
-import {BattleFieldMap} from './Map/Model';
-import {getUnitAttacks} from './Unit/Skills';
-import {PLAYER_FORCE} from './constants';
+import {
+  Squad,
+  Member,
+  MemberIndex,
+  Index,
+  makeSquadMember,
+  makeSquad,
+} from "./Squad/Model";
+import { Item, itemTypeSlots, ItemTypeSlots, ItemMap } from "./Item/Model";
+import { Unit, UnitIndex } from "./Unit/Model";
+import { Options } from "./Models";
+import { BattleFieldMap } from "./Map/Model";
+import { getUnitAttacks } from "./Unit/Skills";
+import { PLAYER_FORCE } from "./constants";
+import { List, Map } from "immutable";
 
-const get = (str: string) => JSON.parse(localStorage.getItem(str) || '{}');
+const get = (str: string) => JSON.parse(localStorage.getItem(str) || "{}");
 const set = (str: string, data: any) =>
   localStorage.setItem(str, JSON.stringify(data));
 
-export const getSquads = (): SquadMap => get('squads');
+export const getSquadsFromDB = (): Index => get("squads");
 
-export const getSquad = (id: string): Squad => {
-  const squad = Object.values(getSquads()).find((squad) => squad.id === id);
-  if (!squad) throw new Error(INVALID_STATE);
-  return squad;
+export const getSquadFromDB = (id: string): Squad => {
+  return getSquadsFromDB().get(id);
 };
 
-export const getSquadMembers = (id: string): Unit[] => {
-  const squad = getSquad(id);
+export const getSquadMembersFromDB = (id: string): List<Unit> => {
+  const squad = getSquadFromDB(id);
 
-  return Object.values(squad.members)
-    .map((unit) => getUnit(unit.id))
-    .filter((a) => a) as Unit[];
+  return squad.members
+    .map((unit) => getUnitFromDB(unit.id))
+    .filter((a) => a)
+    .toList();
 };
 
-export const getSquadMember = (id: string): SquadMember => {
-  const unit = getUnit(id);
-  if (!unit || !unit.squad) throw new Error(INVALID_STATE);
-  const squad = getSquad(unit.squad.id);
+export const getSquadMemberFromDB = (id: string): Member => {
+  const unit = getUnitFromDB(id);
+  const squad = getSquadFromDB(unit.squad);
 
-  return Object.values(squad.members).find(
-    (unit) => unit.id === id,
-  ) as SquadMember;
+  return squad.members.get(id);
 };
 
-export const getSquadLeader = (id: string): Unit => {
-  const members = getSquadMembers(id);
+export const getSquadLeaderFromDB = (id: string): Unit => {
+  const squad = getSquadFromDB(id);
 
-  const unit = members.find((unit) => unit.id === id);
+  const unit = getUnitFromDB(squad.leader);
 
-  if (!unit) throw new Error(INVALID_STATE);
   return unit;
 };
 
-export const getUnits = (): UnitMap => {
+export const getUnitsFromDB = (): UnitIndex => {
+  let units = get("units") as UnitIndex;
 
-  let units = get('units')
-
-  for(let k in units)
-    units[k].attacks = getUnitAttacks(units[k].class)
-
-  return units
-
+  return units.map((u) => ({ ...u, attacks: getUnitAttacks(u.class) }));
 };
 
-export const getItems = (): ItemMap => get('items');
-export const getItem = (id: string): Item => {
-  const item = getItems()[id];
-  if (!item) throw new Error(INVALID_STATE);
-  return item;
+export const getItemsFromDB = (): ItemMap => get("items");
+export const getItemFromDB = (id: string): Item => {
+  return getItemsFromDB()[id];
 };
-export const getItemList = (): Item[] => Object.values(getItems());
+export const getItemList = (): Item[] => Object.values(getItemsFromDB());
 
 export const getItemTypes = (): ItemTypeSlots => itemTypeSlots;
 
-export const getUnit = (id: string): Unit => {
-  const unit = getUnits()[id];
+export const getUnitFromDB = (id: string): Unit => {
+  const unit = getUnitsFromDB().get(id);
 
-  unit.attacks = getUnitAttacks(unit.class);
-
-  if (!unit) throw new Error(INVALID_STATE);
-
-  return unit;
+  return { ...unit, attacks: getUnitAttacks(unit.class) };
 };
 
-export const saveSquads = (squads: SquadMap) => set('squads', squads);
+export const saveSquadsIntoDB = (squads: Index) => set("squads", squads);
 
-export const saveUnits = (units: UnitMap) => {
-  const unitsToSave = {};
+export const saveUnitsIntoDB = (units: UnitIndex) => {
+  const unitsToSave = units.map((u) => {
+    delete u.attacks;
+    return u;
+  });
 
-  for (let k in units) {
-    //@ts-ignore
-    unitsToSave[k] = {...units[k]};
-    //@ts-ignore
-    delete unitsToSave[k].attacks;
-  }
-
-  set('units', unitsToSave);
+  set("units", unitsToSave.toJS());
 };
 
-export const saveItems = (items: ItemMap) => set('items', items);
+export const saveItemsIntoDB = (items: ItemMap) => set("items", items);
 
-export const saveSquad = (squad: Squad) => {
-  const squads = getSquads();
-  saveSquads({...squads, [squad.id]: squad});
+export const saveSquadIntoDB = (squad: Squad) => {
+  const squads = getSquadsFromDB();
+  saveSquadsIntoDB({ ...squads, [squad.id]: squad });
 };
 
 // Unit queries
 
-export const saveUnit = (unit: Unit) => {
-  const units = getUnits();
-  saveUnits({...units, [unit.id]: unit});
+export const saveUnitIntoDB = (unit: Unit) => {
+  const units = getUnitsFromDB();
+  saveUnitsIntoDB({ ...units, [unit.id]: unit });
 };
 
 /** Persists unit representation in squad map */
-export const saveSquadUnit = ({
+export const saveSquadUnitIntoDB = ({
   squadId,
   unitId,
   x,
@@ -121,9 +106,9 @@ export const saveSquadUnit = ({
   y: number;
 }) => {
   console.log(`save squad unit`, squadId, unitId, x, y);
-  const squads = getSquads();
-  const squad = squads[squadId];
-  saveSquads({
+  const squads = getSquadsFromDB();
+  const squad = squads.get(squadId);
+  saveSquadsIntoDB({
     ...squads,
     [squadId]: {
       ...squad,
@@ -133,7 +118,6 @@ export const saveSquadUnit = ({
           id: unitId,
           x,
           y,
-          leader: squad.members[unitId]?.leader === true,
         },
       },
     },
@@ -141,167 +125,82 @@ export const saveSquadUnit = ({
 };
 
 export const disbandSquad = (id: string) => {
-  const squads = getSquads();
+  const squads = getSquadsFromDB();
 
-  const squadToRemove = squads[id];
+  const squadToRemove = squads.get(id);
 
-  Object.values(squadToRemove.members).forEach((member) =>
-    removeUnitFromSquad(member.id, squadToRemove),
+  squadToRemove.members.forEach((member) =>
+    removeUnitFromSquad(member.id, squadToRemove)
   );
 
-  const updatedSquads = removeIdFromMap(id, squads);
-  saveSquads(updatedSquads);
+  saveSquadsIntoDB(squads.delete(id));
 };
-
-export const unitsWithoutSquad = () => unitsWithoutSquadSelector(getUnits());
-
-export const addUnitToSquad = (
-  unit: Unit,
-  squad: Squad,
-  x: number,
-  y: number,
-) => {
-  const {members} = squad;
-
-  const newEntry = {
-    leader: Object.keys(members).length === 0,
-    x,
-    y,
-    id: unit.id,
-  };
-  console.log(`NEW ENTRY`, newEntry);
-
-  const unitInTargetPosition = Object.values(members).find(
-    (member) => member.x === x && member.y === y,
-  );
-
-  if (unitInTargetPosition) {
-    console.log(`REMOVE EXISTING`);
-
-    const remainingMembers = Object.values(members).filter(
-      (member) => member.id !== unitInTargetPosition.id,
-    );
-    const updatedMembers = remainingMembers
-      .concat([newEntry])
-      .reduce((acc, curr) => ({...acc, [curr.id]: curr}), {});
-
-    //TODO: as only one unit can be the leader, the `leader` prop should be from the squad:
-    const updatedSquad = {
-      ...squad,
-      members: updatedMembers as SquadMemberMap,
-    };
-
-    const removedUnit = getUnit(unitInTargetPosition.id);
-
-    if (!removedUnit) throw new Error(INVALID_STATE);
-
-    saveUnit({...removedUnit, squad: null});
-    saveUnit({
-      ...unit,
-      squad: {
-        id: squad.id,
-        x: members[unit.id].x,
-        y: members[unit.id].y,
-      },
-    });
-    saveSquad(updatedSquad);
-
-    return updatedSquad;
-  } else {
-
-    // Add unit to squad
-    const updatedMembers = {...members, [unit.id]: newEntry};
-
-    const updatedSquad = {
-      ...squad,
-      members: updatedMembers,
-      name: newEntry.leader ? unit.name : squad.name,
-    };
-
-    saveUnit({
-      ...unit,
-      squad: {
-        id: squad.id,
-        x,
-        y,
-      },
-    });
-    saveSquad(updatedSquad);
-
-    return updatedSquad;
-  }
-};
-
-
 
 export const removeUnitFromSquad = (unitId: string, squad: Squad) => {
-  const unit = getUnit(unitId);
-  if (!unit) {
-    throw new Error('ERROR: tried to save unit with invalid ID');
-  }
-  const updatedUnit = {...unit, squad: (null as UnitSquadPosition|null)};
+  const unit = getUnitFromDB(unitId);
+  const updatedUnit = { ...unit, squad: null } as Unit;
 
-  const {members} = squad;
+  const { members } = squad;
 
-  const updatedMembers: SquadMemberMap = removeIdFromMap(unitId, members);
+  const updatedMembers: MemberIndex = members.delete(unitId);
 
-  const updatedSquad = {...squad, members: updatedMembers};
+  const updatedSquad = { ...squad, members: updatedMembers };
 
-  saveUnit(updatedUnit);
-  saveSquad(updatedSquad);
+  saveUnitIntoDB(updatedUnit);
+  saveSquadIntoDB(updatedSquad);
 };
 
 export const createSquad = (leader: Unit) => {
-  const squads = getSquads();
-  const newId = squads.length.toString();
+  const squads = getSquadsFromDB();
+  const newId = squads.size.toString();
 
   let defaultX = 2;
   let defaultY = 2;
 
-  const newSquad = {
+  const newSquad = makeSquad({
     id: newId,
-    name: leader.name,
     force: PLAYER_FORCE,
-    members: {
-      [leader.id]: {id: leader.id, leader: true, x: defaultX, y: defaultY},
-    },
-  };
-  const updatedSquads = {
-    ...squads,
-    [newId]: newSquad,
-  };
+    leader: leader.id,
+    members: Map({
+      [leader.id]: makeSquadMember({ id: leader.id, x: defaultX, y: defaultY }),
+    }),
+  });
+  const updatedSquads = squads.set(newId, newSquad);
 
-  const updatedUnit = {...leader, squad: {id: newId, x: defaultX, y: defaultY}};
+  const updatedUnit: Unit = {
+    ...leader,
+    squad: newId,
+  };
   const fn = (
-    resolve: ({units, squads}: {units: UnitMap; squads: SquadMap}) => void,
+    resolve: ({ units, squads }: { units: UnitIndex; squads: Index }) => void
   ) => {
-    saveSquads(updatedSquads);
-    saveUnit(updatedUnit);
-    const units = getUnits();
+    saveSquadsIntoDB(updatedSquads);
+    saveUnitIntoDB(updatedUnit);
+    const units = getUnitsFromDB();
     console.log(units, updatedSquads);
-    resolve({units, squads: updatedSquads});
+    resolve({ units, squads: updatedSquads });
   };
 
   return new Promise(fn);
 };
 
 export const equipItem = (itemId: string, unitId: string) => {
-  const unit = getUnit(unitId);
-  const item = getItem(itemId);
+  const unit = getUnitFromDB(unitId);
+  const item = getItemFromDB(itemId);
 
-  if (!unit) throw new Error('An invalid unit id was supplied to equipItem');
-  if (!item) throw new Error('An invalid item id was supplied to equipItem');
+  if (!unit) throw new Error("An invalid unit id was supplied to equipItem");
+  if (!item) throw new Error("An invalid item id was supplied to equipItem");
 
   const slot = getItemTypes()[item.type];
 
-  const updatedUnit = {...unit, equips: {...unit.equips, [slot]: item.id}};
+  const updatedUnit = { ...unit, equips: { ...unit.equips, [slot]: item.id } };
 
-  saveUnit(updatedUnit);
+  saveUnitIntoDB(updatedUnit);
 };
 
-export const getOptions = (): Options => get('options');
+export const getOptions = (): Options => get("options");
 export const setSoundEnabled = (val: boolean) =>
-  set('options', {...getOptions(), soundEnabled: val});
+  set("options", { ...getOptions(), soundEnabled: val });
 export const setMusicEnabled = (val: boolean) =>
-  set('options', {...getOptions(), musicEnabled: val});
-export const getMaps = (): BattleFieldMap => get('maps');
+  set("options", { ...getOptions(), musicEnabled: val });
+export const getMaps = (): BattleFieldMap => get("maps");

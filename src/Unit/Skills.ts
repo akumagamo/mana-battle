@@ -1,4 +1,5 @@
-import {random} from "../utils/random";
+import { getMember, Index } from "../Squad/Model";
+import { random } from "../utils/random";
 import { Elem, Unit, UnitClass } from "./Model";
 import { atk, attrMod, mAtk } from "./mods";
 
@@ -32,14 +33,14 @@ const fireball = (times: number) => (unit: Unit): Attack => {
     times: times,
   };
 };
-const iceBolt = (times: number) => (unit: Unit): Attack => {
-  return {
-    name: "Ice Bold",
-    damage: mAtk(unit) + attrMod(unit.int) + random(1, 6),
-    elem: "water",
-    times: times,
-  };
-};
+// const iceBolt = (times: number) => (unit: Unit): Attack => {
+//   return {
+//     name: "Ice Bold",
+//     damage: mAtk(unit) + attrMod(unit.int) + random(1, 6),
+//     elem: "water",
+//     times: times,
+//   };
+// };
 
 const shoot = (times: number) => (unit: Unit): Attack => {
   return {
@@ -80,14 +81,15 @@ export function getUnitAttacks(class_: UnitClass) {
   return skills[class_];
 }
 
-export function getUnitDamage(unit: Unit) {
-  return getUnitAttack(unit).damage;
+export function getUnitDamage(squadIndex: Index, unit: Unit) {
+  return getUnitAttack(squadIndex, unit).damage;
 }
 
-export function getUnitAttack(unit: Unit) {
+export function getUnitAttack(squadIndex: Index, unit: Unit) {
+  const member = getMember(unit.id, squadIndex.get(unit.squad));
   const getPos = (): Row => {
-    if (unit.squad?.y === 0) return "back";
-    else if (unit.squad?.y === 1) return "middle";
+    if (member.y === 0) return "back";
+    else if (member.y === 1) return "middle";
     else return "front";
   };
 

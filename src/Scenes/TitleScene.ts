@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { getSquads, getOptions, getUnits, disbandSquad } from "../DB";
+import { getSquadsFromDB, getOptions, getUnitsFromDB, disbandSquad } from "../DB";
 import defaultData from "../defaultData";
 import { preload } from "../preload";
 import button from "../UI/button";

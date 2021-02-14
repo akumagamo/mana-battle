@@ -2,21 +2,23 @@ import { Scene } from "phaser";
 import { MapSquad } from "../Model";
 import BoardScene from "../../Board/StaticBoardScene";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../constants";
-import { INVALID_STATE } from "../../errors";
 import { Container } from "../../Models";
 import button from "../../UI/button";
-import { Unit } from "../../Unit/Model";
+import { Unit, UnitIndex } from "../../Unit/Model";
 import SmallUnitDetailsBar from "../../Unit/SmallUnitDetailsBar";
 import { MapScene } from "../MapScene";
+import { findMember } from "../../Squad/Model";
 
 export default (
   scene: MapScene,
-  squad: MapSquad,
-  units: Unit[],
+  mapSquad: MapSquad,
+  units: UnitIndex,
   onClose: () => void
 ) => {
-  const leader = Object.values(squad.members).find((m) => m.leader);
-  if (!leader) throw new Error(INVALID_STATE);
+  const leader = findMember(
+    (m) => m.id === mapSquad.squad.leader,
+    mapSquad.squad
+  );
 
   let charaStats = scene.add.container(0, 0);
 
@@ -28,8 +30,8 @@ export default (
 
   const detailsBar = renderUnitDetailsBar(scene, details, container);
 
-  const boardScene = new BoardScene(squad, units, 200, 50, 0.7);
-  scene.scene.add(`board-squad-${squad.id}`, boardScene, true);
+  const boardScene = new BoardScene(mapSquad.squad, units, 200, 50, 0.7);
+  scene.scene.add(`board-squad-${mapSquad.squad.id}`, boardScene, true);
   boardScene.onUnitClick((chara) => {
     charaStats.removeAll();
 

@@ -4,11 +4,12 @@ import button from "../UI/button";
 import maps from "../maps";
 import { MapCommands } from "./MapCommands";
 import { toMapSquad } from "../Unit/Model";
-import { getSquads, getUnits } from "../DB";
+import { getSquadsFromDB, getUnitsFromDB } from "../DB";
 import { Container } from "../Models";
 import { MapState } from "./Model";
 import { fadeIn } from "../UI/Transition";
-import { Set } from "immutable";
+import { List, Set } from "immutable";
+import { Squad } from "../Squad/Model";
 
 export default class MapListScene extends Phaser.Scene {
   constructor() {
@@ -41,9 +42,9 @@ export default class MapListScene extends Phaser.Scene {
 
     this.cameras.main.fadeOut(1000, 0, 0, 0);
 
-    const alliedUnits = getUnits();
+    const alliedUnits = getUnitsFromDB();
 
-    const firstSquad = Object.values(getSquads())[0].id;
+    const firstSquad = getSquadsFromDB().first<Squad>().id;
 
     let commands: MapCommands[] = [
       {
@@ -51,15 +52,17 @@ export default class MapListScene extends Phaser.Scene {
         target: {
           ...map,
           dispatchedSquads: Set(
-            [firstSquad].concat(map.squads.map((u) => u.id))
+            List([firstSquad]).concat(map.squads.map((u) => u.squad.id))
           ),
           squads: map.squads.concat(
-            Object.values(getSquads()).map((s) =>
-              toMapSquad(
-                s,
-                map.cities.find((c) => c.id === "castle1")
+            getSquadsFromDB()
+              .map((s) =>
+                toMapSquad(
+                  s,
+                  map.cities.find((c) => c.id === "castle1")
+                )
               )
-            )
+              .toList()
           ),
 
           units: map.units.merge(alliedUnits),

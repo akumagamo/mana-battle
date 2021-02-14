@@ -1,16 +1,14 @@
 import { Modifier, ItemSlot, ItemMap, ItemType } from "../Item/Model";
 import { sum } from "../utils/math";
 import { Container } from "../Models";
-import { getItems } from "../DB";
+import { getItemsFromDB } from "../DB";
 import { UnitAttacks } from "./Skills";
 import { MapSquad } from "../Map/Model";
 import { Squad } from "../Squad/Model";
 import { Vector } from "matter";
 import { List, Map, Set } from "immutable";
 
-export type UnitMap = { [x: string]: Unit };
-
-export type UnitIndex =  Map<string, Unit>;
+export type UnitIndex = Map<string, Unit>;
 
 export type Stat = "str" | "dex" | "int";
 export const statLabels: {
@@ -23,7 +21,7 @@ export const statLabels: {
 
 export enum Gender {
   Male = "male",
-  Female = "female"
+  Female = "female",
 }
 export const genders: Gender[] = [Gender.Male, Gender.Female];
 export const genderLabels: { [gender in Gender]: string } = {
@@ -50,8 +48,6 @@ export const unitClassLabels: { [x in UnitClass]: string } = {
 
 export type Movement = "plain" | "mountain" | "sky" | "forest";
 
-export type UnitSquadPosition = { id: string; x: number; y: number };
-
 /**
  * Database representation of a unit. Contains basic data.
  */
@@ -61,7 +57,7 @@ export type Unit = {
   class: UnitClass;
   gender: Gender;
   movement: Movement;
-  squad: UnitSquadPosition | null; // TODO: make this just an id
+  squad: string | null; // todo: remove
   lvl: number;
   hp: number;
   currentHp: number;
@@ -82,18 +78,16 @@ export type Unit = {
   leader?: boolean;
   attacks: UnitAttacks;
 };
-export type UnitInSquad = Unit & { squad: UnitSquadPosition };
+export type UnitInSquad = Unit & { squad: string };
 
-export function assignSquad(
-  unit: Unit,
-  position: UnitSquadPosition
-): UnitInSquad {
-  return { ...unit, squad: position };
+export function assignSquad(unit: Unit, squad: string): UnitInSquad {
+  return { ...unit, squad };
 }
 
 export function toMapSquad(squad: Squad, pos: Vector): MapSquad {
   return {
-    ...squad,
+    id: squad.id,
+    squad,
     pos: { x: pos.x, y: pos.y },
     range: 5,
     validSteps: List(),
@@ -163,13 +157,6 @@ export function getActualStat(stat: Stat, items: ItemMap, unit: Unit) {
   return value + values.reduce(sum, 0);
 }
 
-export function getUnitsWithoutSquad(map: UnitMap) {
-  return Object.values(map).reduce(
-    (acc, curr) => (curr.squad ? acc : { ...acc, [curr.id]: curr }),
-    {} as UnitMap
-  );
-}
-
 export const HAIR_STYLES = [
   "dark1",
   "long1",
@@ -207,7 +194,7 @@ export type Job = {
 const slash: Skill = {
   name: "slash",
   formula: (unit) => {
-    const items = getItems();
+    const items = getItemsFromDB();
     const weapon = items[unit.equips.mainHand];
     const str = getActualStat("str", items, unit);
     const dex = getActualStat("dex", items, unit);
@@ -221,7 +208,7 @@ const slash: Skill = {
   },
 };
 
-const fighter: Job = {
+export const fighter: Job = {
   name: "fighter",
   statsPerLevel: {
     str: 6,
@@ -237,3 +224,10 @@ const fighter: Job = {
     ornament: "accessory",
   },
 };
+
+export function isAlive(unit: Unit) {
+  return unit.currentHp > 0;
+}
+
+export const unitsWithoutSquad = (unitMap: UnitIndex) =>
+  unitMap.filter((unit) => unit.squad === null);

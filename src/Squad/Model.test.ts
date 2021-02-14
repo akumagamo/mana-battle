@@ -1,26 +1,75 @@
-import { makeSquad, updateMember } from "./Model";
+import { Map } from "immutable";
+import {
+  changeLeader,
+  changeSquadMemberPosition,
+  getMember,
+  makeSquad,
+  makeSquadMember,
+  removeMember,
+  updateMember,
+} from "./Model";
 
-test("generates squads", () => {
-  const sqd = makeSquad("id1", "force");
-
-  expect(sqd).toStrictEqual({
-    id: "id1",
-    name: "",
-    members: {},
-    force: "force",
-  });
-
-  const member = { id: "1", x: 2, y: 2, leader: true };
-  const squadWithMember = updateMember(sqd, member);
-
-  const newLeader = { id: "2", x: 1, y: 2, leader: true };
-
-  const replaceLeader = updateMember(squadWithMember, newLeader);
-
-  expect(replaceLeader).toStrictEqual({
-    id: "id1",
-    name: "",
-    members: { "1": { ...member, leader: false }, "2": newLeader },
-    force: "force",
-  });
+const defaultSquadIndex = Map({
+  s1: givenASquadWithOneMember(),
 });
+
+test("Generates squads", () => {
+  const squadWithLeader = givenASquadWithOneMember();
+
+  expect(squadWithLeader).toStrictEqual(defaultSquadIndex.get("s1"));
+});
+
+test("Should get members", () => {
+  const squad = givenASquadWithTwoMembers();
+
+  expect(getMember("u1", squad).id).toBe("u1");
+  expect(getMember("u2", squad).id).toBe("u2");
+});
+
+test("Should add new members", () => {
+  const squad = updateMember(
+    givenASquadWithTwoMembers(),
+    makeSquadMember({ id: "u3" })
+  );
+
+  expect(getMember("u3", squad).id).toBe("u3");
+});
+
+test("Should change leader", () => {
+  const defaultSquad = givenASquadWithTwoMembers();
+  expect(defaultSquad.leader).toBe("u1");
+  const squad = changeLeader("u2", defaultSquad);
+
+  expect(squad.leader).toBe("u2");
+});
+
+test("Should remove member", () => {
+  const squad = removeMember("u1", givenASquadWithTwoMembers());
+
+  expect(squad.members.size).toBe(1);
+  expect(getMember("u2", squad).id).toBe("u2");
+});
+test("Should update position", () => {
+  const squad = changeSquadMemberPosition(
+    makeSquadMember({ id: "u1" }),
+    givenASquadWithTwoMembers(),
+    3,
+    3
+  );
+
+  expect(getMember("u1", squad)).toHaveProperty("x", 3);
+  expect(getMember("u1", squad)).toHaveProperty("y", 3);
+});
+
+function givenASquadWithOneMember() {
+  const sqd = makeSquad({ id: "s1", leader: "u1" });
+  const member = makeSquadMember({ id: "u1", x: 2, y: 2 });
+  const squadWithLeader = changeLeader("u1", updateMember(sqd, member));
+  return squadWithLeader;
+}
+
+function givenASquadWithTwoMembers() {
+  const sqd = givenASquadWithOneMember();
+  const newMember = makeSquadMember({ id: "u2", x: 1, y: 2 });
+  return updateMember(sqd, newMember);
+}

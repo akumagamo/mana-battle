@@ -1,25 +1,26 @@
-import {PLAYER_FORCE} from '../../constants';
-import button from '../../UI/button';
-import text from '../../UI/text';
-import {MapScene} from '../MapScene';
-import playerSquad from './playerSquad';
+import { PLAYER_FORCE } from "../../constants";
+import button from "../../UI/button";
+import text from "../../UI/text";
+import { MapScene } from "../MapScene";
+import playerSquad from "./playerSquad";
 
-export async  function squadInfo(
+export async function squadInfo(
   scene: MapScene,
   uiContainer: Phaser.GameObjects.Container,
   baseY: number,
-  id: string): Promise<void> {
-  const squad = scene.getSquad(id);
+  id: string
+): Promise<void> {
+  const mapSquad = scene.getSquad(id);
 
-  text(20, baseY, squad.name, uiContainer, scene);
+  text(20, baseY, "TODO: squadName", uiContainer, scene);
 
-  if (squad.force !== PLAYER_FORCE) {
-    button(200, baseY, 'Squad Details', scene.uiContainer, scene, () => scene.viewSquadDetails(squad.id)
+  if (mapSquad.squad.force !== PLAYER_FORCE) {
+    button(200, baseY, "Squad Details", scene.uiContainer, scene, () =>
+      scene.viewSquadDetails(id)
     );
   }
 
-  if (squad.force === PLAYER_FORCE) {
-    playerSquad(scene, baseY, squad, uiContainer);
+  if (mapSquad.squad.force === PLAYER_FORCE) {
+    playerSquad(scene, baseY, mapSquad, uiContainer);
   }
 }
-

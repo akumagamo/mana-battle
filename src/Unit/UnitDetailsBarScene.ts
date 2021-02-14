@@ -125,7 +125,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
 
     const item = (x: number, y: number, slotId: ItemSlot) => {
       const itemId = unit.equips[slotId];
-      const slot = itemId !== 'none' ? api.getItem(itemId) : null;
+      const slot = itemId !== 'none' ? api.getItemFromDB(itemId) : null;
 
       const bg = this.add.image(x, y, 'panel');
 
@@ -168,7 +168,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
   unitControls(unit: Unit) {
     if (this.container && this.showToggleHat)
       button(600, 20, 'Toggle Hat', this.container, this, () => {
-        api.saveUnit({
+        api.saveUnitIntoDB({
           ...unit,
           style: {...unit.style, displayHat: !unit.style.displayHat},
         });

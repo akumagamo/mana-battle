@@ -1,14 +1,7 @@
-import {Vector} from 'matter';
+import { Vector } from "matter";
 
-export function removeIdFromMap(id: string, map: {[id: string]: {id: string}}) {
-  return Object.values(map).reduce(
-    (acc, curr) => (curr.id === id ? acc : {...acc, [curr.id]: curr}),
-    {},
-  );
-}
-
-export const indexById = (list: {id: string}[]) =>
-  list.reduce((acc, curr) => ({...acc, [curr.id]: curr}), {});
+export const indexById = (list: { id: string }[]) =>
+  list.reduce((acc, curr) => ({ ...acc, [curr.id]: curr }), {});
 
 export const maybeZero = (v: number | undefined | null) => (v ? v : 0);
 

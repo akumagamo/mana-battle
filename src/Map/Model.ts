@@ -1,6 +1,6 @@
-import {Squad} from '../Squad/Model';
-import {Unit} from '../Unit/Model';
-import {Map, List, Set} from 'immutable';
+import { Squad } from "../Squad/Model";
+import { Unit } from "../Unit/Model";
+import { Map, List, Set } from "immutable";
 export type UnitId = string;
 export type ForceId = string;
 export type CityId = string;
@@ -23,7 +23,7 @@ export type CellNumber =
   | 14
   | 15;
 
-export type AICommand = 'DEFEND' | 'ATTACK';
+export type AICommand = "DEFEND" | "ATTACK";
 export type MapState = {
   id: string;
   name: string;
@@ -32,7 +32,7 @@ export type MapState = {
   cells: CellNumber[][];
   forces: Force[];
   cities: City[];
-  squads: MapSquad[];
+  squads: List<MapSquad>;
   units: Map<string, Unit>;
   ai: Map<string, AICommand>;
   dispatchedSquads: Set<string>;
@@ -41,7 +41,7 @@ export type Force = {
   id: ForceId;
   name: string;
   squads: string[];
-  relations: {[id: string]: 'hostile' | 'neutral' | 'ally'};
+  relations: { [id: string]: "hostile" | "neutral" | "ally" };
   initialPosition: string;
 };
 
@@ -51,20 +51,22 @@ export type City = {
   x: number;
   y: number;
   force: ForceId | null;
-  type: 'town' | 'castle' | 'shop';
+  type: "town" | "castle" | "shop";
 };
 
-export type Vector = {x: number; y: number};
-export type ValidStep = {target: Vector; steps: Vector[]};
-export type EnemyInRange = {enemy: string; steps: Vector[]};
-export type MapSquad = Squad & {
+export type Vector = { x: number; y: number };
+export type ValidStep = { target: Vector; steps: Vector[] };
+export type EnemyInRange = { enemy: string; steps: Vector[] };
+export type MapSquad = {
+  id: string;
+  squad: Squad;
   pos: Vector;
   range: number;
   validSteps: List<ValidStep>;
   steps: Set<Vector>;
   enemiesInRange: EnemyInRange[];
-  pathFinder: (v: Vector)=>(v: Vector) => Vector[];
-  status: 'alive' | 'defeated' | 'retreated' | 'hidden';
+  pathFinder: (v: Vector) => (v: Vector) => Vector[];
+  status: "alive" | "defeated" | "retreated" | "hidden";
 };
 
 export type TurnManager = {
@@ -75,28 +77,28 @@ export type TurnManager = {
   walkableCells: number[];
 };
 
-export type Step = {target: Vector; steps: Vector[]};
+export type Step = { target: Vector; steps: Vector[] };
 
-export const tileMap: {[x in CellNumber]: string} = {
-  0: 'grass',
-  1: 'woods',
-  2: 'mountain',
-  3: 'water',
+export const tileMap: { [x in CellNumber]: string } = {
+  0: "grass",
+  1: "woods",
+  2: "mountain",
+  3: "water",
 
-  4: 'beach-r',
-  5: 'beach-l',
-  6: 'beach-t',
-  7: 'beach-b',
+  4: "beach-r",
+  5: "beach-l",
+  6: "beach-t",
+  7: "beach-b",
 
-  8: 'beach-tr',
-  9: 'beach-tl',
-  10: 'beach-br',
-  11: 'beach-bl',
+  8: "beach-tr",
+  9: "beach-tl",
+  10: "beach-br",
+  11: "beach-bl",
 
-  12: 'beach-b-and-r',
-  13: 'beach-t-and-r',
-  14: 'beach-b-and-l',
-  15: 'beach-t-and-l', //br
+  12: "beach-b-and-r",
+  13: "beach-t-and-r",
+  14: "beach-b-and-l",
+  15: "beach-t-and-l", //br
 };
 
 export const translateTiles = (tiles: CellNumber[][]) => {
@@ -181,7 +183,7 @@ export const translateTiles = (tiles: CellNumber[][]) => {
       }
 
       return cell;
-    }),
+    })
   );
 };
 

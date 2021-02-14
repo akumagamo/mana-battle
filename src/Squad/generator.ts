@@ -1,10 +1,9 @@
-import { maleNames } from "../constants/names";
-import { randomItem } from "../utils";
+import { Squad, MemberIndex, makeSquadMember, makeSquad } from "./Model";
+import { UnitClass, UnitIndex } from "../Unit/Model";
+import { Map } from "immutable";
 import { makeUnit } from "../Unit/makeUnit";
-import { Squad, SquadMemberMap } from "./Model";
-import { Unit, UnitClass } from "../Unit/Model";
 
-type SquadGeneratorResponse = { units: { [id: string]: Unit }; squad: Squad };
+type SquadGeneratorResponse = { units: UnitIndex; squad: Squad };
 
 /**
  * a _ f
@@ -33,38 +32,32 @@ export function squadGenerator(
   level: number,
   force: string
 ) {
-  const leaderName = randomItem(maleNames);
-
   const unitId = (n: number) => squadId + "_unit_" + n.toString();
 
-  const units = units_.reduce((xs, [class_, [x, y]], index) => {
-    return {
-      ...xs,
-      [unitId(index)]: {
-        ...makeUnit(class_, unitId(index), level),
-        squad: { id: squadId, x, y },
-      },
-    };
-  }, {} as { [id: string]: Unit });
+  const units = units_.reduce((xs, [class_], index) => {
+    return xs.set(unitId(index), {
+      ...makeUnit(class_, unitId(index), level),
+      squad: squadId,
+    });
+  }, Map() as UnitIndex);
 
-  const members = units_.reduce((xs, [, [x, y], leader], index) => {
-    return {
-      ...xs,
-      [unitId(index)]: {
+  const members = units_.reduce((xs, [, [x, y]], index) => {
+    return xs.set(
+      unitId(index),
+      makeSquadMember({
         id: unitId(index),
         x,
         y,
-        leader,
-      },
-    };
-  }, {} as SquadMemberMap);
+      })
+    );
+  }, Map() as MemberIndex);
 
-  const squad: Squad = {
+  const squad: Squad = makeSquad({
     id: squadId,
-    name: leaderName,
+    leader: unitId(units_.findIndex(([, , leader]) => leader)),
     members,
     force: force,
-  };
+  });
 
   return { units, squad };
 }

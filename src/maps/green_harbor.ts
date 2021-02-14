@@ -1,9 +1,10 @@
-import { Map, Set } from "immutable";
+import { List, Map, Set } from "immutable";
 import { CellNumber, City, MapState } from "../Map/Model";
-import { getSquads } from "../DB";
+import { getSquadsFromDB } from "../DB";
 import { makeUnit } from "../Unit/makeUnit";
-import { assignSquad, toMapSquad } from "../Unit/Model";
+import { toMapSquad } from "../Unit/Model";
 import { CPU_FORCE, PLAYER_FORCE } from "../constants";
+import { makeSquad, makeSquadMember } from "../Squad/Model";
 
 const enemyCastle: City = {
   id: "castle2",
@@ -27,7 +28,7 @@ const tiles: CellNumber[][] = [
   [3, 3, 3, 3, 3, 3, 3, 2, 1, 2, 0, 0, 1, 2],
 ];
 const map: () => MapState = () => {
-  const playerSquad = Object.keys(getSquads())[0];
+  const playerSquad = Object.keys(getSquadsFromDB())[0];
 
   return {
     id: "greenHarbor",
@@ -36,36 +37,35 @@ const map: () => MapState = () => {
     description: "The first map",
     dispatchedSquads: Set(),
     cells: tiles,
-    squads: [
+    squads: List([
       toMapSquad(
-        {
+        makeSquad({
           id: "squad1",
-          name: "Derpy",
-          members: {
-            enemy1: { id: "enemy1", x: 1, y: 2, leader: true },
-            enemy2: { id: "enemy2", x: 3, y: 1, leader: false },
-            enemy3: { id: "enemy3", x: 3, y: 2, leader: false },
-            enemy4: { id: "enemy4", x: 3, y: 3, leader: false },
-          },
+          leader: "enemy1",
+          members: Map({
+            enemy1: makeSquadMember({ id: "enemy1", x: 1, y: 2 }),
+            enemy2: makeSquadMember({ id: "enemy2", x: 3, y: 1 }),
+            enemy3: makeSquadMember({ id: "enemy3", x: 3, y: 2 }),
+            enemy4: makeSquadMember({ id: "enemy4", x: 3, y: 3 }),
+          }),
           force: CPU_FORCE,
-        },
+        }),
         { x: 6, y: 4 }
       ),
       toMapSquad(
-        {
+        makeSquad({
           id: "squad2",
-          name: "Herpy",
-          members: {
-            enemy5: { id: "enemy5", x: 2, y: 2, leader: true },
-            enemy6: { id: "enemy6", x: 3, y: 1, leader: false },
-            enemy7: { id: "enemy7", x: 3, y: 2, leader: false },
-            enemy8: { id: "enemy8", x: 3, y: 3, leader: false },
-          },
+          members: Map({
+            enemy5: makeSquadMember({ id: "enemy5", x: 2, y: 2 }),
+            enemy6: makeSquadMember({ id: "enemy6", x: 3, y: 1 }),
+            enemy7: makeSquadMember({ id: "enemy7", x: 3, y: 2 }),
+            enemy8: makeSquadMember({ id: "enemy8", x: 3, y: 3 }),
+          }),
           force: CPU_FORCE,
-        },
+        }),
         enemyCastle
       ),
-    ],
+    ]),
     forces: [
       {
         id: PLAYER_FORCE,
@@ -119,38 +119,14 @@ const map: () => MapState = () => {
       },
     ],
     units: Map({
-      enemy1: assignSquad(
-        { ...makeUnit("fighter", 0, 10), id: "enemy1" },
-        { id: "squad1", x: 2, y: 2 }
-      ),
-      enemy2: assignSquad(
-        { ...makeUnit("fighter", 0, 10), id: "enemy2" },
-        { id: "squad1", x: 3, y: 1 }
-      ),
-      enemy3: assignSquad(
-        { ...makeUnit("fighter", 0, 10), id: "enemy3" },
-        { id: "squad1", x: 3, y: 2 }
-      ),
-      enemy4: assignSquad(
-        { ...makeUnit("fighter", 0, 10), id: "enemy4" },
-        { id: "squad1", x: 3, y: 3 }
-      ),
-      enemy5: assignSquad(
-        { ...makeUnit("fighter", 0, 10), id: "enemy5" },
-        { id: "squad2", x: 2, y: 2 }
-      ),
-      enemy6: assignSquad(
-        { ...makeUnit("fighter", 0, 10), id: "enemy6" },
-        { id: "squad2", x: 3, y: 1 }
-      ),
-      enemy7: assignSquad(
-        { ...makeUnit("fighter", 0, 10), id: "enemy7" },
-        { id: "squad2", x: 3, y: 2 }
-      ),
-      enemy8: assignSquad(
-        { ...makeUnit("fighter", 0, 10), id: "enemy8" },
-        { id: "squad2", x: 3, y: 3 }
-      ),
+      enemy1: { ...makeUnit("fighter", 0, 10), id: "enemy1", squad: "squad1" },
+      enemy2: { ...makeUnit("fighter", 0, 10), id: "enemy2", squad: "squad1" },
+      enemy3: { ...makeUnit("fighter", 0, 10), id: "enemy3", squad: "squad1" },
+      enemy4: { ...makeUnit("fighter", 0, 10), id: "enemy4", squad: "squad1" },
+      enemy5: { ...makeUnit("fighter", 0, 10), id: "enemy5", squad: "squad2" },
+      enemy6: { ...makeUnit("fighter", 0, 10), id: "enemy6", squad: "squad2" },
+      enemy7: { ...makeUnit("fighter", 0, 10), id: "enemy7", squad: "squad2" },
+      enemy8: { ...makeUnit("fighter", 0, 10), id: "enemy8", squad: "squad2" },
     }),
     ai: Map({
       squad1: "DEFEND",

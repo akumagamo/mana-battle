@@ -20,25 +20,25 @@ test("generates units", () => {
 
   expect(Object.keys(squad.members)).toStrictEqual([unit1Id, unit2Id]);
 
-  expect(squad.members[unit1Id]).toStrictEqual({
+  expect(squad.members.get(unit1Id)).toStrictEqual({
     id: unit1Id,
     x: 2,
     y: 1,
     leader: true,
   });
-  expect(squad.members[unit2Id]).toStrictEqual({
+  expect(squad.members.get(unit2Id)).toStrictEqual({
     id: unit2Id,
     x: 2,
     y: 2,
     leader: false,
   });
 
-  expect(units[unit1Id].class).toBe("fighter");
-  expect(units[unit2Id].class).toBe("archer");
+  expect(units.get(unit1Id).class).toBe("fighter");
+  expect(units.get(unit2Id).class).toBe("archer");
 
-  expect(units[unit1Id].lvl).toBe(22);
-  expect(units[unit2Id].lvl).toBe(22);
+  expect(units.get(unit1Id).lvl).toBe(22);
+  expect(units.get(unit2Id).lvl).toBe(22);
 
-  expect(units[unit1Id].squad).toStrictEqual({ id: squadId, x: 2, y: 1 });
-  expect(units[unit2Id].squad).toStrictEqual({ id: squadId, x: 2, y: 2 });
+  expect(units.get(unit1Id).squad).toStrictEqual(squadId);
+  expect(units.get(unit2Id).squad).toStrictEqual(squadId);
 });

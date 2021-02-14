@@ -2,10 +2,11 @@ import * as Phaser from "phaser";
 import * as api from "../DB";
 import { Text, Image } from "../Models";
 import { Chara } from "../Chara/Chara";
-import { Unit } from "./Model";
+import { Unit, UnitIndex } from "./Model";
 import { UnitDetailsBarScene } from "./UnitDetailsBarScene";
 import button from "../UI/button";
 import menu from "../Backgrounds/menu";
+import { List } from "immutable";
 
 type ListUnit = {
   tile: Image;
@@ -23,11 +24,12 @@ export class ListUnitsScene extends Phaser.Scene {
   }
 
   getUnits() {
-    // TODO: filter only player units
-    return Object.values(api.getUnits()).slice(
-      this.page * this.itemsPerPage,
-      this.page * this.itemsPerPage + this.itemsPerPage
-    );
+    return api
+      .getUnitsFromDB()
+      .slice(
+        this.page * this.itemsPerPage,
+        this.page * this.itemsPerPage + this.itemsPerPage
+      );
   }
   create() {
     menu(this);
@@ -52,26 +54,31 @@ export class ListUnitsScene extends Phaser.Scene {
       });
     });
 
-    this.selectUnit(units[0].id);
+    const first = units.first<Unit>();
+
+    this.selectUnit(first.id);
   }
 
-  renderUnitsList(units: Unit[]) {
-    const rows = this.formatList(units, []);
+  renderUnitsList(units: UnitIndex) {
+    const rows = this.formatList(units, List());
 
     rows.forEach((row, y) =>
       row.forEach((col, x) => this.renderUnit(col, x, y))
     );
   }
 
-  formatList(units: Unit[], accumulator: Unit[][]): Unit[][] {
+  formatList(
+    units: UnitIndex,
+    accumulator: List<List<Unit>>
+  ): List<List<Unit>> {
     const cols = 10;
-    if (units.length <= cols) {
-      return accumulator.concat([units]);
+    if (units.size <= cols) {
+      return accumulator.push(units.toList());
     } else {
       const slice = units.slice(0, cols);
       return this.formatList(
-        units.slice(cols, units.length),
-        accumulator.concat([slice])
+        units.slice(cols, units.size),
+        accumulator.push(slice.toList())
       );
     }
   }

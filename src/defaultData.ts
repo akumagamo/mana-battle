@@ -1,4 +1,4 @@
-import { UnitClass, UnitMap } from "./Unit/Model";
+import { UnitClass, UnitIndex } from "./Unit/Model";
 import {
   Item,
   ItemType,
@@ -13,12 +13,10 @@ import {
 import itemsJSON from "./constants/items.json";
 import { idfy } from "./utils/idfy";
 import { indexById } from "./utils";
-import { SquadMap } from "./Squad/Model";
+import * as Squad from "./Squad/Model";
 import { Player } from "./Player/Model";
 import { Options } from "./Models";
 import { BattleFieldMap } from "./Map/Model";
-import { fighterArcherSquad } from "./Squad/generator";
-import { PLAYER_FORCE } from "./constants";
 
 export const classes: UnitClass[] = ["fighter", "mage", "archer"];
 export const classLabels: { [label in UnitClass]: string } = {
@@ -92,8 +90,8 @@ const options: Options = {
 const data: [
   string,
   (
-    | UnitMap
-    | SquadMap
+    | UnitIndex
+    | Squad.Index
     | ItemMap
     | ItemTypeSlots
     | Player
@@ -101,16 +99,8 @@ const data: [
     | BattleFieldMap
   )
 ][] = [
-  [
-    "units",
-    {},
-    //units
-  ],
-  [
-    "squads",
-    {},
-    //squads
-  ],
+  ["units", {}],
+  ["squads", {}],
   ["items", items],
   ["itemTypes", itemTypeSlots],
   ["player", player],

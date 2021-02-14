@@ -11,14 +11,14 @@ import dispatchWindow from "../dispatchWindow";
 export default (
   scene: MapScene,
   baseY: number,
-  squad: MapSquad,
+  mapSquad: MapSquad,
   uiContainer: Phaser.GameObjects.Container
 ) => {
   const baseX = 300;
   const mode = scene.mode.type;
   if (mode !== "MOVING_SQUAD" && mode !== "SELECTING_ATTACK_TARGET") {
     const event = () => {
-      scene.showMoveControls(squad);
+      scene.showMoveControls(mapSquad);
     };
     button(
       baseX + 100,
@@ -27,14 +27,14 @@ export default (
       scene.uiContainer,
       scene,
       event,
-      scene.inactiveSquads.has(squad.id)
+      scene.inactiveSquads.has(mapSquad.squad.id)
     );
     //@ts-ignore
     window.moveButton = event;
   }
 
   if (mode !== "SELECTING_ATTACK_TARGET") {
-    const event = () => scene.showAttackControls(squad);
+    const event = () => scene.showAttackControls(mapSquad);
 
     //@ts-ignore
     window.clickAttack = event;
@@ -45,8 +45,8 @@ export default (
       scene.uiContainer,
       scene,
       event,
-      scene.getTargets(squad.pos).length < 1 ||
-        scene.inactiveSquads.has(squad.id)
+      scene.getTargets(mapSquad.pos).length < 1 ||
+        scene.inactiveSquads.has(mapSquad.squad.id)
     );
   }
 
@@ -56,23 +56,26 @@ export default (
       const container = scene.add.container();
       panel(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, container, scene);
       let details: Container | null = null;
-      const boardScene = new BoardScene(squad, (updatedSquad) =>
-        scene.signal("changed unit position on board, updating", [
-          {
-            type: "UPDATE_STATE",
-            target: {
-              ...scene.state,
-              squads: scene.state.squads.map((sqd) => {
-                if (sqd.id === updatedSquad.id)
-                  return {
-                    ...sqd,
-                    members: updatedSquad.members,
-                  };
-                else return sqd;
-              }),
+      const boardScene = new BoardScene(
+        mapSquad.squad,
+        (updatedSquad) =>
+          scene.signal("changed unit position on board, updating", [
+            {
+              type: "UPDATE_STATE",
+              target: {
+                ...scene.state,
+                squads: scene.state.squads.map((sqd) => {
+                  if (sqd.squad.id === updatedSquad.id)
+                    return {
+                      ...sqd,
+                      members: updatedSquad.members,
+                    };
+                  else return sqd;
+                }),
+              },
             },
-          },
-        ]), scene.state.units
+          ]),
+        scene.state.units
       );
 
       scene.scene.add("editSquadInMap", boardScene, true);
@@ -93,7 +96,7 @@ export default (
         scene.scene.remove("editSquadInMap");
         container.destroy();
 
-        scene.changeMode({ type: "SQUAD_SELECTED", id: squad.id });
+        scene.changeMode({ type: "SQUAD_SELECTED", id: mapSquad.squad.id });
       });
     });
 
@@ -101,14 +104,14 @@ export default (
     button(1150, baseY, "Cancel", uiContainer, scene, async () => {
       switch (scene.mode.type) {
         case "SELECTING_ATTACK_TARGET":
-          scene.changeMode({ type: "SQUAD_SELECTED", id: squad.id });
+          scene.changeMode({ type: "SQUAD_SELECTED", id: mapSquad.squad.id });
           scene.signal('cancelled squad targeting"', [
             { type: "CLEAR_TILES_TINTING" },
           ]);
           break;
         case "MOVING_SQUAD":
           const { start, id } = scene.mode;
-          await scene.moveSquadTo(squad.id, start);
+          await scene.moveSquadTo(mapSquad.squad.id, start);
 
           scene.signal('cancelled movement"', [
             { type: "CLEAR_TILES_TINTING" },
@@ -129,7 +132,7 @@ export default (
   if (mode === "MOVING_SQUAD" || mode == "SQUAD_SELECTED") {
     const event = () => {
       scene.signal('clicked "end squad turn"', [
-        { type: "END_SQUAD_TURN", id: squad.id },
+        { type: "END_SQUAD_TURN", id: mapSquad.squad.id },
       ]);
     };
     button(baseX + 700, baseY, "Wait", uiContainer, scene, event);
@@ -146,7 +149,7 @@ export default (
     scene.scene.run("ListSquadsScene", {
       // TODO: only player units
       units: scene.state.units,
-      squads: scene.state.squads.filter((s) => s.force === PLAYER_FORCE),
+      squads: scene.state.squads.filter((s) => s.squad.force === PLAYER_FORCE),
       dispatched: scene.state.dispatchedSquads,
       onDisbandSquad: (id: string) => {
         console.log(`disbanded!!!`, id);

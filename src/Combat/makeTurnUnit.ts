@@ -1,6 +1,7 @@
-import {Unit} from '../Unit/Model';
-import {getUnitAttack} from '../Unit/Skills';
+import * as Squad from "../Squad/Model";
+import { Unit } from "../Unit/Model";
+import { getUnitAttack } from "../Unit/Skills";
 
-export function makeTurnUnit(unit: Unit) {
-  return {remainingAttacks: getUnitAttack(unit).times, unit};
+export function makeTurnUnit(squadIndex: Squad.Index, unit: Unit) {
+  return { remainingAttacks: getUnitAttack(squadIndex, unit).times, unit };
 }

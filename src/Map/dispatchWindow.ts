@@ -1,6 +1,4 @@
-import { Set } from "immutable";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
-import { getSquads } from "../DB";
 import { delay } from "../Scenes/utils";
 import button from "../UI/button";
 import panel from "../UI/panel";
@@ -31,33 +29,32 @@ export default (scene: MapScene) => {
   title.setFontSize(24);
 
   const close = scene.add.image(x + width, y, "close_btn");
-  container.add(close)
+  container.add(close);
   close.setOrigin(0.5);
-  close.setScale(0.7)
+  close.setScale(0.7);
   close.setInteractive();
   close.on("pointerup", () => {
     container.destroy();
     scene.enableInput();
   });
 
-
   // TODO: avoid listing defeated squads
-  let squadsToRender = scene.getPlayerSquads().filter(
-    (sqd) => !scene.state.dispatchedSquads.has(sqd.id)
-  );
+  let squadsToRender = scene
+    .getPlayerSquads()
+    .filter((mapSquad) => !scene.state.dispatchedSquads.has(mapSquad.squad.id));
 
-  squadsToRender.forEach((sqd, i) => {
+  squadsToRender.forEach((mapSquad, i) => {
     const event = async () => {
       container.destroy();
 
-      await scene.dispatchSquad(sqd);
+      await scene.dispatchSquad(mapSquad.squad);
       scene.enableInput();
 
       await delay(scene, 100);
 
-      scene.changeMode({ type: "SQUAD_SELECTED", id: sqd.id });
+      scene.changeMode({ type: "SQUAD_SELECTED", id: mapSquad.squad.id });
 
-      let squad = scene.getSquad(sqd.id);
+      let squad = scene.getSquad(mapSquad.squad.id);
       scene.signal("clicked dispatch squad button", [
         { type: "CLICK_SQUAD", unit: squad },
         {
@@ -71,7 +68,7 @@ export default (scene: MapScene) => {
     button(
       x + padding,
       y + 60 + 70 * i,
-      sqd.name,
+      "todo: squadName",
       container,
       scene,
       event,

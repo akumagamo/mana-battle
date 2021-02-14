@@ -1,21 +1,32 @@
-import {Unit} from '../Unit/Model';
-import {TurnUnit, isFromAnotherSquad, isAlive, transpose} from './turns';
+import * as Squad from "../Squad/Model";
+import { isAlive, UnitIndex, UnitInSquad } from "../Unit/Model";
 
-export function getMeleeTarget(current: Unit, units: TurnUnit[]) {
-  //TODO: treatment for when multiple units are in the same distance
-  return units
-    .map((u) => u.unit)
-    .filter(isFromAnotherSquad(current))
-    .filter(isAlive)
-    .map((u) => {
-      if (u.squad === null) throw new Error('Null squad');
-      return {...u, squad: transpose(u.squad)};
-    })
-    .map((u) => ({
+// TODO: this should receive alive members
+export function getMeleeTarget(
+  current: UnitInSquad,
+  unitIndex: UnitIndex,
+  squadIndex: Squad.Index
+): Squad.Member {
+  const aliveIndex = Squad.filterMembers((m) => isAlive(unitIndex.get(m.id)))(
+    squadIndex
+  );
+
+  const transposedIndex = Squad.mapMembers(Squad.transpose)(current.squad)(
+    aliveIndex
+  );
+
+  const units = Squad.getAllUnits(transposedIndex);
+  const get = (unitId: string, squadId: string) =>
+    transposedIndex.get(squadId).members.get(unitId);
+
+  const sorted = units
+    .map((unit) => ({
       distance:
-        Math.abs(u.squad.x - current.squad.x) +
-        Math.abs(u.squad.y - current.squad.y),
-      unit: u,
+        Math.abs(unit.x - get(current.id, current.squad).x) +
+        Math.abs(unit.y - get(current.id, current.squad).y),
+      unit,
     }))
-    .sort((a, b) => a.distance - b.distance)[0].unit;
+    .sort((a, b) => a.distance - b.distance);
+
+  return sorted.get(0).unit;
 }

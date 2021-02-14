@@ -1,18 +1,20 @@
-import { Unit, UnitSquadPosition } from "../Unit/Model";
+import { Unit, UnitIndex, isAlive } from "../Unit/Model";
 import { getUnitAttack, getUnitDamage } from "../Unit/Skills";
 import { INVALID_STATE } from "../errors";
-import { invertBoardPosition } from "./utils";
 import { getMeleeTarget } from "./getMeleeTarget";
 import { random } from "../utils/random";
-import { Set } from "immutable";
+import * as Squad from "../Squad/Model";
+import { List } from "immutable";
 
-const sortInitiative = ({ unit }: TurnUnit) => {
+const sortInitiative = (unit: Unit) => {
   return random(1, 6) + unit.dex;
 };
 
-export const initiativeList = (units: TurnUnit[]) => {
-  return units.sort((a, b) => sortInitiative(b) - sortInitiative(a));
-};
+export const initiativeList = (units: UnitIndex): List<string> =>
+  units
+    .toList()
+    .sort((a, b) => sortInitiative(b) - sortInitiative(a))
+    .map((u) => u.id);
 
 export type Move = { type: "MOVE"; source: string; target: string };
 export type Return = { type: "RETURN"; target: string };
@@ -40,13 +42,13 @@ export type Fireball = {
   updatedTarget: Unit;
   updatedSource: Unit;
 };
-export type Victory = { type: "VICTORY"; target: string; units: Unit[] };
-export type EndCombat = { type: "END_COMBAT"; units: Unit[] };
+export type Victory = { type: "VICTORY"; target: string; units: UnitIndex };
+export type EndCombat = { type: "END_COMBAT"; units: UnitIndex };
 export type EndTurn = { type: "END_TURN" };
 export type RestartTurns = { type: "RESTART_TURNS" };
 export type DisplayXP = {
   type: "DISPLAY_XP";
-  xpInfo: XPInfo[];
+  xpInfo: List<XPInfo>;
 };
 
 export type XPInfo = {
@@ -55,7 +57,7 @@ export type XPInfo = {
   id: string;
 };
 
-const displayXPCmd = (xpInfo: XPInfo[]): DisplayXP => ({
+const displayXPCmd = (xpInfo: List<XPInfo>): DisplayXP => ({
   type: "DISPLAY_XP",
   xpInfo,
 });
@@ -72,64 +74,97 @@ export type Command =
   | Return
   | EndCombat;
 
-export const runCombat = (units: Unit[]): Command[] => {
-  const squads = units.reduce(
-    (xs, x) => xs.add(x.squad.id),
-    Set() as Set<string>
-  );
-  const turnUnits: TurnUnit[] = units.map((unit) => ({
-    unit,
-    remainingAttacks: getUnitAttack(unit).times,
-  }));
-  const unitList = initiativeList(turnUnits);
+export const runCombat = (
+  squadIndex: Squad.Index,
+  unitIndex: UnitIndex
+): Command[] => {
+  const remainingAttacksIndex: RemainingAttacksIndex = unitIndex
+    .map((unit) => ({
+      id: unit.id,
+      remainingAttacks: getUnitAttack(squadIndex, unit).times,
+    }))
+    .reduce(
+      (xs, x) => ({ ...xs, [x.id]: x.remainingAttacks }),
+      {} as RemainingAttacksIndex
+    );
 
-  return runTurn(0, squads, unitList, []);
+  const initiative = initiativeList(unitIndex);
+
+  const initialTurnState: TurnState = {
+    unitIndex: unitIndex,
+    squadIndex: squadIndex,
+    initiative,
+    remainingAttacksIndex,
+    turn: 0,
+  };
+  return runTurn(initialTurnState, []);
 };
 
-/** Unit that is guaranteed in a squad */
-export type UnitInSquad = Unit & { squad: UnitSquadPosition };
+export type TurnState = {
+  unitIndex: UnitIndex;
+  squadIndex: Squad.Index;
+  initiative: List<string>;
+  remainingAttacksIndex: RemainingAttacksIndex;
+  turn: number;
+};
 
-export type TurnUnit = { unit: UnitInSquad; remainingAttacks: number };
+/** Unit that is guaranteed to be in a squad */
+export type UnitInSquad = Unit & { squad: string };
+
+export type RemainingAttacksIndex = { [id: string]: number };
 
 export const runTurn = (
-  turnNumber: number,
-  squads: Set<string>,
-  units: TurnUnit[],
+  turnState: TurnState,
   commands: Command[]
 ): Command[] => {
-  const current = units[turnNumber];
-  const { unit, remainingAttacks } = current;
-  const isLastActor = units.length - 1 === turnNumber;
+  const {
+    unitIndex,
+    squadIndex,
+    initiative,
+    remainingAttacksIndex,
+    turn,
+  } = turnState;
 
-  const nextTurn = isLastActor ? 0 : turnNumber + 1;
+  const currentUnitId = initiative.get(turn);
+  const remainingAttacks = remainingAttacksIndex[currentUnitId];
+  const unit = unitIndex.get(currentUnitId);
+  const isLast = initiative.size - 1 === turn;
 
-  // Decide on what to do based on the character's class
-  // TODO: multiple conditions
-  // TODO: remove mutation
+  const nextTurn = isLast ? 0 : turn + 1;
 
   let turnCommands: Command[] = [];
-  let updatedUnits = units;
+  let updatedUnits = unitIndex;
 
   const hasRemainingAttacks = remainingAttacks > 0;
-  const isAlive = unit.currentHp > 0;
 
-  if (hasRemainingAttacks && isAlive) {
+  if (hasRemainingAttacks && isAlive(unit)) {
     let res;
-    switch (current.unit.class) {
+    switch (unit.class) {
       case "archer":
-        res = rangedAttackSingleTarget(current, units, commands);
-        turnCommands = res.commands;
-        updatedUnits = res.updatedUnits;
+        // res = rangedAttackSingleTarget(
+        //   squadIndex,
+        //   currentUnitId,
+        //   units,
+        //   commands
+        // );
+        // turnCommands = res.commands;
+        // updatedUnits = res.updatedUnits;
         break;
       case "mage":
-        res = rangedSpellSingleTarget(current, units, commands);
-        turnCommands = res.commands;
-        updatedUnits = res.updatedUnits;
+        // res = rangedSpellSingleTarget(
+        //   squadIndex,
+        //   currentUnitId,
+        //   units,
+        //   commands
+        // );
+        // turnCommands = res.commands;
+        // updatedUnits = res.updatedUnits;
         break;
       case "fighter":
-        res = meleeAttackSingleTarget(current, units, commands);
+        res = meleeAttackSingleTarget(turnState, commands);
         turnCommands = res.commands;
-        updatedUnits = res.updatedUnits;
+        turnState.unitIndex = res.updatedUnits;
+        turnState.remainingAttacksIndex = res.remainingAttacks;
         break;
       default:
         break;
@@ -140,13 +175,13 @@ export const runTurn = (
 
   const { squad } = unit;
 
-  const victory = (units: Unit[]): Victory => ({
+  const victory = (units: UnitIndex): Victory => ({
     type: "VICTORY",
-    target: squad.id,
+    target: squad,
     units,
   });
 
-  const { unitsWithXp, cmds: xpCmds } = calcXp(squads, updatedUnits);
+  const { unitsWithXp, cmds: xpCmds } = calcXp(squadIndex, updatedUnits);
 
   const endCombat: (cmds: Command[]) => Command[] = (commands: Command[]) => {
     return commands
@@ -154,42 +189,34 @@ export const runTurn = (
       .concat([{ type: "END_COMBAT", units: unitsWithXp.map((u) => u.unit) }]);
   };
 
-  if (isVictory(current, updatedUnits)) {
-    return turnCommands
-      .concat(xpCmds)
-      .concat([victory(updatedUnits.map((u) => u.unit))]);
-  } else if (noAttacksRemaining(updatedUnits)) {
+  turnState.unitIndex = updatedUnits;
+
+  if (isVictory(currentUnitId, updatedUnits)) {
+    return turnCommands.concat(xpCmds).concat([victory(updatedUnits)]);
+  } else if (noAttacksRemaining(updatedUnits, remainingAttacksIndex)) {
     return endCombat(turnCommands);
   } else {
-    return runTurn(nextTurn, squads, updatedUnits, turnCommands);
+    return runTurn({ ...turnState, turn: nextTurn }, turnCommands);
   }
 };
 
-function calcXp(
-  squads: Set<string>,
-  units: TurnUnit[]
-): {
-  unitsWithXp: { xp: number; lvls: number; unit: UnitInSquad }[];
-  cmds: Command[];
-} {
-  const squadXp = squads.map((squadId) => {
-    const enemyUnits = units.filter((u) => u.unit.squad.id !== squadId);
+function calcXp(squadIndex: Squad.Index, units: UnitIndex) {
+  const squadXp = squadIndex.map((squad) => {
+    const enemyUnits = units.filter((u) => u.squad !== squad.id);
 
     const deadEnemies = enemyUnits
-      .map((u) => (u.unit.currentHp < 1 ? 1 : 0))
+      .map((u) => (u.currentHp < 1 ? 1 : 0))
       .reduce((xs, x) => xs + x, 0);
 
     const xpAmount = deadEnemies * 40;
 
-    return { squadId, xpAmount };
+    return { squadId: squad.id, xpAmount };
   });
 
   const MAX_XP = 100;
 
-  const unitsWithXp = units.map((u) => {
-    const { unit } = u;
-
-    const { xpAmount } = squadXp.find((s) => s.squadId === unit.squad.id);
+  const unitsWithXp = units.map((unit) => {
+    const { xpAmount } = squadXp.get(unit.squad);
 
     if (xpAmount < 1) return { xp: 0, lvls: 0, unit };
 
@@ -209,227 +236,208 @@ function calcXp(
     };
   });
 
-  const xps: XPInfo[] = unitsWithXp
+  const xps = unitsWithXp
     .filter(({ xp, lvls }) => xp > 0 || lvls > 0)
-    .map(({ unit, xp, lvls }) => ({ id: unit.id, xp, lvls }));
+    .map(({ unit, xp, lvls }) => ({ id: unit.id, xp, lvls }))
+    .toList();
 
   return {
     unitsWithXp,
-    cmds: xps.length > 0 ? [displayXPCmd(xps)] : [],
+    cmds: xps.size > 0 ? [displayXPCmd(xps)] : [],
   };
 }
 
-function meleeAttackSingleTarget(
-  current: TurnUnit,
-  units: TurnUnit[],
-  commands: Command[]
-) {
-  const target = getMeleeTarget(current.unit, units);
+function meleeAttackSingleTarget(state: TurnState, commands: Command[]) {
+  const {
+    unitIndex,
+    squadIndex,
+    initiative,
+    remainingAttacksIndex,
+    turn,
+  } = state;
+
+  const id = initiative.get(turn);
+  const current = unitIndex.get(id);
+  const target = getMeleeTarget(current, unitIndex, squadIndex);
 
   if (!target) throw new Error(INVALID_STATE);
 
-  const damage = getUnitDamage(current.unit);
+  const damage = getUnitDamage(squadIndex, current);
 
-  const updatedUnits = units
-    .map((unit) => {
-      const newHp = unit.unit.currentHp - damage;
-      const currentHp = newHp < 1 ? 0 : newHp;
+  const updatedUnits = unitIndex.map((unit) => {
+    const newHp = unit.currentHp - damage;
+    const currentHp = newHp < 1 ? 0 : newHp;
 
-      return unit.unit.id === target.id
-        ? {
-            remainingAttacks: unit.remainingAttacks,
-            unit: { ...unit.unit, currentHp },
-          }
-        : unit;
-    })
-    .map((unit) => {
-      return unit.unit.id === current.unit.id
-        ? {
-            remainingAttacks: unit.remainingAttacks - 1,
-            unit: { ...unit.unit },
-          }
-        : unit;
-    });
+    return unit.id === target.id
+      ? {
+          ...unit,
+          currentHp,
+        }
+      : unit;
+  });
 
-  const updatedTarget = updatedUnits.find((u) => u.unit.id === target.id);
+  const updatedRemainingAttacksIndex = {
+    ...remainingAttacksIndex,
+    [current.id]: remainingAttacksIndex[current.id] - 1,
+  };
 
-  const updatedSource = updatedUnits.find((u) => u.unit.id === current.unit.id);
+  const updatedTarget = updatedUnits.get(target.id);
+
+  const updatedSource = updatedUnits.get(current.id);
 
   if (!updatedTarget || !updatedSource) throw new Error(INVALID_STATE);
 
   const move: Command[] = [
-    { type: "MOVE", source: current.unit.id, target: target.id },
+    { type: "MOVE", source: current.id, target: target.id },
   ];
   const slash: Command[] = [
     {
       type: "SLASH",
-      source: current.unit.id,
+      source: current.id,
       target: target.id,
       damage,
-      updatedTarget: updatedTarget.unit,
-      updatedSource: updatedSource.unit,
+      updatedTarget: updatedTarget,
+      updatedSource: updatedSource,
     },
   ];
 
-  const returnCmd: Command[] = [{ type: "RETURN", target: current.unit.id }];
+  const returnCmd: Command[] = [{ type: "RETURN", target: current.id }];
 
   return {
     commands: commands.concat(move).concat(slash).concat(returnCmd),
     updatedUnits,
-  };
-}
-function rangedAttackSingleTarget(
-  current: TurnUnit,
-  units: TurnUnit[],
-  commands: Command[]
-) {
-  const target = getTarget(current.unit, units);
-
-  if (!target) throw new Error(INVALID_STATE);
-
-  const damage = getUnitDamage(current.unit);
-
-  const updatedUnits = units
-    .map((unit) => {
-      const newHp = unit.unit.currentHp - damage;
-      const currentHp = newHp < 1 ? 0 : newHp;
-
-      return unit.unit.id === target.id
-        ? {
-            remainingAttacks: unit.remainingAttacks,
-            unit: { ...unit.unit, currentHp },
-          }
-        : unit;
-    })
-    .map((unit) => {
-      return unit.unit.id === current.unit.id
-        ? {
-            remainingAttacks: unit.remainingAttacks - 1,
-            unit: { ...unit.unit },
-          }
-        : unit;
-    });
-
-  const updatedTarget = updatedUnits.find((u) => u.unit.id === target.id);
-
-  const updatedSource = updatedUnits.find((u) => u.unit.id === current.unit.id);
-
-  if (!updatedTarget || !updatedSource) throw new Error(INVALID_STATE);
-
-  const useBow: Command[] = [
-    {
-      type: "SHOOT",
-      source: current.unit.id,
-      target: target.id,
-      damage,
-      updatedTarget: updatedTarget.unit,
-      updatedSource: updatedSource.unit,
-    },
-  ];
-
-  return {
-    commands: commands.concat(useBow),
-    updatedUnits,
-  };
-}
-function rangedSpellSingleTarget(
-  current: TurnUnit,
-  units: TurnUnit[],
-  commands: Command[]
-) {
-  const target = getTarget(current.unit, units);
-
-  if (!target) throw new Error(INVALID_STATE);
-
-  const damage = getUnitDamage(current.unit);
-
-  const updatedUnits = units
-    .map((unit) => {
-      const newHp = unit.unit.currentHp - damage;
-      const currentHp = newHp < 1 ? 0 : newHp;
-
-      return unit.unit.id === target.id
-        ? {
-            remainingAttacks: unit.remainingAttacks,
-            unit: { ...unit.unit, currentHp },
-          }
-        : unit;
-    })
-    .map((unit) => {
-      return unit.unit.id === current.unit.id
-        ? {
-            remainingAttacks: unit.remainingAttacks - 1,
-            unit: { ...unit.unit },
-          }
-        : unit;
-    });
-
-  const updatedTarget = updatedUnits.find((u) => u.unit.id === target.id);
-
-  const updatedSource = updatedUnits.find((u) => u.unit.id === current.unit.id);
-
-  if (!updatedTarget || !updatedSource) throw new Error(INVALID_STATE);
-
-  const useFireball: Command[] = [
-    {
-      type: "FIREBALL",
-      source: current.unit.id,
-      target: target.id,
-      damage,
-      updatedTarget: updatedTarget.unit,
-      updatedSource: updatedSource.unit,
-    },
-  ];
-
-  return {
-    commands: commands.concat(useFireball),
-    updatedUnits,
+    remainingAttacks: updatedRemainingAttacksIndex,
   };
 }
 
-function isVictory(current: TurnUnit, units: TurnUnit[]) {
+// function rangedAttackSingleTarget(
+//   squadIndex: SquadIndex,
+//   current: TurnUnit,
+//   units: TurnUnit[],
+//   commands: Command[]
+// ) {
+//   return;
+// const target = getTarget(squadIndex, current.unit, units);
+
+// if (!target) throw new Error(INVALID_STATE);
+
+// const damage = getUnitDamage(current.unit);
+
+// const updatedUnits = units
+//   .map((unit) => {
+//     const newHp = unit.unit.currentHp - damage;
+//     const currentHp = newHp < 1 ? 0 : newHp;
+
+//     return unit.unit.id === target.id
+//       ? {
+//           remainingAttacks: unit.remainingAttacks,
+//           unit: { ...unit.unit, currentHp },
+//         }
+//       : unit;
+//   })
+//   .map((unit) => {
+//     return unit.unit.id === current.unit.id
+//       ? {
+//           remainingAttacks: unit.remainingAttacks - 1,
+//           unit: { ...unit.unit },
+//         }
+//       : unit;
+//   });
+
+// const updatedTarget = updatedUnits.find((u) => u.unit.id === target.id);
+
+// const updatedSource = updatedUnits.find((u) => u.unit.id === current.unit.id);
+
+// if (!updatedTarget || !updatedSource) throw new Error(INVALID_STATE);
+
+// const useBow: Command[] = [
+//   {
+//     type: "SHOOT",
+//     source: current.unit.id,
+//     target: target.id,
+//     damage,
+//     updatedTarget: updatedTarget.unit,
+//     updatedSource: updatedSource.unit,
+//   },
+// ];
+
+// return {
+//   commands: commands.concat(useBow),
+//   updatedUnits,
+// };
+// }
+// function rangedSpellSingleTarget(
+//   squadIndex: SquadIndex,
+//   current: TurnUnit,
+//   units: TurnUnit[],
+//   commands: Command[]
+// ) {
+//   return;
+// const target = getTarget(squadIndex, current.unit, units);
+
+// if (!target) throw new Error(INVALID_STATE);
+
+// const damage = getUnitDamage(current.unit);
+
+// const updatedUnits = units
+//   .map((unit) => {
+//     const newHp = unit.unit.currentHp - damage;
+//     const currentHp = newHp < 1 ? 0 : newHp;
+
+//     return unit.unit.id === target.id
+//       ? {
+//           remainingAttacks: unit.remainingAttacks,
+//           unit: { ...unit.unit, currentHp },
+//         }
+//       : unit;
+//   })
+//   .map((unit) => {
+//     return unit.unit.id === current.unit.id
+//       ? {
+//           remainingAttacks: unit.remainingAttacks - 1,
+//           unit: { ...unit.unit },
+//         }
+//       : unit;
+//   });
+
+// const updatedTarget = updatedUnits.find((u) => u.unit.id === target.id);
+
+// const updatedSource = updatedUnits.find((u) => u.unit.id === current.unit.id);
+
+// if (!updatedTarget || !updatedSource) throw new Error(INVALID_STATE);
+
+// const useFireball: Command[] = [
+//   {
+//     type: "FIREBALL",
+//     source: current.unit.id,
+//     target: target.id,
+//     damage,
+//     updatedTarget: updatedTarget.unit,
+//     updatedSource: updatedSource.unit,
+//   },
+// ];
+
+// return {
+//   commands: commands.concat(useFireball),
+//   updatedUnits,
+// };
+// }
+
+function isVictory(current: string, units: UnitIndex) {
   return units
-    .map((u) => u.unit)
-    .filter(isFromAnotherSquad(current.unit))
+    .filter(isFromAnotherSquad(units.get(current)))
     .every((enemy) => !isAlive(enemy));
 }
 
-function noAttacksRemaining(units: TurnUnit[]) {
-  return units
-    .filter((u) => isAlive(u.unit))
-    .every((u) => u.remainingAttacks < 1);
+function noAttacksRemaining(
+  units: UnitIndex,
+  remainingAttacks: RemainingAttacksIndex
+) {
+  return units.filter(isAlive).every((u) => remainingAttacks[u.id] < 1);
 }
 
-export function transpose({ id, x, y }: UnitSquadPosition) {
-  return {
-    id,
-    x: invertBoardPosition(x) + 3,
-    y: invertBoardPosition(y),
-  };
-}
-
-// TODO: add get closest target option
-export function getTarget(current: Unit, units: TurnUnit[]) {
-  return units
-    .map((u) => u.unit)
-    .filter(isFromAnotherSquad(current))
-    .filter(isAlive)
-    .map((u) => {
-      if (u.squad === null) throw new Error("Null squad");
-      return { ...u, squad: transpose(u.squad) };
-    })
-    .sort(
-      (a, b) =>
-        Math.abs(a.squad.x - b.squad.x) + Math.abs(a.squad.y - b.squad.y)
-    )[0];
-}
-
-export function isAlive(unit: Unit) {
-  return unit.currentHp > 0;
-}
-
-export function isFromAnotherSquad(current: Unit) {
-  return function (unit: Unit) {
-    return current.squad?.id !== unit.squad?.id;
+export function isFromAnotherSquad(current: UnitInSquad) {
+  return function (unit: UnitInSquad) {
+    return current.squad !== unit.squad;
   };
 }

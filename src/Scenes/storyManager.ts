@@ -1,13 +1,11 @@
 import { PLAYER_FORCE } from "../constants";
 import { fadeOut } from "../UI/Transition";
-import { Set } from "immutable";
-import { startTheaterScene } from "../Theater/TheaterScene";
+import { List, Map, Set } from "immutable";
 import { startCharaCreationScene } from "../CharaCreation/CharaCreationScene";
-import chapter_1_intro from "../Theater/Chapters/chapter_1_intro";
 import { MapCommands } from "../Map/MapCommands";
 import maps from "../maps";
 import { startMapScene } from "../Map/MapScene";
-import { makeSquad, updateMember } from "../Squad/Model";
+import { makeSquad, makeSquadMember } from "../Squad/Model";
 import { toMapSquad } from "../Unit/Model";
 import TitleScene from "./TitleScene";
 import { makeUnit } from "../Unit/makeUnit";
@@ -28,11 +26,17 @@ export const storyManager = async (parent: TitleScene) => {
   // const answers = await startTheaterScene(parent, chapter_1_intro(unit));
   // console.log(`answers`, answers);
 
-  const firstSquad = updateMember(makeSquad("1", PLAYER_FORCE), {
-    id: unit.id,
-    x: 2,
-    y: 2,
-    leader: true,
+  const firstSquad = makeSquad({
+    id: "1",
+    force: PLAYER_FORCE,
+    members: Map({
+      [unit.id]: makeSquadMember({
+        id: unit.id,
+        x: 2,
+        y: 2,
+      }),
+    }),
+    leader: unit.id,
   });
 
   const members = [
@@ -66,7 +70,7 @@ export const storyManager = async (parent: TitleScene) => {
       type: "UPDATE_STATE",
       target: {
         ...map,
-        dispatchedSquads: Set(["1"].concat(map.squads.map((u) => u.id))),
+        dispatchedSquads: Set(List(["1"]).concat(map.squads.map((u) => u.id))),
         squads: map.squads.concat(
           squads.map((s) =>
             toMapSquad(

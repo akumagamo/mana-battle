@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 import { Chara } from "../Chara/Chara";
-import { Squad } from "../Squad/Model";
-import { addUnitToSquad, saveSquad } from "../DB";
+import * as Squad from "../Squad/Model";
+import { saveSquadIntoDB, saveUnitIntoDB } from "../DB";
 import UnitListScene from "../Unit/UnitListScene";
 import { Unit, UnitIndex } from "../Unit/Model";
 import BoardScene, { BOARD_SCENE_KEY } from "../Board/InteractiveBoardScene";
@@ -9,17 +9,19 @@ import button from "../UI/button";
 import menu from "../Backgrounds/menu";
 import SmallUnitDetailsBar from "../Unit/SmallUnitDetailsBar";
 import { Container } from "../Models";
+import { Map } from "immutable";
 
 export class EditSquadScene extends Phaser.Scene {
   unitListScene: UnitListScene | null = null;
   boardScene: BoardScene | null = null;
   unitDetails: Container | null = null;
+  unitIndex: UnitIndex = Map();
 
   constructor() {
     super("EditSquadScene");
   }
 
-  create({ squad, unitIndex }: { squad: Squad; unitIndex: UnitIndex }) {
+  create({ squad, unitIndex }: { squad: Squad.Squad; unitIndex: UnitIndex }) {
     menu(this);
 
     this.renderBoard(squad, unitIndex);
@@ -29,8 +31,8 @@ export class EditSquadScene extends Phaser.Scene {
     this.renderReturnBtn();
   }
 
-  renderBoard(squad: Squad, unitIndex: UnitIndex) {
-    this.boardScene = new BoardScene(squad, saveSquad, unitIndex);
+  renderBoard(squad: Squad.Squad, unitIndex: UnitIndex) {
+    this.boardScene = new BoardScene(squad, saveSquadIntoDB, unitIndex);
     this.scene.add(BOARD_SCENE_KEY, this.boardScene, true);
 
     this.boardScene.makeUnitsClickable((c) => {
@@ -54,16 +56,27 @@ export class EditSquadScene extends Phaser.Scene {
     if (!boardScene) return;
 
     if (boardSprite) {
-      const updatedSquad = addUnitToSquad(
+      const { updatedSquad, added, removed } = Squad.addMember(
         unit,
         boardScene.squad,
         boardSprite.boardX,
         boardSprite.boardY
       );
 
-      const unitToReplace = Object.values(boardScene.squad.members).find(
-        (unit) => unit.x === boardSprite.boardX && unit.y === boardSprite.boardY
+      added.forEach(() =>
+        saveUnitIntoDB({ ...unit, squad: boardScene.squad.id })
       );
+
+      removed.forEach((u) =>
+        saveUnitIntoDB({ ...this.unitIndex.get(u.id), squad: null })
+      );
+
+      saveSquadIntoDB(updatedSquad);
+
+      const unitToReplace = Squad.getMemberByPosition({
+        x: boardSprite.boardX,
+        y: boardSprite.boardY,
+      })(boardScene.squad);
 
       boardScene.squad = updatedSquad;
 
@@ -71,7 +84,7 @@ export class EditSquadScene extends Phaser.Scene {
       this.unitListScene?.removeUnit(unit);
       //create new chara on board, representing same unit
       boardScene.placeUnit({
-        member: updatedSquad.members[unit.id],
+        member: updatedSquad.members.get(unit.id),
         fromOutside: true,
       });
       //remove replaced unit

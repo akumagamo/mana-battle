@@ -1,12 +1,11 @@
 import * as Phaser from "phaser";
 import { Chara } from "../Chara/Chara";
-import { Squad } from "../Squad/Model";
+import * as Squad from "../Squad/Model";
 import { cartesianToIsometric } from "../utils/isometric";
 import { BoardTile } from "./Model";
 import { Graphics } from "../Models";
-import { Unit } from "../Unit/Model";
+import { Unit, UnitIndex } from "../Unit/Model";
 import { Vector } from "matter";
-import { invertBoardPosition } from "../Combat/utils";
 
 const BOARD_WIDTH = 250;
 const BOARD_HEIGHT = 150;
@@ -20,8 +19,8 @@ export default class StaticBoardScene extends Phaser.Scene {
   overlay: Graphics | null = null;
   isSelected = false;
   constructor(
-    public squad: Squad,
-    public units: Unit[],
+    public squad: Squad.Squad,
+    public units: UnitIndex,
     public x: number,
     public y: number,
     public scaleSizing: number,
@@ -79,7 +78,7 @@ export default class StaticBoardScene extends Phaser.Scene {
     this.overlay = graphics;
   }
 
-  onClick(fn: (sqd: Squad) => void) {
+  onClick(fn: (sqd: Squad.Squad) => void) {
     var clickZone = this.add.zone(
       this.x + OFFSET_X,
       this.y + OFFSET_Y,
@@ -129,7 +128,7 @@ export default class StaticBoardScene extends Phaser.Scene {
   addUnitToBoard(unit: Unit) {
     if (!unit.squad) return;
 
-    const pos = this.squad.members[unit.id];
+    const pos = this.squad.members.get(unit.id);
 
     let { x, y } = this.getUnitPositionInScreen(pos);
 
@@ -183,8 +182,12 @@ export default class StaticBoardScene extends Phaser.Scene {
       .forEach((chara) => chara.scene.bringToTop());
   }
   getUnitPositionInScreen(squadMember: Vector) {
-    const x_ = this.front ? squadMember.x : invertBoardPosition(squadMember.x);
-    const y_ = this.front ? squadMember.y : invertBoardPosition(squadMember.y);
+    const x_ = this.front
+      ? squadMember.x
+      : Squad.invertBoardPosition(squadMember.x);
+    const y_ = this.front
+      ? squadMember.y
+      : Squad.invertBoardPosition(squadMember.y);
 
     const { x, y } = cartesianToIsometric(x_, y_);
 
@@ -194,7 +197,7 @@ export default class StaticBoardScene extends Phaser.Scene {
   onUnitClick(fn: (c: Chara) => void) {
     this.unitList.forEach((chara) => {
       chara.onClick(() => {
-        const pos = this.squad.members[chara.unit.id];
+        const pos = this.squad.members.get(chara.unit.id);
         this.highlightTile(pos);
         fn(chara);
       });
@@ -210,6 +213,6 @@ export default class StaticBoardScene extends Phaser.Scene {
   }
 }
 
-function makeId(squad: Squad) {
+function makeId(squad: Squad.Squad) {
   return `static-squad-${squad.id}`;
 }

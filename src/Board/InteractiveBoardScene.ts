@@ -1,11 +1,10 @@
 import * as Phaser from "phaser";
 import { Chara } from "../Chara/Chara";
 import { Image } from "../Models";
-import { SquadMember, Squad, changeSquadMemberPosition } from "../Squad/Model";
+import * as Squad from "../Squad/Model";
 import { cartesianToIsometric } from "../utils/isometric";
 import { Unit, UnitIndex } from "../Unit/Model";
 import { tileWidth, tileHeight } from "../constants";
-import { INVALID_STATE } from "../errors";
 
 type BoardTile = {
   sprite: Image;
@@ -22,8 +21,8 @@ export default class BoardScene extends Phaser.Scene {
   unitList: Chara[] = [];
 
   constructor(
-    public squad: Squad,
-    public onSquadUpdated: (squad: Squad) => void,
+    public squad: Squad.Squad,
+    public onSquadUpdated: (squad: Squad.Squad) => void,
     public unitIndex: UnitIndex
   ) {
     super(BOARD_SCENE_KEY);
@@ -50,30 +49,27 @@ export default class BoardScene extends Phaser.Scene {
     x: number;
     y: number;
   }) {
-    const updatedBoard = changeSquadMemberPosition(
-      this.squad.members[unit.id],
+    const updatedSquad = Squad.updateMember(
       this.squad,
-      x,
-      y,
-      this.onSquadUpdated
+      Squad.makeSquadMember({ id: unit.id, x, y })
     );
 
-    this.squad.members = updatedBoard.members;
+    this.onSquadUpdated(updatedSquad);
+    this.squad = updatedSquad;
 
     //animate updated units
-    updatedBoard.updatedUnits.forEach((updatedUnit) => {
-      this.moveUnitToBoardTile(updatedUnit.id, updatedUnit.x, updatedUnit.y);
+    updatedSquad.members.forEach((updatedUnit) => {
+      this.moveUnitToBoardTile(updatedUnit.id);
     });
   }
-  moveUnitToBoardTile(id: string, x: number, y: number) {
-    //TODO: check why params are not being used
+  moveUnitToBoardTile(id: string) {
     const chara = this.unitList.find((chara) => chara.unit.id === id);
 
     if (!chara) return;
 
     const { unit } = chara;
 
-    const pos = getUnitPositionInScreen(this.squad.members[unit.id]);
+    const pos = getUnitPositionInScreen(Squad.getMember(unit.id, this.squad));
 
     const tween = this.tweens.add({
       targets: chara?.container,
@@ -96,7 +92,7 @@ export default class BoardScene extends Phaser.Scene {
 
     const boardSprite = this.findTileByXY(x, y);
 
-    const squadMember = squad.members[unit.id];
+    const squadMember = Squad.getMember(unit.id, squad);
 
     if (!squadMember)
       throw new Error("Invalid state. Unit should be in board object.");
@@ -163,14 +159,14 @@ export default class BoardScene extends Phaser.Scene {
       });
     });
 
-    this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      this.tiles.filter(isPointerInTile(pointer)).forEach((tile) => {});
-    });
+    //this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+    //  //this.tiles.filter(isPointerInTile(pointer)).forEach((tile) => {});
+    //});
 
     return tiles;
   }
 
-  addUnitToBoard(squadMember: SquadMember) {
+  addUnitToBoard(squadMember: Squad.Member) {
     const { x, y } = getUnitPositionInScreen(squadMember);
 
     const unit = this.getUnit(squadMember.id);
@@ -190,13 +186,12 @@ export default class BoardScene extends Phaser.Scene {
   }
 
   makeUnitsClickable(fn: (u: Chara) => void) {
-    this.unitList.map((chara) => {
+    this.unitList.forEach((chara) => {
       chara.onClick((c) => {
-        const member = Object.values(this.squad.members).find(
-          (mem) => mem.id === chara.unit.id
+        const member = Squad.findMember(
+          (mem) => mem.id === chara.unit.id,
+          this.squad
         );
-
-        if (!member) throw new Error(INVALID_STATE);
 
         const tile = this.tiles.find(
           (t) => t.boardX === member.x && t.boardY === member.y
@@ -224,7 +219,7 @@ export default class BoardScene extends Phaser.Scene {
   placeUnits() {
     const { squad } = this;
 
-    Object.values(squad.members).forEach((member) =>
+    squad.members.forEach((member) =>
       this.placeUnit({ member: member, fromOutside: false })
     );
   }
@@ -233,7 +228,7 @@ export default class BoardScene extends Phaser.Scene {
     member,
     fromOutside,
   }: {
-    member: SquadMember;
+    member: Squad.Member;
     fromOutside: boolean;
   }) {
     const chara = this.addUnitToBoard(member);
@@ -243,7 +238,7 @@ export default class BoardScene extends Phaser.Scene {
     this.sortUnitsByDepth();
 
     if (fromOutside) {
-      this.squad.members[member.id] = member;
+      this.squad = Squad.updateMember(this.squad, member);
     }
   }
 
@@ -271,7 +266,7 @@ export default class BoardScene extends Phaser.Scene {
   }
 }
 
-function getUnitPositionInScreen(squadMember: SquadMember) {
+function getUnitPositionInScreen(squadMember: Squad.Member) {
   const { x, y } = cartesianToIsometric(squadMember.x, squadMember.y);
 
   //FIXME: unit should be rendered at origin 0.5
