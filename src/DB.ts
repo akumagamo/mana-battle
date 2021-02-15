@@ -1,9 +1,9 @@
 import {
-  Squad,
-  Member,
+  SquadRecord,
+  MemberRecord,
   MemberIndex,
   Index,
-  makeSquadMember,
+  makeMember,
   makeSquad,
 } from "./Squad/Model";
 import { Item, itemTypeSlots, ItemTypeSlots, ItemMap } from "./Item/Model";
@@ -20,7 +20,7 @@ const set = (str: string, data: any) =>
 
 export const getSquadsFromDB = (): Index => get("squads");
 
-export const getSquadFromDB = (id: string): Squad => {
+export const getSquadFromDB = (id: string): SquadRecord => {
   return getSquadsFromDB().get(id);
 };
 
@@ -33,7 +33,7 @@ export const getSquadMembersFromDB = (id: string): List<Unit> => {
     .toList();
 };
 
-export const getSquadMemberFromDB = (id: string): Member => {
+export const getSquadMemberFromDB = (id: string): MemberRecord => {
   const unit = getUnitFromDB(id);
   const squad = getSquadFromDB(unit.squad);
 
@@ -81,7 +81,7 @@ export const saveUnitsIntoDB = (units: UnitIndex) => {
 
 export const saveItemsIntoDB = (items: ItemMap) => set("items", items);
 
-export const saveSquadIntoDB = (squad: Squad) => {
+export const saveSquadIntoDB = (squad: SquadRecord) => {
   const squads = getSquadsFromDB();
   saveSquadsIntoDB({ ...squads, [squad.id]: squad });
 };
@@ -136,7 +136,7 @@ export const disbandSquad = (id: string) => {
   saveSquadsIntoDB(squads.delete(id));
 };
 
-export const removeUnitFromSquad = (unitId: string, squad: Squad) => {
+export const removeUnitFromSquad = (unitId: string, squad: SquadRecord) => {
   const unit = getUnitFromDB(unitId);
   const updatedUnit = { ...unit, squad: null } as Unit;
 
@@ -162,7 +162,7 @@ export const createSquad = (leader: Unit) => {
     force: PLAYER_FORCE,
     leader: leader.id,
     members: Map({
-      [leader.id]: makeSquadMember({ id: leader.id, x: defaultX, y: defaultY }),
+      [leader.id]: makeMember({ id: leader.id, x: defaultX, y: defaultY }),
     }),
   });
   const updatedSquads = squads.set(newId, newSquad);

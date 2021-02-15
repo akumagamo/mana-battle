@@ -1,4 +1,4 @@
-import { Unit, UnitIndex, isAlive } from "../Unit/Model";
+import * as Unit from "../Unit/Model";
 import { getUnitAttack, getUnitDamage } from "../Unit/Skills";
 import { INVALID_STATE } from "../errors";
 import { getMeleeTarget } from "./getMeleeTarget";
@@ -6,11 +6,11 @@ import { random } from "../utils/random";
 import * as Squad from "../Squad/Model";
 import { List } from "immutable";
 
-const sortInitiative = (unit: Unit) => {
+const sortInitiative = (unit: Unit.Unit) => {
   return random(1, 6) + unit.dex;
 };
 
-export const initiativeList = (units: UnitIndex): List<string> =>
+export const initiativeList = (units: Unit.UnitIndex): List<string> =>
   units
     .toList()
     .sort((a, b) => sortInitiative(b) - sortInitiative(a))
@@ -23,27 +23,31 @@ export type Slash = {
   source: string;
   target: string;
   damage: number;
-  updatedTarget: Unit;
-  updatedSource: Unit;
+  updatedTarget: Unit.Unit;
+  updatedSource: Unit.Unit;
 };
 export type Shoot = {
   type: "SHOOT";
   source: string;
   target: string;
   damage: number;
-  updatedTarget: Unit;
-  updatedSource: Unit;
+  updatedTarget: Unit.Unit;
+  updatedSource: Unit.Unit;
 };
 export type Fireball = {
   type: "FIREBALL";
   source: string;
   target: string;
   damage: number;
-  updatedTarget: Unit;
-  updatedSource: Unit;
+  updatedTarget: Unit.Unit;
+  updatedSource: Unit.Unit;
 };
-export type Victory = { type: "VICTORY"; target: string; units: UnitIndex };
-export type EndCombat = { type: "END_COMBAT"; units: UnitIndex };
+export type Victory = {
+  type: "VICTORY";
+  target: string;
+  units: Unit.UnitIndex;
+};
+export type EndCombat = { type: "END_COMBAT"; units: Unit.UnitIndex };
 export type EndTurn = { type: "END_TURN" };
 export type RestartTurns = { type: "RESTART_TURNS" };
 export type DisplayXP = {
@@ -76,7 +80,7 @@ export type Command =
 
 export const runCombat = (
   squadIndex: Squad.Index,
-  unitIndex: UnitIndex
+  unitIndex: Unit.UnitIndex
 ): Command[] => {
   const remainingAttacksIndex: RemainingAttacksIndex = unitIndex
     .map((unit) => ({
@@ -101,7 +105,7 @@ export const runCombat = (
 };
 
 export type TurnState = {
-  unitIndex: UnitIndex;
+  unitIndex: Unit.UnitIndex;
   squadIndex: Squad.Index;
   initiative: List<string>;
   remainingAttacksIndex: RemainingAttacksIndex;
@@ -109,7 +113,7 @@ export type TurnState = {
 };
 
 /** Unit that is guaranteed to be in a squad */
-export type UnitInSquad = Unit & { squad: string };
+export type UnitInSquad = Unit.Unit & { squad: string };
 
 export type RemainingAttacksIndex = { [id: string]: number };
 
@@ -137,7 +141,7 @@ export const runTurn = (
 
   const hasRemainingAttacks = remainingAttacks > 0;
 
-  if (hasRemainingAttacks && isAlive(unit)) {
+  if (hasRemainingAttacks && Unit.isAlive(unit)) {
     let res;
     switch (unit.class) {
       case "archer":
@@ -175,7 +179,7 @@ export const runTurn = (
 
   const { squad } = unit;
 
-  const victory = (units: UnitIndex): Victory => ({
+  const victory = (units: Unit.UnitIndex): Victory => ({
     type: "VICTORY",
     target: squad,
     units,
@@ -200,7 +204,7 @@ export const runTurn = (
   }
 };
 
-function calcXp(squadIndex: Squad.Index, units: UnitIndex) {
+function calcXp(squadIndex: Squad.Index, units: Unit.UnitIndex) {
   const squadXp = squadIndex.map((squad) => {
     const enemyUnits = units.filter((u) => u.squad !== squad.id);
 
@@ -260,21 +264,15 @@ function meleeAttackSingleTarget(state: TurnState, commands: Command[]) {
   const current = unitIndex.get(id);
   const target = getMeleeTarget(current, unitIndex, squadIndex);
 
-  if (!target) throw new Error(INVALID_STATE);
-
   const damage = getUnitDamage(squadIndex, current);
 
-  const updatedUnits = unitIndex.map((unit) => {
-    const newHp = unit.currentHp - damage;
-    const currentHp = newHp < 1 ? 0 : newHp;
+  const targetUnit = unitIndex.get(target.id);
+  const newHp = targetUnit.currentHp - damage;
+  const currentHp = newHp < 1 ? 0 : newHp;
 
-    return unit.id === target.id
-      ? {
-          ...unit,
-          currentHp,
-        }
-      : unit;
-  });
+  const updatedUnits = Unit.update({ ...unitIndex.get(target.id), currentHp })(
+    unitIndex
+  );
 
   const updatedRemainingAttacksIndex = {
     ...remainingAttacksIndex,
@@ -423,17 +421,17 @@ function meleeAttackSingleTarget(state: TurnState, commands: Command[]) {
 // };
 // }
 
-function isVictory(current: string, units: UnitIndex) {
+function isVictory(current: string, units: Unit.UnitIndex) {
   return units
     .filter(isFromAnotherSquad(units.get(current)))
-    .every((enemy) => !isAlive(enemy));
+    .every((enemy) => !Unit.isAlive(enemy));
 }
 
 function noAttacksRemaining(
-  units: UnitIndex,
+  units: Unit.UnitIndex,
   remainingAttacks: RemainingAttacksIndex
 ) {
-  return units.filter(isAlive).every((u) => remainingAttacks[u.id] < 1);
+  return units.filter(Unit.isAlive).every((u) => remainingAttacks[u.id] < 1);
 }
 
 export function isFromAnotherSquad(current: UnitInSquad) {

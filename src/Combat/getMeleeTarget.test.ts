@@ -1,5 +1,7 @@
 import { Map } from "immutable";
-import { makeSquad, makeSquadMember } from "../Squad/Model";
+import { makeSquad, makeMember, squadBuilder } from "../Squad/Model";
+import { printSquad } from "../Squad/Model.test";
+import { equals } from "../test/utils";
 import { makeUnit } from "../Unit/makeUnit";
 import { getMeleeTarget } from "./getMeleeTarget";
 
@@ -34,11 +36,11 @@ test("Should get correct melee targets", () => {
       force: "player",
       leader: "0",
       members: Map({
-        "0": makeSquadMember({ id: "0", x: 1, y: 1 }),
-        "1": makeSquadMember({ id: "1", x: 3, y: 1 }),
-        "2": makeSquadMember({ id: "2", x: 3, y: 2 }),
-        "3": makeSquadMember({ id: "3", x: 3, y: 3 }),
-        "4": makeSquadMember({ id: "4", x: 1, y: 3 }),
+        "0": makeMember({ id: "0", x: 1, y: 1 }),
+        "1": makeMember({ id: "1", x: 3, y: 1 }),
+        "2": makeMember({ id: "2", x: 3, y: 2 }),
+        "3": makeMember({ id: "3", x: 3, y: 3 }),
+        "4": makeMember({ id: "4", x: 1, y: 3 }),
       }),
     }),
     "2": makeSquad({
@@ -46,10 +48,10 @@ test("Should get correct melee targets", () => {
       force: "cpu",
       leader: "5",
       members: Map({
-        "5": makeSquadMember({ id: "5", x: 2, y: 2 }),
-        "6": makeSquadMember({ id: "6", x: 3, y: 1 }),
-        "7": makeSquadMember({ id: "7", x: 3, y: 2 }),
-        "8": makeSquadMember({ id: "8", x: 3, y: 3 }),
+        "5": makeMember({ id: "5", x: 2, y: 2 }),
+        "6": makeMember({ id: "6", x: 3, y: 1 }),
+        "7": makeMember({ id: "7", x: 3, y: 2 }),
+        "8": makeMember({ id: "8", x: 3, y: 3 }),
       }),
     }),
   });
@@ -69,11 +71,11 @@ test("Should get correct melee targets", () => {
   const targetOf = (id: string) =>
     getMeleeTarget(unitIndex.get(id), unitIndex, squadIndex).id;
 
-  expect(targetOf("0")).toEqual("8");
-  expect(targetOf("1")).toEqual("8");
-  expect(targetOf("2")).toEqual("7");
-  expect(targetOf("3")).toEqual("6");
-  expect(targetOf("4")).toEqual("6");
+  equals(targetOf("0"), "8");
+  equals(targetOf("1"), "8");
+  equals(targetOf("2"), "7");
+  equals(targetOf("3"), "6");
+  equals(targetOf("4"), "6");
 });
 
 test("Should choose closer enemy on diagonal", () => {
@@ -95,35 +97,33 @@ test("Should choose closer enemy on diagonal", () => {
   // 1 -> 3
 
   const squadIndex = Map({
-    "1": makeSquad({
+    "1": squadBuilder({
       id: "1",
       force: "player",
       leader: "0",
-      members: Map({
-        "0": makeSquadMember({ id: "0", x: 3, y: 1 }),
-      }),
+      members: [["0", 3, 1]],
     }),
-    "2": makeSquad({
+    "2": squadBuilder({
       id: "2",
       force: "cpu",
       leader: "1",
-      members: Map({
-        "1": makeSquadMember({ id: "1", x: 2, y: 2 }),
-        "2": makeSquadMember({ id: "2", x: 1, y: 3 }),
-        "3": makeSquadMember({ id: "3", x: 3, y: 2 }),
-      }),
+      members: [
+        ["1", 2, 2],
+        ["2", 1, 3],
+        ["3", 3, 2],
+      ],
     }),
   });
 
   const unitIndex = Map({
     "0": { ...makeUnit("fighter", 0, 1), squad: "1" },
-    "5": { ...makeUnit("fighter", 1, 1), squad: "2" },
-    "6": { ...makeUnit("fighter", 2, 1), squad: "2" },
-    "7": { ...makeUnit("fighter", 3, 1), squad: "2" },
+    "1": { ...makeUnit("fighter", 1, 1), squad: "2" },
+    "2": { ...makeUnit("fighter", 2, 1), squad: "2" },
+    "3": { ...makeUnit("fighter", 3, 1), squad: "2" },
   });
 
   const targetOf = (id: string) =>
     getMeleeTarget(unitIndex.get(id), unitIndex, squadIndex).id;
 
-  expect(targetOf("0")).toEqual("3");
+  equals(targetOf("0"), "3");
 });

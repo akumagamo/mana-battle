@@ -1,9 +1,9 @@
-import { Squad, MemberIndex, makeSquadMember, makeSquad } from "./Model";
+import { SquadRecord, MemberIndex, makeMember, makeSquad } from "./Model";
 import { UnitClass, UnitIndex } from "../Unit/Model";
 import { Map } from "immutable";
 import { makeUnit } from "../Unit/makeUnit";
 
-type SquadGeneratorResponse = { units: UnitIndex; squad: Squad };
+type SquadGeneratorResponse = { units: UnitIndex; squad: SquadRecord };
 
 /**
  * a _ f
@@ -15,36 +15,42 @@ export function fighterArcherSquad(
   prefix: string,
   level: number
 ): SquadGeneratorResponse {
-  const units: [UnitClass, [number, number], boolean][] = [
-    ["fighter", [3, 1], false],
-    ["fighter", [3, 2], true],
-    ["fighter", [3, 3], false],
-    ["archer", [1, 1], false],
-    ["archer", [1, 3], false],
-  ];
-
-  return squadGenerator(prefix, units, level, force);
+  return squadGenerator(
+    prefix,
+    [
+      ["fighter", [3, 2]],
+      ["fighter", [3, 1]],
+      ["fighter", [3, 3]],
+      ["archer", [1, 1]],
+      ["archer", [1, 3]],
+    ],
+    level,
+    force
+  );
 }
 
+/**
+ * The leader will always be the first unit in the list
+ */
 export function squadGenerator(
   squadId: string,
-  units_: [UnitClass, [number, number], boolean][],
+  unitList: [UnitClass, [number, number]][],
   level: number,
   force: string
-) {
+): { units: UnitIndex; squad: SquadRecord } {
   const unitId = (n: number) => squadId + "_unit_" + n.toString();
 
-  const units = units_.reduce((xs, [class_], index) => {
+  const units = unitList.reduce((xs, [class_], index) => {
     return xs.set(unitId(index), {
       ...makeUnit(class_, unitId(index), level),
       squad: squadId,
     });
   }, Map() as UnitIndex);
 
-  const members = units_.reduce((xs, [, [x, y]], index) => {
+  const members = unitList.reduce((xs, [, [x, y]], index) => {
     return xs.set(
       unitId(index),
-      makeSquadMember({
+      makeMember({
         id: unitId(index),
         x,
         y,
@@ -52,9 +58,9 @@ export function squadGenerator(
     );
   }, Map() as MemberIndex);
 
-  const squad: Squad = makeSquad({
+  const squad: SquadRecord = makeSquad({
     id: squadId,
-    leader: unitId(units_.findIndex(([, , leader]) => leader)),
+    leader: units.get(unitId(0)).id,
     members,
     force: force,
   });

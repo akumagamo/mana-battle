@@ -21,7 +21,7 @@ export class EditSquadScene extends Phaser.Scene {
     super("EditSquadScene");
   }
 
-  create({ squad, unitIndex }: { squad: Squad.Squad; unitIndex: UnitIndex }) {
+  create({ squad, unitIndex }: { squad: Squad.SquadRecord; unitIndex: UnitIndex }) {
     menu(this);
 
     this.renderBoard(squad, unitIndex);
@@ -31,7 +31,7 @@ export class EditSquadScene extends Phaser.Scene {
     this.renderReturnBtn();
   }
 
-  renderBoard(squad: Squad.Squad, unitIndex: UnitIndex) {
+  renderBoard(squad: Squad.SquadRecord, unitIndex: UnitIndex) {
     this.boardScene = new BoardScene(squad, saveSquadIntoDB, unitIndex);
     this.scene.add(BOARD_SCENE_KEY, this.boardScene, true);
 

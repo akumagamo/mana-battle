@@ -4,7 +4,7 @@ import { getSquadsFromDB } from "../DB";
 import { makeUnit } from "../Unit/makeUnit";
 import { toMapSquad } from "../Unit/Model";
 import { CPU_FORCE, PLAYER_FORCE } from "../constants";
-import { makeSquad, makeSquadMember } from "../Squad/Model";
+import { makeSquad, makeMember } from "../Squad/Model";
 
 const enemyCastle: City = {
   id: "castle2",
@@ -43,10 +43,10 @@ const map: () => MapState = () => {
           id: "squad1",
           leader: "enemy1",
           members: Map({
-            enemy1: makeSquadMember({ id: "enemy1", x: 1, y: 2 }),
-            enemy2: makeSquadMember({ id: "enemy2", x: 3, y: 1 }),
-            enemy3: makeSquadMember({ id: "enemy3", x: 3, y: 2 }),
-            enemy4: makeSquadMember({ id: "enemy4", x: 3, y: 3 }),
+            enemy1: makeMember({ id: "enemy1", x: 1, y: 2 }),
+            enemy2: makeMember({ id: "enemy2", x: 3, y: 1 }),
+            enemy3: makeMember({ id: "enemy3", x: 3, y: 2 }),
+            enemy4: makeMember({ id: "enemy4", x: 3, y: 3 }),
           }),
           force: CPU_FORCE,
         }),
@@ -55,11 +55,12 @@ const map: () => MapState = () => {
       toMapSquad(
         makeSquad({
           id: "squad2",
+          leader: "enemy5",
           members: Map({
-            enemy5: makeSquadMember({ id: "enemy5", x: 2, y: 2 }),
-            enemy6: makeSquadMember({ id: "enemy6", x: 3, y: 1 }),
-            enemy7: makeSquadMember({ id: "enemy7", x: 3, y: 2 }),
-            enemy8: makeSquadMember({ id: "enemy8", x: 3, y: 3 }),
+            enemy5: makeMember({ id: "enemy5", x: 2, y: 2 }),
+            enemy6: makeMember({ id: "enemy6", x: 3, y: 1 }),
+            enemy7: makeMember({ id: "enemy7", x: 3, y: 2 }),
+            enemy8: makeMember({ id: "enemy8", x: 3, y: 3 }),
           }),
           force: CPU_FORCE,
         }),

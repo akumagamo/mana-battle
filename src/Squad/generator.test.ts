@@ -1,4 +1,8 @@
+import { List } from "immutable";
+import { equals } from "../test/utils";
 import { squadGenerator } from "./generator";
+import { makeMember, Member, MemberRecord } from "./Model";
+import { printSquad } from "./Model.test";
 
 test("generates units", () => {
   const squadId = "SQD1";
@@ -6,8 +10,8 @@ test("generates units", () => {
   const { squad, units } = squadGenerator(
     squadId,
     [
-      ["fighter", [2, 1], true],
-      ["archer", [2, 2], false],
+      ["fighter", [2, 1]],
+      ["archer", [2, 2]],
     ],
     22,
     "TEST_FORCE"
@@ -18,27 +22,31 @@ test("generates units", () => {
   const unit1Id = `${squadId}_unit_0`;
   const unit2Id = `${squadId}_unit_1`;
 
-  expect(Object.keys(squad.members)).toStrictEqual([unit1Id, unit2Id]);
+  equals(squad.members.keySeq().toList(), List([unit1Id, unit2Id]));
 
-  expect(squad.members.get(unit1Id)).toStrictEqual({
-    id: unit1Id,
-    x: 2,
-    y: 1,
-    leader: true,
-  });
-  expect(squad.members.get(unit2Id)).toStrictEqual({
-    id: unit2Id,
-    x: 2,
-    y: 2,
-    leader: false,
-  });
+  equals(
+    squad.members.get(unit1Id),
+    makeMember({
+      id: unit1Id,
+      x: 2,
+      y: 1,
+    })
+  );
+  equals(
+    squad.members.get(unit2Id),
+    makeMember({
+      id: unit2Id,
+      x: 2,
+      y: 2,
+    })
+  );
 
-  expect(units.get(unit1Id).class).toBe("fighter");
-  expect(units.get(unit2Id).class).toBe("archer");
+  equals(units.get(unit1Id).class, "fighter");
+  equals(units.get(unit2Id).class, "archer");
 
-  expect(units.get(unit1Id).lvl).toBe(22);
-  expect(units.get(unit2Id).lvl).toBe(22);
+  equals(units.get(unit1Id).lvl, 22);
+  equals(units.get(unit2Id).lvl, 22);
 
-  expect(units.get(unit1Id).squad).toStrictEqual(squadId);
-  expect(units.get(unit2Id).squad).toStrictEqual(squadId);
+  equals(units.get(unit1Id).squad, squadId);
+  equals(units.get(unit2Id).squad, squadId);
 });

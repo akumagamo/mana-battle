@@ -5,7 +5,7 @@ import { startCharaCreationScene } from "../CharaCreation/CharaCreationScene";
 import { MapCommands } from "../Map/MapCommands";
 import maps from "../maps";
 import { startMapScene } from "../Map/MapScene";
-import { makeSquad, makeSquadMember } from "../Squad/Model";
+import { makeSquad, makeMember } from "../Squad/Model";
 import { toMapSquad } from "../Unit/Model";
 import TitleScene from "./TitleScene";
 import { makeUnit } from "../Unit/makeUnit";
@@ -30,7 +30,7 @@ export const storyManager = async (parent: TitleScene) => {
     id: "1",
     force: PLAYER_FORCE,
     members: Map({
-      [unit.id]: makeSquadMember({
+      [unit.id]: makeMember({
         id: unit.id,
         x: 2,
         y: 2,
@@ -39,28 +39,24 @@ export const storyManager = async (parent: TitleScene) => {
     leader: unit.id,
   });
 
-  const members = [
-    makeUnit("fighter", "m1", 1),
-    makeUnit("fighter", "m2", 1),
-    makeUnit("archer", "m3", 1),
-    makeUnit("mage", "m4", 1),
-  ];
-
-  const alliedUnits = {
+  const alliedUnits = Map({
     [unit.id]: unit,
-    ...members.reduce((xs, x) => ({ ...xs, [x.id]: x }), {}),
-  };
+    m1: makeUnit("fighter", "m1", 1),
+    m2: makeUnit("fighter", "m2", 1),
+    m3: makeUnit("archer", "m3", 1),
+    m4: makeUnit("mage", "m4", 1),
+  });
 
-  const sqd = {
-    ...firstSquad,
-    members: {
-      ...firstSquad.members,
-      m1: { id: members[0].id, leader: false, x: 3, y: 1 },
-      m2: { id: members[1].id, leader: false, x: 3, y: 3 },
-      m3: { id: members[2].id, leader: false, x: 1, y: 1 },
-      m4: { id: members[3].id, leader: false, x: 1, y: 3 },
-    },
-  };
+  const sqd = firstSquad.mergeDeep(
+    Map({
+      members: Map({
+        m1: makeMember({ id: "m1", x: 3, y: 1 }),
+        m2: makeMember({ id: "m2", x: 3, y: 3 }),
+        m3: makeMember({ id: "m3", x: 1, y: 1 }),
+        m4: makeMember({ id: "m4", x: 1, y: 3 }),
+      }),
+    })
+  );
 
   const squads = [sqd];
 
@@ -79,7 +75,6 @@ export const storyManager = async (parent: TitleScene) => {
             )
           )
         ),
-
         units: map.units.merge(alliedUnits),
       },
     },

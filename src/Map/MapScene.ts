@@ -23,7 +23,7 @@ import renderSquads, { renderSquad } from "./board/renderSquads";
 import renderStructures from "./board/renderStructures";
 import entityInfo from "./entityInfo";
 import squadDetails from "./effects/squadDetails";
-import {  Squad } from "../Squad/Model";
+import {  SquadRecord } from "../Squad/Model";
 import { makeVector, VectorRec } from "./makeVector";
 import announcement from "../UI/announcement";
 import { delay, tween } from "../Scenes/utils";
@@ -827,7 +827,7 @@ export class MapScene extends Phaser.Scene {
     return this.state.squads.filter((sqd) => sqd.squad.force === PLAYER_FORCE);
   }
 
-  async dispatchSquad(squad: Squad) {
+  async dispatchSquad(squad: SquadRecord) {
     const force = await this.getForce(PLAYER_FORCE);
     let mapSquad = toMapSquad(squad, await this.getCity(force.initialPosition));
 

@@ -19,7 +19,7 @@ export default class StaticBoardScene extends Phaser.Scene {
   overlay: Graphics | null = null;
   isSelected = false;
   constructor(
-    public squad: Squad.Squad,
+    public squad: Squad.SquadRecord,
     public units: UnitIndex,
     public x: number,
     public y: number,
@@ -78,7 +78,7 @@ export default class StaticBoardScene extends Phaser.Scene {
     this.overlay = graphics;
   }
 
-  onClick(fn: (sqd: Squad.Squad) => void) {
+  onClick(fn: (sqd: Squad.SquadRecord) => void) {
     var clickZone = this.add.zone(
       this.x + OFFSET_X,
       this.y + OFFSET_Y,
@@ -213,6 +213,6 @@ export default class StaticBoardScene extends Phaser.Scene {
   }
 }
 
-function makeId(squad: Squad.Squad) {
+function makeId(squad: Squad.SquadRecord) {
   return `static-squad-${squad.id}`;
 }

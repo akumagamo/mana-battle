@@ -1,24 +1,26 @@
 // @ts-nocheck
 
-import {getPossibleMoves} from './api';
-import {Range, Set, fromJS} from 'immutable';
-import {TurnManager} from './Model';
+import { getPossibleMoves } from "./api";
+import { Range, Set, fromJS, List, Map } from "immutable";
+import { TurnManager } from "./Model";
+import { equals } from "../test/utils";
+import { squadBuilder } from "../Squad/Model";
 const defaultParams: TurnManager = {
-  currentForce: 'a',
+  currentForce: "a",
   forces: [
     {
-      id: 'a',
-      squads: ['a1'],
-      name: 'a',
-      relations: {['b']: 'hostile'},
-      initialPosition: 'castle1',
+      id: "a",
+      squads: ["a1"],
+      name: "a",
+      relations: { ["b"]: "hostile" },
+      initialPosition: "castle1",
     },
     {
-      id: 'b',
-      squads: ['b1'],
-      name: 'b',
-      relations: {['a']: 'hostile'},
-      initialPosition: 'castle2',
+      id: "b",
+      squads: ["b1"],
+      name: "b",
+      relations: { ["a"]: "hostile" },
+      initialPosition: "castle2",
     },
   ],
   grid: [
@@ -31,49 +33,55 @@ const defaultParams: TurnManager = {
   walkableCells: [0],
   mapSquads: [
     {
-      id: 'a1',
-      pos: {x: 0, y: 0},
+      id: "a1",
+      pos: { x: 0, y: 0 },
       enemiesInRange: [],
       validSteps: [],
       range: 2,
-      force: 'a',
-      name: '',
-      members: {},
-      status: 'alive',
+      status: "alive",
+      squad: squadBuilder({
+        id: "a1",
+        leader: "u1",
+        members: Map(),
+        force: "a",
+      }),
     },
     {
-      id: 'b1',
-      pos: {x: 3, y: 3},
+      id: "b1",
+      pos: { x: 3, y: 3 },
       enemiesInRange: [],
       validSteps: [],
       range: 2,
-      force: 'b',
-      name: '',
-      members: {},
-      status: 'alive',
+      status: "alive",
+      squad: squadBuilder({
+        id: "b1",
+        leader: "u2",
+        members: Map(),
+        force: "b",
+      }),
     },
   ],
 };
 
-test('Get moves in straight line', () => {
-  const cells = getPossibleMoves(defaultParams);
+test("Get moves in straight line", () => {
+  const cells = getPossibleMoves(defaultParams)[0].validSteps.map(
+    (t) => t.target
+  );
 
-  const lens = (c) => c[0].validSteps.map((t) => t.target).toJS();
+  const expected = List([
+    { x: 0, y: 1 },
+    { x: 0, y: 2 },
+  ]);
 
-  const expected = [
-    {x: 0, y: 1},
-    {x: 0, y: 2},
-  ];
-
-  expect(lens(cells)).toEqual(expected);
+  equals(cells, expected);
 });
 
-test('Make a turn', () => {
+test("Make a turn", () => {
   const longerRange = {
     ...defaultParams,
 
     mapSquads: defaultParams.mapSquads.map((unit) =>
-      unit.id === 'a1' ? {...unit, range: 4} : unit,
+      unit.id === "a1" ? { ...unit, range: 4 } : unit
     ),
   };
   const moves = getPossibleMoves(longerRange);
@@ -81,16 +89,16 @@ test('Make a turn', () => {
   const lens = (c) => c[0].validSteps.map((t) => t.target).toJS();
 
   const expected = [
-    {x: 0, y: 1},
-    {x: 0, y: 2},
-    {x: 0, y: 3},
-    {x: 1, y: 3},
+    { x: 0, y: 1 },
+    { x: 0, y: 2 },
+    { x: 0, y: 3 },
+    { x: 1, y: 3 },
   ];
 
   expect(lens(moves)).toEqual(expected);
 });
 
-test('Get moves in blocked path ', () => {
+test("Get moves in blocked path ", () => {
   const path = {
     ...defaultParams,
     grid: [
@@ -102,21 +110,21 @@ test('Get moves in blocked path ', () => {
     ],
 
     mapSquads: defaultParams.mapSquads.map((unit) =>
-      unit.id === 'a1' ? {...unit, range: 4} : unit,
+      unit.id === "a1" ? { ...unit, range: 4 } : unit
     ),
   };
   const moves = getPossibleMoves(path);
 
   const lens = (c) => c[0].validSteps.map((t) => t.target).toJS();
   const expected = [
-    {x: 0, y: 1},
-    {x: 0, y: 2},
+    { x: 0, y: 1 },
+    { x: 0, y: 2 },
   ];
 
   expect(lens(moves)).toEqual(expected);
 });
 
-test('Get moves in forked path ', () => {
+test("Get moves in forked path ", () => {
   const path = {
     ...defaultParams,
     grid: [
@@ -128,37 +136,39 @@ test('Get moves in forked path ', () => {
     ],
 
     mapSquads: defaultParams.mapSquads.map((unit) =>
-      unit.id === 'a1' ? {...unit, range: 4} : unit,
+      unit.id === "a1" ? { ...unit, range: 4 } : unit
     ),
   };
   const moves = getPossibleMoves(path);
 
   const expected = Set(
     [
-      {x: 0, y: 1},
-      {x: 0, y: 2},
-      {x: 0, y: 3},
-      {x: 1, y: 1},
-      {x: 1, y: 3},
-      {x: 2, y: 1},
-      {x: 2, y: 2},
-      {x: 3, y: 1},
-    ].map((v) => fromJS(v)),
+      { x: 0, y: 1 },
+      { x: 0, y: 2 },
+      { x: 0, y: 3 },
+      { x: 1, y: 1 },
+      { x: 1, y: 3 },
+      { x: 2, y: 1 },
+      { x: 2, y: 2 },
+      { x: 3, y: 1 },
+    ].map((v) => fromJS(v))
   );
 
   const result = Set(
-    fromJS(moves[0].validSteps.map((t) => t.target).map((v) => fromJS(v))),
+    fromJS(moves[0].validSteps.map((t) => t.target).map((v) => fromJS(v)))
   );
 
   expect(result.equals(expected)).toBe(true);
 });
 
-test('Enemy blocks path', () => {
+test("Enemy blocks path", () => {
   const path = {
     ...defaultParams,
     mapSquads: defaultParams.mapSquads
-      .map((unit) => (unit.id === 'a1' ? {...unit, range: 4} : unit))
-      .map((unit) => (unit.id === 'b1' ? {...unit, pos: {x: 0, y: 3}} : unit)),
+      .map((unit) => (unit.id === "a1" ? { ...unit, range: 4 } : unit))
+      .map((unit) =>
+        unit.id === "b1" ? { ...unit, pos: { x: 0, y: 3 } } : unit
+      ),
   };
   const moves = getPossibleMoves(path);
 
@@ -206,7 +216,7 @@ test('Enemy blocks path', () => {
   expect(fromJS(result).equals(fromJS(expected))).toBe(true);
   //expect(result).toEqual(expected);
 });
-test('Large map - performance check', () => {
+test("Large map - performance check", () => {
   const path = {
     ...defaultParams,
     grid: Range(0, 50)

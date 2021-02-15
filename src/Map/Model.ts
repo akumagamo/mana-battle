@@ -1,4 +1,4 @@
-import { Squad } from "../Squad/Model";
+import { SquadRecord } from "../Squad/Model";
 import { Unit } from "../Unit/Model";
 import { Map, List, Set } from "immutable";
 export type UnitId = string;
@@ -59,7 +59,7 @@ export type ValidStep = { target: Vector; steps: Vector[] };
 export type EnemyInRange = { enemy: string; steps: Vector[] };
 export type MapSquad = {
   id: string;
-  squad: Squad;
+  squad: SquadRecord;
   pos: Vector;
   range: number;
   validSteps: List<ValidStep>;

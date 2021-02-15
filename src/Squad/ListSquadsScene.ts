@@ -62,9 +62,9 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   formatList(
-    squads: List<Squad.Squad>,
-    accumulator: List<List<Squad.Squad>>
-  ): List<List<Squad.Squad>> {
+    squads: List<Squad.SquadRecord>,
+    accumulator: List<List<Squad.SquadRecord>>
+  ): List<List<Squad.SquadRecord>> {
     const cols = 4;
     if (squads.size <= cols) {
       return accumulator.push(squads);
@@ -77,7 +77,7 @@ export class ListSquadsScene extends Phaser.Scene {
     }
   }
 
-  renderSelectSquadInfo(squad: Squad.Squad) {
+  renderSelectSquadInfo(squad: Squad.SquadRecord) {
     const container = this.add.container(0, 670);
     const panel_ = panel(0, 0, SCREEN_WIDTH, 100, container, this);
 
@@ -124,7 +124,7 @@ export class ListSquadsScene extends Phaser.Scene {
     );
   }
 
-  renderBoard(squad: Squad.Squad, x: number, y: number) {
+  renderBoard(squad: Squad.SquadRecord, x: number, y: number) {
     const BOARD_X = 20 + x * 350;
     const BOARD_Y = 20 + y * 330;
     const boardScene = new BoardScene(
@@ -149,7 +149,7 @@ export class ListSquadsScene extends Phaser.Scene {
 
     fn(board);
   }
-  selectSquad(sqd: Squad.Squad) {
+  selectSquad(sqd: Squad.SquadRecord) {
     this.squadSceneIO(sqd.id, (squadScene) => {
       this.renderSelectSquadInfo(sqd);
       this.boardScenes
@@ -270,7 +270,7 @@ export class ListSquadsScene extends Phaser.Scene {
     this.units = Map();
   }
 
-  editSquad(squad: Squad.Squad) {
+  editSquad(squad: Squad.SquadRecord) {
     this.turnOff();
 
     this.scene.transition({

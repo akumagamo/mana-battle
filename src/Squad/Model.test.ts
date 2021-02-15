@@ -1,12 +1,14 @@
-import { Map } from "immutable";
+import { Map, Range } from "immutable";
 import {
   changeLeader,
   changeSquadMemberPosition,
   getMember,
-  makeSquad,
-  makeSquadMember,
+  makeMember,
   removeMember,
   updateMember,
+  getLeader,
+  squadBuilder,
+  SquadRecord,
 } from "./Model";
 
 const defaultSquadIndex = Map({
@@ -29,7 +31,7 @@ test("Should get members", () => {
 test("Should add new members", () => {
   const squad = updateMember(
     givenASquadWithTwoMembers(),
-    makeSquadMember({ id: "u3" })
+    makeMember({ id: "u3" })
   );
 
   expect(getMember("u3", squad).id).toBe("u3");
@@ -43,6 +45,14 @@ test("Should change leader", () => {
   expect(squad.leader).toBe("u2");
 });
 
+test("Should get leader", () => {
+  const defaultSquad = givenASquadWithTwoMembers();
+  expect(defaultSquad.leader).toBe("u1");
+  const leader = getLeader(defaultSquad);
+
+  expect(leader.id).toBe("u1");
+});
+
 test("Should remove member", () => {
   const squad = removeMember("u1", givenASquadWithTwoMembers());
 
@@ -50,9 +60,15 @@ test("Should remove member", () => {
   expect(getMember("u2", squad).id).toBe("u2");
 });
 test("Should update position", () => {
+  const defaultSquad = givenASquadWithTwoMembers();
+
+  // Sanity-check
+  expect(getMember("u1", defaultSquad)).toHaveProperty("x", 2);
+  expect(getMember("u1", defaultSquad)).toHaveProperty("y", 2);
+
   const squad = changeSquadMemberPosition(
-    makeSquadMember({ id: "u1" }),
-    givenASquadWithTwoMembers(),
+    makeMember({ id: "u1" }),
+    defaultSquad,
     3,
     3
   );
@@ -62,14 +78,34 @@ test("Should update position", () => {
 });
 
 function givenASquadWithOneMember() {
-  const sqd = makeSquad({ id: "s1", leader: "u1" });
-  const member = makeSquadMember({ id: "u1", x: 2, y: 2 });
-  const squadWithLeader = changeLeader("u1", updateMember(sqd, member));
-  return squadWithLeader;
+  return squadBuilder({
+    id: "s1",
+    leader: "u1",
+    force: "player",
+    members: [["u1", 2, 2]],
+  });
 }
 
 function givenASquadWithTwoMembers() {
-  const sqd = givenASquadWithOneMember();
-  const newMember = makeSquadMember({ id: "u2", x: 1, y: 2 });
-  return updateMember(sqd, newMember);
+  return squadBuilder({
+    id: "s1",
+    leader: "u1",
+    force: "player",
+    members: [
+      ["u1", 2, 2],
+      ["u2", 1, 2],
+    ],
+  });
+}
+
+export function printSquad(squad: SquadRecord) {
+  let o = Range(0, 3)
+    .map(() => Range(0, 6).map(() => "-"))
+    .toJS();
+  squad.members.forEach((m) => {
+    const { y, x } = m;
+    o[y - 1][x - 1] = m.id;
+  });
+
+  console.log(o.map((o) => o.join(" ")).join("\n"));
 }

@@ -1,36 +1,59 @@
-import { List, Map, Record, RecordOf, Set } from "immutable";
+import { List, Map, Record, RecordOf } from "immutable";
 import { Unit } from "../Unit/Model";
 
 export type ForceId = string;
 
-export type Squad = RecordOf<{
+export type Squad = {
   id: string;
   members: MemberIndex;
   force: ForceId;
   leader: string;
-}>;
+};
+export type SquadRecord = RecordOf<Squad>;
 
-export type Member = RecordOf<{
+export type Member = {
   id: string;
   x: number;
   y: number;
-}>;
+};
+export type MemberRecord = RecordOf<Member>;
 
-export type MemberIndex = Map<string, Member>;
+export type MemberIndex = Map<string, MemberRecord>;
 
-export type Index = Map<string, Squad>;
+export type Index = Map<string, SquadRecord>;
 
 export const makeSquad = Record(
   {
     id: "",
-    members: Map<string, Member>(),
+    members: Map<string, MemberRecord>(),
     force: "",
     leader: "",
   },
   "Squad"
 );
 
-export const makeSquadMember = Record(
+export const squadBuilder = ({
+  id,
+  force,
+  leader,
+  members,
+}: {
+  id: string;
+  force: string;
+  leader: string;
+  members: [string, number, number][];
+}) =>
+  makeSquad({
+    id,
+    members: members.reduce(
+      (xs, [id, x, y]) => xs.set(id, makeMember({ id, x, y })),
+      Map() as MemberIndex
+    ),
+    force,
+    leader,
+  });
+
+export const makeMember = Record(
   {
     id: "",
     x: 1,
@@ -39,64 +62,84 @@ export const makeSquadMember = Record(
   "SquadMember"
 );
 
-export const isLeader = (squad: Squad, id: string) => squad.leader === id;
-export const changeLeader = (id: string, squad: Squad) =>
+export const isLeader = (squad: SquadRecord, id: string) => squad.leader === id;
+export const changeLeader = (id: string, squad: SquadRecord) =>
   squad.set("leader", id);
 
-export const mapSquadMembers = (fn: (s: Member) => Member) => (index: Index) =>
-  index.map((squad) => squad.set("members", squad.members.map(fn)));
+export const mapSquadMembers = (fn: (s: MemberRecord) => MemberRecord) => (
+  index: Index
+) => index.map((squad) => squad.set("members", squad.members.map(fn)));
 
-export const filterMembersFromSquad = (fn: (s: Member) => boolean) => (
-  squad: Squad
+export const filterMembersFromSquad = (fn: (s: MemberRecord) => boolean) => (
+  squad: SquadRecord
 ) => squad.set("members", squad.members.filter(fn));
 
-export const filterMembers = (fn: (s: Member) => boolean) => (index: Index) =>
-  index.map(filterMembersFromSquad(fn));
-
-export const mapMembers = (fn: (s: Member) => Member) => (squadId: string) => (
+export const filterMembers = (fn: (s: MemberRecord) => boolean) => (
   index: Index
-) =>
+) => index.map(filterMembersFromSquad(fn));
+
+export const mapMembers = (fn: (s: MemberRecord) => MemberRecord) => (
+  squadId: string
+) => (index: Index) =>
   index.map((squad) =>
     squad.id === squadId ? squad.set("members", squad.members.map(fn)) : squad
   );
 
 /** Returns a List with the squad members from all indexed squads */
-export const getAllUnits = (index: Index): List<Member> =>
+export const getAllUnits = (index: Index): List<MemberRecord> =>
   index.reduce(
     (xs, x) => xs.concat(x.members.toList()),
-    List() as List<Member>
+    List() as List<MemberRecord>
   );
 
-export const getMember = (unitId: string, squad: Squad) =>
+export const getUnitsFromSquad = (id: string) => (
+  index: Index
+): List<MemberRecord> => getAllUnits(index.filter((s) => s.id === id));
+
+export const rejectUnitsFromSquad = (id: string) => (
+  index: Index
+): List<MemberRecord> => getAllUnits(index.filter((s) => s.id !== id));
+
+export const getMember = (unitId: string, squad: SquadRecord) =>
   squad.members.get(unitId);
 
-export const getLeader = (squad: Squad) => squad.members.get(squad.leader);
+export const getLeader = (squad: SquadRecord) =>
+  squad.members.get(squad.leader);
 
-export const findMember = (fn: (m: Member) => boolean, squad: Squad) =>
-  squad.members.find(fn);
+export const findMember = (
+  fn: (m: MemberRecord) => boolean,
+  squad: SquadRecord
+) => squad.members.find(fn);
 
 /**
  * Adds a new member or updates an existing one.
  */
-export const updateMember = (squad: Squad, member: Member): Squad =>
-  squad.set("members", squad.members.set(member.id, member));
+export const updateMember = (
+  squad: SquadRecord,
+  member: MemberRecord
+): SquadRecord => squad.set("members", squad.members.set(member.id, member));
 
-export const removeMember = (id: string, squad: Squad): Squad =>
+export const removeMember = (id: string, squad: SquadRecord): SquadRecord =>
   squad.set("members", squad.members.delete(id));
 
 export const changeSquadMemberPosition = (
-  unit: Member,
-  squad: Squad,
+  unit: MemberRecord,
+  squad: SquadRecord,
   x: number,
   y: number
 ) => updateMember(squad, unit.merge({ x, y }));
 
 export const getMemberByPosition = ({ x, y }: { x: number; y: number }) => (
-  sqd: Squad
+  sqd: SquadRecord
 ) => sqd.members.find((m) => m.x === x && m.y === y);
 
-export const addMember = (unit: Unit, squad: Squad, x: number, y: number) => {
-  const newMember = makeSquadMember({ id: unit.id, x, y });
+export const addMember = (
+  unit: Unit,
+  squad: SquadRecord,
+  x: number,
+  y: number
+) => {
+  const newMember = makeMember({ id: unit.id, x, y });
   const memberToRemove = getMemberByPosition({ x, y })(squad);
 
   if (memberToRemove) {
@@ -124,11 +167,12 @@ export const invertBoardPosition = (n: number) => {
   else if (n === 3) return 1;
   else return n;
 };
-export function transpose(member: Member) {
+export function transpose(member: MemberRecord): MemberRecord {
   const { x, y } = member;
-  return {
-    ...member,
-    x: invertBoardPosition(x) + 3,
-    y: invertBoardPosition(y),
-  };
+  return member.merge(
+    Map({
+      x: invertBoardPosition(x) + 3,
+      y: invertBoardPosition(y),
+    })
+  );
 }

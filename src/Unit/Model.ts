@@ -4,7 +4,7 @@ import { Container } from "../Models";
 import { getItemsFromDB } from "../DB";
 import { UnitAttacks } from "./Skills";
 import { MapSquad } from "../Map/Model";
-import { Squad } from "../Squad/Model";
+import { SquadRecord } from "../Squad/Model";
 import { Vector } from "matter";
 import { List, Map, Set } from "immutable";
 
@@ -48,6 +48,9 @@ export const unitClassLabels: { [x in UnitClass]: string } = {
 
 export type Movement = "plain" | "mountain" | "sky" | "forest";
 
+export const update = (unit: Unit) => (index: UnitIndex) =>
+  index.set(unit.id, unit);
+
 /**
  * Database representation of a unit. Contains basic data.
  */
@@ -84,7 +87,7 @@ export function assignSquad(unit: Unit, squad: string): UnitInSquad {
   return { ...unit, squad };
 }
 
-export function toMapSquad(squad: Squad, pos: Vector): MapSquad {
+export function toMapSquad(squad: SquadRecord, pos: Vector): MapSquad {
   return {
     id: squad.id,
     squad,

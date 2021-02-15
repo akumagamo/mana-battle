@@ -1,4 +1,4 @@
-import { getMember, Index } from "../Squad/Model";
+import * as Squad from "../Squad/Model";
 import { random } from "../utils/random";
 import { Elem, Unit, UnitClass } from "./Model";
 import { atk, attrMod, mAtk } from "./mods";
@@ -81,12 +81,12 @@ export function getUnitAttacks(class_: UnitClass) {
   return skills[class_];
 }
 
-export function getUnitDamage(squadIndex: Index, unit: Unit) {
+export function getUnitDamage(squadIndex: Squad.Index, unit: Unit) {
   return getUnitAttack(squadIndex, unit).damage;
 }
 
-export function getUnitAttack(squadIndex: Index, unit: Unit) {
-  const member = getMember(unit.id, squadIndex.get(unit.squad));
+export function getUnitAttack(squadIndex: Squad.Index, unit: Unit) {
+  const member = Squad.getMember(unit.id, squadIndex.get(unit.squad));
   const getPos = (): Row => {
     if (member.y === 0) return "back";
     else if (member.y === 1) return "middle";

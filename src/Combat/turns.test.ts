@@ -1,8 +1,9 @@
 import { initiativeList, runCombat } from "./turns";
 import { assignSquad } from "../Unit/Model";
 import { makeUnit } from "../Unit/makeUnit";
-import { makeSquad, makeSquadMember } from "../Squad/Model";
-import { Map } from "immutable";
+import { makeSquad, makeMember } from "../Squad/Model";
+import { List, Map } from "immutable";
+import { equals } from "../test/utils";
 
 jest.mock("../utils/random");
 jest.mock("../Unit/mods");
@@ -17,42 +18,41 @@ test("Should sort by initiave correctly", () => {
 
   const sorted = initiativeList(units);
 
-  expect(sorted).toEqual(["0", "3", "2", "1"]);
+  equals(sorted, List(["0", "3", "2", "1"]));
 });
 
 test("Combat should have the expected outcome", () => {
   const units = Map({
-    "0": assignSquad(makeUnit("fighter", "0", 1), "player"),
-    "1": assignSquad(makeUnit("fighter", "1", 1), "player"),
-    "2": assignSquad(makeUnit("fighter", "2", 1), "player"),
-    "3": assignSquad(makeUnit("fighter", "3", 1), "cpu"),
+    "0": assignSquad(makeUnit("fighter", "0", 1), "s1"),
+    "1": assignSquad(makeUnit("fighter", "1", 1), "s1"),
+    "2": assignSquad(makeUnit("fighter", "2", 1), "s1"),
+    "3": assignSquad(makeUnit("fighter", "3", 1), "s2"),
   });
 
   const squadIndex = Map({
-    "1": makeSquad({
-      id: "1",
+    s1: makeSquad({
+      id: "s1",
       leader: "0",
       force: "player",
       members: Map({
-        "0": makeSquadMember({ id: "0", x: 1, y: 2 }),
-        "1": makeSquadMember({ id: "1", x: 2, y: 2 }),
-        "2": makeSquadMember({ id: "2", x: 3, y: 2 }),
+        "0": makeMember({ id: "0", x: 1, y: 2 }),
+        "1": makeMember({ id: "1", x: 2, y: 2 }),
+        "2": makeMember({ id: "2", x: 3, y: 2 }),
       }),
     }),
-    "2": makeSquad({
-      id: "2",
+    s2: makeSquad({
+      id: "s2",
       leader: "3",
       force: "cpu",
       members: Map({
-        "3": makeSquadMember({ id: "3", x: 1, y: 2 }),
+        "3": makeMember({ id: "3", x: 1, y: 2 }),
       }),
     }),
   });
 
-  console.log(squadIndex);
   const res = runCombat(squadIndex, units);
-  expect(res.length).toBe(25);
+  equals(res.length, 25);
 
   const [last] = res.reverse();
-  expect(last.type).toBe("END_COMBAT");
+  equals(last.type, "END_COMBAT");
 });

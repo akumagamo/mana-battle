@@ -9,7 +9,7 @@ import { Container } from "../Models";
 import { MapState } from "./Model";
 import { fadeIn } from "../UI/Transition";
 import { List, Set } from "immutable";
-import { Squad } from "../Squad/Model";
+import { SquadRecord } from "../Squad/Model";
 
 export default class MapListScene extends Phaser.Scene {
   constructor() {
@@ -44,7 +44,7 @@ export default class MapListScene extends Phaser.Scene {
 
     const alliedUnits = getUnitsFromDB();
 
-    const firstSquad = getSquadsFromDB().first<Squad>().id;
+    const firstSquad = getSquadsFromDB().first<SquadRecord>().id;
 
     let commands: MapCommands[] = [
       {

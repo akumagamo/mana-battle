@@ -1,4 +1,5 @@
 import * as Squad from "../Squad/Model";
+import { printSquad } from "../Squad/Model.test";
 import { isAlive, UnitIndex, UnitInSquad } from "../Unit/Model";
 
 // TODO: this should receive alive members
@@ -6,7 +7,7 @@ export function getMeleeTarget(
   current: UnitInSquad,
   unitIndex: UnitIndex,
   squadIndex: Squad.Index
-): Squad.Member {
+): Squad.MemberRecord {
   const aliveIndex = Squad.filterMembers((m) => isAlive(unitIndex.get(m.id)))(
     squadIndex
   );
@@ -15,7 +16,8 @@ export function getMeleeTarget(
     aliveIndex
   );
 
-  const units = Squad.getAllUnits(transposedIndex);
+  const units = Squad.rejectUnitsFromSquad(current.squad)(transposedIndex);
+
   const get = (unitId: string, squadId: string) =>
     transposedIndex.get(squadId).members.get(unitId);
 
@@ -28,5 +30,5 @@ export function getMeleeTarget(
     }))
     .sort((a, b) => a.distance - b.distance);
 
-  return sorted.get(0).unit;
+  return sorted.map((u) => u.unit).first<Squad.MemberRecord>();
 }

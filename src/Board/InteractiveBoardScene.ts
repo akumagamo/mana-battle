@@ -21,8 +21,8 @@ export default class BoardScene extends Phaser.Scene {
   unitList: Chara[] = [];
 
   constructor(
-    public squad: Squad.Squad,
-    public onSquadUpdated: (squad: Squad.Squad) => void,
+    public squad: Squad.SquadRecord,
+    public onSquadUpdated: (squad: Squad.SquadRecord) => void,
     public unitIndex: UnitIndex
   ) {
     super(BOARD_SCENE_KEY);
@@ -51,7 +51,7 @@ export default class BoardScene extends Phaser.Scene {
   }) {
     const updatedSquad = Squad.updateMember(
       this.squad,
-      Squad.makeSquadMember({ id: unit.id, x, y })
+      Squad.makeMember({ id: unit.id, x, y })
     );
 
     this.onSquadUpdated(updatedSquad);
@@ -166,7 +166,7 @@ export default class BoardScene extends Phaser.Scene {
     return tiles;
   }
 
-  addUnitToBoard(squadMember: Squad.Member) {
+  addUnitToBoard(squadMember: Squad.MemberRecord) {
     const { x, y } = getUnitPositionInScreen(squadMember);
 
     const unit = this.getUnit(squadMember.id);
@@ -228,7 +228,7 @@ export default class BoardScene extends Phaser.Scene {
     member,
     fromOutside,
   }: {
-    member: Squad.Member;
+    member: Squad.MemberRecord;
     fromOutside: boolean;
   }) {
     const chara = this.addUnitToBoard(member);
@@ -266,7 +266,7 @@ export default class BoardScene extends Phaser.Scene {
   }
 }
 
-function getUnitPositionInScreen(squadMember: Squad.Member) {
+function getUnitPositionInScreen(squadMember: Squad.MemberRecord) {
   const { x, y } = cartesianToIsometric(squadMember.x, squadMember.y);
 
   //FIXME: unit should be rendered at origin 0.5
