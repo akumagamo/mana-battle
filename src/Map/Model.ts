@@ -1,5 +1,5 @@
 import { SquadRecord } from "../Squad/Model";
-import { Unit } from "../Unit/Model";
+import { Unit, UnitIndex } from "../Unit/Model";
 import { Map, List, Set } from "immutable";
 export type UnitId = string;
 export type ForceId = string;
@@ -33,7 +33,7 @@ export type MapState = {
   forces: Force[];
   cities: City[];
   squads: List<MapSquad>;
-  units: Map<string, Unit>;
+  units: UnitIndex;
   ai: Map<string, AICommand>;
   dispatchedSquads: Set<string>;
 };

@@ -40,11 +40,11 @@ export const storyManager = async (parent: TitleScene) => {
   });
 
   const alliedUnits = Map({
-    [unit.id]: unit,
-    m1: makeUnit("fighter", "m1", 1),
-    m2: makeUnit("fighter", "m2", 1),
-    m3: makeUnit("archer", "m3", 1),
-    m4: makeUnit("mage", "m4", 1),
+    [unit.id]: { ...unit, squad: "1" },
+    m1: { ...makeUnit("fighter", "m1", 1), squad: "1" },
+    m2: { ...makeUnit("fighter", "m2", 1), squad: "1" },
+    m3: { ...makeUnit("archer", "m3", 1), squad: "1" },
+    m4: { ...makeUnit("mage", "m4", 1), squad: "1" },
   });
 
   const sqd = firstSquad.mergeDeep(

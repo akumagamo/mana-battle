@@ -107,6 +107,7 @@ export default class CombatScene extends Phaser.Scene {
   }) {
     if (this.container) this.container.destroy();
 
+    console.log(`created combatscene with data::`, data);
     this.squads = data.squads;
     this.unitIndex = data.units;
 
@@ -162,19 +163,14 @@ export default class CombatScene extends Phaser.Scene {
 
     await fadeIn(this);
 
-    this.renderMiniSquads(data.top, data.bottom, data.squads, data.units);
+    this.renderMiniSquads(data.top, data.bottom);
 
     await announcement(this, "Fight it out!");
 
     this.turn();
   }
 
-  renderMiniSquads(
-    top: string,
-    bottom: string,
-    squads: Squad.Index,
-    units: Map<string, Unit>
-  ) {
+  renderMiniSquads(top: string, bottom: string) {
     const pos = {
       [top]: { x: SCREEN_WIDTH - 430, y: -20, top: true },
       [bottom]: { x: -80, y: SCREEN_HEIGHT - 230, top: false },
@@ -188,8 +184,8 @@ export default class CombatScene extends Phaser.Scene {
 
     const render = (squadId: string) =>
       new StaticBoardScene(
-        squads.find((s) => s.id === squadId),
-        units.filter((u) => u.squad === squadId),
+        this.squads.find((s) => s.id === squadId),
+        this.unitIndex.filter((u) => u.squad === squadId),
         pos[squadId].x,
         pos[squadId].y,
         0.4,
@@ -336,6 +332,7 @@ export default class CombatScene extends Phaser.Scene {
 
   getChara(id: string) {
     const chara = this.charas.find((u) => u.unit.id === id);
+    console.log(id, `>>`, chara, this.charas);
     if (!chara || !chara.container) throw new Error(INVALID_STATE);
     return chara;
   }

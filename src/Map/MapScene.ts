@@ -23,7 +23,7 @@ import renderSquads, { renderSquad } from "./board/renderSquads";
 import renderStructures from "./board/renderStructures";
 import entityInfo from "./entityInfo";
 import squadDetails from "./effects/squadDetails";
-import {  SquadRecord } from "../Squad/Model";
+import { Index, makeSquad, SquadRecord } from "../Squad/Model";
 import { makeVector, VectorRec } from "./makeVector";
 import announcement from "../UI/announcement";
 import { delay, tween } from "../Scenes/utils";
@@ -733,9 +733,15 @@ export class MapScene extends Phaser.Scene {
       );
     };
 
+    // URGENT TODO: type this scene integration
+    // change this.state.squads to squadIndex
     this.scene.start("CombatScene", {
-      squads: this.state.squads,
-      units: this.state.units,
+      squads: this.state.squads
+        .filter((sqd) => [starter.id, target.id].includes(sqd.id))
+        .reduce((xs, x) => xs.set(x.id, makeSquad(x.squad)), Map()) as Index,
+      units: this.state.units.filter((u) =>
+        [starter.id, target.id].includes(u.squad)
+      ),
       // GOD mode
       // .map((u) =>
       //   u.id.startsWith("player")
@@ -1031,7 +1037,9 @@ export class MapScene extends Phaser.Scene {
   }
 
   getEnemies() {
-    return this.state.squads.filter((unit) => unit.squad.force !== this.currentForce);
+    return this.state.squads.filter(
+      (unit) => unit.squad.force !== this.currentForce
+    );
   }
 
   getTileAt(x: number, y: number) {

@@ -8,7 +8,7 @@ import { SquadRecord } from "../Squad/Model";
 import { Vector } from "matter";
 import { List, Map, Set } from "immutable";
 
-export type UnitIndex = Map<string, Unit>;
+export type UnitIndex = Map<string, UnitInSquad>;
 
 export type Stat = "str" | "dex" | "int";
 export const statLabels: {

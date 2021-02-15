@@ -143,34 +143,13 @@ export const runTurn = (
 
   if (hasRemainingAttacks && Unit.isAlive(unit)) {
     let res;
+    // TODO: add ranged classes
     switch (unit.class) {
-      case "archer":
-        // res = rangedAttackSingleTarget(
-        //   squadIndex,
-        //   currentUnitId,
-        //   units,
-        //   commands
-        // );
-        // turnCommands = res.commands;
-        // updatedUnits = res.updatedUnits;
-        break;
-      case "mage":
-        // res = rangedSpellSingleTarget(
-        //   squadIndex,
-        //   currentUnitId,
-        //   units,
-        //   commands
-        // );
-        // turnCommands = res.commands;
-        // updatedUnits = res.updatedUnits;
-        break;
-      case "fighter":
+      default:
         res = meleeAttackSingleTarget(turnState, commands);
         turnCommands = res.commands;
         turnState.unitIndex = res.updatedUnits;
         turnState.remainingAttacksIndex = res.remainingAttacks;
-        break;
-      default:
         break;
     }
   } else {

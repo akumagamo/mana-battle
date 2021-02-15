@@ -1,5 +1,4 @@
 import * as Squad from "../Squad/Model";
-import { printSquad } from "../Squad/Model.test";
 import { isAlive, UnitIndex, UnitInSquad } from "../Unit/Model";
 
 // TODO: this should receive alive members
