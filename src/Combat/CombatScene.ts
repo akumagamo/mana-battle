@@ -107,7 +107,6 @@ export default class CombatScene extends Phaser.Scene {
   }) {
     if (this.container) this.container.destroy();
 
-    console.log(`created combatscene with data::`, data);
     this.squads = data.squads;
     this.unitIndex = data.units;
 
@@ -331,10 +330,7 @@ export default class CombatScene extends Phaser.Scene {
   // UNIT METHODS
 
   getChara(id: string) {
-    const chara = this.charas.find((u) => u.unit.id === id);
-    console.log(id, `>>`, chara, this.charas);
-    if (!chara || !chara.container) throw new Error(INVALID_STATE);
-    return chara;
+    return this.charas.find((u) => u.unit.id === id);
   }
 
   moveUnit(sourceId: string, targetId: string) {

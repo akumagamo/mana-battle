@@ -3,13 +3,13 @@ import { Unit } from "../Unit/Model";
 
 export type ForceId = string;
 
-export type Squad = {
+export type Model = {
   id: string;
   members: MemberIndex;
   force: ForceId;
   leader: string;
 };
-export type SquadRecord = RecordOf<Squad>;
+export type SquadRecord = RecordOf<Model>;
 
 export type Member = {
   id: string;
@@ -167,6 +167,17 @@ export const invertBoardPosition = (n: number) => {
   else if (n === 3) return 1;
   else return n;
 };
+
+/**
+ * Mirrors a squad member position
+ *
+ * x x 1      x x 3
+ * x x 2  =>  2 x x
+ * 3 x x      1 x x
+ *
+ * Used to enable targeting when two squads are facing each other
+ *
+ */
 export function transpose(member: MemberRecord): MemberRecord {
   const { x, y } = member;
   return member.merge(
