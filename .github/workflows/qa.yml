@@ -34,6 +34,9 @@ jobs:
         
     - name: Copy Assets
       run: cp -r assets/ dist/assets/
+
+    - name: Copy index
+      run: cp src/index.html dist/index.html
     
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
