@@ -1,14 +1,11 @@
 import Phaser from "phaser";
-import { getSquadsFromDB, getOptions, getUnitsFromDB, disbandSquad } from "../DB";
-import defaultData from "../defaultData";
+import { getOptions } from "../DB";
 import { preload } from "../preload";
 import button from "../UI/button";
-import { SCREEN_WIDTH, SCREEN_HEIGHT, lipsum } from "../constants";
+import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../constants";
 import { Chara, loadCharaAssets } from "../Chara/Chara";
 import { Container } from "../Models";
 import { fadeOut } from "../UI/Transition";
-import { Set } from "immutable";
-import { startTheaterScene } from "../Theater/TheaterScene";
 import { makeUnit } from "../Unit/makeUnit";
 import { storyManager } from "./storyManager";
 
@@ -24,12 +21,6 @@ export default class TitleScene extends Phaser.Scene {
     loadCharaAssets(this);
   }
 
-  turnOff() {
-    this.charas.map((c) => c.container.destroy());
-    this.charas.map((c) => this.scene.remove(c));
-    this.charas = [];
-    this.container?.destroy();
-  }
   create() {
     this.events.once("shutdown", () => this.turnOff());
 
@@ -71,47 +62,7 @@ export default class TitleScene extends Phaser.Scene {
 
     this.changeMusic("title");
 
-    //     button(20, 50, "List Units", this.container, this, () => {
-    //       this.scene.transition({
-    //         target: "ListUnitsScene",
-    //         duration: 0,
-    //         moveBelow: true,
-    //       });
-    //     });
-
-    //     button(20, 170, "List Squads", this.container, this, () => {
-    //       this.scene.start("ListSquadsScene", {
-    //         units: Object.values(getUnits()),
-    //         squads: Object.values(getSquads()),
-    //         dispatched: Set(),
-    //         onDisbandSquad: (id: string) => disbandSquad(id),
-    //       });
-    //     });
-
-    //     button(20, 370, "Create Character", this.container, this, () => {
-    //       startCharaCreationScene(this, null);
-    //     });
-
-    //    button(20, 230, "Maps", this.container, this, () => this.mapsEvent());
-
-    // button(20, 290, "Combat", this.container, this, () => {
-    //   this.scene.start("CombatScene", {
-    //     top: "1",
-    //     bottom: "2",
-    //     squads: [getSquad("1"), getSquad("2")],
-    //     units: [getUnit("1"), getUnit("2")],
-    //     onCombatFinish: () => {
-    //       this.scene.start("TitleScene");
-    //     },
-    //   });
-    // });
-
-    button(20, 650, "Load Game", this.container, this, () => {
-      // defaultData(true);
-      // alert("Data erased!");
-    });
-
-    button(220, 650, "Go Fullscreen", this.container, this, () => {
+    button(20, 650, "Go Fullscreen", this.container, this, () => {
       window.document.body.requestFullscreen();
     });
 
@@ -147,5 +98,12 @@ export default class TitleScene extends Phaser.Scene {
   async mapsEvent() {
     await fadeOut(this);
     this.scene.start("MapListScene");
+  }
+
+  turnOff() {
+    this.charas.map((c) => c.container.destroy());
+    this.charas.map((c) => this.scene.remove(c));
+    this.charas = [];
+    this.container?.destroy();
   }
 }
