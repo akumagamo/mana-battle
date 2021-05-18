@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 import * as Squad from "../Squad/Model";
-import BoardScene from "../Board/StaticBoardScene";
+import Board from "../Board/StaticBoardScene";
 import { Pointer, Image, Text } from "../Models";
 import button from "../UI/button";
 import panel from "../UI/panel";
@@ -9,8 +9,21 @@ import text from "../UI/text";
 import menu from "../Backgrounds/menu";
 import { UnitIndex } from "../Unit/Model";
 import { List, Map, Set } from "immutable";
+
+type CreateParams = {
+  squads: Squad.Index;
+  units: UnitIndex;
+  dispatched: Set<string>;
+};
+
+const sceneKey = "ListSquadsScene";
+
+export const run = (params: CreateParams, scene: Phaser.Scenes.SceneManager) => {
+  scene.run(sceneKey, params);
+};
+
 export class ListSquadsScene extends Phaser.Scene {
-  boardScenes: BoardScene[] = [];
+  boardScenes: Board[] = [];
   controls: (Image | Text)[] = [];
   page: number = 0;
   itemsPerPage: number = 16;
@@ -20,18 +33,10 @@ export class ListSquadsScene extends Phaser.Scene {
   onDisbandSquad: (id: string) => void = () => {};
 
   constructor() {
-    super("ListSquadsScene");
+    super(sceneKey);
   }
 
-  create({
-    squads,
-    units,
-    dispatched,
-  }: {
-    squads: Squad.Index;
-    units: UnitIndex;
-    dispatched: Set<string>;
-  }) {
+  create({ squads, units, dispatched }: CreateParams) {
     this.events.once("shutdown", () => this.turnOff());
 
     this.squads = squads;
@@ -127,7 +132,7 @@ export class ListSquadsScene extends Phaser.Scene {
   renderBoard(squad: Squad.SquadRecord, x: number, y: number) {
     const BOARD_X = 20 + x * 350;
     const BOARD_Y = 20 + y * 330;
-    const boardScene = new BoardScene(
+    const boardScene = new Board(
       squad,
       this.units.filter((u) => u.squad === squad.id),
       BOARD_X,
@@ -144,7 +149,7 @@ export class ListSquadsScene extends Phaser.Scene {
     this.boardScenes.push(boardScene);
   }
 
-  squadSceneIO(id: string, fn: (board: BoardScene) => void) {
+  squadSceneIO(id: string, fn: (board: Board) => void) {
     const board = this.boardScenes.find((e) => e.squad.id === id);
 
     fn(board);

@@ -25,13 +25,10 @@ import CombatScene from "./Combat/CombatScene";
       EditSquadScene,
       ListSquadsScene,
       ListUnitsScene,
-      //MapScene,
       MapListScene,
       CombatScene,
       OptionsScene,
       WorldScene,
-      //TheaterScene,
-      //CharaCreationScene,
     ],
     dom: {
       createContainer: true,

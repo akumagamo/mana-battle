@@ -7,6 +7,8 @@ import panel from "../../UI/panel";
 import SmallUnitDetailsBar from "../../Unit/SmallUnitDetailsBar";
 import { MapScene } from "../MapScene";
 import dispatchWindow from "../dispatchWindow";
+import * as ListSquads from "../../Squad/ListSquadsScene";
+import { Map } from "immutable";
 
 export default (
   scene: MapScene,
@@ -146,16 +148,23 @@ export default (
 
     scene.scene.stop("MapScene");
 
-    scene.scene.run("ListSquadsScene", {
-      // TODO: only player units
-      units: scene.state.units,
-      squads: scene.state.squads.filter((s) => s.squad.force === PLAYER_FORCE),
-      dispatched: scene.state.dispatchedSquads,
-      onDisbandSquad: (id: string) => {
-        console.log(`disbanded!!!`, id);
-        scene.scene.start("MapScene");
+    // TODO: make all .run calls like this
+    ListSquads.run(
+      {
+        // TODO: only player units
+        units: scene.state.units,
+        squads: scene.state.squads
+          .filter((s) => s.squad.force === PLAYER_FORCE)
+          .map((s) => s.squad)
+          .reduce((xs, x) => xs.set(x.id, x), Map()),
+        dispatched: scene.state.dispatchedSquads,
+        // onDisbandSquad: (id: string) => {
+        //   console.log(`disbanded!!!`, id);
+        //   scene.scene.start("MapScene");
+        // },
       },
-    });
+      scene.scene.manager
+    );
   });
   button(250, 40, "Dispatch", uiContainer, scene, () => {
     scene.disableMapInput();
