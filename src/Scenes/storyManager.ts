@@ -9,7 +9,7 @@ import { makeSquad, makeMember } from "../Squad/Model";
 import { toMapSquad } from "../Unit/Model";
 import TitleScene from "./TitleScene";
 import { makeUnit } from "../Unit/makeUnit";
-import {startTheaterScene} from "../Theater/TheaterScene";
+import { startTheaterScene } from "../Theater/TheaterScene";
 import chapter_1_intro from "../Theater/Chapters/chapter_1_intro";
 
 export const storyManager = async (parent: TitleScene) => {

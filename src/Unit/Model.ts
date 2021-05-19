@@ -78,7 +78,6 @@ export type Unit = {
     [x in ItemSlot]: string;
   };
   elem: Elem;
-  leader?: boolean;
   attacks: UnitAttacks;
 };
 export type UnitInSquad = Unit & { squad: string };

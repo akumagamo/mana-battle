@@ -78,8 +78,6 @@ export class Chara extends Phaser.Scene {
 
     if (this.animated) this.stand();
 
-    this.maybeRenderInsignea();
-
     const container_width = 100;
     const container_height = 170;
 
@@ -118,13 +116,6 @@ export class Chara extends Phaser.Scene {
     }
 
     this.hpBarContainer = hpBar(this, this.container, hpAmount, this.unit.hp);
-  }
-
-  private maybeRenderInsignea() {
-    if (this.unit.leader) {
-      const insignea = this.add.image(50, 0, "insignea");
-      this.container.add(insignea);
-    }
   }
 
   onClick(fn: (chara: Chara) => void) {
