@@ -29,8 +29,6 @@ export default (scene: MapScene, uiContainer: Container): Promise<void> => {
       return squadInfo(scene, uiContainer, baseY,  scene.mode.id);
     case 'MOVING_SQUAD':
       return squadInfo(scene, uiContainer, baseY, scene.mode.id);
-    case 'SELECTING_ATTACK_TARGET':
-      return squadInfo(scene, uiContainer, baseY,  scene.mode.id);
     case 'CITY_SELECTED':
       return city(scene, uiContainer, baseY, scene.mode.id);
     default:

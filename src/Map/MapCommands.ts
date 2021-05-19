@@ -25,16 +25,12 @@ export type MapCommands = {type: 'UPDATE_STATE'; target: MapState;} |
 {type: 'CLEAR_TILES_EVENTS';} |
 {type: 'CLEAR_TILES_TINTING';} |
 {type: 'RESET_SQUAD_POSITION'; unit: MapSquad;} |
-{type: 'SHOW_TARGETABLE_CELLS'; unit: MapSquad;} |
 {type: 'HIGHLIGHT_CELL'; pos: Vector;} |
 {type: 'SELECT_CITY'; id: string;} |
 {type: 'SET_SELECTED_UNIT'; id: string;} |
 {type: 'VIEW_SQUAD_DETAILS'; id: string;} |
-{type: 'END_SQUAD_TURN'; id: string;} |
 {type: 'REFRESH_UI';} |
 {type: 'CITY_CLICK'; id: string;} |
-{type: 'END_FORCE_TURN';} |
 {type: 'CAPTURE_CITY'; id: string; force: string;} |
-{type: 'RUN_TURN';} |
 {type: 'MOVE_SQUAD'; mapTile: MapTile; squad: MapSquad;};
 

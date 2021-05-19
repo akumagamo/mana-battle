@@ -73,5 +73,4 @@ export default async (scene: MapScene) => {
     alpha: 0,
     duration: 1000,
   });
-  scene.startForceTurn();
 };

@@ -18,39 +18,7 @@ export default (
 ) => {
   const baseX = 300;
   const mode = scene.mode.type;
-  if (mode !== "MOVING_SQUAD" && mode !== "SELECTING_ATTACK_TARGET") {
-    const event = () => {
-      scene.showMoveControls(mapSquad);
-    };
-    button(
-      baseX + 100,
-      baseY,
-      "Move",
-      scene.uiContainer,
-      scene,
-      event,
-      scene.inactiveSquads.has(mapSquad.squad.id)
-    );
-    //@ts-ignore
-    window.moveButton = event;
-  }
 
-  if (mode !== "SELECTING_ATTACK_TARGET") {
-    const event = () => scene.showAttackControls(mapSquad);
-
-    //@ts-ignore
-    window.clickAttack = event;
-    button(
-      baseX + 200,
-      baseY,
-      "Attack",
-      scene.uiContainer,
-      scene,
-      event,
-      scene.getTargets(mapSquad.pos).length < 1 ||
-        scene.inactiveSquads.has(mapSquad.squad.id)
-    );
-  }
 
   if (mode === "SQUAD_SELECTED")
     button(baseX + 300, baseY, "Formation", scene.uiContainer, scene, () => {
@@ -101,47 +69,6 @@ export default (
         scene.changeMode({ type: "SQUAD_SELECTED", id: mapSquad.squad.id });
       });
     });
-
-  if (mode == "SELECTING_ATTACK_TARGET" || mode === "MOVING_SQUAD")
-    button(1150, baseY, "Cancel", uiContainer, scene, async () => {
-      switch (scene.mode.type) {
-        case "SELECTING_ATTACK_TARGET":
-          scene.changeMode({ type: "SQUAD_SELECTED", id: mapSquad.squad.id });
-          scene.signal('cancelled squad targeting"', [
-            { type: "CLEAR_TILES_TINTING" },
-          ]);
-          break;
-        case "MOVING_SQUAD":
-          const { start, id } = scene.mode;
-          await scene.moveSquadTo(mapSquad.squad.id, start);
-
-          scene.signal('cancelled movement"', [
-            { type: "CLEAR_TILES_TINTING" },
-            { type: "HIGHLIGHT_CELL", pos: start },
-
-            {
-              type: "UPDATE_SQUAD_POS",
-              id,
-              pos: start,
-            },
-          ]);
-
-          scene.changeMode({ type: "SQUAD_SELECTED", id });
-          break;
-      }
-    });
-
-  if (mode === "MOVING_SQUAD" || mode == "SQUAD_SELECTED") {
-    const event = () => {
-      scene.signal('clicked "end squad turn"', [
-        { type: "END_SQUAD_TURN", id: mapSquad.squad.id },
-      ]);
-    };
-    button(baseX + 700, baseY, "Wait", uiContainer, scene, event);
-
-    //@ts-ignore
-    window.clickWait = event;
-  }
 
   button(50, 40, "Organize", uiContainer, scene, () => {
     console.log("organize btn");

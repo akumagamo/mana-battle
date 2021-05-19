@@ -41,9 +41,6 @@ export const renderSquad = (scene: MapScene, mapSquad: MapSquad): void => {
   container.add(chara.container);
 
   scene.charas.push(chara);
-
-  if (scene.inactiveSquads.includes(mapSquad.squad.id))
-    chara.container.setAlpha(0.5);
 };
 
 export default (scene: MapScene): void => {
