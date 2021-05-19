@@ -2,6 +2,7 @@ import { MapScene, MapTile } from "../MapScene";
 import { getDistance } from "../../utils";
 import { makeVector } from "../makeVector";
 import { CPU_FORCE, PLAYER_FORCE } from "../../constants";
+import { Vector } from "../Model";
 
 export default async (scene: MapScene, cell: MapTile) => {
   const { x, y } = cell;
@@ -41,22 +42,56 @@ export default async (scene: MapScene, cell: MapTile) => {
 
   switch (scene.mode.type) {
     case "MOVING_SQUAD":
-      const { id } = scene.mode;
-      const selectedSquad = scene.getSquad(id);
-
-      if (selectedSquad && selectedSquad.squad.force === PLAYER_FORCE) {
-        const isWalkable = scene.moveableCells.has(makeVector({ x, y }));
-
-        if (isWalkable) {
-          await scene.moveSquadTo(selectedSquad.squad.id, { x, y });
-          scene.signal("squad moved, updating position", [
-            { type: "UPDATE_SQUAD_POS", id, pos: { x, y } },
-          ]);
-          scene.refreshUI();
-        }
-      }
+      await handleMovingSquad(scene, x, y, scene.mode.id);
+      break;
+    case "SELECT_SQUAD_MOVE_TARGET":
+      await handleSelectSquadMoveTarget(
+        scene,
+        x,
+        y,
+        scene.mode.id,
+        scene.mode.start
+      );
       break;
     default:
       select();
   }
 };
+
+async function handleMovingSquad(
+  scene: MapScene,
+  x: number,
+  y: number,
+  id: string
+) {
+  const selectedSquad = scene.getSquad(id);
+
+  if (selectedSquad && selectedSquad.squad.force === PLAYER_FORCE) {
+    const isWalkable = scene.moveableCells.has(makeVector({ x, y }));
+
+    if (isWalkable) {
+      await scene.moveSquadTo(selectedSquad.squad.id, { x, y });
+      scene.signal("squad moved, updating position", [
+        { type: "UPDATE_SQUAD_POS", id, pos: { x, y } },
+      ]);
+      scene.refreshUI();
+    }
+  }
+}
+
+async function handleSelectSquadMoveTarget(
+  scene: MapScene,
+  x: number,
+  y: number,
+  id: string,
+  start: Vector
+) {
+  const selectedSquad = scene.getSquad(id);
+  if (selectedSquad && selectedSquad.squad.force === PLAYER_FORCE) {
+    await scene.moveSquadTo(selectedSquad.squad.id, { x, y });
+    scene.signal("squad moved, updating position", [
+      { type: "UPDATE_SQUAD_POS", id, pos: { x, y } },
+    ]);
+    scene.refreshUI();
+  }
+}
