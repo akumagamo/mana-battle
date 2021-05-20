@@ -1,8 +1,8 @@
-import { MapSquad } from "../Model";
-import { Chara } from "../../Chara/Chara";
-import { INVALID_STATE } from "../../errors";
-import { MapScene } from "../MapScene";
-import { PLAYER_FORCE } from "../../constants";
+import { MapSquad } from '../Model';
+import { Chara } from '../../Chara/Chara';
+import { INVALID_STATE } from '../../errors';
+import { MapScene } from '../MapScene';
+import { PLAYER_FORCE } from '../../constants';
 
 const CHARA_MAP_SCALE = 0.45;
 
@@ -18,7 +18,13 @@ export const renderSquad = (scene: MapScene, mapSquad: MapSquad): void => {
 
   if (!leader) throw new Error(INVALID_STATE);
 
-  const { x, y } = scene.getCellPositionOnScreen(mapSquad.pos);
+  const getPosition = () => {
+    if (scene.squadsInMovement.keySeq().toSet().has(mapSquad.id))
+      return scene.squadsInMovement.get(mapSquad.id).current;
+    else return scene.getCellPositionOnScreen(mapSquad.pos);
+  };
+
+  const { x, y } = getPosition();
 
   const chara = new Chara(
     scene.charaKey(mapSquad.squad.id),
@@ -33,7 +39,7 @@ export const renderSquad = (scene: MapScene, mapSquad: MapSquad): void => {
   const emblem = chara.add.image(
     100,
     -20,
-    mapSquad.squad.force === PLAYER_FORCE ? "ally_emblem" : "enemy_emblem"
+    mapSquad.squad.force === PLAYER_FORCE ? 'ally_emblem' : 'enemy_emblem'
   );
 
   chara.container.add(emblem);

@@ -1,11 +1,11 @@
-import * as Phaser from "phaser";
-import { Chara } from "../Chara/Chara";
-import * as Squad from "../Squad/Model";
-import { cartesianToIsometric } from "../utils/isometric";
-import { BoardTile } from "./Model";
-import { Graphics } from "../Models";
-import { Unit, UnitIndex } from "../Unit/Model";
-import { Vector } from "matter";
+import * as Phaser from 'phaser';
+import { Chara } from '../Chara/Chara';
+import * as Squad from '../Squad/Model';
+import { cartesianToIsometric } from '../utils/isometric';
+import { BoardTile } from './Model';
+import { Graphics } from '../Models';
+import { Unit, UnitIndex } from '../Unit/Model';
+import { Vector } from 'matter';
 
 const BOARD_WIDTH = 250;
 const BOARD_HEIGHT = 150;
@@ -51,7 +51,7 @@ export default class StaticBoardScene extends Phaser.Scene {
   }
 
   turnOff() {
-    // TODO: check if necessary
+    // TODO: check if this is necessary
     this.tiles.forEach((tile) => tile.sprite.destroy());
 
     this.unitList.forEach((chara) => {
@@ -108,7 +108,7 @@ export default class StaticBoardScene extends Phaser.Scene {
         x = x * this.scaleSizing + this.x;
         y = y * this.scaleSizing + this.y;
 
-        const tileSprite = this.add.image(x, y, "tile");
+        const tileSprite = this.add.image(x, y, 'tile');
         tileSprite.scale = this.scaleSizing;
         tileSprite.depth = y;
 
