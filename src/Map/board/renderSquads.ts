@@ -53,4 +53,14 @@ export default (scene: MapScene): void => {
   scene.state.dispatchedSquads.forEach((id) =>
     renderSquad(scene, scene.getSquad(id))
   );
+
+  scene.squadsInMovement.forEach(async ({ current, path, squad }, id) => {
+    const chara = await scene.getChara(id);
+
+    scene.squadsInMovement = scene.squadsInMovement.set(id, {
+      current,
+      path,
+      squad: chara,
+    });
+  });
 };

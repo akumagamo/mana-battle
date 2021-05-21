@@ -101,6 +101,7 @@ export class MapScene extends Phaser.Scene {
   cellHighlight: Phaser.GameObjects.Rectangle | null = null;
 
   squadsToRemove: Set<string> = Set();
+  squadToPush: string | null = null;
 
   constructor() {
     super('MapScene');
@@ -170,6 +171,7 @@ export class MapScene extends Phaser.Scene {
 
       const dist = getDistance(current, next);
 
+      console.log(dist);
       if (dist > 10) {
         if (next.x > current.x) {
           squad.container.x += 1;
@@ -265,6 +267,8 @@ export class MapScene extends Phaser.Scene {
         this.selectCity(cmd.id);
       } else if (cmd.type === 'CAPTURE_CITY') {
         this.captureCity(cmd);
+      } else if (cmd.type === 'PUSH_SQUAD') {
+        this.squadToPush = cmd.id;
       }
 
       console.timeEnd(cmd.type);
@@ -356,8 +360,11 @@ export class MapScene extends Phaser.Scene {
     //   victoryCondition(this);
     //   this.hasShownVictoryCondition = true;
     // }
-    //
+
+    await this.pushLoser();
+
     this.enableInput();
+    this.isPaused = false;
   }
 
   async removeSquadFromState(id: string) {
@@ -651,8 +658,11 @@ export class MapScene extends Phaser.Scene {
 
     const isPlayer = starter.squad.force === PLAYER_FORCE;
 
+    // for now, player always wins
+    const loser = isPlayer ? target.id : starter.id;
+
     const combatCallback = (cmds: MapCommands[]) => {
-      let squads = cmds.reduce((xs, x) => {
+      let squadsTotalHP = cmds.reduce((xs, x) => {
         if (x.type === 'UPDATE_UNIT') {
           let sqdId = x.unit.squad || '';
 
@@ -666,15 +676,16 @@ export class MapScene extends Phaser.Scene {
         return xs;
       }, {} as { [x: string]: number });
 
-      let defeated = Map(squads)
+      let commands = Map(squadsTotalHP)
         .filter((v) => v === 0)
         .keySeq()
         .map((target) => ({ type: 'DESTROY_TEAM', target }))
-        .toJS();
+        .toJS()
+        .concat([{ type: 'PUSH_SQUAD', id: loser }]);
 
       this.scene.start(
         'MapScene',
-        cmds.concat(defeated)
+        cmds.concat(commands)
         //.concat([{type: 'END_SQUAD_TURN'}]),
       );
     };
@@ -764,9 +775,14 @@ export class MapScene extends Phaser.Scene {
     return this.state.squads.find((s) => s.id === squadId);
   }
   squadAt(x: number, y: number) {
+    const coords = this.getPos({ x, y });
     return this.state.dispatchedSquads
       .map((id) => this.getSquad(id))
-      .find((s) => s.pos.x === x && s.pos.y === y);
+      .find((s) => {
+        const dist = getDistance(coords, this.getPos(s.pos));
+
+        return dist < 50;
+      });
   }
 
   getSelectedSquadLeader(squadId: string) {
@@ -1000,5 +1016,23 @@ export class MapScene extends Phaser.Scene {
     console.log('CHANGING MODE', mode);
     this.mode = mode;
     this.refreshUI();
+  }
+
+  async pushLoser() {
+    if (this.squadToPush) {
+      const sqd = await this.getChara(this.squadToPush);
+
+      return new Promise((resolve) => {
+        this.add.tween({
+          targets: sqd.container,
+          duration: 1000,
+          x: sqd.container.x + 100,
+          onComplete: () => {
+            this.squadToPush = null;
+            resolve();
+          },
+        });
+      }) as Promise<void>;
+    } else return Promise.resolve();
   }
 }
