@@ -1,52 +1,53 @@
-import { Modifier, ItemSlot, ItemMap, ItemType } from "../Item/Model";
-import { sum } from "../utils/math";
-import { Container } from "../Models";
-import { getItemsFromDB } from "../DB";
-import { UnitAttacks } from "./Skills";
-import { MapSquad } from "../Map/Model";
-import { SquadRecord } from "../Squad/Model";
-import { Vector } from "matter";
-import { List, Map, Set } from "immutable";
+import { Modifier, ItemSlot, ItemMap, ItemType } from '../Item/Model';
+import { sum } from '../utils/math';
+import { Container } from '../Models';
+import { getItemsFromDB } from '../DB';
+import { UnitAttacks } from './Skills';
+import { MapSquad } from '../Map/Model';
+import { SquadRecord } from '../Squad/Model';
+import { Vector } from 'matter';
+import { List, Map, Set } from 'immutable';
+import { getPos } from '../Map/MapScene';
 
 export type UnitIndex = Map<string, UnitInSquad>;
 
-export type Stat = "str" | "dex" | "int";
+export type Stat = 'str' | 'dex' | 'int';
 export const statLabels: {
   [stat in Stat]: string;
 } = {
-  str: "Strength",
-  dex: "Dexterity",
-  int: "Intelligence",
+  str: 'Strength',
+  dex: 'Dexterity',
+  int: 'Intelligence',
 };
 
 export enum Gender {
-  Male = "male",
-  Female = "female",
+  Male = 'male',
+  Female = 'female',
 }
 export const genders: Gender[] = [Gender.Male, Gender.Female];
 export const genderLabels: { [gender in Gender]: string } = {
-  male: "Male",
-  female: "Female",
+  male: 'Male',
+  female: 'Female',
 };
 
 export type Elem =
-  | "fire"
-  | "water"
-  | "earth"
-  | "wind"
-  | "light"
-  | "shadow"
-  | "neutral";
+  | 'fire'
+  | 'water'
+  | 'earth'
+  | 'wind'
+  | 'light'
+  | 'shadow'
+  | 'neutral';
 
-export type UnitClass = "fighter" | "mage" | "archer";
+export type UnitClass = 'fighter' | 'mage' | 'archer';
 
 export const unitClassLabels: { [x in UnitClass]: string } = {
-  archer: "Archer",
-  mage: "Mage",
-  fighter: "Fighter",
+  archer: 'Archer',
+  mage: 'Mage',
+  fighter: 'Fighter',
 };
 
-export type Movement = "plain" | "mountain" | "sky" | "forest";
+export type Movement = 'plain' | 'mountain' | 'sky' | 'forest';
 
 export const update = (unit: Unit) => (index: UnitIndex) =>
   index.set(unit.id, unit);
@@ -90,13 +91,13 @@ export function toMapSquad(squad: SquadRecord, pos: Vector): MapSquad {
   return {
     id: squad.id,
     squad,
-    pos: { x: pos.x, y: pos.y },
+    pos: getPos({ x: pos.x, y: pos.y }),
     range: 5,
     validSteps: List(),
     steps: Set(),
     enemiesInRange: [],
     pathFinder: () => () => [],
-    status: "alive",
+    status: 'alive',
   };
 }
 
@@ -138,7 +139,7 @@ function getItemModifier({
   const item = items[itemId];
 
   if (!item) {
-    throw new Error("Invalid State: Item should be in index");
+    throw new Error('Invalid State: Item should be in index');
   }
 
   const modifier = item.modifiers[stat];
@@ -147,7 +148,7 @@ function getItemModifier({
   else return 0;
 }
 
-const equipKeys: ItemSlot[] = ["mainHand", "offHand", "chest", "ornament"];
+const equipKeys: ItemSlot[] = ['mainHand', 'offHand', 'chest', 'ornament'];
 
 export function getActualStat(stat: Stat, items: ItemMap, unit: Unit) {
   const value = unit[stat];
@@ -160,14 +161,14 @@ export function getActualStat(stat: Stat, items: ItemMap, unit: Unit) {
 }
 
 export const HAIR_STYLES = [
-  "dark1",
-  "long1",
-  "split",
-  "long2",
-  "split2",
-  "female1",
-  "female2",
-  "male1",
+  'dark1',
+  'long1',
+  'split',
+  'long2',
+  'split2',
+  'female1',
+  'female2',
+  'male1',
 ];
 
 export type Skill = {
@@ -194,12 +195,12 @@ export type Job = {
 };
 
 const slash: Skill = {
-  name: "slash",
+  name: 'slash',
   formula: (unit) => {
     const items = getItemsFromDB();
     const weapon = items[unit.equips.mainHand];
-    const str = getActualStat("str", items, unit);
-    const dex = getActualStat("dex", items, unit);
+    const str = getActualStat('str', items, unit);
+    const dex = getActualStat('dex', items, unit);
 
     return str + dex / 4 + weapon.modifiers.atk;
   },
@@ -211,7 +212,7 @@ const slash: Skill = {
 };
 
 export const fighter: Job = {
-  name: "fighter",
+  name: 'fighter',
   statsPerLevel: {
     str: 6,
     dex: 4,
@@ -219,11 +220,11 @@ export const fighter: Job = {
   },
   attack: slash,
   equips: {
-    head: "helm",
-    mainHand: "sword",
-    offHand: "shield",
-    chest: "heavy_armor",
-    ornament: "accessory",
+    head: 'helm',
+    mainHand: 'sword',
+    offHand: 'shield',
+    chest: 'heavy_armor',
+    ornament: 'accessory',
   },
 };
 

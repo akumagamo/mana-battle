@@ -18,13 +18,7 @@ export const renderSquad = (scene: MapScene, mapSquad: MapSquad): void => {
 
   if (!leader) throw new Error(INVALID_STATE);
 
-  const getPosition = () => {
-    if (scene.squadsInMovement.keySeq().toSet().has(mapSquad.id))
-      return scene.squadsInMovement.get(mapSquad.id).current;
-    else return scene.getCellPositionOnScreen(mapSquad.pos);
-  };
-
-  const { x, y } = getPosition();
+  const { x, y } = mapSquad.pos;
 
   const chara = new Chara(
     scene.charaKey(mapSquad.squad.id),
@@ -54,13 +48,14 @@ export default (scene: MapScene): void => {
     renderSquad(scene, scene.getSquad(id))
   );
 
-  scene.squadsInMovement.forEach(async ({ current, path, squad }, id) => {
-    const chara = await scene.getChara(id);
+  scene.squadsInMovement.forEach(async ({ path }, id) => {
+    const squad = scene.getSquad(id);
 
+    // Update reference
+    // We need a ref for quick updates in the main loop
     scene.squadsInMovement = scene.squadsInMovement.set(id, {
-      current,
       path,
-      squad: chara,
+      squad,
     });
   });
 };

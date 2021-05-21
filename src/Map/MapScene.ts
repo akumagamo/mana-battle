@@ -33,7 +33,7 @@ import { getDistance } from '../utils';
 
 const WALKABLE_CELL_TINT = 0x88aa88;
 
-const SPEED = 1;
+const SPEED = 2;
 
 const SQUAD_MOVE_DURATION = 1000 / SPEED;
 const CHARA_VERTICAL_OFFSET = -10;
@@ -62,10 +62,7 @@ export const startMapScene = async (
 
 export class MapScene extends Phaser.Scene {
   isPaused = false;
-  squadsInMovement: Map<
-    string,
-    { current: Vector; path: Vector[]; squad: Chara }
-  > = Map();
+  squadsInMovement: Map<string, { path: Vector[]; squad: MapSquad }> = Map();
 
   // TODO: use a map
   charas: Chara[] = [];
@@ -162,30 +159,31 @@ export class MapScene extends Phaser.Scene {
   private moveSquads() {
     const movedSquads = this.squadsInMovement.keySeq();
 
-    this.squadsInMovement.forEach((value, squadId) => {
-      const { current, path, squad } = value;
+    this.squadsInMovement.forEach(async (value, squadId) => {
+      const { path, squad } = value;
 
       const [head] = path;
 
-      const next = this.getPos(head);
+      const next = getPos(head);
 
-      const dist = getDistance(current, next);
+      const dist = getDistance(squad.pos, next);
 
-      console.log(dist);
       if (dist > 10) {
-        if (next.x > current.x) {
-          squad.container.x += 1;
-        } else if (next.x < current.x) {
-          squad.container.x -= 1;
-        } else if (next.y > current.y) {
-          squad.container.y += 1;
-        } else if (next.y < current.y) {
-          squad.container.y -= 1;
+        if (next.x > squad.pos.x) {
+          squad.pos.x += 1 * SPEED;
+        } else if (next.x < squad.pos.x) {
+          squad.pos.x -= 1 * SPEED;
+        } else if (next.y > squad.pos.y) {
+          squad.pos.y += 1 * SPEED;
+        } else if (next.y < squad.pos.y) {
+          squad.pos.y -= 1 * SPEED;
         }
-        this.squadsInMovement = this.squadsInMovement.set(squadId, {
-          path,
-          current: { x: squad.container.x, y: squad.container.y },
-          squad,
+        const chara = await this.getChara(squadId);
+        chara.container.setPosition(squad.pos.x, squad.pos.y);
+        // TODO: update squad + add single source of "squad truth"
+        this.updateState({
+          ...this.state,
+          squads: this.state.squads.setIn([squadId, 'pos'], squad.pos),
         });
       } else {
         console.log('arrived at checkpoint!');
@@ -195,7 +193,6 @@ export class MapScene extends Phaser.Scene {
           console.log(`removing checkpoint, as there are checkpoins remaining`);
           this.squadsInMovement = this.squadsInMovement.set(squadId, {
             path: remaining,
-            current,
             squad,
           });
         } else {
@@ -235,9 +232,10 @@ export class MapScene extends Phaser.Scene {
       } else if (cmd.type === 'UPDATE_STATE') {
         this.updateState(cmd.target);
       } else if (cmd.type === 'UPDATE_SQUAD_POS') {
-        this.state.squads = this.state.squads.map((squad) =>
-          squad.id === cmd.id ? { ...squad, pos: cmd.pos } : squad
-        );
+        this.state.squads = this.state.squads.update(cmd.id, (sqd) => ({
+          ...sqd,
+          pos: cmd.pos,
+        }));
       } else if (cmd.type === 'UPDATE_UNIT') {
         this.state.units = this.state.units.set(cmd.unit.id, cmd.unit);
       } else if (cmd.type === 'CLICK_CELL') {
@@ -309,6 +307,7 @@ export class MapScene extends Phaser.Scene {
 
   private highlightCell(cmd: { type: 'HIGHLIGHT_CELL'; pos: Vector }) {
     const { x, y } = cmd.pos;
+
     const mapTile = this.tileAt(x, y);
 
     this.cellHighlight?.destroy();
@@ -391,7 +390,7 @@ export class MapScene extends Phaser.Scene {
    * Moves camera position to a vector in the board. If the position is out of bounds, moves until the limit.
    */
   moveCameraTo(vec: Vector, duration: number) {
-    let { x, y } = this.getPos(vec);
+    let { x, y } = getPos(vec);
 
     x = x * -1 + SCREEN_WIDTH / 2;
 
@@ -557,13 +556,6 @@ export class MapScene extends Phaser.Scene {
       }, Set() as Set<string>);
   }
 
-  getPos({ x, y }: Vector) {
-    return {
-      x: boardPadding + x * cellSize,
-      y: boardPadding + y * cellSize,
-    };
-  }
-
   renderStructures() {}
 
   // TODO: call this only once, and control on/off with boolean
@@ -617,7 +609,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   getCellPositionOnScreen({ x, y }: { x: number; y: number }) {
-    const pos = this.getPos({ x, y });
+    const pos = getPos({ x, y });
 
     return { ...pos, y: pos.y + CHARA_VERTICAL_OFFSET };
   }
@@ -625,9 +617,9 @@ export class MapScene extends Phaser.Scene {
   async clickSquad(squad: MapSquad) {
     await this.moveCameraTo(squad.pos, 100);
 
-    this.signal('clicked on unit, marking cell as selected', [
-      { type: 'HIGHLIGHT_CELL', pos: squad.pos },
-    ]);
+    // this.signal('clicked on unit, marking cell as selected', [
+    //   { type: 'HIGHLIGHT_CELL', pos: squad.pos },
+    // ]);
     if (squad.squad.force === PLAYER_FORCE) {
       this.handleClickOnOwnUnit();
     } else {
@@ -772,17 +764,12 @@ export class MapScene extends Phaser.Scene {
   }
 
   getSquad(squadId: string) {
-    return this.state.squads.find((s) => s.id === squadId);
+    return this.state.squads.get(squadId);
   }
   squadAt(x: number, y: number) {
-    const coords = this.getPos({ x, y });
     return this.state.dispatchedSquads
       .map((id) => this.getSquad(id))
-      .find((s) => {
-        const dist = getDistance(coords, this.getPos(s.pos));
-
-        return dist < 50;
-      });
+      .find((s) => getDistance(getPos({ x, y }), s.pos) < 50);
   }
 
   getSelectedSquadLeader(squadId: string) {
@@ -988,15 +975,16 @@ export class MapScene extends Phaser.Scene {
     const source = this.getSquad(id);
 
     const grid = this.makeWalkableGrid();
-    const [, ...path] = getPathTo(grid)(source.pos)(target).map(([x, y]) => ({
+
+    const startCell = getBoardPos(source.pos);
+    const [, ...path] = getPathTo(grid)(startCell)(target).map(([x, y]) => ({
       x,
       y,
     }));
-    const squad = await this.getChara(id);
+    const squad = this.getSquad(id);
 
     console.log(`path::`, path);
     this.squadsInMovement = this.squadsInMovement.set(id, {
-      current: this.getPos(source.pos),
       path,
       squad,
     });
@@ -1035,4 +1023,21 @@ export class MapScene extends Phaser.Scene {
       }) as Promise<void>;
     } else return Promise.resolve();
   }
+}
+
+export function getPos({ x, y }: Vector) {
+  return {
+    x: boardPadding + x * cellSize,
+    y: boardPadding + y * cellSize,
+  };
+}
+
+export function getBoardPos({ x, y }: Vector) {
+  const res = {
+    x: Math.floor((x - boardPadding) / cellSize),
+    y: Math.floor((y - boardPadding) / cellSize),
+  };
+  console.log(`RES::`, res);
+
+  return res;
 }

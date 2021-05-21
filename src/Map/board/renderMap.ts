@@ -1,11 +1,11 @@
-import {tileMap, translateTiles} from '../Model';
-import {cellSize, MapScene} from '../MapScene';
+import { tileMap, translateTiles } from '../Model';
+import { cellSize, getPos, MapScene } from '../MapScene';
 
 export default (scene: MapScene) => {
-  const {container} = scene.getContainers();
+  const { container } = scene.getContainers();
   translateTiles(scene.state.cells).forEach((arr, col) =>
     arr.forEach((n, row) => {
-      const {x, y} = scene.getPos({x: row, y: col});
+      const { x, y } = getPos({ x: row, y: col });
 
       const tile = scene.add.image(x, y, `tiles/${tileMap[n]}`);
 
@@ -28,6 +28,6 @@ export default (scene: MapScene) => {
 
       if (!scene.tileIndex[col]) scene.tileIndex[col] = [];
       scene.tileIndex[col][row] = mapTile;
-    }),
+    })
   );
 };

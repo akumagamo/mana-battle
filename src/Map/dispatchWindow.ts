@@ -43,7 +43,7 @@ export default (scene: MapScene) => {
     .getPlayerSquads()
     .filter((mapSquad) => !scene.state.dispatchedSquads.has(mapSquad.squad.id));
 
-  squadsToRender.forEach((mapSquad, i) => {
+  squadsToRender.toList().forEach((mapSquad, i) => {
     const event = async () => {
       container.destroy();
 

@@ -1,24 +1,24 @@
-import Phaser from "phaser";
-import { preload } from "../preload";
-import button from "../UI/button";
-import maps from "../maps";
-import { MapCommands } from "./MapCommands";
-import { toMapSquad } from "../Unit/Model";
-import { getSquadsFromDB, getUnitsFromDB } from "../DB";
-import { Container } from "../Models";
-import { MapState } from "./Model";
-import { fadeIn } from "../UI/Transition";
-import { List, Set } from "immutable";
-import { SquadRecord } from "../Squad/Model";
+import Phaser from 'phaser';
+import { preload } from '../preload';
+import button from '../UI/button';
+import maps from '../maps';
+import { MapCommands } from './MapCommands';
+import { toMapSquad } from '../Unit/Model';
+import { getSquadsFromDB, getUnitsFromDB } from '../DB';
+import { Container } from '../Models';
+import { MapState } from './Model';
+import { fadeIn } from '../UI/Transition';
+import { List, Set } from 'immutable';
+import { SquadRecord } from '../Squad/Model';
 
 export default class MapListScene extends Phaser.Scene {
   constructor() {
-    super("MapListScene");
+    super('MapListScene');
   }
   preload = preload;
 
   create() {
-    const bg = this.add.image(0, 0, "map_select");
+    const bg = this.add.image(0, 0, 'map_select');
     bg.setOrigin(0);
     const container = this.add.container(100, 100);
 
@@ -48,21 +48,17 @@ export default class MapListScene extends Phaser.Scene {
 
     let commands: MapCommands[] = [
       {
-        type: "UPDATE_STATE",
+        type: 'UPDATE_STATE',
         target: {
           ...map,
-          dispatchedSquads: Set(
-            List([firstSquad]).concat(map.squads.map((u) => u.squad.id))
-          ),
-          squads: map.squads.concat(
-            getSquadsFromDB()
-              .map((s) =>
-                toMapSquad(
-                  s,
-                  map.cities.find((c) => c.id === "castle1")
-                )
+          dispatchedSquads: Set(List([firstSquad]).concat(map.squads.keySeq())),
+          squads: map.squads.merge(
+            getSquadsFromDB().map((s) =>
+              toMapSquad(
+                s,
+                map.cities.find((c) => c.id === 'castle1')
               )
-              .toList()
+            )
           ),
 
           units: map.units.merge(alliedUnits),
@@ -71,7 +67,7 @@ export default class MapListScene extends Phaser.Scene {
     ];
 
     this.scene.transition({
-      target: "MapScene",
+      target: 'MapScene',
       duration: 1000,
       moveBelow: true,
       data: commands,
