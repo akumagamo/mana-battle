@@ -1,4 +1,3 @@
-import * as Phaser from 'phaser';
 import { Chara } from '../Chara/Chara';
 import { INVALID_STATE } from '../errors';
 import button from '../UI/button';
@@ -30,6 +29,8 @@ import { fadeIn, fadeOut } from '../UI/Transition';
 import { MapCommands } from './MapCommands';
 import { Mode, DEFAULT_MODE } from './Mode';
 import { getDistance } from '../utils';
+import { cellSize } from './config';
+import { getBoardPos, getPos } from './board/position';
 
 const WALKABLE_CELL_TINT = 0x88aa88;
 
@@ -37,10 +38,6 @@ const SPEED = 2;
 
 const SQUAD_MOVE_DURATION = 1000 / SPEED;
 const CHARA_VERTICAL_OFFSET = -10;
-
-export const cellSize = 100;
-
-const boardPadding = 50;
 
 const CITY_HEAL_PERCENT = 20;
 
@@ -1044,21 +1041,4 @@ export class MapScene extends Phaser.Scene {
       }) as Promise<void>;
     } else return Promise.resolve();
   }
-}
-
-export function getPos({ x, y }: Vector) {
-  return {
-    x: boardPadding + x * cellSize,
-    y: boardPadding + y * cellSize,
-  };
-}
-
-export function getBoardPos({ x, y }: Vector) {
-  const res = {
-    x: Math.floor((x - boardPadding) / cellSize),
-    y: Math.floor((y - boardPadding) / cellSize),
-  };
-  console.log(`RES::`, res);
-
-  return res;
 }

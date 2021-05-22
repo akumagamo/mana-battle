@@ -1,4 +1,3 @@
-import * as Phaser from 'phaser';
 import {Container} from '../Models';
 import {Chara} from '../Chara/Chara';
 import {Unit, unitClassLabels} from './Model';

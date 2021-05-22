@@ -1,10 +1,9 @@
-import * as Phaser from "phaser";
-import { Chara } from "../Chara/Chara";
-import { Image } from "../Models";
-import * as Squad from "../Squad/Model";
-import { cartesianToIsometric } from "../utils/isometric";
-import { Unit, UnitIndex } from "../Unit/Model";
-import { tileWidth, tileHeight } from "../constants";
+import { Chara } from '../Chara/Chara';
+import { Image } from '../Models';
+import * as Squad from '../Squad/Model';
+import { cartesianToIsometric } from '../utils/isometric';
+import { Unit, UnitIndex } from '../Unit/Model';
+import { tileWidth, tileHeight } from '../constants';
 
 type BoardTile = {
   sprite: Image;
@@ -14,7 +13,7 @@ type BoardTile = {
   boardY: number;
 };
 
-export const BOARD_SCENE_KEY = "BoardScene";
+export const BOARD_SCENE_KEY = 'BoardScene';
 
 export default class BoardScene extends Phaser.Scene {
   tiles: BoardTile[] = [];
@@ -75,14 +74,14 @@ export default class BoardScene extends Phaser.Scene {
       targets: chara?.container,
       x: pos.x,
       y: pos.y,
-      ease: "Cubic",
+      ease: 'Cubic',
       duration: 400,
       repeat: 0,
       paused: false,
       yoyo: false,
     });
     // TODO: optimize, fire only once if multiple units were move at the same time
-    tween.on("complete", () => {
+    tween.on('complete', () => {
       this.sortUnitsByDepth();
     });
   }
@@ -95,7 +94,7 @@ export default class BoardScene extends Phaser.Scene {
     const squadMember = Squad.getMember(unit.id, squad);
 
     if (!squadMember)
-      throw new Error("Invalid state. Unit should be in board object.");
+      throw new Error('Invalid state. Unit should be in board object.');
 
     const isMoved = (boardSprite: BoardTile) =>
       squadMember.x !== boardSprite.boardX ||
@@ -115,7 +114,7 @@ export default class BoardScene extends Phaser.Scene {
         targets: this.getChara(unit)?.container,
         x: x,
         y: y,
-        ease: "Cubic",
+        ease: 'Cubic',
         duration: 400,
         repeat: 0,
         paused: false,
@@ -144,7 +143,7 @@ export default class BoardScene extends Phaser.Scene {
       row.forEach((_, xIndex) => {
         var { x, y } = cartesianToIsometric(xIndex, yIndex);
 
-        const tileSprite = this.add.image(x, y, "tile");
+        const tileSprite = this.add.image(x, y, 'tile');
         tileSprite.depth = y;
 
         tileSprite.setInteractive();
@@ -171,7 +170,7 @@ export default class BoardScene extends Phaser.Scene {
 
     const unit = this.getUnit(squadMember.id);
 
-    if (!unit) throw new Error("Invalid member supplied.");
+    if (!unit) throw new Error('Invalid member supplied.');
 
     const key = this.makeUnitKey(unit);
     const chara = new Chara(key, this, unit, x, y, 1, true);

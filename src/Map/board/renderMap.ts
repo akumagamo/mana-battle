@@ -1,5 +1,7 @@
 import { tileMap, translateTiles } from '../Model';
-import { cellSize, getPos, MapScene } from '../MapScene';
+import { MapScene } from '../MapScene';
+import { getPos } from './position';
+import { cellSize } from '../config';
 
 export default (scene: MapScene) => {
   const { container } = scene.getContainers();

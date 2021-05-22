@@ -1,4 +1,3 @@
-import * as Phaser from "phaser";
 import * as Squad from "../Squad/Model";
 import Board from "../Board/StaticBoardScene";
 import { Pointer, Image, Text } from "../Models";

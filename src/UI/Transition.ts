@@ -1,4 +1,3 @@
-import * as Phaser from "phaser";
 import panel from "../UI/panel";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
 

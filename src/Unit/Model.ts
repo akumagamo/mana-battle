@@ -3,11 +3,10 @@ import { sum } from '../utils/math';
 import { Container } from '../Models';
 import { getItemsFromDB } from '../DB';
 import { UnitAttacks } from './Skills';
-import { MapSquad } from '../Map/Model';
+import { MapSquad, Vector } from '../Map/Model';
 import { SquadRecord } from '../Squad/Model';
-import { Vector } from 'matter';
 import { List, Map, Set } from 'immutable';
-import { getPos } from '../Map/MapScene';
+import { getPos } from '../Map/board/position';
 
 export type UnitIndex = Map<string, UnitInSquad>;
 

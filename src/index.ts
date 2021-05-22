@@ -1,19 +1,18 @@
-import "phaser";
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from "./constants";
-import TitleScene from "./Scenes/TitleScene";
-import OptionsScene from "./Scenes/OptionsScene";
-import WorldScene from "./Scenes/World";
-import defaultData from "./defaultData";
-import { EditSquadScene } from "./Squad/EditSquadScene";
-import { ListSquadsScene } from "./Squad/ListSquadsScene";
-import { ListUnitsScene } from "./Unit/ListUnits";
-import MapListScene from "./Map/MapListScene";
-import CombatScene from "./Combat/CombatScene";
+import { SCREEN_WIDTH, SCREEN_HEIGHT } from './constants';
+import TitleScene from './Scenes/TitleScene';
+import OptionsScene from './Scenes/OptionsScene';
+import WorldScene from './Scenes/World';
+import defaultData from './defaultData';
+import { EditSquadScene } from './Squad/EditSquadScene';
+import { ListSquadsScene } from './Squad/ListSquadsScene';
+import { ListUnitsScene } from './Unit/ListUnits';
+import MapListScene from './Map/MapListScene';
+import CombatScene from './Combat/CombatScene';
 
 (() => {
   const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
-    backgroundColor: "#000000",
+    backgroundColor: '#000000',
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
     scale: {
@@ -33,10 +32,10 @@ import CombatScene from "./Combat/CombatScene";
     dom: {
       createContainer: true,
     },
-    parent: "content",
+    parent: 'content',
   };
 
-  if (localStorage.getItem("player") === null) {
+  if (localStorage.getItem('player') === null) {
     defaultData(true);
   }
 

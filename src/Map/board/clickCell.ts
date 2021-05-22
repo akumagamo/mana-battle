@@ -1,8 +1,9 @@
-import { MapScene, MapTile, getBoardPos, getPos } from '../MapScene';
+import { MapScene, MapTile } from '../MapScene';
 import { getDistance } from '../../utils';
 import { makeVector } from '../makeVector';
 import { CPU_FORCE, PLAYER_FORCE } from '../../constants';
 import { Vector } from '../Model';
+import { getBoardPos, getPos } from './position';
 
 export default async (scene: MapScene, cell: MapTile) => {
   const { x, y } = cell;

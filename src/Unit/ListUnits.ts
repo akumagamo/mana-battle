@@ -1,4 +1,3 @@
-import * as Phaser from "phaser";
 import * as api from "../DB";
 import { Text, Image } from "../Models";
 import { Chara } from "../Chara/Chara";

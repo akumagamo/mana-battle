@@ -1,20 +1,19 @@
-import { List } from "immutable";
-import { equals } from "../test/utils";
-import { squadGenerator } from "./generator";
-import { makeMember, Member, MemberRecord } from "./Model";
-import { printSquad } from "./Model.test";
+import { List } from 'immutable';
+import { equals } from '../test/utils';
+import { squadGenerator } from './generator';
+import { makeMember } from './Model';
 
-test("generates units", () => {
-  const squadId = "SQD1";
+test('generates units', () => {
+  const squadId = 'SQD1';
 
   const { squad, units } = squadGenerator(
     squadId,
     [
-      ["fighter", [2, 1]],
-      ["archer", [2, 2]],
+      ['fighter', [2, 1]],
+      ['archer', [2, 2]],
     ],
     22,
-    "TEST_FORCE"
+    'TEST_FORCE'
   );
 
   expect(squad.id).toBe(squadId);
@@ -41,8 +40,8 @@ test("generates units", () => {
     })
   );
 
-  equals(units.get(unit1Id).class, "fighter");
-  equals(units.get(unit2Id).class, "archer");
+  equals(units.get(unit1Id).class, 'fighter');
+  equals(units.get(unit2Id).class, 'archer');
 
   equals(units.get(unit1Id).lvl, 22);
   equals(units.get(unit2Id).lvl, 22);

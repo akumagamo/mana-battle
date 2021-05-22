@@ -1,4 +1,3 @@
-import * as Phaser from "phaser";
 import { Chara } from "../Chara/Chara";
 import * as Squad from "../Squad/Model";
 import { saveSquadIntoDB, saveUnitIntoDB } from "../DB";

@@ -1,4 +1,4 @@
-import { Vector } from "matter";
+import { Vector } from './Map/Model';
 
 export const indexById = (list: { id: string }[]) =>
   list.reduce((acc, curr) => ({ ...acc, [curr.id]: curr }), {});

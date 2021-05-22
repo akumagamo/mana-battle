@@ -1,4 +1,3 @@
-import * as Phaser from 'phaser';
 import UnitListScene from '../Unit/UnitListScene';
 import {Unit} from '../Unit/Model';
 

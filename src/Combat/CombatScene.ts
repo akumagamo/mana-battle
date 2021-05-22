@@ -1,4 +1,3 @@
-import * as Phaser from "phaser";
 import { Chara } from "../Chara/Chara";
 import { cartesianToIsometricBattle } from "../utils/isometric";
 import { INVALID_STATE } from "../errors";

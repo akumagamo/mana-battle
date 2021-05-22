@@ -1,18 +1,16 @@
-import * as Phaser from "phaser";
+import { Unit } from '../Unit/Model';
+import { Container, Pointer, Image } from '../Models';
+import run from './animations/run';
 
-import { Unit } from "../Unit/Model";
-import { Container, Pointer, Image } from "../Models";
-import run from "./animations/run";
-
-import defaultPose from "./animations/defaultPose";
-import stand from "./animations/stand";
-import flinch from "./animations/flinch";
-import slash from "./animations/slash";
-import bowAttack from "./animations/bowAttack";
-import initial from "./animations/initial";
-import hpBar from "./hpBar";
-import { PUBLIC_URL } from "../constants";
-import { classes } from "../defaultData";
+import defaultPose from './animations/defaultPose';
+import stand from './animations/stand';
+import flinch from './animations/flinch';
+import slash from './animations/slash';
+import bowAttack from './animations/bowAttack';
+import initial from './animations/initial';
+import hpBar from './hpBar';
+import { PUBLIC_URL } from '../constants';
+import { classes } from '../defaultData';
 
 const CHARA_INACTIVE_COLOR = 222222;
 export class Chara extends Phaser.Scene {
@@ -121,7 +119,7 @@ export class Chara extends Phaser.Scene {
   onClick(fn: (chara: Chara) => void) {
     this.container.setInteractive();
 
-    this.container.on("pointerdown", (_pointer: Pointer) => {
+    this.container.on('pointerdown', (_pointer: Pointer) => {
       fn(this);
     });
   }
@@ -134,7 +132,7 @@ export class Chara extends Phaser.Scene {
     this.input.setDraggable(this.container);
 
     this.input.on(
-      "drag",
+      'drag',
       (_pointer: Pointer, obj: Container, x: number, y: number) => {
         this.container.setDepth(Infinity);
 
@@ -146,7 +144,7 @@ export class Chara extends Phaser.Scene {
     );
 
     this.container.on(
-      "dragend",
+      'dragend',
       (_pointer: Pointer, _dragX: number, dragY: number) => {
         this.container.setDepth(dragY);
         dragEnd(this.unit, this.container.x || 0, this.container.y || 0, this);
@@ -155,7 +153,7 @@ export class Chara extends Phaser.Scene {
   }
 
   handleClick(fn: (chara: Chara, pointer: Pointer) => void) {
-    this.container.on("pointerdown", (pointer: Pointer) => {
+    this.container.on('pointerdown', (pointer: Pointer) => {
       fn(this, pointer);
     });
   }
@@ -226,7 +224,7 @@ export class Chara extends Phaser.Scene {
   tint(value: number) {
     this.container.iterate(
       (child: Phaser.GameObjects.Image | Phaser.GameObjects.Container) => {
-        if (child.type === "Container") {
+        if (child.type === 'Container') {
           (child as Phaser.GameObjects.Container).iterate(
             (grand: Phaser.GameObjects.Image) => {
               grand.setTint(Phaser.Display.Color.GetColor(value, value, value));
@@ -256,30 +254,30 @@ export class Chara extends Phaser.Scene {
 }
 export const loadCharaAssets = (scene: Phaser.Scene) => {
   [
-    "insignea",
-    "hand",
-    "foot",
-    "head",
-    "chara/head_male",
-    "chara/head_female",
-  ].forEach((str) => scene.load.image(str, PUBLIC_URL + "/" + str + ".svg"));
+    'insignea',
+    'hand',
+    'foot',
+    'head',
+    'chara/head_male',
+    'chara/head_female',
+  ].forEach((str) => scene.load.image(str, PUBLIC_URL + '/' + str + '.svg'));
   const hairs = [
-    "dark1",
-    "long1",
-    "long2",
-    "split",
-    "split2",
-    "male1",
-    "female1",
-    "female2",
+    'dark1',
+    'long1',
+    'long2',
+    'split',
+    'split2',
+    'male1',
+    'female1',
+    'female2',
   ];
   hairs.forEach((str) => {
-    scene.load.image(str, PUBLIC_URL + "/hair/" + str + ".svg");
-    scene.load.image("back_" + str, PUBLIC_URL + "/hair/back_" + str + ".svg");
+    scene.load.image(str, PUBLIC_URL + '/hair/' + str + '.svg');
+    scene.load.image('back_' + str, PUBLIC_URL + '/hair/back_' + str + '.svg');
   });
 
-  scene.load.image("head", PUBLIC_URL + "/head.svg");
-  scene.load.image("back_head", PUBLIC_URL + "/back_head.svg");
+  scene.load.image('head', PUBLIC_URL + '/head.svg');
+  scene.load.image('back_head', PUBLIC_URL + '/back_head.svg');
 
   classes.forEach((job) => {
     scene.load.image(`trunk_${job}`, `${PUBLIC_URL}/trunk_${job}.svg`);
@@ -289,22 +287,22 @@ export const loadCharaAssets = (scene: Phaser.Scene) => {
     );
   });
   const equips = [
-    "equips/iron_sword",
-    "equips/iron_spear",
-    "equips/steel_sword",
-    "equips/baldar_sword",
-    "equips/oaken_staff",
-    "equips/bow",
+    'equips/iron_sword',
+    'equips/iron_spear',
+    'equips/steel_sword',
+    'equips/baldar_sword',
+    'equips/oaken_staff',
+    'equips/bow',
 
-    "equips/simple_helm",
-    "equips/iron_helm",
-    "equips/wiz_hat",
-    "equips/archer_hat",
+    'equips/simple_helm',
+    'equips/iron_helm',
+    'equips/wiz_hat',
+    'equips/archer_hat',
 
-    "equips/back_simple_helm",
-    "equips/back_iron_helm",
-    "equips/back_wiz_hat",
-    "equips/back_archer_hat",
+    'equips/back_simple_helm',
+    'equips/back_iron_helm',
+    'equips/back_wiz_hat',
+    'equips/back_archer_hat',
   ];
   equips.forEach((id: string) => {
     scene.load.image(id, `${PUBLIC_URL}/${id}.svg`);

@@ -1,4 +1,5 @@
-import { getPos, MapScene } from '../MapScene';
+import { MapScene } from '../MapScene';
+import { getPos } from './position';
 
 const CITY_SCALE = 0.5;
 

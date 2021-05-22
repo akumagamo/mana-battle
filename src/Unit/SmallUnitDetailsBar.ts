@@ -1,4 +1,3 @@
-import * as Phaser from 'phaser';
 import {Container} from '../Models';
 import {Unit, unitClassLabels} from './Model';
 import text from '../UI/text';

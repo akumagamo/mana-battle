@@ -1,4 +1,3 @@
-import * as Phaser from "phaser";
 import * as api from "../DB";
 import { Container } from "../Models";
 import { INVALID_STATE } from "../errors";

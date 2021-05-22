@@ -1,11 +1,10 @@
-import * as Phaser from 'phaser';
 import { Chara } from '../Chara/Chara';
 import * as Squad from '../Squad/Model';
 import { cartesianToIsometric } from '../utils/isometric';
 import { BoardTile } from './Model';
 import { Graphics } from '../Models';
 import { Unit, UnitIndex } from '../Unit/Model';
-import { Vector } from 'matter';
+import { Vector } from '../Map/Model';
 
 const BOARD_WIDTH = 250;
 const BOARD_HEIGHT = 150;
