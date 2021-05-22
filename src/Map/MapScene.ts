@@ -98,7 +98,7 @@ export class MapScene extends Phaser.Scene {
   cellHighlight: Phaser.GameObjects.Rectangle | null = null;
 
   squadsToRemove: Set<string> = Set();
-  squadToPush: string | null = null;
+  squadToPush: { winner: string; loser: string } | null = null;
 
   constructor() {
     super('MapScene');
@@ -266,7 +266,7 @@ export class MapScene extends Phaser.Scene {
       } else if (cmd.type === 'CAPTURE_CITY') {
         this.captureCity(cmd);
       } else if (cmd.type === 'PUSH_SQUAD') {
-        this.squadToPush = cmd.id;
+        this.squadToPush = cmd;
       }
 
       console.timeEnd(cmd.type);
@@ -651,7 +651,7 @@ export class MapScene extends Phaser.Scene {
     const isPlayer = starter.squad.force === PLAYER_FORCE;
 
     // for now, player always wins
-    const loser = isPlayer ? target.id : starter.id;
+    const loser = target.id;
 
     const combatCallback = (cmds: MapCommands[]) => {
       let squadsTotalHP = cmds.reduce((xs, x) => {
@@ -673,7 +673,13 @@ export class MapScene extends Phaser.Scene {
         .keySeq()
         .map((target) => ({ type: 'DESTROY_TEAM', target }))
         .toJS()
-        .concat([{ type: 'PUSH_SQUAD', id: loser }]);
+        .concat([
+          {
+            type: 'PUSH_SQUAD',
+            winner: starter.id,
+            loser: loser,
+          },
+        ]);
 
       this.scene.start(
         'MapScene',
@@ -1008,13 +1014,28 @@ export class MapScene extends Phaser.Scene {
 
   async pushLoser() {
     if (this.squadToPush) {
-      const sqd = await this.getChara(this.squadToPush);
+      const loser = this.getSquad(this.squadToPush.loser);
+      const winner = this.getSquad(this.squadToPush.winner);
+
+      let direction = { x: 0, y: 0 };
+      const winnerPos = getBoardPos(winner.pos);
+      const loserPos = getBoardPos(loser.pos);
+
+      debugger;
+      if (winnerPos.x < loserPos.x) direction = { x: 1, y: 0 };
+      if (winnerPos.x > loserPos.x) direction = { x: -1, y: 0 };
+
+      if (winnerPos.y < loserPos.y) direction = { x: 0, y: 1 };
+      if (winnerPos.y > loserPos.y) direction = { x: 0, y: -1 };
+
+      const chara = await this.getChara(loser.id);
 
       return new Promise((resolve) => {
         this.add.tween({
-          targets: sqd.container,
+          targets: chara.container,
           duration: 1000,
-          x: sqd.container.x + 100,
+          x: chara.container.x + direction.x * 200,
+          y: chara.container.y + direction.y * 200,
           onComplete: () => {
             this.squadToPush = null;
             resolve();
