@@ -216,20 +216,23 @@ export class MapScene extends Phaser.Scene {
       const current = await this.getChara(sqd);
 
       // TODO: only enemies
-      this.charas.forEach((c) => {
-        if (c.key !== current.key) {
-          const distance = getDistance(c.container, current.container);
+      // how: have indexes per team
+      this.charas
+        .filter((c) => c.unit.squad !== sqd)
+        .forEach((c) => {
+          if (c.key !== current.key) {
+            const distance = getDistance(c.container, current.container);
 
-          if (distance < 100) {
-            this.isPaused = true;
-            this.startCombat(
-              this.getSquad(sqd),
-              this.getSquad(c.unit.squad),
-              direction
-            );
+            if (distance < 100) {
+              this.isPaused = true;
+              this.startCombat(
+                this.getSquad(sqd),
+                this.getSquad(c.unit.squad),
+                direction
+              );
+            }
           }
-        }
-      });
+        });
     });
   }
 
