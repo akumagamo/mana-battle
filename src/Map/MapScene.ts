@@ -36,7 +36,6 @@ const WALKABLE_CELL_TINT = 0x88aa88;
 
 const SPEED = 2;
 
-const SQUAD_MOVE_DURATION = 1000 / SPEED;
 const CHARA_VERTICAL_OFFSET = -10;
 
 const CITY_HEAL_PERCENT = 20;
@@ -171,7 +170,7 @@ export class MapScene extends Phaser.Scene {
 
       const dist = getDistance(squad.pos, next);
 
-      if (dist > SPEED) {
+      if (dist >= SPEED) {
         if (next.x > squad.pos.x) {
           squad.pos.x += 1 * SPEED;
           direction = 'right';
@@ -863,36 +862,6 @@ export class MapScene extends Phaser.Scene {
     pic.setOrigin(0.5);
     pic.setDisplaySize(250, 250);
     this.label(SCREEN_WIDTH / 2, 520, 'Merano Castle');
-  }
-
-  /**
-   * Moves a squad alongside a path
-   */
-  async moveUnit(squadId: string, path: Vector[]) {
-    const chara = await this.getChara(squadId);
-
-    const [, ...tail] = path;
-    const tweens = tail.map((pos) => {
-      const { x, y } = this.getCellPositionOnScreen(pos);
-      return {
-        targets: chara.container,
-        x,
-        y,
-        duration: SQUAD_MOVE_DURATION,
-        ease: 'Cubic',
-      };
-    });
-
-    if (tweens.length > 0)
-      return new Promise<void>((resolve) => {
-        this.tweens.timeline({
-          tweens,
-          onComplete: () => {
-            resolve();
-          },
-        });
-      });
-    else return Promise.resolve();
   }
 
   getTileAt(x: number, y: number) {
