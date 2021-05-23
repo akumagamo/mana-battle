@@ -9,11 +9,8 @@ export function getPos({ x, y }: Vector) {
 }
 
 export function getBoardPos({ x, y }: Vector) {
-  const res = {
+  return {
     x: Math.floor((x - boardPadding) / cellSize),
     y: Math.floor((y - boardPadding) / cellSize),
   };
-  console.log(`RES::`, res);
-
-  return res;
 }

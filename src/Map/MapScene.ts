@@ -95,7 +95,11 @@ export class MapScene extends Phaser.Scene {
   cellHighlight: Phaser.GameObjects.Rectangle | null = null;
 
   squadsToRemove: Set<string> = Set();
-  squadToPush: { winner: string; loser: string } | null = null;
+  squadToPush: {
+    winner: string;
+    loser: string;
+    direction: string;
+  } | null = null;
 
   constructor() {
     super('MapScene');
@@ -156,6 +160,8 @@ export class MapScene extends Phaser.Scene {
   private moveSquads() {
     const movedSquads = this.squadsInMovement.keySeq();
 
+    let direction = '';
+
     this.squadsInMovement.forEach(async (value, squadId) => {
       const { path, squad } = value;
 
@@ -168,12 +174,16 @@ export class MapScene extends Phaser.Scene {
       if (dist > 10) {
         if (next.x > squad.pos.x) {
           squad.pos.x += 1 * SPEED;
+          direction = 'right';
         } else if (next.x < squad.pos.x) {
           squad.pos.x -= 1 * SPEED;
+          direction = 'left';
         } else if (next.y > squad.pos.y) {
           squad.pos.y += 1 * SPEED;
+          direction = 'bottom';
         } else if (next.y < squad.pos.y) {
           squad.pos.y -= 1 * SPEED;
+          direction = 'top';
         }
         const chara = await this.getChara(squadId);
         chara.container.setPosition(squad.pos.x, squad.pos.y);
@@ -213,7 +223,11 @@ export class MapScene extends Phaser.Scene {
 
           if (distance < 100) {
             this.isPaused = true;
-            this.startCombat(this.getSquad(sqd), this.getSquad(c.unit.squad));
+            this.startCombat(
+              this.getSquad(sqd),
+              this.getSquad(c.unit.squad),
+              direction
+            );
           }
         }
       });
@@ -640,7 +654,7 @@ export class MapScene extends Phaser.Scene {
     this.changeMode({ type: 'SQUAD_SELECTED', id: enemyUnit.id });
   }
 
-  attack = async (starter: MapSquad, target: MapSquad) => {
+  attack = async (starter: MapSquad, target: MapSquad, direction: string) => {
     await fadeOut(this);
 
     this.turnOff();
@@ -675,6 +689,7 @@ export class MapScene extends Phaser.Scene {
             type: 'PUSH_SQUAD',
             winner: starter.id,
             loser: loser,
+            direction,
           },
         ]);
 
@@ -889,7 +904,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   // TODO: handle scenario where none of the engaging squads belongs to the player
-  async startCombat(squadA: MapSquad, squadB: MapSquad) {
+  async startCombat(squadA: MapSquad, squadB: MapSquad, direction: string) {
     const baseX = 200;
     const baseY = 200;
     const scale = 0.5;
@@ -948,7 +963,7 @@ export class MapScene extends Phaser.Scene {
     ally.turnOff();
     enemy.turnOff();
 
-    this.attack(squadA, squadB);
+    this.attack(squadA, squadB, direction);
   }
 
   disableMapInput() {
@@ -1012,29 +1027,37 @@ export class MapScene extends Phaser.Scene {
   async pushLoser() {
     if (this.squadToPush) {
       const loser = this.getSquad(this.squadToPush.loser);
-      const winner = this.getSquad(this.squadToPush.winner);
 
-      let direction = { x: 0, y: 0 };
-      const winnerPos = getBoardPos(winner.pos);
-      const loserPos = getBoardPos(loser.pos);
-
-      debugger;
-      if (winnerPos.x < loserPos.x) direction = { x: 1, y: 0 };
-      if (winnerPos.x > loserPos.x) direction = { x: -1, y: 0 };
-
-      if (winnerPos.y < loserPos.y) direction = { x: 0, y: 1 };
-      if (winnerPos.y > loserPos.y) direction = { x: 0, y: -1 };
+      const { direction } = this.squadToPush;
+      const dist = cellSize;
+      let xPush = 0;
+      let yPush = 0;
+      if (direction === 'left') xPush = dist * -1;
+      if (direction === 'right') xPush = dist;
+      if (direction === 'top') yPush = dist * -1;
+      if (direction === 'bottom') yPush = dist;
 
       const chara = await this.getChara(loser.id);
+
+      const newPos = {
+        x: chara.container.x + xPush,
+        y: chara.container.y + yPush,
+      };
+
+      console.log(`NEWPOS::`, newPos);
 
       return new Promise((resolve) => {
         this.add.tween({
           targets: chara.container,
           duration: 1000,
-          x: chara.container.x + direction.x * 200,
-          y: chara.container.y + direction.y * 200,
+          x: newPos.x,
+          y: newPos.y,
           onComplete: () => {
             this.squadToPush = null;
+            this.updateState({
+              ...this.state,
+              squads: this.state.squads.setIn([loser.id, 'pos'], newPos),
+            });
             resolve();
           },
         });

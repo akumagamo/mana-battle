@@ -29,5 +29,5 @@ export type MapCommands =
   | { type: 'REFRESH_UI' }
   | { type: 'CITY_CLICK'; id: string }
   | { type: 'CAPTURE_CITY'; id: string; force: string }
-  | { type: 'PUSH_SQUAD'; winner: string; loser: string }
+  | { type: 'PUSH_SQUAD'; winner: string; loser: string; direction: string }
   | { type: 'MOVE_SQUAD'; mapTile: MapTile; squad: MapSquad };
