@@ -223,7 +223,7 @@ export class MapScene extends Phaser.Scene {
           if (c.key !== current.key) {
             const distance = getDistance(c.container, current.container);
 
-            if (distance < 100) {
+            if (distance < cellSize * 0.8) {
               this.isPaused = true;
               this.startCombat(
                 this.getSquad(sqd),
