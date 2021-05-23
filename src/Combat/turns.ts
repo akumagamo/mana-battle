@@ -1,10 +1,10 @@
-import * as Unit from "../Unit/Model";
-import { getUnitAttack, getUnitDamage } from "../Unit/Skills";
-import { INVALID_STATE } from "../errors";
-import { getMeleeTarget } from "./getMeleeTarget";
-import { random } from "../utils/random";
-import * as Squad from "../Squad/Model";
-import { List } from "immutable";
+import * as Unit from '../Unit/Model';
+import { getUnitAttack, getUnitDamage } from '../Unit/Skills';
+import { INVALID_STATE } from '../errors';
+import { getMeleeTarget } from './getMeleeTarget';
+import { random } from '../utils/random';
+import * as Squad from '../Squad/Model';
+import { List } from 'immutable';
 
 const sortInitiative = (unit: Unit.Unit) => {
   return random(1, 6) + unit.dex;
@@ -16,10 +16,10 @@ export const initiativeList = (units: Unit.UnitIndex): List<string> =>
     .sort((a, b) => sortInitiative(b) - sortInitiative(a))
     .map((u) => u.id);
 
-export type Move = { type: "MOVE"; source: string; target: string };
-export type Return = { type: "RETURN"; target: string };
+export type Move = { type: 'MOVE'; source: string; target: string };
+export type Return = { type: 'RETURN'; target: string };
 export type Slash = {
-  type: "SLASH";
+  type: 'SLASH';
   source: string;
   target: string;
   damage: number;
@@ -27,7 +27,7 @@ export type Slash = {
   updatedSource: Unit.Unit;
 };
 export type Shoot = {
-  type: "SHOOT";
+  type: 'SHOOT';
   source: string;
   target: string;
   damage: number;
@@ -35,7 +35,7 @@ export type Shoot = {
   updatedSource: Unit.Unit;
 };
 export type Fireball = {
-  type: "FIREBALL";
+  type: 'FIREBALL';
   source: string;
   target: string;
   damage: number;
@@ -43,15 +43,15 @@ export type Fireball = {
   updatedSource: Unit.Unit;
 };
 export type Victory = {
-  type: "VICTORY";
+  type: 'VICTORY';
   target: string;
   units: Unit.UnitIndex;
 };
-export type EndCombat = { type: "END_COMBAT"; units: Unit.UnitIndex };
-export type EndTurn = { type: "END_TURN" };
-export type RestartTurns = { type: "RESTART_TURNS" };
+export type EndCombat = { type: 'END_COMBAT'; units: Unit.UnitIndex };
+export type EndTurn = { type: 'END_TURN' };
+export type RestartTurns = { type: 'RESTART_TURNS' };
 export type DisplayXP = {
-  type: "DISPLAY_XP";
+  type: 'DISPLAY_XP';
   xpInfo: List<XPInfo>;
 };
 
@@ -62,7 +62,7 @@ export type XPInfo = {
 };
 
 const displayXPCmd = (xpInfo: List<XPInfo>): DisplayXP => ({
-  type: "DISPLAY_XP",
+  type: 'DISPLAY_XP',
   xpInfo,
 });
 
@@ -137,7 +137,6 @@ export const runTurn = (
   const nextTurn = isLast ? 0 : turn + 1;
 
   let turnCommands: Command[] = [];
-  let updatedUnits = unitIndex;
 
   const hasRemainingAttacks = remainingAttacks > 0;
 
@@ -159,24 +158,22 @@ export const runTurn = (
   const { squad } = unit;
 
   const victory = (units: Unit.UnitIndex): Victory => ({
-    type: "VICTORY",
+    type: 'VICTORY',
     target: squad,
     units,
   });
 
-  const { unitsWithXp, cmds: xpCmds } = calcXp(squadIndex, updatedUnits);
+  const { unitsWithXp, cmds: xpCmds } = calcXp(squadIndex, turnState.unitIndex);
 
   const endCombat: (cmds: Command[]) => Command[] = (commands: Command[]) => {
     return commands
       .concat(xpCmds)
-      .concat([{ type: "END_COMBAT", units: unitsWithXp.map((u) => u.unit) }]);
+      .concat([{ type: 'END_COMBAT', units: unitsWithXp.map((u) => u.unit) }]);
   };
 
-  turnState.unitIndex = updatedUnits;
-
-  if (isVictory(currentUnitId, updatedUnits)) {
-    return turnCommands.concat(xpCmds).concat([victory(updatedUnits)]);
-  } else if (noAttacksRemaining(updatedUnits, remainingAttacksIndex)) {
+  if (isVictory(currentUnitId, turnState.unitIndex)) {
+    return turnCommands.concat(xpCmds).concat([victory(turnState.unitIndex)]);
+  } else if (noAttacksRemaining(turnState.unitIndex, remainingAttacksIndex)) {
     return endCombat(turnCommands);
   } else {
     return runTurn({ ...turnState, turn: nextTurn }, turnCommands);
@@ -264,24 +261,20 @@ function meleeAttackSingleTarget(state: TurnState, commands: Command[]) {
 
   if (!updatedTarget || !updatedSource) throw new Error(INVALID_STATE);
 
-  const move: Command[] = [
-    { type: "MOVE", source: current.id, target: target.id },
-  ];
-  const slash: Command[] = [
-    {
-      type: "SLASH",
-      source: current.id,
-      target: target.id,
-      damage,
-      updatedTarget: updatedTarget,
-      updatedSource: updatedSource,
-    },
-  ];
+  const move: Command = { type: 'MOVE', source: current.id, target: target.id };
+  const slash: Command = {
+    type: 'SLASH',
+    source: current.id,
+    target: target.id,
+    damage,
+    updatedTarget: updatedTarget,
+    updatedSource: updatedSource,
+  };
 
-  const returnCmd: Command[] = [{ type: "RETURN", target: current.id }];
+  const returnCmd: Command = { type: 'RETURN', target: current.id };
 
   return {
-    commands: commands.concat(move).concat(slash).concat(returnCmd),
+    commands: commands.concat([move, slash, returnCmd]),
     updatedUnits,
     remainingAttacks: updatedRemainingAttacksIndex,
   };
