@@ -1,13 +1,13 @@
 import { tileMap, translateTiles } from '../Model';
 import { MapScene } from '../MapScene';
-import { getPos } from './position';
+import { cellToScreenPosition } from './position';
 import { cellSize } from '../config';
 
 export default (scene: MapScene) => {
   const { container } = scene.getContainers();
   translateTiles(scene.state.cells).forEach((arr, col) =>
     arr.forEach((n, row) => {
-      const { x, y } = getPos({ x: row, y: col });
+      const { x, y } = cellToScreenPosition({ x: row, y: col });
 
       const tile = scene.add.image(x, y, `tiles/${tileMap[n]}`);
 

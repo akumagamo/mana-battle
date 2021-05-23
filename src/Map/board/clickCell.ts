@@ -3,7 +3,7 @@ import { getDistance } from '../../utils';
 import { makeVector } from '../makeVector';
 import { CPU_FORCE, PLAYER_FORCE } from '../../constants';
 import { Vector } from '../Model';
-import { getBoardPos, getPos } from './position';
+import { screenToCellPosition, cellToScreenPosition } from './position';
 
 export default async (scene: MapScene, cell: MapTile) => {
   const { x, y } = cell;
@@ -89,8 +89,8 @@ async function handleSelectSquadMoveTarget(
 ) {
   const selectedSquad = scene.getSquad(id);
   if (selectedSquad && selectedSquad.squad.force === PLAYER_FORCE) {
-    const cell = getBoardPos({ x, y });
-    const normalizedPosition = getPos(cell);
+    const cell = screenToCellPosition({ x, y });
+    const normalizedPosition = cellToScreenPosition(cell);
     await scene.moveSquadTo(selectedSquad.squad.id, { x, y });
     scene.signal('squad moved, updating position', [
       { type: 'UPDATE_SQUAD_POS', id, pos: { x, y } },

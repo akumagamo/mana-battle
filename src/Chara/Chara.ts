@@ -95,6 +95,19 @@ export class Chara extends Phaser.Scene {
     //graphics.fillRectShape(rect);
     //this.container.add(graphics);
     //
+    // DEBUG ORIGIN
+    // var origin = new Phaser.Geom.Rectangle(
+    //   0,
+    //   0,
+    //   20,
+    //   20
+    // );
+
+    // var originGraphic = this.add.graphics({ fillStyle: { color: 0xff0000 } });
+    // originGraphic.alpha = 1;
+
+    // originGraphic.fillRectShape(origin);
+    // this.container.add(originGraphic);
 
     if (this.showHpBar) {
       this.renderHPBar(this.unit.currentHp);

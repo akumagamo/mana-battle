@@ -30,7 +30,7 @@ import { MapCommands } from './MapCommands';
 import { Mode, DEFAULT_MODE } from './Mode';
 import { getDistance } from '../utils';
 import { cellSize } from './config';
-import { getBoardPos, getPos } from './board/position';
+import { screenToCellPosition, cellToScreenPosition } from './board/position';
 
 const WALKABLE_CELL_TINT = 0x88aa88;
 
@@ -167,11 +167,11 @@ export class MapScene extends Phaser.Scene {
 
       const [head] = path;
 
-      const next = getPos(head);
+      const next = cellToScreenPosition(head);
 
       const dist = getDistance(squad.pos, next);
 
-      if (dist > 10) {
+      if (dist > SPEED) {
         if (next.x > squad.pos.x) {
           squad.pos.x += 1 * SPEED;
           direction = 'right';
@@ -401,7 +401,7 @@ export class MapScene extends Phaser.Scene {
    * Moves camera position to a vector in the board. If the position is out of bounds, moves until the limit.
    */
   moveCameraTo(vec: Vector, duration: number) {
-    let { x, y } = getPos(vec);
+    let { x, y } = cellToScreenPosition(vec);
 
     x = x * -1 + SCREEN_WIDTH / 2;
 
@@ -620,7 +620,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   getCellPositionOnScreen({ x, y }: { x: number; y: number }) {
-    const pos = getPos({ x, y });
+    const pos = cellToScreenPosition({ x, y });
 
     return { ...pos, y: pos.y + CHARA_VERTICAL_OFFSET };
   }
@@ -787,7 +787,7 @@ export class MapScene extends Phaser.Scene {
   squadAt(x: number, y: number) {
     return this.state.dispatchedSquads
       .map((id) => this.getSquad(id))
-      .find((s) => getDistance(getPos({ x, y }), s.pos) < 50);
+      .find((s) => getDistance(cellToScreenPosition({ x, y }), s.pos) < 50);
   }
 
   getSelectedSquadLeader(squadId: string) {
@@ -994,7 +994,7 @@ export class MapScene extends Phaser.Scene {
 
     const grid = this.makeWalkableGrid();
 
-    const startCell = getBoardPos(source.pos);
+    const startCell = screenToCellPosition(source.pos);
     const [, ...path] = getPathTo(grid)(startCell)(target).map(([x, y]) => ({
       x,
       y,

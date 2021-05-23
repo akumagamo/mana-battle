@@ -1,11 +1,11 @@
 import { MapScene } from '../MapScene';
-import { getPos } from './position';
+import { cellToScreenPosition } from './position';
 
 const CITY_SCALE = 0.5;
 
 export default (scene: MapScene) => {
   scene.state.cities.forEach((city) => {
-    const { x, y } = getPos({ x: city.x, y: city.y });
+    const { x, y } = cellToScreenPosition({ x: city.x, y: city.y });
 
     const city_ = scene.add.image(x, y, `tiles/${city.type}`);
 

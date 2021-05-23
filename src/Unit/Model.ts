@@ -6,7 +6,7 @@ import { UnitAttacks } from './Skills';
 import { MapSquad, Vector } from '../Map/Model';
 import { SquadRecord } from '../Squad/Model';
 import { List, Map, Set } from 'immutable';
-import { getPos } from '../Map/board/position';
+import { cellToScreenPosition } from '../Map/board/position';
 
 export type UnitIndex = Map<string, UnitInSquad>;
 
@@ -90,7 +90,7 @@ export function toMapSquad(squad: SquadRecord, pos: Vector): MapSquad {
   return {
     id: squad.id,
     squad,
-    pos: getPos({ x: pos.x, y: pos.y }),
+    pos: cellToScreenPosition({ x: pos.x, y: pos.y }),
     range: 5,
     validSteps: List(),
     steps: Set(),
