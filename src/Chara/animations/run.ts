@@ -94,6 +94,14 @@ const back = (chara: Chara, speed: number) => {
     repeat: -1,
     duration: 500 * speed,
   });
+
+  chara.add.tween({
+    targets: chara.charaWrapper,
+    y: chara.charaWrapper.y - 20,
+    yoyo: true,
+    repeat: -1,
+    duration: 100 * speed,
+  });
 };
 
 export default (chara: Chara, speed: number) => {
