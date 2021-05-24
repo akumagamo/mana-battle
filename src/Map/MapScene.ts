@@ -29,7 +29,7 @@ import { fadeIn, fadeOut } from "../UI/Transition";
 import { MapCommands } from "./MapCommands";
 import { Mode, DEFAULT_MODE } from "./Mode";
 import { getDistance } from "../utils";
-import { cellSize } from "./config";
+import { cellSize, CHARA_MAP_SCALE } from "./config";
 import { screenToCellPosition, cellToScreenPosition } from "./board/position";
 
 const WALKABLE_CELL_TINT = 0x88aa88;
@@ -170,13 +170,17 @@ export class MapScene extends Phaser.Scene {
 
       const dist = getDistance(squad.pos, next);
 
+      const chara = await this.getChara(squadId);
+
       if (dist >= SPEED) {
         if (next.x > squad.pos.x) {
           squad.pos.x += 1 * SPEED;
           direction = "right";
+          chara.container.scaleX = CHARA_MAP_SCALE;
         } else if (next.x < squad.pos.x) {
           squad.pos.x -= 1 * SPEED;
           direction = "left";
+          chara.container.scaleX = CHARA_MAP_SCALE * -1;
         } else if (next.y > squad.pos.y) {
           squad.pos.y += 1 * SPEED;
           direction = "bottom";
@@ -184,7 +188,6 @@ export class MapScene extends Phaser.Scene {
           squad.pos.y -= 1 * SPEED;
           direction = "top";
         }
-        const chara = await this.getChara(squadId);
         chara.container.setPosition(squad.pos.x, squad.pos.y);
         // TODO: update squad + add single source of "squad truth"
         this.updateState({

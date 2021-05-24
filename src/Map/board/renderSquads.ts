@@ -3,8 +3,8 @@ import { Chara } from '../../Chara/Chara';
 import { INVALID_STATE } from '../../errors';
 import { MapScene } from '../MapScene';
 import { PLAYER_FORCE } from '../../constants';
+import {CHARA_MAP_SCALE} from '../config';
 
-const CHARA_MAP_SCALE = 0.45;
 
 export const renderSquad = (scene: MapScene, mapSquad: MapSquad): void => {
   const { container } = scene.getContainers();
