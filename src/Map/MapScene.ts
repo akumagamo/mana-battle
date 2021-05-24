@@ -204,6 +204,9 @@ export class MapScene extends Phaser.Scene {
         } else {
           console.log('no checkpoints remaining, arrived at finale!');
           this.squadsInMovement = this.squadsInMovement.delete(squadId);
+
+          const chara = await this.getChara(squadId);
+          chara.stand()
           await this.speak(squad);
         }
       }
@@ -425,7 +428,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   /**
-   * Moves camera position to a vector in the board. 
+   * Moves camera position to a vector in the board.
    * If the position is out of bounds, moves until the limit.
    */
   moveCameraTo({ x, y }: Vector, duration: number) {
@@ -997,11 +1000,14 @@ export class MapScene extends Phaser.Scene {
     }));
     const squad = this.getSquad(id);
 
-    console.log(`path::`, path);
     this.squadsInMovement = this.squadsInMovement.set(id, {
       path,
       squad,
     });
+
+    const chara = await this.getChara(id);
+
+    chara.run(SPEED);
 
     this.changeMode({ type: 'NOTHING_SELECTED' });
   }

@@ -176,7 +176,7 @@ export class Chara extends Phaser.Scene {
   clearAnimations() {
     defaultPose(this);
   }
-
+  // TODO: add speed parameter
   stand() {
     stand(this);
   }
