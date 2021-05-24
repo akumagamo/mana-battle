@@ -117,6 +117,7 @@ export type UnitInSquad = Unit.Unit & { squad: string };
 
 export type RemainingAttacksIndex = { [id: string]: number };
 
+// TODO: remove mutations from this
 export const runTurn = (
   turnState: TurnState,
   commands: Command[]

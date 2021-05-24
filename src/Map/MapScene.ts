@@ -204,6 +204,7 @@ export class MapScene extends Phaser.Scene {
         } else {
           console.log('no checkpoints remaining, arrived at finale!');
           this.squadsInMovement = this.squadsInMovement.delete(squadId);
+          await this.speak(squad);
         }
       }
 
@@ -236,54 +237,78 @@ export class MapScene extends Phaser.Scene {
     });
   }
 
-  signal(eventName: string, cmds: MapCommands[]) {
+  async speak(squad: MapSquad) {
+    this.isPaused = true;
+    await this.signal('Squad arrived at destination', [
+      { type: 'CLICK_SQUAD', unit: squad },
+    ]);
+
+    const leader = this.getSelectedSquadLeader(squad.id);
+    const res = speech(
+      leader,
+      450,
+      70,
+      'We arrived at the target destination.',
+      this.uiContainer,
+      this
+    );
+    button(950, 180, 'Ok', this.uiContainer, this, () => {
+      this.scene.remove(res.portrait.scene.key);
+      this.refreshUI();
+      this.isPaused = false;
+    });
+  }
+
+  async signal(eventName: string, cmds: MapCommands[]) {
     console.log(`💁 ::: SIGNAL ::: ${eventName}`, cmds);
-    cmds.forEach(async (cmd) => {
-      console.time(cmd.type);
-      if (cmd.type === 'DESTROY_TEAM') {
-        this.markSquadForRemoval(cmd.target);
-      } else if (cmd.type === 'UPDATE_STATE') {
-        this.updateState(cmd.target);
-      } else if (cmd.type === 'UPDATE_SQUAD_POS') {
-        this.state.squads = this.state.squads.update(cmd.id, (sqd) => ({
-          ...sqd,
-          pos: cmd.pos,
-        }));
-      } else if (cmd.type === 'UPDATE_UNIT') {
-        this.state.units = this.state.units.set(cmd.unit.id, cmd.unit);
-      } else if (cmd.type === 'CLICK_CELL') {
-        if (this.cellClickDisabled) {
-          console.log(`Cell click disabled! Cancelling click`);
-          return;
+    await Promise.all(
+      cmds.map(async (cmd) => {
+        console.time(cmd.type);
+        if (cmd.type === 'DESTROY_TEAM') {
+          this.markSquadForRemoval(cmd.target);
+        } else if (cmd.type === 'UPDATE_STATE') {
+          this.updateState(cmd.target);
+        } else if (cmd.type === 'UPDATE_SQUAD_POS') {
+          this.state.squads = this.state.squads.update(cmd.id, (sqd) => ({
+            ...sqd,
+            pos: cmd.pos,
+          }));
+        } else if (cmd.type === 'UPDATE_UNIT') {
+          this.state.units = this.state.units.set(cmd.unit.id, cmd.unit);
+        } else if (cmd.type === 'CLICK_CELL') {
+          if (this.cellClickDisabled) {
+            console.log(`Cell click disabled! Cancelling click`);
+            return;
+          }
+
+          clickCell(this, cmd.cell);
+        } else if (cmd.type === 'CLICK_SQUAD') {
+          await this.clickSquad(cmd.unit);
+        } else if (cmd.type === 'MOVE_CAMERA_TO') {
+          this.moveCameraTo({ x: cmd.x, y: cmd.y }, cmd.duration);
+        } else if (cmd.type === 'CLEAR_TILES') {
+          this.clearTiles();
+        } else if (cmd.type === 'CLEAR_TILES_EVENTS') {
+          this.clearAllTileEvents();
+        } else if (cmd.type === 'CLEAR_TILES_TINTING') {
+          this.clearAllTileTint();
+        } else if (cmd.type === 'HIGHLIGHT_CELL') {
+          this.highlightCell(cmd);
+        } else if (cmd.type === 'VIEW_SQUAD_DETAILS') {
+          this.viewSquadDetails(cmd.id);
+        } else if (cmd.type === 'REFRESH_UI') {
+          this.refreshUI();
+        } else if (cmd.type === 'CITY_CLICK') {
+          this.selectCity(cmd.id);
+        } else if (cmd.type === 'CAPTURE_CITY') {
+          this.captureCity(cmd);
+        } else if (cmd.type === 'PUSH_SQUAD') {
+          this.squadToPush = cmd;
         }
 
-        clickCell(this, cmd.cell);
-      } else if (cmd.type === 'CLICK_SQUAD') {
-        this.clickSquad(cmd.unit);
-      } else if (cmd.type === 'MOVE_CAMERA_TO') {
-        this.moveCameraTo({ x: cmd.x, y: cmd.y }, cmd.duration);
-      } else if (cmd.type === 'CLEAR_TILES') {
-        this.clearTiles();
-      } else if (cmd.type === 'CLEAR_TILES_EVENTS') {
-        this.clearAllTileEvents();
-      } else if (cmd.type === 'CLEAR_TILES_TINTING') {
-        this.clearAllTileTint();
-      } else if (cmd.type === 'HIGHLIGHT_CELL') {
-        this.highlightCell(cmd);
-      } else if (cmd.type === 'VIEW_SQUAD_DETAILS') {
-        this.viewSquadDetails(cmd.id);
-      } else if (cmd.type === 'REFRESH_UI') {
-        this.refreshUI();
-      } else if (cmd.type === 'CITY_CLICK') {
-        this.selectCity(cmd.id);
-      } else if (cmd.type === 'CAPTURE_CITY') {
-        this.captureCity(cmd);
-      } else if (cmd.type === 'PUSH_SQUAD') {
-        this.squadToPush = cmd;
-      }
-
-      console.timeEnd(cmd.type);
-    });
+        console.timeEnd(cmd.type);
+      })
+    );
 
     console.log(`🙅 ::: finish signal ${eventName}`);
   }
@@ -400,11 +425,10 @@ export class MapScene extends Phaser.Scene {
   }
 
   /**
-   * Moves camera position to a vector in the board. If the position is out of bounds, moves until the limit.
+   * Moves camera position to a vector in the board. 
+   * If the position is out of bounds, moves until the limit.
    */
-  moveCameraTo(vec: Vector, duration: number) {
-    let { x, y } = cellToScreenPosition(vec);
-
+  moveCameraTo({ x, y }: Vector, duration: number) {
     x = x * -1 + SCREEN_WIDTH / 2;
 
     y = y * -1 + SCREEN_HEIGHT / 2;

@@ -1,11 +1,16 @@
-import { Scene } from "phaser";
-import { Chara } from "../Chara/Chara";
-import { Container } from "../Models";
-import { Unit } from "../Unit/Model";
-import {animatedText} from "./animatedText";
-import panel from "./panel";
-import text from "./text";
+import { Scene } from 'phaser';
+import { Chara } from '../Chara/Chara';
+import { Container } from '../Models';
+import { Unit } from '../Unit/Model';
+import { animatedText } from './animatedText';
+import panel from './panel';
+import text from './text';
 
+/**
+ * Be careful calling this after MapScene's CLICK_SQUAD, as refreshing
+ * the UI container (and having it as parent for this) will throw
+ * errors at the Chara and text container levels
+ */
 export default (
   unit: Unit,
   x: number,
@@ -39,10 +44,9 @@ export default (
 
   text(x + 150, y + 10, unit.name, container, scene);
 
-  const speechText = text(x + 150, y + 50, "", container, scene);
+  const speechText = text(x + 150, y + 50, '', container, scene);
 
   animatedText(scene, text_, speechText);
 
   return { bg, portrait, speechText };
 };
-
