@@ -1,10 +1,10 @@
-import { Chara } from '../Chara/Chara';
-import * as Squad from '../Squad/Model';
-import { cartesianToIsometric } from '../utils/isometric';
-import { BoardTile } from './Model';
-import { Graphics } from '../Models';
-import { Unit, UnitIndex } from '../Unit/Model';
-import { Vector } from '../Map/Model';
+import { Chara } from "../Chara/Chara";
+import * as Squad from "../Squad/Model";
+import { cartesianToIsometric } from "../utils/isometric";
+import { BoardTile } from "./Model";
+import { Graphics } from "../Models";
+import { Unit, UnitIndex } from "../Unit/Model";
+import { Vector } from "../Map/Model";
 
 const BOARD_WIDTH = 250;
 const BOARD_HEIGHT = 150;
@@ -54,7 +54,7 @@ export default class StaticBoardScene extends Phaser.Scene {
     this.tiles.forEach((tile) => tile.sprite.destroy());
 
     this.unitList.forEach((chara) => {
-      const key = this.makeUnitKey(chara.unit);
+      const key = this.makeUnitKey(chara.props.unit);
       this.scene.remove(key);
     });
     this.scene.remove(makeId(this.squad));
@@ -107,7 +107,7 @@ export default class StaticBoardScene extends Phaser.Scene {
         x = x * this.scaleSizing + this.x;
         y = y * this.scaleSizing + this.y;
 
-        const tileSprite = this.add.image(x, y, 'tile');
+        const tileSprite = this.add.image(x, y, "tile");
         tileSprite.scale = this.scaleSizing;
         tileSprite.depth = y;
 
@@ -135,20 +135,20 @@ export default class StaticBoardScene extends Phaser.Scene {
     y = y * this.scaleSizing + this.y;
 
     const key = this.makeUnitKey(unit);
-    const c = new Chara(
+    const c = new Chara({
       key,
-      this,
+      parent: this,
       unit,
-      x,
-      y,
-      this.scaleSizing,
-      this.front,
-      false,
-      false,
-      true
-    );
+      cx: x,
+      cy: y,
+      scaleSizing: this.scaleSizing,
+      front: this.front,
+      animated: false,
+      headOnly: false,
+      showHpBar: true,
+    });
 
-    if (c.unit.currentHp < 1) c.tint(222222);
+    if (c.props.unit.currentHp < 1) c.tint(222222);
 
     return c;
   }
@@ -196,7 +196,7 @@ export default class StaticBoardScene extends Phaser.Scene {
   onUnitClick(fn: (c: Chara) => void) {
     this.unitList.forEach((chara) => {
       chara.onClick(() => {
-        const pos = this.squad.members.get(chara.unit.id);
+        const pos = this.squad.members.get(chara.props.unit.id);
         this.highlightTile(pos);
         fn(chara);
       });

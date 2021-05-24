@@ -105,7 +105,7 @@ const back = (chara: Chara, speed: number) => {
 };
 
 export default (chara: Chara, speed: number) => {
-  if (chara.front) {
+  if (chara.props.front) {
     front(chara, speed);
   } else {
     back(chara, speed);

@@ -1,10 +1,10 @@
-import { Scene } from 'phaser';
-import { Chara } from '../Chara/Chara';
-import { Container } from '../Models';
-import { Unit } from '../Unit/Model';
-import { animatedText } from './animatedText';
-import panel from './panel';
-import text from './text';
+import { Scene } from "phaser";
+import { Chara } from "../Chara/Chara";
+import { Container } from "../Models";
+import { Unit } from "../Unit/Model";
+import { animatedText } from "./animatedText";
+import panel from "./panel";
+import text from "./text";
 
 /**
  * Be careful calling this after MapScene's CLICK_SQUAD, as refreshing
@@ -19,17 +19,17 @@ export default (
   container: Container,
   scene: Scene
 ) => {
-  const portrait = new Chara(
-    `speech_${unit.id}`,
-    scene,
+  const portrait = new Chara({
+    key: `speech_${unit.id}`,
+    parent: scene,
     unit,
-    x + 70,
-    y + 70,
-    1,
-    true,
-    false,
-    true
-  );
+    cx: x + 70,
+    cy: y + 70,
+    scaleSizing: 1,
+    front: true,
+    animated: false,
+    headOnly: true,
+  });
 
   const finalText = text(0, 0, text_, container, scene);
   const bg = panel(
@@ -44,7 +44,7 @@ export default (
 
   text(x + 150, y + 10, unit.name, container, scene);
 
-  const speechText = text(x + 150, y + 50, '', container, scene);
+  const speechText = text(x + 150, y + 50, "", container, scene);
 
   animatedText(scene, text_, speechText);
 

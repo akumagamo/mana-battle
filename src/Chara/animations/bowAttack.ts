@@ -5,10 +5,10 @@ const ATTACK_DURATION = 500;
 export default (chara: Chara, onComplete: () => void) => {
   chara.clearAnimations();
 
-  chara.parent.tweens.add({
+  chara.props.parent.tweens.add({
     targets: chara?.mainHandContainer,
     yoyo: true,
-    x: (chara.mainHandContainer?.x || 0) + (chara.front ? -30 : 30),
+    x: (chara.mainHandContainer?.x || 0) + (chara.props.front ? -30 : 30),
     y: (chara.mainHandContainer?.y || 0) - 20,
     duration: ATTACK_DURATION,
     ease: 'ExpoOut',
@@ -17,10 +17,10 @@ export default (chara: Chara, onComplete: () => void) => {
     },
   });
 
-  chara.parent.tweens.add({
+  chara.props.parent.tweens.add({
     targets: chara?.offHandContainer,
     yoyo: true,
-    rotation: chara.front ? -1.2 : 0.5,
+    rotation: chara.props.front ? -1.2 : 0.5,
     x: (chara.mainHandContainer?.y || 0) + 20,
     Y: (chara.mainHandContainer?.y || 0) - 5,
     duration: ATTACK_DURATION,

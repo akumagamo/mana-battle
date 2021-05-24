@@ -90,7 +90,7 @@ export class ListUnitsScene extends Phaser.Scene {
 
     const tile = this.add.image(x_ + 2, y_ + 63, "tile");
     tile.setScale(0.4);
-    const chara = new Chara(key, this, unit, x_, y_, 0.6, true, false);
+    const chara = new Chara({key, parent: this, unit, cx: x_, cy: y_, scaleSizing: 0.6, front: true});
 
     chara.onClick(() => this.selectUnit(unit.id));
 
@@ -102,7 +102,7 @@ export class ListUnitsScene extends Phaser.Scene {
 
   selectUnit(id: string) {
     this.units.forEach((u) => u.tile.clearTint());
-    const listUnit = this.units.find((u) => u.chara.unit.id === id);
+    const listUnit = this.units.find((u) => u.chara.props.unit.id === id);
 
     if (listUnit) {
       listUnit.tile.setTint(0x333333);
@@ -114,7 +114,7 @@ export class ListUnitsScene extends Phaser.Scene {
   renderUnitDetails(chara: Chara) {
     if (!this.detailsBar) return;
 
-    this.detailsBar.render(chara.unit);
+    this.detailsBar.render(chara.props.unit);
     this.detailsBar.onHatToggle = (unit: Unit) => {
       this.removeUnitList();
       this.renderUnitsList(this.getUnits());
@@ -128,9 +128,9 @@ export class ListUnitsScene extends Phaser.Scene {
     this.renderUnitsList(this.getUnits());
   }
   removeUnitList() {
-    this.units.forEach((chara) => {
-      this.scene.remove(`list-chara-${chara.chara.unit.id}`);
-      chara.tile.destroy();
+    this.units.forEach((listUnit) => {
+      this.scene.remove(`list-chara-${listUnit.chara.props.unit.id}`);
+      listUnit.tile.destroy();
     });
     this.units = [];
   }

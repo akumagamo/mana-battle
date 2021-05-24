@@ -43,7 +43,7 @@ export function formationBtn(scene: MapScene, mapSquad: MapSquad) {
       10,
       SCREEN_HEIGHT - 100,
       scene,
-      scene.state.units.find((u) => u.id === c.unit.id)
+      scene.state.units.find((u) => u.id === c.props.unit.id)
     );
     container.add(details);
   });

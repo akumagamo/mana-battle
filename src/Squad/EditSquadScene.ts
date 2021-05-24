@@ -36,7 +36,7 @@ export class EditSquadScene extends Phaser.Scene {
 
     this.boardScene.makeUnitsClickable((c) => {
       this.unitDetails?.destroy();
-      this.unitDetails = SmallUnitDetailsBar(0, 650, this, c.unit);
+      this.unitDetails = SmallUnitDetailsBar(0, 650, this, c.props.unit);
     });
   }
 
@@ -89,7 +89,7 @@ export class EditSquadScene extends Phaser.Scene {
       //remove replaced unit
       if (unitToReplace) {
         const charaToRemove = boardScene.unitList.find(
-          (chara) => chara.unit.id === unitToReplace.id
+          (chara) => chara.props.unit.id === unitToReplace.id
         );
 
         this.tweens.add({

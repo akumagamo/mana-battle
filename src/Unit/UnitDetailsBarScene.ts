@@ -82,16 +82,15 @@ export class UnitDetailsBarScene extends Phaser.Scene {
     ]);
 
     this.scene.remove('pic');
-    const pic = new Chara(
-      'pic',
-      this,
+    const pic = new Chara({
+      key: 'pic',
+      parent: this,
       unit,
-      baseX + 80,
-      baseY + 130,
-      1.3,
-      true,
-      false,
-      true,
+      cx: baseX + 80,
+      cy: baseY + 130,
+      scaleSizing: 1.3,
+      front: true,
+      headOnly: true,}
     );
 
     this.container?.add(pic.container);

@@ -53,7 +53,7 @@ export default class UnitListScene extends Phaser.Scene {
 
   destroy() {
     this.rows.forEach((row) =>
-      this.scene.remove(this.makeUnitKey(row.chara.unit))
+      this.scene.remove(this.makeUnitKey(row.chara.props.unit))
     );
     this.scene.remove();
   }
@@ -112,7 +112,7 @@ export default class UnitListScene extends Phaser.Scene {
 
   clearUnitList() {
     this.rows.forEach((row) => {
-      this.scene.remove(row.chara.key);
+      this.scene.remove(row.chara.props.key);
       this.children.remove(row.container);
     });
 
@@ -148,7 +148,7 @@ export default class UnitListScene extends Phaser.Scene {
 
   private handleUnitDrag(unit: Unit, x: number, y: number, chara: Chara) {
     this.scaleUp(chara);
-    this.scene.bringToTop(chara.key);
+    this.scene.bringToTop(chara.props.key);
     if (this.onDrag) return this.onDrag(unit, x, y);
   }
 
@@ -188,7 +188,7 @@ export default class UnitListScene extends Phaser.Scene {
       });
     }
 
-    const chara = new Chara(key, this, unit, charaX, charaY, 0.5, true);
+    const chara = new Chara({key, parent: this, unit, cy: charaX, cx: charaY, scaleSizing: 0.5, front: true});
 
     if (onDrag && onDragEnd)
       chara.enableDrag(onDrag.bind(this), onDragEnd.bind(this));
@@ -211,14 +211,14 @@ export default class UnitListScene extends Phaser.Scene {
   }
 
   private getUnitIndex(unit: Unit) {
-    return this.rows.findIndex((row) => row.chara.unit.id === unit.id);
+    return this.rows.findIndex((row) => row.chara.props.unit.id === unit.id);
   }
 
   returnToOriginalPosition(unit: Unit) {
     const index = this.getUnitIndex(unit);
 
     const row = this.rows.find(
-      (row) => row.chara.key === this.makeUnitKey(unit)
+      (row) => row.chara.props.key === this.makeUnitKey(unit)
     );
 
     if (!row) {
@@ -286,7 +286,7 @@ export default class UnitListScene extends Phaser.Scene {
 
   removeUnit(unit: Unit) {
     const findUnit = (row: { chara: Chara; text: Text }): boolean =>
-      row.chara.unit.id === unit.id;
+      row.chara.props.unit.id === unit.id;
     this.rows.filter(findUnit).forEach((row) => {
       this.scene.remove(row.chara);
       this.children.remove(row.container);
@@ -303,7 +303,7 @@ export default class UnitListScene extends Phaser.Scene {
     const last = unitsToRender.get(unitsToRender.size - 1);
 
     const isAlreadyRendered = this.rows.some(
-      (row) => row.chara.unit.id === last.id
+      (row) => row.chara.props.unit.id === last.id
     );
 
     if (isAlreadyRendered) return;

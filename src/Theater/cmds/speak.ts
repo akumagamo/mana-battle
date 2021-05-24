@@ -20,21 +20,19 @@ export const speak = (scene: TheaterScene, { id, text: text_ }: Speak) => {
 
   panel(0, 0, SCREEN_WIDTH, PANEL_HEIGHT, container, scene);
 
-  const head = new Chara(
-    "head",
-    scene,
-    chara.unit,
-    100,
-    120,
-    1.4,
-    true,
-    false,
-    true
-  );
+  const head = new Chara({
+    key: "head",
+    parent: scene,
+    unit: chara.props.unit,
+    cx: 100,
+    cy: 120,
+    scaleSizing: 1.4,
+    front: true,
+    headOnly: true});
 
   container.add(head.container);
 
-  text(190, 20, chara.unit.name, container, scene);
+  text(190, 20, chara.props.unit.name, container, scene);
   const unitText = text(190, 60, "", container, scene);
 
   const clickZone = scene.add.zone(0, y, SCREEN_WIDTH, PANEL_HEIGHT);

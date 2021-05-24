@@ -119,7 +119,7 @@ export default class CharaCreationScene extends Phaser.Scene {
       const name: string = (<HTMLInputElement>(
         document.getElementById("new-chara-name")
       )).value;
-      const unit: Unit = { ...this.chara.unit, name };
+      const unit: Unit = { ...this.chara.props.unit, name };
 
       this.scene.remove(this.chara);
       this.scene.remove(this);
@@ -313,18 +313,15 @@ export default class CharaCreationScene extends Phaser.Scene {
 
   refreshChara() {
     this.scene.remove("new_chara");
-    this.chara = new Chara(
-      "new_chara",
-      this,
-      this.unit,
-      250,
-      250,
-      3,
-      true,
-      true,
-      false,
-      false,
-      false
-    );
+    this.chara = new Chara({
+      key: "new_chara",
+      parent: this,
+      unit: this.unit,
+      cx: 250,
+      cy: 250,
+      scaleSizing: 3,
+      front: true,
+      animated: true,
+    });
   }
 }

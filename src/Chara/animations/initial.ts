@@ -28,13 +28,13 @@ import {
 } from "./constants";
 
 const shouldRenderHair = (chara: Chara) =>
-  !chara.unit.style.displayHat || chara.unit.equips.head === "none";
+  !chara.props.unit.style.displayHat || chara.props.unit.equips.head === "none";
 
 const shouldRenderHat = (chara: Chara) =>
-  chara.unit.style.displayHat && chara.unit.equips.head !== "none";
+  chara.props.unit.style.displayHat && chara.props.unit.equips.head !== "none";
 
 function front(chara: Chara, headOnly = false) {
-  const { skinColor, hair, hairColor } = chara.unit.style;
+  const { skinColor, hair, hairColor } = chara.props.unit.style;
   const renderHair = (gx: number, gy: number) => {
     if (!shouldRenderHair(chara)) return null;
     const hairSprite = chara.add.image(gx, gy, hair);
@@ -73,13 +73,13 @@ function front(chara: Chara, headOnly = false) {
   function renderHat(x: number, y: number) {
     if (!shouldRenderHat(chara)) return null;
 
-    const hat = chara.add.image(x, y, `equips/${chara.unit.equips.head}`);
+    const hat = chara.add.image(x, y, `equips/${chara.props.unit.equips.head}`);
 
     chara.container?.add(hat);
     return hat;
   }
 
-  chara.head = renderHead(HEAD_FRONT_X, HEAD_FRONT_Y, chara.unit.gender);
+  chara.head = renderHead(HEAD_FRONT_X, HEAD_FRONT_Y, chara.props.unit.gender);
   chara.hair = renderHair(HEAD_FRONT_X, HEAD_FRONT_Y);
   chara.hat = renderHat(HEAD_FRONT_X, HEAD_FRONT_Y);
 
@@ -87,13 +87,13 @@ function front(chara: Chara, headOnly = false) {
 
   chara.leftFoot = renderFoot(LEFT_FOOT_FRONT_X, LEFT_FOOT_FRONT_Y);
   chara.rightFoot = renderFoot(RIGHT_FOOT_FRONT_X, RIGHT_FOOT_FRONT_Y);
-  if (chara.unit.class === "mage") {
+  if (chara.props.unit.class === "mage") {
     chara.leftFoot.visible = false;
     chara.rightFoot.visible = false;
   }
 
   chara.leftHand = renderHand(0, 0);
-  chara.trunk = renderTrunk(chara.unit.class, TRUNK_FRONT_X, TRUNK_FRONT_Y);
+  chara.trunk = renderTrunk(chara.props.unit.class, TRUNK_FRONT_X, TRUNK_FRONT_Y);
   chara.rightHand = renderHand(0, 0);
 
   chara.mainHandContainer = chara.add.container(
@@ -111,7 +111,7 @@ function front(chara: Chara, headOnly = false) {
   chara.mainHandContainer.add(chara.rightHand);
   chara.offHandContainer.add(chara.leftHand);
 
-  if (chara.showWeapon) renderFrontWeapon(chara);
+  if (chara.props.showWeapon) renderFrontWeapon(chara);
 
   chara.container.sendToBack(chara.offHandContainer);
   chara.container?.bringToTop(chara.head);
@@ -121,11 +121,11 @@ function front(chara: Chara, headOnly = false) {
   chara.container.bringToTop(chara.mainHandContainer);
 }
 function renderFrontWeapon(chara: Chara) {
-  if (chara.unit.class === "mage") {
+  if (chara.props.unit.class === "mage") {
     chara.rightHandEquip = chara.add.image(
       23,
       17,
-      `equips/${chara.unit.equips.mainHand}`
+      `equips/${chara.props.unit.equips.mainHand}`
     );
 
     chara.rightHandEquip.setScale(-0.3, 0.3);
@@ -135,11 +135,11 @@ function renderFrontWeapon(chara: Chara) {
 
     chara.mainHandContainer.add(chara.rightHandEquip);
     chara.mainHandContainer.sendToBack(chara.rightHandEquip);
-  } else if (chara.unit.class === "fighter") {
+  } else if (chara.props.unit.class === "fighter") {
     chara.rightHandEquip = chara.add.image(
       23,
       17,
-      `equips/${chara.unit.equips.mainHand}`
+      `equips/${chara.props.unit.equips.mainHand}`
     );
 
     chara.rightHandEquip.setScale(0.2);
@@ -147,11 +147,11 @@ function renderFrontWeapon(chara: Chara) {
 
     chara.mainHandContainer.add(chara.rightHandEquip);
     chara.mainHandContainer.sendToBack(chara.rightHandEquip);
-  } else if (chara.unit.class === "archer") {
+  } else if (chara.props.unit.class === "archer") {
     chara.leftHandEquip = chara.add.image(
       0,
       0,
-      `equips/${chara.unit.equips.mainHand}`
+      `equips/${chara.props.unit.equips.mainHand}`
     );
 
     chara.offHandContainer.add(chara.leftHandEquip);
@@ -162,7 +162,7 @@ function renderFrontWeapon(chara: Chara) {
 }
 
 function back(chara: Chara, headOnly = false) {
-  const { skinColor, hair, hairColor } = chara.unit.style;
+  const { skinColor, hair, hairColor } = chara.props.unit.style;
   const renderHair = (gx: number, gy: number) => {
     if (!shouldRenderHair(chara)) return null;
 
@@ -209,7 +209,7 @@ function back(chara: Chara, headOnly = false) {
   function renderHat(x: number, y: number) {
     if (!shouldRenderHat(chara)) return null;
 
-    const hat = chara.add.image(x, y, `equips/back_${chara.unit.equips.head}`);
+    const hat = chara.add.image(x, y, `equips/back_${chara.props.unit.equips.head}`);
 
     chara.container?.add(hat);
     return hat;
@@ -234,12 +234,12 @@ function back(chara: Chara, headOnly = false) {
   chara.leftFoot.setScale(1, 1);
   chara.rightFoot.setScale(1, 1);
 
-  if (chara.unit.class === "mage") {
+  if (chara.props.unit.class === "mage") {
     chara.leftFoot.visible = false;
     chara.rightFoot.visible = false;
   }
   chara.leftHand = renderHand(0, 0);
-  chara.trunk = renderTrunk(chara.unit.class, TRUNK_BACK_X, TRUNK_BACK_Y);
+  chara.trunk = renderTrunk(chara.props.unit.class, TRUNK_BACK_X, TRUNK_BACK_Y);
   chara.rightHand = renderHand(0, 0);
 
   chara.offHandContainer = chara.add.container(
@@ -251,7 +251,7 @@ function back(chara: Chara, headOnly = false) {
   chara.mainHandContainer.add(chara.rightHand);
   chara.offHandContainer.add(chara.leftHand);
 
-  if (chara.showWeapon) {
+  if (chara.props.showWeapon) {
     renderBackWeapon(chara);
   }
 
@@ -266,16 +266,16 @@ function back(chara: Chara, headOnly = false) {
 }
 
 export default (chara: Chara, headOnly = false) => {
-  if (chara.front) front(chara, headOnly);
+  if (chara.props.front) front(chara, headOnly);
   else back(chara, headOnly);
 };
 
 function renderBackWeapon(chara: Chara) {
-  if (chara.unit.class === "mage") {
+  if (chara.props.unit.class === "mage") {
     chara.rightHandEquip = chara.add.image(
       13,
       17,
-      `equips/${chara.unit.equips.mainHand}`
+      `equips/${chara.props.unit.equips.mainHand}`
     );
 
     chara.rightHandEquip.setScale(-0.3, 0.3);
@@ -285,11 +285,11 @@ function renderBackWeapon(chara: Chara) {
 
     chara.mainHandContainer.add(chara.rightHandEquip);
     chara.mainHandContainer.sendToBack(chara.rightHandEquip);
-  } else if (chara.unit.class === "fighter") {
+  } else if (chara.props.unit.class === "fighter") {
     chara.rightHandEquip = chara.add.image(
       -10,
       15,
-      `equips/${chara.unit.equips.mainHand}`
+      `equips/${chara.props.unit.equips.mainHand}`
     );
 
     chara.rightHandEquip.setScale(-0.2, 0.2);
@@ -297,11 +297,11 @@ function renderBackWeapon(chara: Chara) {
 
     chara.mainHandContainer.add(chara.rightHandEquip);
     chara.mainHandContainer.sendToBack(chara.rightHandEquip);
-  } else if (chara.unit.class === "archer") {
+  } else if (chara.props.unit.class === "archer") {
     chara.leftHandEquip = chara.add.image(
       0,
       20,
-      `equips/${chara.unit.equips.mainHand}`
+      `equips/${chara.props.unit.equips.mainHand}`
     );
     chara.leftHandEquip.rotation = 1;
 

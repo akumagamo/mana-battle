@@ -62,11 +62,11 @@ export default class BoardScene extends Phaser.Scene {
     });
   }
   moveUnitToBoardTile(id: string) {
-    const chara = this.unitList.find((chara) => chara.unit.id === id);
+    const chara = this.unitList.find((chara) => chara.props.unit.id === id);
 
     if (!chara) return;
 
-    const { unit } = chara;
+    const { unit } = chara.props;
 
     const pos = getUnitPositionInScreen(Squad.getMember(unit.id, this.squad));
 
@@ -128,7 +128,7 @@ export default class BoardScene extends Phaser.Scene {
     }
   };
   private getChara(unit: { id: string }) {
-    return this.unitList.find((chara) => chara.key === this.makeUnitKey(unit));
+    return this.unitList.find((chara) => chara.props.key === this.makeUnitKey(unit));
   }
   placeTiles({ mapWidth, mapHeight }: { mapWidth: number; mapHeight: number }) {
     var grid: null[][] = [[]];
@@ -173,7 +173,7 @@ export default class BoardScene extends Phaser.Scene {
     if (!unit) throw new Error('Invalid member supplied.');
 
     const key = this.makeUnitKey(unit);
-    const chara = new Chara(key, this, unit, x, y, 1, true);
+    const chara = new Chara({key, parent: this, unit, cx: x, cy: y, scaleSizing: 1, front: true});
 
     chara.enableDrag(this.onUnitDrag.bind(this), this.onUnitDragEnd.bind(this));
 
@@ -188,7 +188,7 @@ export default class BoardScene extends Phaser.Scene {
     this.unitList.forEach((chara) => {
       chara.onClick((c) => {
         const member = Squad.findMember(
-          (mem) => mem.id === chara.unit.id,
+          (mem) => mem.id === chara.props.unit.id,
           this.squad
         );
 
@@ -258,7 +258,7 @@ export default class BoardScene extends Phaser.Scene {
     this.tiles.forEach((tile) => tile.sprite.destroy());
 
     this.unitList.forEach((chara) =>
-      this.scene.remove(this.makeUnitKey(chara.unit))
+      this.scene.remove(this.makeUnitKey(chara.props.unit))
     );
 
     this.scene.remove();

@@ -5,9 +5,9 @@ export default (chara: Chara, damage: number, isKilled: boolean) => {
   const FLINCH_DURATION = 200;
   const FLINCH_ROTATION = -0.2;
 
-  chara.parent.tweens.add({
+  chara.props.parent.tweens.add({
     targets: chara?.container,
-    rotation: chara.front ? FLINCH_ROTATION : FLINCH_ROTATION * -1,
+    rotation: chara.props.front ? FLINCH_ROTATION : FLINCH_ROTATION * -1,
     yoyo: !isKilled,
     duration: isKilled ? FLINCH_DURATION / 2 : FLINCH_DURATION,
     onComplete: () => {

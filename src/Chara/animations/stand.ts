@@ -27,7 +27,7 @@ const front = (chara: Chara) => {
   });
 
   //TODO: create weapon->stance type mapping
-  if (chara.unit.equips.mainHand === 'iron_spear') {
+  if (chara.props.unit.equips.mainHand === 'iron_spear') {
     chara.tweens.add({
       targets: chara.offHandContainer,
       y: LEFT_HAND_FRONT_Y,
@@ -69,6 +69,6 @@ const back = (chara: Chara) => {
 };
 
 export default (chara: Chara) => {
-  if (chara.front) front(chara);
+  if (chara.props.front) front(chara);
   else back(chara);
 };

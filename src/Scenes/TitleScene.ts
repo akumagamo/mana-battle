@@ -32,27 +32,33 @@ export default class TitleScene extends Phaser.Scene {
     this.container.add(bg);
 
     this.charas = [
-      new Chara(
-        "3",
-        this,
-        makeUnit("fighter", 3, 1),
-        250,
-        500,
-        1.3,
-        false,
-        true
-      ),
-      new Chara("1", this, makeUnit("mage", 1, 1), 350, 520, 1.5, false, true),
-      new Chara(
-        "2",
-        this,
-        makeUnit("archer", 2, 1),
-        450,
-        550,
-        1.6,
-        false,
-        true
-      ),
+      new Chara({
+        key: "3",
+        parent: this,
+        unit: makeUnit("fighter", 3, 1),
+        cx: 250,
+        cy: 500,
+        scaleSizing: 1.3,
+        front: false,
+      }),
+      new Chara({
+        key: "1",
+        parent: this,
+        unit: makeUnit("mage", 1, 1),
+        cx: 350,
+        cy: 520,
+        scaleSizing: 1.5,
+        front: false,
+      }),
+      new Chara({
+        key: "2",
+        parent: this,
+        unit: makeUnit("archer", 2, 1),
+        cx: 450,
+        cy: 550,
+        scaleSizing: 1.6,
+        front: false,
+      }),
     ];
 
     this.charas.forEach((c) => {

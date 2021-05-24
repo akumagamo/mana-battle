@@ -189,16 +189,16 @@ export class MapScene extends Phaser.Scene {
       // TODO: only enemies
       // how: have indexes per team
       this.charas
-        .filter((c) => c.unit.squad !== sqd)
+        .filter((c) => c.props.unit.squad !== sqd)
         .forEach((c) => {
-          if (c.key !== current.key) {
+          if (c.props.key !== current.props.key) {
             const distance = getDistance(c.container, current.container);
 
             if (distance < cellSize * 0.8) {
               this.isPaused = true;
               this.startCombat(
                 this.getSquad(sqd),
-                this.getSquad(c.unit.squad),
+                this.getSquad(c.props.unit.squad),
                 direction
               );
             }
@@ -444,7 +444,7 @@ export class MapScene extends Phaser.Scene {
     chara.container.destroy();
     this.scene.remove(chara.scene.key);
 
-    this.charas = this.charas.filter((c) => c.unit.squad !== id);
+    this.charas = this.charas.filter((c) => c.props.unit.squad !== id);
   }
 
   /**
@@ -688,7 +688,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   async getChara(squadId: string) {
-    return this.charas.find((c) => c.key === this.charaKey(squadId));
+    return this.charas.find((c) => c.props.key === this.charaKey(squadId));
   }
 
   charaKey(squadId: string) {

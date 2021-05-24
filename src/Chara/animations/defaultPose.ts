@@ -50,7 +50,7 @@ export default (chara: Chara) => {
   chara.offHandContainer.rotation = 0;
   chara.trunk.rotation = 0;
 
-  if (chara.front) {
+  if (chara.props.front) {
     chara.charaWrapper.x = CHARA_WRAPPER_X;
     chara.charaWrapper.y = CHARA_WRAPPER_Y;
     chara.head.x = HEAD_FRONT_X;
@@ -70,7 +70,7 @@ export default (chara: Chara) => {
     chara.offHandContainer.y = LEFT_HAND_FRONT_Y;
 
     // TODO: weapon-> stance type mapping
-    if(chara.unit.equips.mainHand === "iron_spear"){
+    if(chara.props.unit.equips.mainHand === "iron_spear"){
         chara.leftHand.setPosition(LEFT_HAND_FRONT_X + 5, LEFT_HAND_FRONT_Y+10)
     }
 

@@ -20,18 +20,15 @@ export const renderSquad = (scene: MapScene, mapSquad: MapSquad): void => {
 
   const { x, y } = mapSquad.pos;
 
-  const chara = new Chara(
-    scene.charaKey(mapSquad.squad.id),
-    scene,
-    leader,
-    x,
-    y,
-    CHARA_MAP_SCALE,
-    true,
-    true,
-    false,
-    false,
-    false
+  const chara = new Chara({
+    key: scene.charaKey(mapSquad.squad.id),
+    parent: scene,
+    unit: leader,
+    cx: x,
+    cy: y,
+    scaleSizing: CHARA_MAP_SCALE,
+     front: true,
+    animated: true}
   );
 
   const emblem = chara.add.image(

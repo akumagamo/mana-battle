@@ -35,7 +35,7 @@ export default (
   boardScene.onUnitClick((chara) => {
     charaStats.removeAll();
 
-    detailsBar(chara.unit);
+    detailsBar(chara.props.unit);
   });
 
   boardScene.highlightTile(leader);

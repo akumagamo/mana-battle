@@ -7,14 +7,14 @@ export function displayDamage(chara: Chara, damage: number) {
     chara.container.y - 100,
     damage.toString(),
     chara.charaWrapper,
-    chara.parent
+    chara.props.parent
   );
   dmg.setScale(2);
   //dmg.setShadow(2, 2, '#000');
   dmg.setStroke("#000000", 4);
   dmg.setAlign("center");
 
-  chara.parent.tweens.add({
+  chara.props.parent.tweens.add({
     targets: dmg,
     y: chara.container.y - 120,
     alpha: 0,
