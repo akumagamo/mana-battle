@@ -38,13 +38,14 @@ export class Chara extends Phaser.Scene {
 
   hpBarContainer: Container | null;
 
+  // TODO: use an object parameter, this is horrible
   constructor(
     public key: string,
     public parent: Phaser.Scene,
     public unit: Unit,
     public cx: number,
     public cy: number,
-    public scaleSizing: number, // todo: rename
+    public scaleSizing: number, // todo: rename - we can't use `scale` because it overrides the Phaser.Scene one
     public front: boolean = true,
     public animated = true,
     public headOnly = false,

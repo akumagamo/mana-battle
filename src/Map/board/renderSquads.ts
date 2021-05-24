@@ -27,7 +27,11 @@ export const renderSquad = (scene: MapScene, mapSquad: MapSquad): void => {
     x,
     y,
     CHARA_MAP_SCALE,
-    true
+    true,
+    true,
+    false,
+    false,
+    false
   );
 
   const emblem = chara.add.image(
