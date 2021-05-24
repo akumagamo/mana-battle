@@ -173,45 +173,9 @@ export class MapScene extends Phaser.Scene {
       const chara = await this.getChara(squadId);
 
       if (dist >= SPEED) {
-        if (next.x > squad.pos.x) {
-          squad.pos.x += 1 * SPEED;
-          direction = "right";
-          chara.container.scaleX = CHARA_MAP_SCALE;
-        } else if (next.x < squad.pos.x) {
-          squad.pos.x -= 1 * SPEED;
-          direction = "left";
-          chara.container.scaleX = CHARA_MAP_SCALE * -1;
-        } else if (next.y > squad.pos.y) {
-          squad.pos.y += 1 * SPEED;
-          direction = "bottom";
-        } else if (next.y < squad.pos.y) {
-          squad.pos.y -= 1 * SPEED;
-          direction = "top";
-        }
-        chara.container.setPosition(squad.pos.x, squad.pos.y);
-        // TODO: update squad + add single source of "squad truth"
-        this.updateState({
-          ...this.state,
-          squads: this.state.squads.setIn([squadId, "pos"], squad.pos),
-        });
+        direction = this.step(next, squad, direction, chara);
       } else {
-        console.log("arrived at checkpoint!");
-        const [, ...remaining] = path;
-
-        if (remaining.length > 0) {
-          console.log(`removing checkpoint, as there are checkpoins remaining`);
-          this.squadsInMovement = this.squadsInMovement.set(squadId, {
-            path: remaining,
-            squad,
-          });
-        } else {
-          console.log("no checkpoints remaining, arrived at finale!");
-          this.squadsInMovement = this.squadsInMovement.delete(squadId);
-
-          const chara = await this.getChara(squadId);
-          chara.stand();
-          await this.speak(squad);
-        }
+        await this.finishMovement(path, squad);
       }
 
       return squadId;
@@ -241,6 +205,59 @@ export class MapScene extends Phaser.Scene {
           }
         });
     });
+  }
+
+  private async finishMovement(
+    path: Vector[],
+    squad: MapSquad
+  ) {
+    console.log("arrived at checkpoint!");
+    const [, ...remaining] = path;
+
+    if (remaining.length > 0) {
+      console.log(`removing checkpoint, as there are checkpoins remaining`);
+      this.squadsInMovement = this.squadsInMovement.set(squad.id, {
+        path: remaining,
+        squad,
+      });
+    } else {
+      console.log("no checkpoints remaining, arrived at finale!");
+      this.squadsInMovement = this.squadsInMovement.delete(squad.id);
+
+      const chara = await this.getChara(squad.id);
+      chara.stand();
+      await this.speak(squad);
+    }
+  }
+
+  private step(
+    next: { x: number; y: number },
+    squad: MapSquad,
+    direction: string,
+    chara: Chara,
+  ) {
+    if (next.x > squad.pos.x) {
+      squad.pos.x += 1 * SPEED;
+      direction = "right";
+      chara.container.scaleX = CHARA_MAP_SCALE;
+    } else if (next.x < squad.pos.x) {
+      squad.pos.x -= 1 * SPEED;
+      direction = "left";
+      chara.container.scaleX = CHARA_MAP_SCALE * -1;
+    } else if (next.y > squad.pos.y) {
+      squad.pos.y += 1 * SPEED;
+      direction = "bottom";
+    } else if (next.y < squad.pos.y) {
+      squad.pos.y -= 1 * SPEED;
+      direction = "top";
+    }
+    chara.container.setPosition(squad.pos.x, squad.pos.y);
+    // TODO: update squad + add single source of "squad truth"
+    this.updateState({
+      ...this.state,
+      squads: this.state.squads.setIn([squad.id, "pos"], squad.pos),
+    });
+    return direction;
   }
 
   async speak(squad: MapSquad) {
