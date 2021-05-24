@@ -17,10 +17,10 @@ interface CharaProps {
   parent: Phaser.Scene;
   // TODO: remove unit, we should have just the eid (avoid data dup)
   unit: Unit;
-  cx: number;
-  cy: number;
-  scaleSizing: number; // todo: rename - we can't use `scale` because it overrides the Phaser.Scene one
-  front: boolean;
+  cx?: number;
+  cy?: number;
+  scaleSizing?: number; // todo: rename - we can't use `scale` because it overrides the Phaser.Scene one
+  front?: boolean;
   animated?: boolean;
   headOnly?: boolean;
   showHpBar?: boolean;
@@ -59,9 +59,9 @@ export class Chara extends Phaser.Scene {
     key,
     parent,
     unit,
-    cx,
-    cy,
-    scaleSizing,
+    cx = 0,
+    cy = 0,
+    scaleSizing = 1,
     front = true,
     animated = true,
     headOnly = false,

@@ -24,7 +24,6 @@ export const createUnit = (
     cy: y,
     scaleSizing: 1,
     front,
-    animated: true,
     showWeapon,
   });
 

@@ -320,8 +320,6 @@ export default class CharaCreationScene extends Phaser.Scene {
       cx: 250,
       cy: 250,
       scaleSizing: 3,
-      front: true,
-      animated: true,
     });
   }
 }

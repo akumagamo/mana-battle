@@ -25,9 +25,6 @@ export default (
     unit,
     cx: x + 70,
     cy: y + 70,
-    scaleSizing: 1,
-    front: true,
-    animated: false,
     headOnly: true,
   });
 

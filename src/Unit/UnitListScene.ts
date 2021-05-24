@@ -188,7 +188,14 @@ export default class UnitListScene extends Phaser.Scene {
       });
     }
 
-    const chara = new Chara({key, parent: this, unit, cy: charaX, cx: charaY, scaleSizing: 0.5, front: true});
+    const chara = new Chara({
+      key,
+      parent: this,
+      unit,
+      cy: charaX,
+      cx: charaY,
+      scaleSizing: 0.5,
+    });
 
     if (onDrag && onDragEnd)
       chara.enableDrag(onDrag.bind(this), onDragEnd.bind(this));
@@ -294,7 +301,6 @@ export default class UnitListScene extends Phaser.Scene {
 
     this.rows = this.rows.filter((row) => !findUnit(row));
     this.rows.forEach((row, index) => this.reposition(row, index));
-
 
     const unitsToRender = this.getUnitsToRender();
 

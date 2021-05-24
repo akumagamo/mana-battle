@@ -5,7 +5,7 @@ import panel from "../../UI/panel";
 import text from "../../UI/text";
 import TheaterScene from "../TheaterScene";
 
-export type Speak= {
+export type Speak = {
   type: "SPEAK";
   id: string;
   text: string;
@@ -27,8 +27,8 @@ export const speak = (scene: TheaterScene, { id, text: text_ }: Speak) => {
     cx: 100,
     cy: 120,
     scaleSizing: 1.4,
-    front: true,
-    headOnly: true});
+    headOnly: true,
+  });
 
   container.add(head.container);
 

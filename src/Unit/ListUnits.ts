@@ -90,7 +90,14 @@ export class ListUnitsScene extends Phaser.Scene {
 
     const tile = this.add.image(x_ + 2, y_ + 63, "tile");
     tile.setScale(0.4);
-    const chara = new Chara({key, parent: this, unit, cx: x_, cy: y_, scaleSizing: 0.6, front: true});
+    const chara = new Chara({
+      key,
+      parent: this,
+      unit,
+      cx: x_,
+      cy: y_,
+      scaleSizing: 0.6,
+    });
 
     chara.onClick(() => this.selectUnit(unit.id));
 

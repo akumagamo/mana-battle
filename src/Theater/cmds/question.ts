@@ -36,7 +36,6 @@ export const question = async (
     cx: 100,
     cy: 120,
     scaleSizing: 1.4,
-    front: true
     }
   );
 

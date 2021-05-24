@@ -1,10 +1,9 @@
-import { MapSquad } from '../Model';
-import { Chara } from '../../Chara/Chara';
-import { INVALID_STATE } from '../../errors';
-import { MapScene } from '../MapScene';
-import { PLAYER_FORCE } from '../../constants';
-import {CHARA_MAP_SCALE} from '../config';
-
+import { MapSquad } from "../Model";
+import { Chara } from "../../Chara/Chara";
+import { INVALID_STATE } from "../../errors";
+import { MapScene } from "../MapScene";
+import { PLAYER_FORCE } from "../../constants";
+import { CHARA_MAP_SCALE } from "../config";
 
 export const renderSquad = (scene: MapScene, mapSquad: MapSquad): void => {
   const { container } = scene.getContainers();
@@ -27,14 +26,12 @@ export const renderSquad = (scene: MapScene, mapSquad: MapSquad): void => {
     cx: x,
     cy: y,
     scaleSizing: CHARA_MAP_SCALE,
-     front: true,
-    animated: true}
-  );
+  });
 
   const emblem = chara.add.image(
     100,
     -20,
-    mapSquad.squad.force === PLAYER_FORCE ? 'ally_emblem' : 'enemy_emblem'
+    mapSquad.squad.force === PLAYER_FORCE ? "ally_emblem" : "enemy_emblem"
   );
 
   chara.container.add(emblem);
