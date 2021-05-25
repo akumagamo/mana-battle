@@ -173,7 +173,7 @@ export default class BoardScene extends Phaser.Scene {
     if (!unit) throw new Error('Invalid member supplied.');
 
     const key = this.makeUnitKey(unit);
-    const chara = new Chara({key, parent: this, unit, cx: x, cy: y, scaleSizing: 1, front: true});
+    const chara = new Chara({key, parent: this, unit, cx: x, cy: y});
 
     chara.enableDrag(this.onUnitDrag.bind(this), this.onUnitDragEnd.bind(this));
 

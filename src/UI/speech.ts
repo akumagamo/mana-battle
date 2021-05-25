@@ -26,6 +26,7 @@ export default (
     cx: x + 70,
     cy: y + 70,
     headOnly: true,
+    animated: false,
   });
 
   const finalText = text(0, 0, text_, container, scene);
