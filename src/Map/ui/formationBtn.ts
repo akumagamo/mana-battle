@@ -1,37 +1,35 @@
-import {MapSquad} from "../Model";
 import BoardScene from "../../Board/InteractiveBoardScene";
-import {SCREEN_HEIGHT, SCREEN_WIDTH} from "../../constants";
-import {Container} from "../../Models";
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../constants";
+import { Container } from "../../Models";
 import button from "../../UI/button";
 import panel from "../../UI/panel";
+import { toMapSquad } from "../../Unit/Model";
 import SmallUnitDetailsBar from "../../Unit/SmallUnitDetailsBar";
-import {MapScene} from "../MapScene";
+import { MapScene } from "../MapScene";
 
-export function formationBtn(scene: MapScene, mapSquad: MapSquad) {
-  scene.changeMode({type: "CHANGING_SQUAD_FORMATION"});
+export function formationBtn(scene: MapScene, squadId: string) {
+  const mapSquad = scene.getSquad(squadId);
+  scene.changeMode({ type: "CHANGING_SQUAD_FORMATION" });
   const container = scene.add.container();
   panel(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, container, scene);
   let details: Container | null = null;
   const boardScene = new BoardScene(
     mapSquad.squad,
-    (updatedSquad) => scene.signal("changed unit position on board, updating", [
-      {
-        type: "UPDATE_STATE",
-        target: {
-          ...scene.state,
-          squads: scene.state.squads.map((sqd) => {
-            if (sqd.squad.id === updatedSquad.id)
-              return {
-                ...sqd,
-                members: updatedSquad.members,
-              };
+    (updatedSquad) =>
+      scene.signal("changed unit position on board, updating", [
 
-            else
-              return sqd;
-          }),
+        // TODO: have a UPDATE_SQUAD_INFO action, this is horrible
+        {
+          type: "UPDATE_STATE",
+          target: {
+            ...scene.state,
+            squads: scene.state.squads.set(squadId, {
+              ...scene.state.squads.get(squadId),
+              squad: updatedSquad,
+            }),
+          },
         },
-      },
-    ]),
+      ]),
     scene.state.units
   );
 
@@ -53,7 +51,6 @@ export function formationBtn(scene: MapScene, mapSquad: MapSquad) {
     scene.scene.remove("editSquadInMap");
     container.destroy();
 
-    scene.changeMode({type: "SQUAD_SELECTED", id: mapSquad.squad.id});
+    scene.changeMode({ type: "SQUAD_SELECTED", id: mapSquad.squad.id });
   });
 }
-

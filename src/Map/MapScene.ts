@@ -1028,7 +1028,7 @@ export class MapScene extends Phaser.Scene {
 
     const chara = await this.getChara(id);
 
-    chara.run(MOVE_SPEED*3);
+    chara.run(MOVE_SPEED / GAME_SPEED);
 
     this.changeMode({ type: "SQUAD_SELECTED", id });
 

@@ -53,6 +53,8 @@ export default class BoardScene extends Phaser.Scene {
       Squad.makeMember({ id: unit.id, x, y })
     );
 
+    console.log(`...updateSquad`, updatedSquad)
+
     this.onSquadUpdated(updatedSquad);
     this.squad = updatedSquad;
 

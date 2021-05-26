@@ -22,7 +22,7 @@ export default (
       mapScene.uiContainer,
       mapScene,
       () => {
-        formationBtn(mapScene, mapSquad);
+        formationBtn(mapScene, mapSquad.id);
       }
     );
     button(baseX + 200, baseY, "Move", mapScene.uiContainer, mapScene, () => {
