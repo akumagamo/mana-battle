@@ -19,7 +19,8 @@ export type Question = {
 
 export const question = async (
   scene: TheaterScene,
-  { id, question, options, title }: Question
+  { id, question, options, title }: Question,
+  speed: number
 ) => {
   const chara = scene.charas.get(scene.charaKey(id));
 
@@ -48,7 +49,7 @@ export const question = async (
   // clickZone.setInteractive();
   // clickZone.setOrigin(0);
 
-  await animatedText(scene, question, unitText);
+  await animatedText(scene, question, unitText, speed);
 
   await delay(scene, 1000);
 

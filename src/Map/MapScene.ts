@@ -35,8 +35,9 @@ import * as CombatScene from "../Combat/CombatScene";
 
 const WALKABLE_CELL_TINT = 0x88aa88;
 
-const MOVE_SPEED = 2;
 const GAME_SPEED = 5
+
+const MOVE_SPEED = 2 * GAME_SPEED;
 
 const CHARA_VERTICAL_OFFSET = -10;
 
@@ -228,7 +229,7 @@ export class MapScene extends Phaser.Scene {
 
       const chara = await this.getChara(squad.id);
       chara.stand();
-      await this.speak(squad);
+      await this.speak(squad, GAME_SPEED);
     }
   }
 
@@ -262,7 +263,7 @@ export class MapScene extends Phaser.Scene {
     return direction;
   }
 
-  async speak(squad: MapSquad) {
+  async speak(squad: MapSquad, speed:number) {
     this.isPaused = true;
 
     const leader = this.getSquadLeader(squad.id);
@@ -272,7 +273,8 @@ export class MapScene extends Phaser.Scene {
       70,
       "We arrived at the target destination.",
       this.uiContainer,
-      this
+      this,
+      speed
     );
     button(950, 180, "Ok", this.uiContainer, this, () => {
       this.scene.remove(res.portrait.scene.key);
@@ -674,7 +676,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   async clickSquad(squad: MapSquad) {
-    await this.moveCameraTo(squad.pos, 100);
+    await this.moveCameraTo(squad.pos, 100/GAME_SPEED);
 
     // this.signal('clicked on unit, marking cell as selected', [
     //   { type: 'HIGHLIGHT_CELL', pos: squad.pos },
@@ -973,10 +975,11 @@ export class MapScene extends Phaser.Scene {
       70,
       "Ready for Combat",
       this.uiContainer,
-      this
+      this,
+      GAME_SPEED
     );
 
-    await delay(this, 3000);
+    await delay(this, 3000 / GAME_SPEED);
 
     this.scene.remove(portrait.scene.key);
 
@@ -1073,7 +1076,7 @@ export class MapScene extends Phaser.Scene {
       return new Promise((resolve) => {
         this.add.tween({
           targets: chara.container,
-          duration: 1000,
+          duration: 1000 /GAME_SPEED,
           x: newPos.x,
           y: newPos.y,
           onComplete: () => {

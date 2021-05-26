@@ -73,7 +73,7 @@ export default class TheaterScene extends Phaser.Scene {
           await wait(this, step);
           return Promise.resolve(answers);
         case "SPEAK":
-          await speak(this, step);
+          await speak(this, step, 1);
           return Promise.resolve(answers);
         case "WALK":
           await walk(this, step);
@@ -88,7 +88,7 @@ export default class TheaterScene extends Phaser.Scene {
           flipUnit(this, step);
           return Promise.resolve(answers);
         case "QUESTION":
-          const answer = await question(this, step);
+          const answer = await question(this, step, 1);
           return Promise.resolve(answers.concat([answer]));
         default:
           return Promise.resolve(answers);

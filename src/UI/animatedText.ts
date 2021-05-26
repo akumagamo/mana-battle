@@ -3,11 +3,12 @@ import { Scene } from "phaser";
 export function animatedText(
   scene: Scene,
   text_: string,
-  speechText: Phaser.GameObjects.Text
+  speechText: Phaser.GameObjects.Text,
+  speed: number
 ) {
   scene.time.addEvent({
     repeat: text_.length,
-    delay: 25,
+    delay: 25 / speed,
     callback: () => {
       speechText.text = text_.slice(0, speechText.text.length + 1);
     },

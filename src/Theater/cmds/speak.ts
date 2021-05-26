@@ -11,7 +11,7 @@ export type Speak = {
   text: string;
 };
 
-export const speak = (scene: TheaterScene, { id, text: text_ }: Speak) => {
+export const speak = (scene: TheaterScene, { id, text: text_ }: Speak, speed:number) => {
   const chara = scene.charas.get(scene.charaKey(id));
 
   const PANEL_HEIGHT = 200;
@@ -40,7 +40,7 @@ export const speak = (scene: TheaterScene, { id, text: text_ }: Speak) => {
   clickZone.setOrigin(0);
 
   return new Promise<void>(async (resolve) => {
-    await animatedText(scene, text_, unitText);
+    await animatedText(scene, text_, unitText, speed);
 
     const img = scene.add.image(SCREEN_WIDTH - 100, 100, "arrow_right");
     container.add(img);

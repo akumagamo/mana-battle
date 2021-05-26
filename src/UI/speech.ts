@@ -17,7 +17,8 @@ export default (
   y: number,
   text_: string,
   container: Container,
-  scene: Scene
+  scene: Scene,
+  speed: number
 ) => {
   const portrait = new Chara({
     key: `speech_${unit.id}`,
@@ -44,7 +45,7 @@ export default (
 
   const speechText = text(x + 150, y + 50, "", container, scene);
 
-  animatedText(scene, text_, speechText);
+  animatedText(scene, text_, speechText, speed);
 
   return { bg, portrait, speechText };
 };
