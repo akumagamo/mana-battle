@@ -35,7 +35,8 @@ import * as CombatScene from "../Combat/CombatScene";
 
 const WALKABLE_CELL_TINT = 0x88aa88;
 
-const SPEED = 2;
+const MOVE_SPEED = 2;
+const GAME_SPEED = 5
 
 const CHARA_VERTICAL_OFFSET = -10;
 
@@ -173,7 +174,7 @@ export class MapScene extends Phaser.Scene {
 
       const chara = await this.getChara(squadId);
 
-      if (dist >= SPEED) {
+      if (dist >= MOVE_SPEED) {
         direction = this.stepChara(next, squad, direction, chara);
       } else {
         await this.finishMovement(path, squad);
@@ -238,18 +239,18 @@ export class MapScene extends Phaser.Scene {
     chara: Chara,
   ) {
     if (next.x > squad.pos.x) {
-      squad.pos.x += 1 * SPEED;
+      squad.pos.x += 1 * MOVE_SPEED;
       direction = "right";
       chara.container.scaleX = CHARA_MAP_SCALE;
     } else if (next.x < squad.pos.x) {
-      squad.pos.x -= 1 * SPEED;
+      squad.pos.x -= 1 * MOVE_SPEED;
       direction = "left";
       chara.container.scaleX = CHARA_MAP_SCALE * -1;
     } else if (next.y > squad.pos.y) {
-      squad.pos.y += 1 * SPEED;
+      squad.pos.y += 1 * MOVE_SPEED;
       direction = "bottom";
     } else if (next.y < squad.pos.y) {
-      squad.pos.y -= 1 * SPEED;
+      squad.pos.y -= 1 * MOVE_SPEED;
       direction = "top";
     }
     chara.container.setPosition(squad.pos.x, squad.pos.y);
@@ -647,7 +648,7 @@ export class MapScene extends Phaser.Scene {
     await tween(this, {
       targets: ping,
       alpha: 0,
-      duration: 500 / SPEED,
+      duration: 500 / GAME_SPEED,
       scale: 2,
       onComplete: () => ping.destroy(),
     });
@@ -711,8 +712,8 @@ export class MapScene extends Phaser.Scene {
     // for now, player always wins
     const loser = target.id;
 
-    const combatCallback = (cmds: List<Unit>) => {
-      let squadsTotalHP = cmds.reduce((xs, unit) => {
+    const combatCallback = (units: List<Unit>) => {
+      let squadsTotalHP = units.reduce((xs, unit) => {
           let sqdId = unit.squad || "";
 
           if (!xs[sqdId]) {
@@ -724,10 +725,13 @@ export class MapScene extends Phaser.Scene {
         return xs;
       }, {} as { [x: string]: number });
 
+      const updateUnits = units.map(unit=>({type: "UPDATE_UNIT", unit}))
+
       let commands = Map(squadsTotalHP)
         .filter((v) => v === 0)
         .keySeq()
         .map((target) => ({ type: "DESTROY_TEAM", target }))
+        .concat(updateUnits)
         .toJS()
         .concat([
           {
@@ -741,7 +745,7 @@ export class MapScene extends Phaser.Scene {
       // TODO: use safe start
       this.scene.start(
         "MapScene",
-        cmds.concat(commands)
+        units.concat(commands)
         //.concat([{type: 'END_SQUAD_TURN'}]),
       );
     };
@@ -1024,7 +1028,7 @@ export class MapScene extends Phaser.Scene {
 
     const chara = await this.getChara(id);
 
-    chara.run(SPEED*3);
+    chara.run(MOVE_SPEED*3);
 
     this.changeMode({ type: "SQUAD_SELECTED", id });
 
