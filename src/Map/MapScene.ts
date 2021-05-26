@@ -173,7 +173,7 @@ export class MapScene extends Phaser.Scene {
       const chara = await this.getChara(squadId);
 
       if (dist >= SPEED) {
-        direction = this.step(next, squad, direction, chara);
+        direction = this.stepChara(next, squad, direction, chara);
       } else {
         await this.finishMovement(path, squad);
       }
@@ -230,7 +230,7 @@ export class MapScene extends Phaser.Scene {
     }
   }
 
-  private step(
+  private stepChara(
     next: { x: number; y: number },
     squad: MapSquad,
     direction: string,
@@ -262,9 +262,6 @@ export class MapScene extends Phaser.Scene {
 
   async speak(squad: MapSquad) {
     this.isPaused = true;
-    await this.signal("Squad arrived at destination", [
-      { type: "CLICK_SQUAD", unit: squad },
-    ]);
 
     const leader = this.getSelectedSquadLeader(squad.id);
     const res = speech(
@@ -1027,9 +1024,10 @@ export class MapScene extends Phaser.Scene {
 
     const chara = await this.getChara(id);
 
-    chara.run(SPEED);
+    chara.run(SPEED*3);
 
-    this.changeMode({ type: "NOTHING_SELECTED" });
+    this.changeMode({ type: "SQUAD_SELECTED", id });
+
   }
 
   showMoveControls(squad: MapSquad) {
