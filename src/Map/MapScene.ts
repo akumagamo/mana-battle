@@ -263,7 +263,7 @@ export class MapScene extends Phaser.Scene {
   async speak(squad: MapSquad) {
     this.isPaused = true;
 
-    const leader = this.getSelectedSquadLeader(squad.id);
+    const leader = this.getSquadLeader(squad.id);
     const res = speech(
       leader,
       450,
@@ -836,7 +836,7 @@ export class MapScene extends Phaser.Scene {
       .find((s) => getDistance(cellToScreenPosition({ x, y }), s.pos) < 50);
   }
 
-  getSelectedSquadLeader(squadId: string) {
+  getSquadLeader(squadId: string) {
     let squad = this.getSquad(squadId);
 
     return this.state.units.get(squad.squad.leader);
@@ -935,7 +935,7 @@ export class MapScene extends Phaser.Scene {
     const bg = panel(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, this.uiContainer, this);
     bg.setAlpha(0.4);
 
-    const leader = this.getSelectedSquadLeader(playerSquad.id);
+    const leader = this.getSquadLeader(playerSquad.id);
 
     const enemyUnits = this.state.units.filter((u) => u.squad === squadB.id);
 
