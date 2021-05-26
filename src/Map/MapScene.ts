@@ -11,8 +11,8 @@ import {
   PLAYER_FORCE,
   PUBLIC_URL,
 } from "../constants";
-import { toMapSquad } from "../Unit/Model";
-import { Map, Set } from "immutable";
+import { toMapSquad, Unit } from "../Unit/Model";
+import { Map, Set, List } from "immutable";
 import speech from "../UI/speech";
 import StaticBoardScene from "../Board/StaticBoardScene";
 import clickCell from "./board/clickCell";
@@ -31,6 +31,7 @@ import { Mode, DEFAULT_MODE } from "./Mode";
 import { getDistance } from "../utils";
 import { cellSize, CHARA_MAP_SCALE } from "./config";
 import { screenToCellPosition, cellToScreenPosition } from "./board/position";
+import * as CombatScene from "../Combat/CombatScene";
 
 const WALKABLE_CELL_TINT = 0x88aa88;
 
@@ -710,17 +711,15 @@ export class MapScene extends Phaser.Scene {
     // for now, player always wins
     const loser = target.id;
 
-    const combatCallback = (cmds: MapCommands[]) => {
-      let squadsTotalHP = cmds.reduce((xs, x) => {
-        if (x.type === "UPDATE_UNIT") {
-          let sqdId = x.unit.squad || "";
+    const combatCallback = (cmds: List<Unit>) => {
+      let squadsTotalHP = cmds.reduce((xs, unit) => {
+          let sqdId = unit.squad || "";
 
           if (!xs[sqdId]) {
             xs[sqdId] = 0;
           }
 
-          xs[sqdId] += x.unit.currentHp;
-        }
+          xs[sqdId] += unit.currentHp;
 
         return xs;
       }, {} as { [x: string]: number });
@@ -739,6 +738,7 @@ export class MapScene extends Phaser.Scene {
           },
         ]);
 
+      // TODO: use safe start
       this.scene.start(
         "MapScene",
         cmds.concat(commands)
@@ -748,7 +748,7 @@ export class MapScene extends Phaser.Scene {
 
     // URGENT TODO: type this scene integration
     // change this.state.squads to squadIndex
-    this.scene.start("CombatScene", {
+    CombatScene.start(this,{
       squads: this.state.squads
         .filter((sqd) => [starter.id, target.id].includes(sqd.id))
         .reduce((xs, x) => xs.set(x.id, makeSquad(x.squad)), Map()) as Index,
