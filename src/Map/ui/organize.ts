@@ -1,14 +1,14 @@
-import {PLAYER_FORCE} from "../../constants";
-import {MapScene} from "../MapScene";
+import { PLAYER_FORCE } from "../../constants";
+import { MapScene } from "../MapScene";
 import * as ListSquads from "../../Squad/ListSquadsScene";
-import {Map} from "immutable";
+import { Map } from "immutable";
 
 export function organize(scene: MapScene) {
   console.log("organize btn");
 
-  scene.scene.stop("MapScene");
+  const sceneManager = scene.scene.manager;
 
-  // TODO: make all .run calls like this
+  sceneManager.stop("MapScene");
   ListSquads.run(
     {
       // TODO: only player units
@@ -18,8 +18,11 @@ export function organize(scene: MapScene) {
         .map((s) => s.squad)
         .reduce((xs, x) => xs.set(x.id, x), Map()),
       dispatched: scene.state.dispatchedSquads,
+      onReturnClick: (listSquadScene) => {
+        listSquadScene.scene.stop();
+        scene.scene.start('MapScene',[]);
+      },
     },
-    scene.scene.manager
+    sceneManager
   );
 }
-

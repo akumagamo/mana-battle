@@ -12,13 +12,17 @@ import { List, Map, Set } from "immutable";
 type CreateParams = {
   squads: Squad.Index;
   units: UnitIndex;
+  onReturnClick: (scene:ListSquadsScene)=>void;
   dispatched: Set<string>;
 };
 
-const sceneKey = "ListSquadsScene";
+export const key = "ListSquadsScene";
 
-export const run = (params: CreateParams, scene: Phaser.Scenes.SceneManager) => {
-  scene.run(sceneKey, params);
+export const run = (
+  params: CreateParams,
+  scene: Phaser.Scenes.SceneManager
+) => {
+  scene.run(key, params);
 };
 
 export class ListSquadsScene extends Phaser.Scene {
@@ -30,17 +34,19 @@ export class ListSquadsScene extends Phaser.Scene {
   units = Map() as UnitIndex;
   dispatched: Set<string> = Set();
   onDisbandSquad: (id: string) => void = () => {};
+  onReturnClick: (scene:ListSquadsScene)=>void | null = null;
 
   constructor() {
-    super(sceneKey);
+    super(key);
   }
 
-  create({ squads, units, dispatched }: CreateParams) {
+  create({ squads, units, dispatched, onReturnClick }: CreateParams) {
     this.events.once("shutdown", () => this.turnOff());
 
     this.squads = squads;
     this.units = units;
     this.dispatched = dispatched;
+    this.onReturnClick = onReturnClick;
 
     menu(this);
 
@@ -164,7 +170,6 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   renderControls() {
-    // TODO: add onReturn event
     button(
       SCREEN_WIDTH - 100,
       40,
@@ -173,11 +178,8 @@ export class ListSquadsScene extends Phaser.Scene {
       this,
       () => {
         this.turnOff();
-        this.scene.transition({
-          target: "TitleScene",
-          duration: 0,
-          moveBelow: true,
-        });
+
+        if (this.onReturnClick) this.onReturnClick(this);
       }
     );
 

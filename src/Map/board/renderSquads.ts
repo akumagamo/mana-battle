@@ -19,8 +19,10 @@ export const renderSquad = (scene: MapScene, mapSquad: MapSquad): void => {
 
   const { x, y } = mapSquad.pos;
 
+  const key = scene.charaKey(mapSquad.squad.id)
+
   const chara = new Chara({
-    key: scene.charaKey(mapSquad.squad.id),
+    key,
     parent: scene,
     unit: leader,
     cx: x,

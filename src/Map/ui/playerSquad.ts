@@ -36,6 +36,9 @@ export default (
   }
 
   button(50, 40, "Organize", uiContainer, mapScene, () => {
+    mapScene.clearSquadBoards()
+    mapScene.turnOff();
+    console.log(mapScene.state.squads.get('1'))
     organize(mapScene);
   });
   button(250, 40, "Dispatch", uiContainer, mapScene, () => {
