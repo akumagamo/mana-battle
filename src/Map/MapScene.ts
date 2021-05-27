@@ -226,7 +226,7 @@ export class MapScene extends Phaser.Scene {
 
       const chara = await this.getChara(squad.id);
       chara.stand();
-      await this.speak(squad, GAME_SPEED);
+      await this.speak(squad);
     }
   }
 
@@ -260,7 +260,7 @@ export class MapScene extends Phaser.Scene {
     return direction;
   }
 
-  async speak(squad: MapSquad, speed: number) {
+  async speak(squad: MapSquad) {
     this.isPaused = true;
 
     const leader = this.getSquadLeader(squad.id);
@@ -271,7 +271,7 @@ export class MapScene extends Phaser.Scene {
       "We arrived at the target destination.",
       this.uiContainer,
       this,
-      speed
+      GAME_SPEED
     );
 
     await res.textCompleted;
@@ -924,8 +924,22 @@ export class MapScene extends Phaser.Scene {
     return tile;
   }
 
+  getSquadUnits(id: string) {
+    return this.state.units.filter((u) => u.squad === id);
+  }
+
   // TODO: handle scenario where none of the engaging squads belongs to the player
   async startCombat(squadA: MapSquad, squadB: MapSquad, direction: string) {
+
+    // remove static boards that might exist in the screen with these squads
+    [squadA.id, squadB.id].forEach((id) => {
+      const board = this.scene.get(
+        `static-squad-${id}`
+      ) as StaticBoardScene | null;
+
+      if (board) board.turnOff();
+    });
+
     const baseX = 200;
     const baseY = 200;
     const scale = 0.5;
@@ -942,7 +956,7 @@ export class MapScene extends Phaser.Scene {
 
     const leader = this.getSquadLeader(playerSquad.id);
 
-    const enemyUnits = this.state.units.filter((u) => u.squad === squadB.id);
+    const enemyUnits = this.getSquadUnits(squadB.id);
 
     const enemy = new StaticBoardScene(
       squadB.squad,

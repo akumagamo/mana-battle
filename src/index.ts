@@ -75,61 +75,13 @@ import CombatScene from "./Combat/CombatScene";
         type: "mousedown",
         x: 721,
         y: 602,
-        time: 30388,
+        time: 33388,
       },
       {
         type: "mouseup",
         x: 722,
         y: 602,
-        time: 30536,
-      },
-      {
-        type: "mousedown",
-        x: 1052,
-        y: 136,
-        time: 32408,
-      },
-      {
-        type: "mouseup",
-        x: 1052,
-        y: 136,
-        time: 32546,
-      },
-      {
-        type: "mousedown",
-        x: 931,
-        y: 131,
-        time: 33310,
-      },
-      {
-        type: "mouseup",
-        x: 931,
-        y: 132,
-        time: 33448,
-      },
-      {
-        type: "mousedown",
-        x: 1035,
-        y: 146,
-        time: 33987,
-      },
-      {
-        type: "mouseup",
-        x: 1036,
-        y: 146,
-        time: 34082,
-      },
-      {
-        type: "mousedown",
-        x: 914,
-        y: 137,
-        time: 34487,
-      },
-      {
-        type: "mouseup",
-        x: 914,
-        y: 137,
-        time: 34577,
+        time: 33536,
       },
       {
         type: "mousedown",
@@ -419,7 +371,7 @@ import CombatScene from "./Combat/CombatScene";
         y: 340,
         time: 101994,
       },
-    ].map(ev=>({...ev,time: ev.time-27000}));
+    ].map(ev=>({...ev,time: ev.time-32000}));
 
     runScript(inputs);
 
