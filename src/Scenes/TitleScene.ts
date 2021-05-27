@@ -40,6 +40,7 @@ export default class TitleScene extends Phaser.Scene {
         cy: 500,
         scaleSizing: 1.3,
         front: false,
+        showWeapon: false
       }),
       new Chara({
         key: "1",
@@ -49,6 +50,7 @@ export default class TitleScene extends Phaser.Scene {
         cy: 520,
         scaleSizing: 1.5,
         front: false,
+        showWeapon: false
       }),
       new Chara({
         key: "2",
@@ -58,6 +60,7 @@ export default class TitleScene extends Phaser.Scene {
         cy: 550,
         scaleSizing: 1.6,
         front: false,
+        showWeapon: false
       }),
     ];
 
