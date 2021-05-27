@@ -35,7 +35,7 @@ import * as CombatScene from "../Combat/CombatScene";
 
 const WALKABLE_CELL_TINT = 0x88aa88;
 
-const GAME_SPEED = 5
+const GAME_SPEED = 5;
 
 const MOVE_SPEED = 2 * GAME_SPEED;
 
@@ -210,10 +210,7 @@ export class MapScene extends Phaser.Scene {
     });
   }
 
-  private async finishMovement(
-    path: Vector[],
-    squad: MapSquad
-  ) {
+  private async finishMovement(path: Vector[], squad: MapSquad) {
     console.log("arrived at checkpoint!");
     const [, ...remaining] = path;
 
@@ -237,7 +234,7 @@ export class MapScene extends Phaser.Scene {
     next: { x: number; y: number },
     squad: MapSquad,
     direction: string,
-    chara: Chara,
+    chara: Chara
   ) {
     if (next.x > squad.pos.x) {
       squad.pos.x += 1 * MOVE_SPEED;
@@ -263,7 +260,7 @@ export class MapScene extends Phaser.Scene {
     return direction;
   }
 
-  async speak(squad: MapSquad, speed:number) {
+  async speak(squad: MapSquad, speed: number) {
     this.isPaused = true;
 
     const leader = this.getSquadLeader(squad.id);
@@ -276,6 +273,8 @@ export class MapScene extends Phaser.Scene {
       this,
       speed
     );
+
+    await res.textCompleted;
     button(950, 180, "Ok", this.uiContainer, this, () => {
       this.scene.remove(res.portrait.scene.key);
       this.refreshUI();
@@ -676,7 +675,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   async clickSquad(squad: MapSquad) {
-    await this.moveCameraTo(squad.pos, 100/GAME_SPEED);
+    await this.moveCameraTo(squad.pos, 100 / GAME_SPEED);
 
     // this.signal('clicked on unit, marking cell as selected', [
     //   { type: 'HIGHLIGHT_CELL', pos: squad.pos },
@@ -716,18 +715,18 @@ export class MapScene extends Phaser.Scene {
 
     const combatCallback = (units: List<Unit>) => {
       let squadsTotalHP = units.reduce((xs, unit) => {
-          let sqdId = unit.squad || "";
+        let sqdId = unit.squad || "";
 
-          if (!xs[sqdId]) {
-            xs[sqdId] = 0;
-          }
+        if (!xs[sqdId]) {
+          xs[sqdId] = 0;
+        }
 
-          xs[sqdId] += unit.currentHp;
+        xs[sqdId] += unit.currentHp;
 
         return xs;
       }, {} as { [x: string]: number });
 
-      const updateUnits = units.map(unit=>({type: "UPDATE_UNIT", unit}))
+      const updateUnits = units.map((unit) => ({ type: "UPDATE_UNIT", unit }));
 
       let commands = Map(squadsTotalHP)
         .filter((v) => v === 0)
@@ -754,7 +753,7 @@ export class MapScene extends Phaser.Scene {
 
     // URGENT TODO: type this scene integration
     // change this.state.squads to squadIndex
-    CombatScene.start(this,{
+    CombatScene.start(this, {
       squads: this.state.squads
         .filter((sqd) => [starter.id, target.id].includes(sqd.id))
         .reduce((xs, x) => xs.set(x.id, makeSquad(x.squad)), Map()) as Index,
@@ -1034,7 +1033,6 @@ export class MapScene extends Phaser.Scene {
     chara.run(MOVE_SPEED / GAME_SPEED);
 
     this.changeMode({ type: "SQUAD_SELECTED", id });
-
   }
 
   showMoveControls(squad: MapSquad) {
@@ -1076,7 +1074,7 @@ export class MapScene extends Phaser.Scene {
       return new Promise((resolve) => {
         this.add.tween({
           targets: chara.container,
-          duration: 1000 /GAME_SPEED,
+          duration: 1000 / GAME_SPEED,
           x: newPos.x,
           y: newPos.y,
           onComplete: () => {

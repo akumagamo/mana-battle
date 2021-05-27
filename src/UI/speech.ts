@@ -45,7 +45,7 @@ export default (
 
   const speechText = text(x + 150, y + 50, "", container, scene);
 
-  animatedText(scene, text_, speechText, speed);
+  const textCompleted = animatedText(scene, text_, speechText, speed);
 
-  return { bg, portrait, speechText };
+  return { bg, portrait, speechText, textCompleted };
 };
