@@ -31,7 +31,7 @@ export class EditSquadScene extends Phaser.Scene {
   }
 
   renderBoard(squad: Squad.SquadRecord, unitIndex: UnitIndex) {
-    this.boardScene = new BoardScene(squad, saveSquadIntoDB, unitIndex);
+    this.boardScene = new BoardScene(squad, saveSquadIntoDB, unitIndex, false);
     this.scene.add(BOARD_SCENE_KEY, this.boardScene, true);
 
     this.boardScene.makeUnitsClickable((c) => {

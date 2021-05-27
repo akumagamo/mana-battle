@@ -75,13 +75,13 @@ import CombatScene from "./Combat/CombatScene";
         type: "mousedown",
         x: 721,
         y: 602,
-        time: 33388,
+        time: 32388,
       },
       {
         type: "mouseup",
         x: 722,
         y: 602,
-        time: 33536,
+        time: 32536,
       },
       {
         type: "mousedown",
@@ -371,9 +371,9 @@ import CombatScene from "./Combat/CombatScene";
         y: 340,
         time: 101994,
       },
-    ].map(ev=>({...ev,time: ev.time-32000}));
+    ].map(ev=>({...ev,time: ev.time-30000}));
 
-    runScript(inputs);
+    //runScript(inputs);
 
     // record user actions
     // let bootTime = new Date().getTime();

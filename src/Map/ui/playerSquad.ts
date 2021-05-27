@@ -22,6 +22,7 @@ export default (
       mapScene.uiContainer,
       mapScene,
       () => {
+        mapScene.clearSquadBoards();
         formationBtn(mapScene, mapSquad.id);
       }
     );

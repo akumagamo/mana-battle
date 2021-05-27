@@ -11,23 +11,19 @@ export async function squadInfo(
   baseY: number,
   id: string
 ): Promise<void> {
-
-  const board = scene.scene.get(
-    `static-squad-${id}`
-  ) as StaticBoardScene | null;
-
-  if (board) board.turnOff();
+  scene.clearSquadBoards();
 
   const mapSquad = scene.getSquad(id);
 
   const leader = scene.getSquadLeader(id);
 
-  text(20, baseY, leader.name, uiContainer, scene);
+  text(320, baseY, leader.name, uiContainer, scene);
 
   if (mapSquad.squad.force !== PLAYER_FORCE) {
-    button(200, baseY, "Squad Details", scene.uiContainer, scene, () =>
-      scene.viewSquadDetails(id)
-    );
+    button(430, baseY, "Squad Details", scene.uiContainer, scene, () => {
+      scene.clearSquadBoards();
+      scene.viewSquadDetails(id);
+    });
   }
 
   if (mapSquad.squad.force === PLAYER_FORCE) {

@@ -928,17 +928,21 @@ export class MapScene extends Phaser.Scene {
     return this.state.units.filter((u) => u.squad === id);
   }
 
-  // TODO: handle scenario where none of the engaging squads belongs to the player
-  async startCombat(squadA: MapSquad, squadB: MapSquad, direction: string) {
-
-    // remove static boards that might exist in the screen with these squads
-    [squadA.id, squadB.id].forEach((id) => {
+  clearSquadBoards(){
+    this.state.squads.forEach((_,id) => {
       const board = this.scene.get(
         `static-squad-${id}`
       ) as StaticBoardScene | null;
 
       if (board) board.turnOff();
     });
+
+  }
+
+  // TODO: handle scenario where none of the engaging squads belongs to the player
+  async startCombat(squadA: MapSquad, squadB: MapSquad, direction: string) {
+
+    this.clearSquadBoards()
 
     const baseX = 200;
     const baseY = 200;

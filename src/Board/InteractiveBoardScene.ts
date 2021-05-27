@@ -22,7 +22,8 @@ export default class BoardScene extends Phaser.Scene {
   constructor(
     public squad: Squad.SquadRecord,
     public onSquadUpdated: (squad: Squad.SquadRecord) => void,
-    public unitIndex: UnitIndex
+    public unitIndex: UnitIndex,
+    public showHpBars: boolean
   ) {
     super(BOARD_SCENE_KEY);
     console.log(`boardScene constructor`);
@@ -175,7 +176,7 @@ export default class BoardScene extends Phaser.Scene {
     if (!unit) throw new Error('Invalid member supplied.');
 
     const key = this.makeUnitKey(unit);
-    const chara = new Chara({key, parent: this, unit, cx: x, cy: y});
+    const chara = new Chara({key, parent: this, unit, cx: x, cy: y, showHpBar: this.showHpBars});
 
     chara.enableDrag(this.onUnitDrag.bind(this), this.onUnitDragEnd.bind(this));
 

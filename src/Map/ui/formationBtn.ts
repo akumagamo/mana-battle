@@ -30,7 +30,7 @@ export function formationBtn(scene: MapScene, squadId: string) {
           },
         },
       ]),
-    scene.state.units
+    scene.state.units,true
   );
 
   scene.scene.add("editSquadInMap", boardScene, true);
