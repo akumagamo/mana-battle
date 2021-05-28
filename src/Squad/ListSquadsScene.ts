@@ -8,11 +8,12 @@ import text from "../UI/text";
 import menu from "../Backgrounds/menu";
 import { UnitIndex } from "../Unit/Model";
 import { List, Map, Set } from "immutable";
+import { EditSquadScene } from "./EditSquadScene";
 
 type CreateParams = {
   squads: Squad.Index;
   units: UnitIndex;
-  onReturnClick: (scene:ListSquadsScene)=>void;
+  onReturnClick: (scene: ListSquadsScene) => void;
   dispatched: Set<string>;
 };
 
@@ -34,7 +35,7 @@ export class ListSquadsScene extends Phaser.Scene {
   units = Map() as UnitIndex;
   dispatched: Set<string> = Set();
   onDisbandSquad: (id: string) => void = () => {};
-  onReturnClick: (scene:ListSquadsScene)=>void | null = null;
+  onReturnClick: (scene: ListSquadsScene) => void | null = null;
 
   constructor() {
     super(key);
@@ -279,11 +280,8 @@ export class ListSquadsScene extends Phaser.Scene {
   editSquad(squad: Squad.SquadRecord) {
     this.turnOff();
 
-    this.scene.transition({
-      target: "EditSquadScene",
-      duration: 0,
-      moveBelow: true,
-      data: { squad },
+    this.scene.start("EditSquadScene", {
+      data: { squad, unitIndex: this.units },
     });
   }
 }
