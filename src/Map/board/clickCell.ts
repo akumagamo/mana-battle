@@ -5,7 +5,7 @@ import { CPU_FORCE, PLAYER_FORCE } from '../../constants';
 import { Vector } from '../Model';
 import { screenToCellPosition, cellToScreenPosition } from './position';
 
-export default async (scene: MapScene, cell: MapTile) => {
+export default async (scene: MapScene, cell: Vector) => {
   const { x, y } = cell;
 
   const mapSquad = scene.squadAt(x, y);

@@ -13,14 +13,17 @@ import { startTheaterScene } from "../Theater/TheaterScene";
 import chapter_1_intro from "../Theater/Chapters/chapter_1_intro";
 
 export const storyManager = async (parent: TitleScene) => {
-  parent.tweens.add({
-    targets: parent.music,
-    volume: 0,
-    duration: 1000,
-  });
-  await fadeOut(parent);
+  if (process.env.SOUND_ENABLED) {
+    parent.tweens.add({
+      targets: parent.music,
+      volume: 0,
+      duration: 1000,
+    });
+  }
 
-  parent.container.destroy();
+  await fadeOut(parent);
+  parent.turnOff()
+
   const scene = await startCharaCreationScene(parent);
 
   const unit = await scene.createUnitForm();

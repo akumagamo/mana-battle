@@ -3,7 +3,6 @@ import { Chara } from "../Chara/Chara";
 import { PUBLIC_URL, SCENES, SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
 import { classes, classLabels } from "../defaultData";
 import { Container } from "../Models";
-import { preload } from "../preload";
 import button from "../UI/button";
 import panel from "../UI/panel";
 import text from "../UI/text";
@@ -39,12 +38,15 @@ export default class CharaCreationScene extends Phaser.Scene {
     super(CHARA_CREATION_SCENE);
   }
   preload() {
-    const id = "jshaw_dream_of_first_flight";
-    this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
-    preload.bind(this)();
-    this.load.on("complete", () => {
+    if (process.env.SOUND_ENABLED) {
+      const id = "jshaw_dream_of_first_flight";
+      this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
+      this.load.on("complete", () => {
+        this.resolve(this);
+      });
+    } else {
       this.resolve(this);
-    });
+    }
   }
 
   unit: Unit | null = null;
@@ -53,9 +55,15 @@ export default class CharaCreationScene extends Phaser.Scene {
 
   createUnitForm() {
     return new Promise<Unit>(async (resolve) => {
-      this.sound.stopAll();
-      const music = this.sound.add("jshaw_dream_of_first_flight");
-      music.play();
+      this.events.on("ConfirmationButtonClicked", () =>
+        this.handleConfirmButtonClick(resolve)
+      );
+
+      if (process.env.SOUND_ENABLED) {
+        this.sound.stopAll();
+        const music = this.sound.add("jshaw_dream_of_first_flight");
+        music.play();
+      }
       this.cameras.main.fadeIn(1000);
 
       this.bg();
@@ -104,10 +112,12 @@ export default class CharaCreationScene extends Phaser.Scene {
         classLabels
       );
 
-      this.confirmButton(resolve);
+      this.confirmButton();
+
+      this.game.events.emit("CharaCreationSceneCreated", this);
     });
   }
-  private confirmButton(resolve: (value: Unit | PromiseLike<Unit>) => void) {
+  private confirmButton() {
     const img = this.add.image(
       SCREEN_WIDTH - 100,
       SCREEN_HEIGHT - 100,
@@ -115,17 +125,19 @@ export default class CharaCreationScene extends Phaser.Scene {
     );
     this.container.add(img);
     img.setInteractive();
-    img.on("pointerdown", () => {
-      const name: string = (<HTMLInputElement>(
-        document.getElementById("new-chara-name")
-      )).value;
-      const unit: Unit = { ...this.chara.props.unit, name };
+    img.on("pointerdown", () => this.events.emit("ConfirmationButtonClicked"));
+  }
 
-      this.scene.remove(this.chara);
-      this.scene.remove(this);
+  handleConfirmButtonClick(resolve: (value: Unit | PromiseLike<Unit>) => void) {
+    const name: string = (<HTMLInputElement>(
+      document.getElementById("new-chara-name")
+    )).value;
+    const unit: Unit = { ...this.chara.props.unit, name };
 
-      resolve(unit);
-    });
+    this.scene.remove(this.chara);
+    this.scene.remove(this);
+
+    resolve(unit);
   }
 
   private nameInput(x: number, y: number) {
@@ -320,7 +332,7 @@ export default class CharaCreationScene extends Phaser.Scene {
       cx: 250,
       cy: 250,
       scaleSizing: 3,
-      showWeapon: false
+      showWeapon: false,
     });
   }
 }

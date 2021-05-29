@@ -67,7 +67,7 @@ export default (
     defaultFill();
     fill();
     text_.setColor("#000000");
-    scene.sound.add("click1").play();
+    if (process.env.SOUND_ENABLED) scene.sound.add("click1").play();
     clickZone.removeAllListeners();
     onClick();
   });

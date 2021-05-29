@@ -46,10 +46,12 @@ export default class TheaterScene extends Phaser.Scene {
     props.forEach((id: string) => {
       this.load.image(id, `${PUBLIC_URL}/${id}.svg`);
     });
-    const mp3s = ["jshaw_dream_of_first_flight"];
-    mp3s.forEach((id: string) => {
-      this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
-    });
+    if (process.env.SOUND_ENABLED) {
+      const mp3s = ["jshaw_dream_of_first_flight"];
+      mp3s.forEach((id: string) => {
+        this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
+      });
+    }
   }
   charas: Map<string, Chara> = Map();
 

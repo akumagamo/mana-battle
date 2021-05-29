@@ -90,10 +90,12 @@ export default class CombatScene extends Phaser.Scene {
       this.load.image(id, `${PUBLIC_URL}/${id}.svg`);
     });
 
-    const mp3s = ["combat1", "sword_hit", "arrow_critical", "fireball"];
-    mp3s.forEach((id: string) => {
-      this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
-    });
+    if (process.env.SOUND_ENABLED) {
+      const mp3s = ["combat1", "sword_hit", "arrow_critical", "fireball"];
+      mp3s.forEach((id: string) => {
+        this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
+      });
+    }
   }
 
   // LIFECYCLE METHODS
@@ -105,9 +107,12 @@ export default class CombatScene extends Phaser.Scene {
 
     this.onCombatFinish = data.onCombatFinish;
 
-    this.sound.stopAll();
-    const music = this.sound.add("combat1");
-    music.play();
+    if (process.env.SOUND_ENABLED) {
+      this.sound.stopAll();
+      const music = this.sound.add("combat1");
+      music.play();
+    }
+
     this.container = this.add.container(0, 0);
 
     plains(this, this.container);
@@ -301,9 +306,7 @@ export default class CombatScene extends Phaser.Scene {
 
     // TODO add battle result ( who won, who was destroyed)
     if (this.onCombatFinish) {
-      this.onCombatFinish(
-        units.toList()
-      );
+      this.onCombatFinish(units.toList());
     }
   }
   async displayExperienceGain(xps: List<XPInfo>) {

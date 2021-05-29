@@ -32,6 +32,7 @@ import { getDistance } from "../utils";
 import { cellSize, CHARA_MAP_SCALE } from "./config";
 import { screenToCellPosition, cellToScreenPosition } from "./board/position";
 import * as CombatScene from "../Combat/CombatScene";
+import { handleMovePlayerSquadButtonClicked } from "./ui/playerSquad";
 
 const WALKABLE_CELL_TINT = 0x88aa88;
 
@@ -108,10 +109,12 @@ export class MapScene extends Phaser.Scene {
   }
 
   preload() {
-    const mp3s = ["map1"];
-    mp3s.forEach((id: string) => {
-      this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
-    });
+    if (process.env.SOUND_ENABLED) {
+      const mp3s = ["map1"];
+      mp3s.forEach((id: string) => {
+        this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
+      });
+    }
     const tiles = [
       "tiles/grass",
       "tiles/woods",
@@ -389,12 +392,27 @@ export class MapScene extends Phaser.Scene {
 
   async create(data: MapCommands[]) {
     this.mode = DEFAULT_MODE;
-    this.sound.stopAll();
-    const music = this.sound.add("map1");
 
-    //@ts-ignore
-    music.setVolume(0.3);
-    music.play();
+    this.events.on("SquadClicked", (sqd: MapSquad) => this.clickSquad(sqd));
+
+    this.events.on("CellClicked", (tile: MapTile, pointer: Pointer) =>
+      this.handleCellClick(tile, pointer)
+    );
+
+    this.events.on(
+      "MovePlayerSquadButonClicked",
+      (mapScene: MapScene, mapSquad: MapSquad) =>
+        handleMovePlayerSquadButtonClicked(mapScene, mapSquad)
+    );
+
+    if (process.env.SOUND_ENABLED) {
+      this.sound.stopAll();
+      const music = this.sound.add("map1");
+
+      //@ts-ignore
+      music.setVolume(0.3);
+      music.play();
+    }
 
     this.mapContainer = this.add.container(this.mapX, this.mapY);
     this.uiContainer = this.add.container();
@@ -425,6 +443,8 @@ export class MapScene extends Phaser.Scene {
 
     this.enableInput();
     this.isPaused = false;
+
+    this.game.events.emit("MapSceneCreated", this);
   }
 
   async removeSquadFromState(id: string) {
@@ -632,15 +652,18 @@ export class MapScene extends Phaser.Scene {
       return this.getSquad(this.mode.id);
   }
   makeInteractive(cell: MapTile) {
-    cell.tile.on("pointerup", async (pointer: Pointer) => {
-      if (!this.cellClickDisabled)
-        this.signal("regular click cell", [
-          { type: "CLICK_CELL", cell },
-          { type: "HIGHLIGHT_CELL", pos: cell },
-        ]);
+    cell.tile.on("pointerup", (pointer: Pointer) =>
+      this.events.emit("CellClicked", cell, pointer)
+    );
+  }
+  async handleCellClick(cell: MapTile, pointer: Pointer) {
+    if (!this.cellClickDisabled)
+      this.signal("regular click cell", [
+        { type: "CLICK_CELL", cell },
+        { type: "HIGHLIGHT_CELL", pos: cell },
+      ]);
 
-      await this.pingEffect(pointer);
-    });
+    await this.pingEffect(pointer);
   }
 
   private async pingEffect(pointer: Phaser.Input.Pointer) {
@@ -928,21 +951,19 @@ export class MapScene extends Phaser.Scene {
     return this.state.units.filter((u) => u.squad === id);
   }
 
-  clearSquadBoards(){
-    this.state.squads.forEach((_,id) => {
+  clearSquadBoards() {
+    this.state.squads.forEach((_, id) => {
       const board = this.scene.get(
         `static-squad-${id}`
       ) as StaticBoardScene | null;
 
       if (board) board.turnOff();
     });
-
   }
 
   // TODO: handle scenario where none of the engaging squads belongs to the player
   async startCombat(squadA: MapSquad, squadB: MapSquad, direction: string) {
-
-    this.clearSquadBoards()
+    this.clearSquadBoards();
 
     const baseX = 200;
     const baseY = 200;

@@ -27,5 +27,7 @@ export default (chara: Chara, onComplete: () => void) => {
     ease: "ExpoOut",
   });
 
-  chara.sound.add("fireball").play();
+  if (process.env.SOUND_ENABLED) {
+    chara.sound.add("fireball").play();
+  }
 };

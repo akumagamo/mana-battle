@@ -1,4 +1,4 @@
-import {Chara} from '../Chara';
+import { Chara } from "../Chara";
 
 const ATTACK_DURATION = 250;
 
@@ -10,14 +10,15 @@ export default (chara: Chara, onComplete: () => void) => {
     rotation: chara.props.front ? 1.9 : -1.9,
     yoyo: true,
     x: (chara.mainHandContainer?.x || 0) + (chara.props.front ? 30 : -10),
-    Y: (chara.mainHandContainer?.y || 0)  + (chara.props.front ? -20 : -40),
+    Y: (chara.mainHandContainer?.y || 0) + (chara.props.front ? -20 : -40),
     duration: ATTACK_DURATION,
-    ease: 'Expo',
+    ease: "Expo",
     onComplete: () => {
       onComplete();
     },
   });
 
-  chara.sound.add('sword_hit').play()
-  
+  if (process.env.SOUND_ENABLED) {
+    chara.sound.add("sword_hit").play();
+  }
 };

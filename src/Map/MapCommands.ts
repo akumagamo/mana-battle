@@ -11,7 +11,7 @@ export type MapCommands =
     }
   | {
       type: 'CLICK_CELL';
-      cell: MapTile;
+      cell: Vector;
     }
   | {
       type: 'CLICK_SQUAD';

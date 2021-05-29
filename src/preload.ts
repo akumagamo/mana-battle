@@ -39,15 +39,16 @@ export function preload(this: Phaser.Scene) {
     this.load.image(id, `${PUBLIC_URL}/items/${id}.png`);
   });
 
-  const mp3s = ["title"];
-  mp3s.forEach((id: string) => {
-    this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
-  });
-
-  const oggs = ["click1"];
-  oggs.forEach((id: string) => {
-    this.load.audio(id, `${PUBLIC_URL}/music/${id}.ogg`);
-  });
+  if (process.env.SOUND_ENABLED) {
+    const mp3s = ["title"];
+    mp3s.forEach((id: string) => {
+      this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
+    });
+    const oggs = ["click1"];
+    oggs.forEach((id: string) => {
+      this.load.audio(id, `${PUBLIC_URL}/music/${id}.ogg`);
+    });
+  }
 
   this.load.image("map_select", `${PUBLIC_URL}/scenes/map_select.jpg`);
 

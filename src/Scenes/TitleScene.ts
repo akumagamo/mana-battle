@@ -24,6 +24,8 @@ export default class TitleScene extends Phaser.Scene {
   create() {
     this.events.once("shutdown", () => this.turnOff());
 
+    this.events.on('NewGameButtonClicked', ()=>this.handleNewGameClick())
+
     this.container = this.add.container(0, 0);
     const bg = this.add.image(0, 0, "backgrounds/sunset");
     bg.setOrigin(0, 0);
@@ -40,7 +42,7 @@ export default class TitleScene extends Phaser.Scene {
         cy: 500,
         scaleSizing: 1.3,
         front: false,
-        showWeapon: false
+        showWeapon: false,
       }),
       new Chara({
         key: "1",
@@ -50,7 +52,7 @@ export default class TitleScene extends Phaser.Scene {
         cy: 520,
         scaleSizing: 1.5,
         front: false,
-        showWeapon: false
+        showWeapon: false,
       }),
       new Chara({
         key: "2",
@@ -60,7 +62,7 @@ export default class TitleScene extends Phaser.Scene {
         cy: 550,
         scaleSizing: 1.6,
         front: false,
-        showWeapon: false
+        showWeapon: false,
       }),
     ];
 
@@ -75,16 +77,7 @@ export default class TitleScene extends Phaser.Scene {
       window.document.body.requestFullscreen();
     });
 
-    button(
-      SCREEN_WIDTH / 2,
-      550,
-      "New Game",
-      this.container,
-      this,
-      async () => {
-        await storyManager(this);
-      }
-    );
+    button(SCREEN_WIDTH / 2, 550, "New Game", this.container, this, ()=>this.events.emit('NewGameButtonClicked'));
 
     button(SCREEN_WIDTH / 2, 620, "Options", this.container, this, () => {
       this.scene.transition({
@@ -93,9 +86,16 @@ export default class TitleScene extends Phaser.Scene {
         moveBelow: true,
       });
     });
+
+    this.game.events.emit("TitleSceneCreated", this);
   }
 
+  handleNewGameClick() {
+    storyManager(this);
+  }
   private changeMusic(key: string) {
+    if (!process.env.SOUND_ENABLED) return;
+
     if (this.music) this.music.destroy();
 
     if (getOptions().musicEnabled) {
@@ -114,5 +114,6 @@ export default class TitleScene extends Phaser.Scene {
     this.charas.map((c) => this.scene.remove(c));
     this.charas = [];
     this.container?.destroy();
+    this.scene.stop();
   }
 }

@@ -26,19 +26,14 @@ export default (
         formationBtn(mapScene, mapSquad.id);
       }
     );
-    button(baseX + 200, baseY, "Move", mapScene.uiContainer, mapScene, () => {
-      mapScene.changeMode({
-        type: "SELECT_SQUAD_MOVE_TARGET",
-        id: mapSquad.id,
-        start: mapSquad.pos,
-      });
-    });
+    button(baseX + 200, baseY, "Move", mapScene.uiContainer, mapScene, () =>
+      mapScene.events.emit("MovePlayerSquadButonClicked", mapScene, mapSquad)
+    );
   }
 
   button(50, 40, "Organize", uiContainer, mapScene, () => {
-    mapScene.clearSquadBoards()
+    mapScene.clearSquadBoards();
     mapScene.turnOff();
-    console.log(mapScene.state.squads.get('1'))
     organize(mapScene);
   });
   button(250, 40, "Dispatch", uiContainer, mapScene, () => {
@@ -46,3 +41,14 @@ export default (
     dispatchWindow(mapScene);
   });
 };
+
+export function handleMovePlayerSquadButtonClicked(
+  mapScene: MapScene,
+  mapSquad: MapSquad
+) {
+  mapScene.changeMode({
+    type: "SELECT_SQUAD_MOVE_TARGET",
+    id: mapSquad.id,
+    start: mapSquad.pos,
+  });
+}
