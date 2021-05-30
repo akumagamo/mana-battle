@@ -3,7 +3,7 @@ const puppeteer = require("puppeteer");
 (() => {
   puppeteer
     .launch({
-      headless: false,
+      headless: true,
     })
     .then((browser) => {
       browser.newPage().then((page) => {
@@ -17,7 +17,7 @@ const puppeteer = require("puppeteer");
         page.goto("http://localhost:3000").then(() => {
           setTimeout(() => {
             browser.close();
-          }, 70000);
+          }, 24000);
         });
       });
     });

@@ -833,6 +833,7 @@ export class MapScene extends Phaser.Scene {
   };
 
   turnOff() {
+    this.clearSquadBoards();
     this.mapContainer.destroy();
     this.uiContainer.destroy();
     this.charas.forEach((chara) => {
@@ -845,6 +846,7 @@ export class MapScene extends Phaser.Scene {
     });
     this.tiles = [];
     this.tileIndex = [[]];
+
     this.mode = DEFAULT_MODE;
   }
 
