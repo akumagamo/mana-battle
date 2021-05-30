@@ -55,8 +55,8 @@ export default (scene: MapScene) => {
       scene.changeMode({ type: "SQUAD_SELECTED", id: mapSquad.squad.id });
 
       let squad = scene.getSquad(mapSquad.squad.id);
+      scene.evs.SquadClicked.emit(squad);
       scene.signal("clicked dispatch squad button", [
-        { type: "CLICK_SQUAD", unit: squad },
         {
           type: "MOVE_CAMERA_TO",
           x: squad.pos.x,

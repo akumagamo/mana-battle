@@ -13,6 +13,8 @@ import { Background, Cmd, SceneConfig } from "./Models";
 import { PUBLIC_URL } from "../constants";
 import { progressBar } from "../progressBar";
 
+const GAME_SPEED = parseInt(process.env.SPEED);
+
 export const startTheaterScene = async (
   parent: Phaser.Scene,
   config: SceneConfig
@@ -81,7 +83,7 @@ export default class TheaterScene extends Phaser.Scene {
           await walk(this, step);
           return Promise.resolve(answers);
         case "FINISH":
-          await fadeOut(this);
+          await fadeOut(this, 1000 / GAME_SPEED);
           this.charas.forEach((c) => this.scene.remove(c));
           this.container.destroy();
           this.scene.remove(this);

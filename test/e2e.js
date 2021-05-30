@@ -4,7 +4,6 @@ const puppeteer = require("puppeteer");
   puppeteer
     .launch({
       headless: false,
-      defaultViewport: { width: 640, height: 480 },
     })
     .then((browser) => {
       browser.newPage().then((page) => {

@@ -10,7 +10,7 @@ export type Walk = {
 export const walk = async (scene: TheaterScene, { id, x, y }: Walk) => {
   const chara = scene.charas.get(scene.charaKey(id));
 
-  chara.run(3);
+  chara.run();
 
   const delta =
     getDistance({ x: chara.container.x, y: chara.container.y }, { x, y }) * 4;

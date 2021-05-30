@@ -11,6 +11,8 @@ import { genderLabels, genders, HAIR_STYLES, Unit } from "../Unit/Model";
 
 const { CHARA_CREATION_SCENE } = SCENES;
 
+const GAME_SPEED = parseInt(process.env.SPEED);
+
 // export const startCharaCreationScene = (
 //   parent: Phaser.Scene,
 //   config: CharaCreationSceneConfig
@@ -63,7 +65,7 @@ export default class CharaCreationScene extends Phaser.Scene {
         const music = this.sound.add("jshaw_dream_of_first_flight");
         music.play();
       }
-      this.cameras.main.fadeIn(1000);
+      this.cameras.main.fadeIn(1000 / GAME_SPEED);
 
       this.bg();
       this.container = this.add.container();

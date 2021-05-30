@@ -2,6 +2,8 @@ import { Chara } from "../Chara";
 
 const ATTACK_DURATION = 250;
 
+const GAME_SPEED = parseInt(process.env.SPEED)
+
 export default (chara: Chara, onComplete: () => void) => {
   chara.clearAnimations();
 
@@ -11,7 +13,7 @@ export default (chara: Chara, onComplete: () => void) => {
     yoyo: true,
     x: (chara.mainHandContainer?.x || 0) + (chara.props.front ? 30 : -10),
     Y: (chara.mainHandContainer?.y || 0) + (chara.props.front ? -20 : -40),
-    duration: ATTACK_DURATION,
+    duration: ATTACK_DURATION / GAME_SPEED,
     ease: "Expo",
     onComplete: () => {
       onComplete();

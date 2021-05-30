@@ -12,6 +12,9 @@ import hpBar from "./hpBar";
 import { PUBLIC_URL } from "../constants";
 import { classes } from "../defaultData";
 
+
+const GAME_SPEED = parseInt(process.env.SPEED)
+
 interface CharaProps {
   key: string;
   parent: Phaser.Scene;
@@ -250,12 +253,12 @@ export class Chara extends Phaser.Scene {
     this.tweens.add({
       targets: this.container,
       alpha: 0,
-      duration: 1000,
+      duration: 1000 / GAME_SPEED,
     });
   }
 
-  run(speed: number) {
-    run(this, speed);
+  run() {
+    run(this);
   }
 
   async fadeOut() {

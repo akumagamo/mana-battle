@@ -12,6 +12,7 @@ import { makeUnit } from "../Unit/makeUnit";
 import { startTheaterScene } from "../Theater/TheaterScene";
 import chapter_1_intro from "../Theater/Chapters/chapter_1_intro";
 
+const GAME_SPEED = parseInt(process.env.SPEED);
 export const storyManager = async (parent: TitleScene) => {
   if (process.env.SOUND_ENABLED) {
     parent.tweens.add({
@@ -21,13 +22,12 @@ export const storyManager = async (parent: TitleScene) => {
     });
   }
 
-  await fadeOut(parent);
+  await fadeOut(parent, 1000 / GAME_SPEED);
   parent.turnOff()
 
   const scene = await startCharaCreationScene(parent);
 
   const unit = await scene.createUnitForm();
-  console.log(`unit`, unit);
   // const answers = await startTheaterScene(parent, chapter_1_intro(unit));
   // console.log(`answers`, answers);
 

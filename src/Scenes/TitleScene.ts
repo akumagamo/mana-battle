@@ -9,12 +9,14 @@ import { fadeOut } from "../UI/Transition";
 import { makeUnit } from "../Unit/makeUnit";
 import { storyManager } from "./storyManager";
 
+const GAME_SPEED = parseInt(process.env.SPEED);
+
 export default class TitleScene extends Phaser.Scene {
   music: Phaser.Sound.BaseSound | null = null;
   charas: Chara[] = [];
   container: Container | null = null;
   sceneEvents = {
-    NewGameButtonClicked: ()=> this.handleNewGameClick()
+    NewGameButtonClicked: this.handleNewGameClick.bind(this)
   }
   constructor() {
     super("TitleScene");
@@ -78,7 +80,7 @@ export default class TitleScene extends Phaser.Scene {
       window.document.body.requestFullscreen();
     });
 
-    button(SCREEN_WIDTH / 2, 550, "New Game", this.container, this, ()=>this.sceneEvents.NewGameButtonClicked());
+    button(SCREEN_WIDTH / 2, 550, "New Game", this.container, this, this.sceneEvents.NewGameButtonClicked.bind(this));
 
     button(SCREEN_WIDTH / 2, 620, "Options", this.container, this, () => {
       this.scene.transition({
@@ -107,7 +109,7 @@ export default class TitleScene extends Phaser.Scene {
   }
 
   async mapsEvent() {
-    await fadeOut(this);
+    await fadeOut(this, 1000 / GAME_SPEED);
     this.scene.start("MapListScene");
   }
 

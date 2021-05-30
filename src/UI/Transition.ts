@@ -9,7 +9,7 @@ class Transition extends Phaser.Scene {
   }: {
     fadeIn: boolean;
     resolve: () => void;
-    duration: number | null;
+    duration: number;
   }) {
     const black = panel(
       0,
@@ -32,18 +32,14 @@ class Transition extends Phaser.Scene {
     timeline.add({
       targets: black,
       alpha: fadeIn ? 0 : 1,
-      duration: duration ? duration : 500,
+      duration,
     });
 
     timeline.play();
   }
 }
 
-const transition = (
-  scene: Phaser.Scene,
-  fadeIn: boolean,
-  duration: number | null
-) => {
+const transition = (scene: Phaser.Scene, fadeIn: boolean, duration: number) => {
   return new Promise<void>((resolve) =>
     scene.scene.add("transition" + Math.random().toString(), Transition, true, {
       resolve: () => resolve(),
@@ -53,7 +49,8 @@ const transition = (
   );
 };
 
-export const fadeIn = (scene: Phaser.Scene) => transition(scene, true, null);
+export const fadeIn = (scene: Phaser.Scene, duration: number) =>
+  transition(scene, true, duration);
 
-export const fadeOut = (scene: Phaser.Scene, duration?: number) =>
+export const fadeOut = (scene: Phaser.Scene, duration: number) =>
   transition(scene, false, duration);

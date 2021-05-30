@@ -1,6 +1,7 @@
 import text from "../../UI/text";
 import { Chara } from "../Chara";
 
+const GAME_SPEED = parseInt(process.env.SPEED);
 export function displayDamage(chara: Chara, damage: number) {
   const dmg = text(
     chara.container.x - 20,
@@ -18,7 +19,7 @@ export function displayDamage(chara: Chara, damage: number) {
     targets: dmg,
     y: chara.container.y - 120,
     alpha: 0,
-    duration: 3000,
+    duration: 3000 / GAME_SPEED,
     ease: "Expo",
     onComplete: () => dmg.destroy(),
   });

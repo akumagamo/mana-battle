@@ -14,7 +14,8 @@ module.exports = merge(common, {
   },
   plugins: [
     new webpack.EnvironmentPlugin({
-      SOUND_ENABLED: false
+      SOUND_ENABLED: false,
+      SPEED: 5
     }),
   ],
 });

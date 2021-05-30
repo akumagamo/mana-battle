@@ -23,6 +23,8 @@ const COMBAT_CHARA_SCALE = 1;
 const WALK_DURATION = 500;
 const WALK_FRAMES = 60;
 
+const GAME_SPEED = parseInt(process.env.SPEED);
+
 const getBoardCoords = (isTopSquad: boolean) => ({ x, y }: Vector) => {
   return {
     x: isTopSquad ? x : Squad.invertBoardPosition(x),
@@ -98,7 +100,6 @@ export default class CombatScene extends Phaser.Scene {
     }
   }
 
-  // LIFECYCLE METHODS
   async create(data: CombatSceneCreateParams) {
     if (this.container) this.container.destroy();
 
@@ -119,6 +120,7 @@ export default class CombatScene extends Phaser.Scene {
 
     this.top = data.top;
     this.bottom = data.bottom;
+
     const combatants = [data.top, data.bottom];
 
     combatants.forEach((id) => {
@@ -157,11 +159,11 @@ export default class CombatScene extends Phaser.Scene {
         });
     });
 
-    await fadeIn(this);
+    await fadeIn(this, 1000 / GAME_SPEED);
 
     this.renderMiniSquads(data.top, data.bottom);
 
-    await announcement(this, "Fight it out!");
+    await announcement(this, "Fight it out!", 2000 / GAME_SPEED);
 
     this.turn();
   }
@@ -302,7 +304,7 @@ export default class CombatScene extends Phaser.Scene {
 
   async combatEnd(units: UnitIndex) {
     this.retreatUnits();
-    await fadeOut(this);
+    await fadeOut(this, 1000 / GAME_SPEED);
 
     // TODO add battle result ( who won, who was destroyed)
     if (this.onCombatFinish) {
@@ -333,7 +335,7 @@ export default class CombatScene extends Phaser.Scene {
     const target = this.getChara(targetId);
 
     unit.clearAnimations();
-    unit.run(1);
+    unit.run();
 
     if (!target.props.unit.squad) throw new Error(INVALID_STATE);
 
@@ -355,7 +357,7 @@ export default class CombatScene extends Phaser.Scene {
       targets: unit.container,
       x: x,
       y: y,
-      duration: WALK_DURATION,
+      duration: WALK_DURATION / GAME_SPEED,
       onComplete: () => {
         onComplete();
       },
@@ -363,7 +365,7 @@ export default class CombatScene extends Phaser.Scene {
 
     // z-sorting for moving character
     const timeEvents = {
-      delay: WALK_DURATION / WALK_FRAMES,
+      delay: WALK_DURATION / WALK_FRAMES / GAME_SPEED,
       callback: () => {
         // reordering a list of 10 scenes takes about 0.013ms
         this.charas
@@ -384,7 +386,7 @@ export default class CombatScene extends Phaser.Scene {
   async retreatUnits() {
     return this.charas.map((chara) => {
       chara.clearAnimations();
-      chara.run(1);
+      chara.run();
 
       if (!chara.props.unit.squad) throw new Error(INVALID_STATE);
 
@@ -404,7 +406,7 @@ export default class CombatScene extends Phaser.Scene {
         targets: chara.container,
         x,
         y,
-        duration: 1000,
+        duration: 1000 / GAME_SPEED,
       };
 
       this.tweens.add(config);
@@ -473,7 +475,7 @@ export default class CombatScene extends Phaser.Scene {
         targets: arrow,
         x: target.container?.x,
         y: target.container?.y,
-        duration: 250,
+        duration: 250 / GAME_SPEED,
         onComplete: () => {
           arrow.destroy();
 
@@ -505,7 +507,7 @@ export default class CombatScene extends Phaser.Scene {
         targets: fb,
         x: target.container?.x,
         y: target.container?.y,
-        duration: 700,
+        duration: 700 / GAME_SPEED,
         onComplete: () => {
           fb.destroy();
           this.damageUnit(target, damage, updatedTarget, targetId);
@@ -517,7 +519,7 @@ export default class CombatScene extends Phaser.Scene {
   returnToPosition(id: string) {
     const chara = this.getChara(id);
     chara.clearAnimations();
-    chara.run(1);
+    chara.run();
 
     if (!chara.props.unit.squad) throw new Error(INVALID_STATE);
     const coords = getBoardCoords(this.top === chara.props.unit.squad)(
@@ -551,7 +553,7 @@ export default class CombatScene extends Phaser.Scene {
       targets: chara.container,
       x: x,
       y: y,
-      duration: WALK_DURATION,
+      duration: WALK_DURATION / GAME_SPEED,
       onComplete: () => {
         chara.stand();
         onComplete();

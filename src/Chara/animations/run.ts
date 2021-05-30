@@ -3,8 +3,10 @@ import { maybeZero } from "../../utils";
 import upAndDown from "./upAndDown";
 
 // TODO: ^^^^ these constants belong to something that we may call "default pose"
+//
+const GAME_SPEED = parseInt(process.env.SPEED);
 
-const front = (chara: Chara, speed: number) => {
+const front = (chara: Chara) => {
   chara.clearAnimations();
 
   chara.add.tween({
@@ -13,7 +15,7 @@ const front = (chara: Chara, speed: number) => {
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
-    duration: 500 * speed,
+    duration: 500 / GAME_SPEED,
   });
 
   chara.add.tween({
@@ -22,7 +24,7 @@ const front = (chara: Chara, speed: number) => {
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
-    duration: 500 * speed,
+    duration: 500 / GAME_SPEED,
   });
 
   chara.add.tween({
@@ -31,7 +33,7 @@ const front = (chara: Chara, speed: number) => {
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
-    duration: 500 * speed,
+    duration: 500 / GAME_SPEED,
   });
 
   chara.add.tween({
@@ -40,7 +42,7 @@ const front = (chara: Chara, speed: number) => {
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
-    duration: 500 * speed,
+    duration: 500 / GAME_SPEED,
   });
 
   chara.add.tween({
@@ -48,11 +50,11 @@ const front = (chara: Chara, speed: number) => {
     y: chara.charaWrapper.y - 20,
     yoyo: true,
     repeat: -1,
-    duration: 100 * speed,
+    duration: 100 / GAME_SPEED,
   });
 };
 
-const back = (chara: Chara, speed: number) => {
+const back = (chara: Chara) => {
   chara.clearAnimations();
 
   const bounce = upAndDown(chara);
@@ -65,7 +67,7 @@ const back = (chara: Chara, speed: number) => {
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
-    duration: 500 * speed,
+    duration: 500 / GAME_SPEED,
   });
 
   chara.add.tween({
@@ -74,7 +76,7 @@ const back = (chara: Chara, speed: number) => {
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
-    duration: 500 * speed,
+    duration: 500 / GAME_SPEED,
   });
 
   chara.add.tween({
@@ -83,7 +85,7 @@ const back = (chara: Chara, speed: number) => {
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
-    duration: 500 * speed,
+    duration: 500 / GAME_SPEED,
   });
 
   chara.add.tween({
@@ -92,7 +94,7 @@ const back = (chara: Chara, speed: number) => {
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
-    duration: 500 * speed,
+    duration: 500 / GAME_SPEED,
   });
 
   chara.add.tween({
@@ -100,14 +102,14 @@ const back = (chara: Chara, speed: number) => {
     y: chara.charaWrapper.y - 20,
     yoyo: true,
     repeat: -1,
-    duration: 100 * speed,
+    duration: 100 / GAME_SPEED,
   });
 };
 
-export default (chara: Chara, speed: number) => {
+export default (chara: Chara) => {
   if (chara.props.front) {
-    front(chara, speed);
+    front(chara);
   } else {
-    back(chara, speed);
+    back(chara);
   }
 };

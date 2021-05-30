@@ -2,6 +2,8 @@ import Phaser from "phaser";
 import { preload } from "../preload";
 import button from "../UI/button";
 
+const GAME_SPEED = parseInt(process.env.SPEED);
+
 export default class WorldScene extends Phaser.Scene {
   constructor() {
     super("WorldScene");
@@ -12,7 +14,7 @@ export default class WorldScene extends Phaser.Scene {
     const container = this.add.container(300, 100);
 
     button(10, 400, "Battalion", container, this, () => {
-      this.cameras.main.fadeOut(1000, 0, 0, 0);
+      this.cameras.main.fadeOut(1000 / GAME_SPEED, 0, 0, 0);
 
       this.scene.transition({
         target: "TitleScene",

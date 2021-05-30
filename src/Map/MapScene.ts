@@ -34,9 +34,9 @@ import { screenToCellPosition, cellToScreenPosition } from "./board/position";
 import * as CombatScene from "../Combat/CombatScene";
 import { handleMovePlayerSquadButtonClicked } from "./ui/playerSquad";
 
-const WALKABLE_CELL_TINT = 0x88aa88;
+const GAME_SPEED = parseInt(process.env.SPEED);
 
-const GAME_SPEED = 5;
+const WALKABLE_CELL_TINT = 0x88aa88;
 
 const MOVE_SPEED = 2 * GAME_SPEED;
 
@@ -460,7 +460,7 @@ export class MapScene extends Phaser.Scene {
     renderStructures(this);
     renderSquads(this);
 
-    await fadeIn(this);
+    await fadeIn(this, 1000 / GAME_SPEED);
 
     this.makeWorldDraggable();
     this.setWorldBounds();
@@ -764,7 +764,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   attack = async (starter: MapSquad, target: MapSquad, direction: string) => {
-    await fadeOut(this);
+    await fadeOut(this,1000 / GAME_SPEED);
 
     this.turnOff();
 
@@ -1106,7 +1106,7 @@ export class MapScene extends Phaser.Scene {
 
     const chara = await this.getChara(id);
 
-    chara.run(MOVE_SPEED / GAME_SPEED);
+    chara.run();
 
     this.changeMode({ type: "SQUAD_SELECTED", id });
   }
