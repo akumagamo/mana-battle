@@ -11,8 +11,11 @@ export function organize(scene: MapScene) {
   sceneManager.stop("MapScene");
   ListSquads.run(
     {
-      // TODO: only player units
-      units: scene.state.units,
+      units: scene.state.units.filter((u) =>
+        scene.state.squads.find(
+          (s) => u.squad === s.id && s.squad.force === PLAYER_FORCE
+        )
+      ),
       squads: scene.state.squads
         .filter((s) => s.squad.force === PLAYER_FORCE)
         .map((s) => s.squad)
@@ -20,7 +23,7 @@ export function organize(scene: MapScene) {
       dispatched: scene.state.dispatchedSquads,
       onReturnClick: (listSquadScene) => {
         listSquadScene.scene.stop();
-        scene.scene.start('MapScene',[]);
+        scene.scene.start("MapScene", []);
       },
     },
     sceneManager

@@ -1,6 +1,5 @@
 import { Chara } from "../Chara/Chara";
 import * as Squad from "../Squad/Model";
-import { saveSquadIntoDB, saveUnitIntoDB } from "../DB";
 import UnitListScene from "../Unit/UnitListScene";
 import { Unit, UnitIndex } from "../Unit/Model";
 import BoardScene, { BOARD_SCENE_KEY } from "../Board/InteractiveBoardScene";
@@ -10,28 +9,34 @@ import SmallUnitDetailsBar from "../Unit/SmallUnitDetailsBar";
 import { Container } from "../Models";
 import { Map } from "immutable";
 
+const SceneKey = "EditSquadScene";
+
+type EditSquadSceneParams = { squad: Squad.SquadRecord; units: UnitIndex };
+export function run(scene: Phaser.Scene, params: EditSquadSceneParams) {
+  scene.scene.run(SceneKey, params);
+}
+
 export class EditSquadScene extends Phaser.Scene {
   unitListScene: UnitListScene | null = null;
   boardScene: BoardScene | null = null;
   unitDetails: Container | null = null;
-  unitIndex: UnitIndex = Map();
+  units: UnitIndex = Map();
 
   constructor() {
-    super("EditSquadScene");
+    super(SceneKey);
   }
 
-  create({ squad, unitIndex }: { squad: Squad.SquadRecord; unitIndex: UnitIndex }) {
-    menu(this);
+  create({ squad, units }: EditSquadSceneParams) {
 
-    this.renderBoard(squad, unitIndex);
+    this.renderBoard(squad, units);
 
-    this.renderUnitList();
+    //this.renderUnitList();
 
     this.renderReturnBtn();
   }
 
   renderBoard(squad: Squad.SquadRecord, unitIndex: UnitIndex) {
-    this.boardScene = new BoardScene(squad, saveSquadIntoDB, unitIndex, false);
+    this.boardScene = new BoardScene(squad, () => {}, unitIndex, false);
     this.scene.add(BOARD_SCENE_KEY, this.boardScene, true);
 
     this.boardScene.makeUnitsClickable((c) => {
@@ -62,15 +67,17 @@ export class EditSquadScene extends Phaser.Scene {
         boardSprite.boardY
       );
 
-      added.forEach(() =>
-        saveUnitIntoDB({ ...unit, squad: boardScene.squad.id })
+      added.forEach(
+        () => {}
+        //saveUnitIntoDB({ ...unit, squad: boardScene.squad.id })
       );
 
-      removed.forEach((u) =>
-        saveUnitIntoDB({ ...this.unitIndex.get(u.id), squad: null })
+      removed.forEach(
+        (u) => {}
+        // saveUnitIntoDB({ ...this.units.get(u.id), squad: null })
       );
 
-      saveSquadIntoDB(updatedSquad);
+      //saveSquadIntoDB(updatedSquad);
 
       const unitToReplace = Squad.getMemberByPosition({
         x: boardSprite.boardX,

@@ -8,7 +8,7 @@ import text from "../UI/text";
 import menu from "../Backgrounds/menu";
 import { UnitIndex } from "../Unit/Model";
 import { List, Map, Set } from "immutable";
-import { EditSquadScene } from "./EditSquadScene";
+import * as EditSquadScene from "./EditSquadScene";
 
 type CreateParams = {
   squads: Squad.Index;
@@ -189,20 +189,15 @@ export class ListSquadsScene extends Phaser.Scene {
 
       const squads = Object.keys(this.squads);
 
-      // TODO; create a functino with typed requirements
-      this.scene.transition({
-        target: "EditSquadScene",
-        duration: 0,
-        moveBelow: true,
-        data: {
-          squad: {
-            id: (squads.length + 1).toString(),
-            name: "",
-            members: {},
-            force: PLAYER_FORCE,
-          },
-        },
-      });
+      // EditSquadScene.run(this, {
+      //   squad: {
+      //       id: (squads.length + 1).toString(),
+      //       members: Map(),
+      //       force: PLAYER_FORCE,
+      //     },
+      //   units: Map()
+      // }
+      // )
     });
 
     this.renderNavigation();
@@ -275,13 +270,12 @@ export class ListSquadsScene extends Phaser.Scene {
     this.controls = [];
     this.squads = Map();
     this.units = Map();
+    this.scene.stop();
   }
 
   editSquad(squad: Squad.SquadRecord) {
+    this.scene.stop();
+    EditSquadScene.run(this, { squad, units: this.units });
     this.turnOff();
-
-    this.scene.start("EditSquadScene", {
-      data: { squad, unitIndex: this.units },
-    });
   }
 }
