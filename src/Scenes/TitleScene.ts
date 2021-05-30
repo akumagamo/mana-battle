@@ -13,6 +13,9 @@ export default class TitleScene extends Phaser.Scene {
   music: Phaser.Sound.BaseSound | null = null;
   charas: Chara[] = [];
   container: Container | null = null;
+  sceneEvents = {
+    NewGameButtonClicked: ()=> this.handleNewGameClick()
+  }
   constructor() {
     super("TitleScene");
   }
@@ -23,8 +26,6 @@ export default class TitleScene extends Phaser.Scene {
 
   create() {
     this.events.once("shutdown", () => this.turnOff());
-
-    this.events.on('NewGameButtonClicked', ()=>this.handleNewGameClick())
 
     this.container = this.add.container(0, 0);
     const bg = this.add.image(0, 0, "backgrounds/sunset");
@@ -77,7 +78,7 @@ export default class TitleScene extends Phaser.Scene {
       window.document.body.requestFullscreen();
     });
 
-    button(SCREEN_WIDTH / 2, 550, "New Game", this.container, this, ()=>this.events.emit('NewGameButtonClicked'));
+    button(SCREEN_WIDTH / 2, 550, "New Game", this.container, this, ()=>this.sceneEvents.NewGameButtonClicked());
 
     button(SCREEN_WIDTH / 2, 620, "Options", this.container, this, () => {
       this.scene.transition({
@@ -87,6 +88,7 @@ export default class TitleScene extends Phaser.Scene {
       });
     });
 
+    // TODO: receive event listener as prop - GameEvents?
     this.game.events.emit("TitleSceneCreated", this);
   }
 

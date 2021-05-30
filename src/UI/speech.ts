@@ -2,7 +2,6 @@ import { Scene } from "phaser";
 import { Chara } from "../Chara/Chara";
 import { Container } from "../Models";
 import { Unit } from "../Unit/Model";
-import { animatedText } from "./animatedText";
 import panel from "./panel";
 import text from "./text";
 
@@ -11,7 +10,7 @@ import text from "./text";
  * the UI container (and having it as parent for this) will throw
  * errors at the Chara and text container levels
  */
-export default (
+export default async (
   unit: Unit,
   x: number,
   y: number,
@@ -43,9 +42,12 @@ export default (
 
   text(x + 150, y + 10, unit.name, container, scene);
 
-  const speechText = text(x + 150, y + 50, "", container, scene);
+  const speechText = text(x + 150, y + 50, text_, container, scene);
 
-  const textCompleted = animatedText(scene, text_, speechText, speed);
+  //const textCompleted = await animatedText(scene, text_, speechText, speed);
 
-  return { bg, portrait, speechText, textCompleted };
+  const textCompleted = Promise.resolve();
+
+  //TODO: return function that destroys the component and removes the portrait scene
+  return { bg, portraitKey: portrait.scene.key, speechText, textCompleted };
 };

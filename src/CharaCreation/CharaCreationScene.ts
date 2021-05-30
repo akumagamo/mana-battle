@@ -27,14 +27,17 @@ const panelWidth = 600;
 const panelHeight = 120;
 
 export const startCharaCreationScene = async (parent: Phaser.Scene) =>
-  new Promise<CharaCreationScene>((resolve) => {
-    const scene = new CharaCreationScene(resolve);
+  new Promise<CharaCreationScene>((onSceneCreated) => {
+    const scene = new CharaCreationScene(onSceneCreated);
 
     parent.scene.add(CHARA_CREATION_SCENE, scene, true);
   });
 
 export default class CharaCreationScene extends Phaser.Scene {
-  constructor(public resolve: (scene: CharaCreationScene) => void) {
+  public sceneEvents = {
+    ConfirmationButtonClicked: this.handleConfirmButtonClick.bind(this),
+  };
+  constructor(public onSceneCreated: (scene: CharaCreationScene) => void) {
     super(CHARA_CREATION_SCENE);
   }
   preload() {
@@ -42,10 +45,10 @@ export default class CharaCreationScene extends Phaser.Scene {
       const id = "jshaw_dream_of_first_flight";
       this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
       this.load.on("complete", () => {
-        this.resolve(this);
+        this.onSceneCreated(this);
       });
     } else {
-      this.resolve(this);
+      this.onSceneCreated(this);
     }
   }
 
@@ -54,11 +57,7 @@ export default class CharaCreationScene extends Phaser.Scene {
   container: Container | null = null;
 
   createUnitForm() {
-    return new Promise<Unit>(async (resolve) => {
-      this.events.on("ConfirmationButtonClicked", () =>
-        this.handleConfirmButtonClick(resolve)
-      );
-
+    return new Promise<Unit>(async (onHeroCreated) => {
       if (process.env.SOUND_ENABLED) {
         this.sound.stopAll();
         const music = this.sound.add("jshaw_dream_of_first_flight");
@@ -112,12 +111,14 @@ export default class CharaCreationScene extends Phaser.Scene {
         classLabels
       );
 
-      this.confirmButton();
+      this.confirmButton(onHeroCreated);
 
-      this.game.events.emit("CharaCreationSceneCreated", this);
+      this.game.events.emit("CharaCreationSceneCreated", this, onHeroCreated);
     });
   }
-  private confirmButton() {
+  private confirmButton(
+    onHeroCreated: (value: Unit | PromiseLike<Unit>) => void
+  ) {
     const img = this.add.image(
       SCREEN_WIDTH - 100,
       SCREEN_HEIGHT - 100,
@@ -125,10 +126,14 @@ export default class CharaCreationScene extends Phaser.Scene {
     );
     this.container.add(img);
     img.setInteractive();
-    img.on("pointerdown", () => this.events.emit("ConfirmationButtonClicked"));
+    img.on("pointerdown", () =>
+      this.sceneEvents.ConfirmationButtonClicked(onHeroCreated)
+    );
   }
 
-  handleConfirmButtonClick(resolve: (value: Unit | PromiseLike<Unit>) => void) {
+  handleConfirmButtonClick(
+    onHeroCreated: (value: Unit | PromiseLike<Unit>) => void
+  ) {
     const name: string = (<HTMLInputElement>(
       document.getElementById("new-chara-name")
     )).value;
@@ -137,7 +142,7 @@ export default class CharaCreationScene extends Phaser.Scene {
     this.scene.remove(this.chara);
     this.scene.remove(this);
 
-    resolve(unit);
+    onHeroCreated(unit);
   }
 
   private nameInput(x: number, y: number) {

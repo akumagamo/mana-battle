@@ -33,14 +33,14 @@ export const speak = (scene: TheaterScene, { id, text: text_ }: Speak, speed:num
   container.add(head.container);
 
   text(190, 20, chara.props.unit.name, container, scene);
-  const unitText = text(190, 60, "", container, scene);
+  //const unitText = text(190, 60, text_, container, scene);
 
   const clickZone = scene.add.zone(0, y, SCREEN_WIDTH, PANEL_HEIGHT);
   clickZone.setInteractive();
   clickZone.setOrigin(0);
 
   return new Promise<void>(async (resolve) => {
-    await animatedText(scene, text_, unitText, speed);
+    //await animatedText(scene, text_, unitText, speed);
 
     const img = scene.add.image(SCREEN_WIDTH - 100, 100, "arrow_right");
     container.add(img);

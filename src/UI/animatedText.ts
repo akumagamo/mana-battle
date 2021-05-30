@@ -6,7 +6,7 @@ export function animatedText(
   speechText: Phaser.GameObjects.Text,
   speed: number
 ) {
-  const characterRenderInterval = 25 / speed;
+  const characterRenderInterval = 50;
 
   scene.time.addEvent({
     repeat: text_.length,
@@ -19,7 +19,7 @@ export function animatedText(
   return new Promise<void>((resolve) => {
     scene.time.addEvent({
       repeat: 0,
-      delay: text_.length * characterRenderInterval,
+      delay: text_.length * characterRenderInterval + characterRenderInterval,
       callback: () => {
         resolve();
       },

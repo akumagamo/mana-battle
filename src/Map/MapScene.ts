@@ -60,7 +60,39 @@ export const startMapScene = async (
   parent.scene.add("MapScene", scene, true, cmds);
 };
 
+const SceneEventFactory = <ARGS>(scene: Phaser.Scene, key: string) => ({
+  on: (callback: (args_: ARGS) => void) => {
+    scene.events.on(key, callback);
+  },
+  once: (callback: (args_: ARGS) => void) => {
+    scene.events.once(key, callback);
+  },
+  emit: (args: ARGS) => {
+    scene.events.emit(key, args);
+  },
+});
+
 export class MapScene extends Phaser.Scene {
+  evs = {
+    CellClicked: SceneEventFactory<{ tile: Vector; pointer: Vector }>(
+      this,
+      "CellClicked"
+    ),
+    MovePlayerSquadButonClicked: SceneEventFactory<{
+      mapScene: MapScene;
+      mapSquad: MapSquad;
+    }>(this, "MovePlayerSquadButonClicked"),
+    SquadArrivedInfoMessageCompleted: SceneEventFactory<Chara>(
+      this,
+      "SquadArrivedInfoMessageCompleted"
+    ),
+    SquadClicked: SceneEventFactory<MapSquad>(this, "SquadClicked"),
+    CloseSquadArrivedInfoMessage: SceneEventFactory<string>(
+      this,
+      "CloseSquadArrivedInfoMessage"
+    ),
+  };
+
   isPaused = false;
   squadsInMovement: Map<string, { path: Vector[]; squad: MapSquad }> = Map();
 
@@ -156,6 +188,18 @@ export class MapScene extends Phaser.Scene {
     });
   }
 
+  init() {
+    for (let ev in this.evs) {
+      this.events.off(ev);
+    }
+    this.evs.CellClicked.on(this.handleCellClick.bind(this));
+    this.evs.MovePlayerSquadButonClicked.on(handleMovePlayerSquadButtonClicked);
+    this.evs.SquadClicked.on(this.clickSquad.bind(this));
+    this.evs.CloseSquadArrivedInfoMessage.on(
+      this.handleCloseSquadArrivedInfoMessage.bind(this)
+    );
+  }
+
   update() {
     if (!this.isPaused) {
       this.moveSquads();
@@ -230,6 +274,7 @@ export class MapScene extends Phaser.Scene {
       const chara = await this.getChara(squad.id);
       chara.stand();
       await this.speak(squad);
+      this.evs.SquadArrivedInfoMessageCompleted.emit(chara);
     }
   }
 
@@ -267,7 +312,7 @@ export class MapScene extends Phaser.Scene {
     this.isPaused = true;
 
     const leader = this.getSquadLeader(squad.id);
-    const res = speech(
+    const res = await speech(
       leader,
       450,
       70,
@@ -277,12 +322,15 @@ export class MapScene extends Phaser.Scene {
       GAME_SPEED
     );
 
-    await res.textCompleted;
-    button(950, 180, "Ok", this.uiContainer, this, () => {
-      this.scene.remove(res.portrait.scene.key);
-      this.refreshUI();
-      this.isPaused = false;
-    });
+    button(950, 180, "Ok", this.uiContainer, this, () =>
+      this.evs.CloseSquadArrivedInfoMessage.emit(res.portraitKey)
+    );
+  }
+  handleCloseSquadArrivedInfoMessage(key: string) {
+    console.log(key);
+    this.scene.remove(key);
+    this.refreshUI();
+    this.isPaused = false;
   }
 
   async signal(eventName: string, cmds: MapCommands[]) {
@@ -308,8 +356,6 @@ export class MapScene extends Phaser.Scene {
           }
 
           clickCell(this, cmd.cell);
-        } else if (cmd.type === "CLICK_SQUAD") {
-          await this.clickSquad(cmd.unit);
         } else if (cmd.type === "MOVE_CAMERA_TO") {
           this.moveCameraTo({ x: cmd.x, y: cmd.y }, cmd.duration);
         } else if (cmd.type === "CLEAR_TILES") {
@@ -392,18 +438,6 @@ export class MapScene extends Phaser.Scene {
 
   async create(data: MapCommands[]) {
     this.mode = DEFAULT_MODE;
-
-    this.events.on("SquadClicked", (sqd: MapSquad) => this.clickSquad(sqd));
-
-    this.events.on("CellClicked", (tile: MapTile, pointer: Pointer) =>
-      this.handleCellClick(tile, pointer)
-    );
-
-    this.events.on(
-      "MovePlayerSquadButonClicked",
-      (mapScene: MapScene, mapSquad: MapSquad) =>
-        handleMovePlayerSquadButtonClicked(mapScene, mapSquad)
-    );
 
     if (process.env.SOUND_ENABLED) {
       this.sound.stopAll();
@@ -653,21 +687,24 @@ export class MapScene extends Phaser.Scene {
   }
   makeInteractive(cell: MapTile) {
     cell.tile.on("pointerup", (pointer: Pointer) =>
-      this.events.emit("CellClicked", cell, pointer)
+      this.evs.CellClicked.emit({
+        tile: cell,
+        pointer: { x: pointer.upX, y: pointer.upY },
+      })
     );
   }
-  async handleCellClick(cell: MapTile, pointer: Pointer) {
+  async handleCellClick({ tile, pointer }: { tile: Vector; pointer: Vector }) {
     if (!this.cellClickDisabled)
       this.signal("regular click cell", [
-        { type: "CLICK_CELL", cell },
-        { type: "HIGHLIGHT_CELL", pos: cell },
+        { type: "CLICK_CELL", cell: tile },
+        { type: "HIGHLIGHT_CELL", pos: tile },
       ]);
 
     await this.pingEffect(pointer);
   }
 
-  private async pingEffect(pointer: Phaser.Input.Pointer) {
-    var ping = this.add.circle(pointer.upX, pointer.upY, 20, 0xffff66);
+  private async pingEffect(pointer: Vector) {
+    var ping = this.add.circle(pointer.x, pointer.y, 20, 0xffff66);
 
     await tween(this, {
       targets: ping,
@@ -1007,7 +1044,7 @@ export class MapScene extends Phaser.Scene {
 
     this.scene.add("ally_board", ally, true);
 
-    const { portrait } = speech(
+    const { portraitKey } = await speech(
       leader,
       450,
       70,
@@ -1019,7 +1056,7 @@ export class MapScene extends Phaser.Scene {
 
     await delay(this, 3000 / GAME_SPEED);
 
-    this.scene.remove(portrait.scene.key);
+    this.scene.remove(portraitKey);
 
     ally.turnOff();
     enemy.turnOff();
