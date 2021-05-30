@@ -34,10 +34,8 @@ export function endToEndTesting(game: Phaser.Game) {
       tile: { x: 4, y: 5 },
       pointer: { x: 200, y: 400 },
     });
-    scn.evs.SquadArrivedInfoMessageCompleted.on((chara: Chara) => {
-      scn.evs.CloseSquadArrivedInfoMessage.emit(
-        `speech_${chara.props.unit.id}`
-      );
+    scn.evs.SquadArrivedInfoMessageCompleted.on((portraitKey: string) => {
+      scn.evs.CloseSquadArrivedInfoMessage.emit(portraitKey)
 
       scn.evs.MovePlayerSquadButonClicked.emit({
         mapScene: scn,

@@ -82,7 +82,7 @@ export class MapScene extends Phaser.Scene {
       mapScene: MapScene;
       mapSquad: MapSquad;
     }>(this, "MovePlayerSquadButonClicked"),
-    SquadArrivedInfoMessageCompleted: SceneEventFactory<Chara>(
+    SquadArrivedInfoMessageCompleted: SceneEventFactory<string>(
       this,
       "SquadArrivedInfoMessageCompleted"
     ),
@@ -273,8 +273,8 @@ export class MapScene extends Phaser.Scene {
 
       const chara = await this.getChara(squad.id);
       chara.stand();
-      await this.speak(squad);
-      this.evs.SquadArrivedInfoMessageCompleted.emit(chara);
+      const portraitKey = await this.speak(squad);
+      this.evs.SquadArrivedInfoMessageCompleted.emit(portraitKey);
     }
   }
 
@@ -325,6 +325,8 @@ export class MapScene extends Phaser.Scene {
     button(950, 180, "Ok", this.uiContainer, this, () =>
       this.evs.CloseSquadArrivedInfoMessage.emit(res.portraitKey)
     );
+
+    return res.portraitKey
   }
   handleCloseSquadArrivedInfoMessage(key: string) {
     console.log(key);
