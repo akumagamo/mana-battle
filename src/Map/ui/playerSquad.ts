@@ -22,7 +22,7 @@ export default (
       mapScene.uiContainer,
       mapScene,
       () => {
-        mapScene.clearSquadBoards();
+        mapScene.clearChildrenScenes();
         formationBtn(mapScene, mapSquad.id);
       }
     );
@@ -33,14 +33,7 @@ export default (
     );
   }
 
-  button(50, 40, "Organize", uiContainer, mapScene, () => {
-    mapScene.turnOff();
-    organize(mapScene);
-  });
-  button(250, 40, "Dispatch", uiContainer, mapScene, () => {
-    mapScene.disableMapInput();
-    dispatchWindow(mapScene);
-  });
+
 };
 
 export function handleMovePlayerSquadButtonClicked({mapSquad, mapScene}:{

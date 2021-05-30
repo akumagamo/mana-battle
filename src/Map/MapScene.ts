@@ -478,6 +478,7 @@ export class MapScene extends Phaser.Scene {
     this.enableInput();
     this.isPaused = false;
 
+    this.refreshUI();
     this.game.events.emit("MapSceneCreated", this);
   }
 
@@ -764,7 +765,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   attack = async (starter: MapSquad, target: MapSquad, direction: string) => {
-    await fadeOut(this,1000 / GAME_SPEED);
+    await fadeOut(this, 1000 / GAME_SPEED);
 
     this.turnOff();
 
@@ -833,7 +834,7 @@ export class MapScene extends Phaser.Scene {
   };
 
   turnOff() {
-    this.clearSquadBoards();
+    this.clearChildrenScenes();
     this.mapContainer.destroy();
     this.uiContainer.destroy();
     this.charas.forEach((chara) => {
@@ -863,11 +864,7 @@ export class MapScene extends Phaser.Scene {
   async refreshUI() {
     this.destroyUI();
 
-    if (
-      this.mode.type === "NOTHING_SELECTED" ||
-      this.mode.type === "CHANGING_SQUAD_FORMATION"
-    )
-      return;
+    if (this.mode.type === "CHANGING_SQUAD_FORMATION") return;
 
     const { uiContainer } = this.getContainers();
 
@@ -990,7 +987,7 @@ export class MapScene extends Phaser.Scene {
     return this.state.units.filter((u) => u.squad === id);
   }
 
-  clearSquadBoards() {
+  clearChildrenScenes() {
     this.state.squads.forEach((_, id) => {
       const board = this.scene.get(
         `static-squad-${id}`
@@ -998,11 +995,15 @@ export class MapScene extends Phaser.Scene {
 
       if (board) board.turnOff();
     });
+    this.charas.forEach((chara) => {
+      const picture = this.scene.get(`speech_${chara.props.unit.id}`) as Chara | null;
+      if (picture) this.scene.remove(picture);
+    });
   }
 
   // TODO: handle scenario where none of the engaging squads belongs to the player
   async startCombat(squadA: MapSquad, squadB: MapSquad, direction: string) {
-    this.clearSquadBoards();
+    this.clearChildrenScenes();
 
     const baseX = 200;
     const baseY = 200;

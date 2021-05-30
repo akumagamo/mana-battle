@@ -65,10 +65,12 @@ export default (scene: MapScene) => {
         },
       ]);
     };
+
+    const leader = scene.getSquadLeader(mapSquad.id)
     button(
       x + padding,
       y + 60 + 70 * i,
-      "todo: squadName",
+      leader.name,
       container,
       scene,
       event,

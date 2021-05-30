@@ -11,7 +11,7 @@ export async function squadInfo(
   baseY: number,
   id: string
 ): Promise<void> {
-  scene.clearSquadBoards();
+  scene.clearChildrenScenes();
 
   const mapSquad = scene.getSquad(id);
 
@@ -21,7 +21,7 @@ export async function squadInfo(
 
   if (mapSquad.squad.force !== PLAYER_FORCE) {
     button(430, baseY, "Squad Details", scene.uiContainer, scene, () => {
-      scene.clearSquadBoards();
+      scene.clearChildrenScenes();
       scene.viewSquadDetails(id);
     });
   }
