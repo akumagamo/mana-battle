@@ -1,12 +1,11 @@
-import BoardScene from "../../Board/InteractiveBoardScene";
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../constants";
-import { Container } from "../../Models";
-import { SquadRecord } from "../../Squad/Model";
-import button from "../../UI/button";
-import panel from "../../UI/panel";
-import { UnitIndex } from "../../Unit/Model";
-import SmallUnitDetailsBar from "../../Unit/SmallUnitDetailsBar";
-import { MapScene } from "../MapScene";
+import BoardScene from "../Board/InteractiveBoardScene";
+import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../constants";
+import { Container } from "../Models";
+import button from "../UI/button";
+import panel from "../UI/panel";
+import { UnitIndex } from "../Unit/Model";
+import SmallUnitDetailsBar from "../Unit/SmallUnitDetailsBar";
+import { SquadRecord } from "./Model";
 
 export default function (
   scene: Phaser.Scene,

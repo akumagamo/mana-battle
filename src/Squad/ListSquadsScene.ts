@@ -9,6 +9,7 @@ import menu from "../Backgrounds/menu";
 import { UnitIndex } from "../Unit/Model";
 import { List, Map, Set } from "immutable";
 import * as EditSquadScene from "./EditSquadScene";
+import EditSquadModal from "./EditSquadModal";
 
 type CreateParams = {
   squads: Squad.Index;
@@ -36,6 +37,7 @@ export class ListSquadsScene extends Phaser.Scene {
   dispatched: Set<string> = Set();
   onDisbandSquad: (id: string) => void = () => {};
   onReturnClick: (scene: ListSquadsScene) => void | null = null;
+  inputEnabled = true;
 
   constructor() {
     super(key);
@@ -114,6 +116,7 @@ export class ListSquadsScene extends Phaser.Scene {
       container,
       this,
       () => {
+        this.inputEnabled = false;
         this.editSquad(squad);
       },
       dispatched
@@ -149,7 +152,7 @@ export class ListSquadsScene extends Phaser.Scene {
     this.scene.add(`board-squad-${squad.id}`, boardScene, true);
 
     boardScene.onClick((sqd) => {
-      this.selectSquad(sqd);
+      if (this.inputEnabled) this.selectSquad(sqd);
     });
 
     this.boardScenes.push(boardScene);
@@ -181,24 +184,22 @@ export class ListSquadsScene extends Phaser.Scene {
         this.turnOff();
 
         if (this.onReturnClick) this.onReturnClick(this);
-      }
+      },
+      !this.inputEnabled
     );
 
-    button(1000, 600, "Create Squad", this.add.container(0, 0), this, () => {
-      this.turnOff();
+    button(
+      1000,
+      600,
+      "Create Squad",
+      this.add.container(0, 0),
+      this,
+      () => {
+        this.turnOff();
+      },
 
-      const squads = Object.keys(this.squads);
-
-      // EditSquadScene.run(this, {
-      //   squad: {
-      //       id: (squads.length + 1).toString(),
-      //       members: Map(),
-      //       force: PLAYER_FORCE,
-      //     },
-      //   units: Map()
-      // }
-      // )
-    });
+      !this.inputEnabled
+    );
 
     this.renderNavigation();
   }
@@ -218,7 +219,7 @@ export class ListSquadsScene extends Phaser.Scene {
     } else {
       prev.setInteractive();
       prev.on("pointerdown", (_pointer: Pointer) => {
-        this.prevPage();
+        if (this.inputEnabled) this.prevPage();
       });
     }
 
@@ -233,7 +234,7 @@ export class ListSquadsScene extends Phaser.Scene {
     if (!isLastPage) {
       next.setInteractive();
       next.on("pointerdown", () => {
-        this.nextPage();
+        if (this.inputEnabled) this.nextPage();
       });
     } else {
       next.setAlpha(0.5);
@@ -243,7 +244,9 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   refresh() {
-    this.turnOff();
+    this.boardScenes.forEach((scene) => {
+      scene.turnOff();
+    });
     this.renderSquadList(this.squads);
     this.renderControls();
   }
@@ -274,11 +277,17 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   editSquad(squad: Squad.SquadRecord) {
-    EditSquadScene.run(this, {
+    EditSquadModal(
+      this,
       squad,
-      units: this.units,
-      onSquadUpdated: (squad) =>
-        (this.squads = this.squads.set(squad.id, squad))
-    });
+      this.units,
+      (sqd) => {
+        this.squads = this.squads.set(sqd.id, sqd);
+      },
+      () => {
+        this.refresh();
+        this.inputEnabled = true;
+      }
+    );
   }
 }

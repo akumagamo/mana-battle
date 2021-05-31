@@ -3,7 +3,7 @@ import button from "../../UI/button";
 import { MapScene } from "../MapScene";
 import dispatchWindow from "../dispatchWindow";
 import { organize } from "./organize";
-import editSquadModal from "./editSquadModal";
+import EditSquadModal from "../../Squad/EditSquadModal";
 
 export default (
   mapScene: MapScene,
@@ -26,7 +26,7 @@ export default (
         mapScene.changeMode({ type: "CHANGING_SQUAD_FORMATION" });
         mapScene.disableMapInput();
 
-        editSquadModal(
+        EditSquadModal(
           mapScene,
           mapSquad.squad,
           mapScene.state.units,
