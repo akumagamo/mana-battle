@@ -274,8 +274,11 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   editSquad(squad: Squad.SquadRecord) {
-    this.scene.stop();
-    EditSquadScene.run(this, { squad, units: this.units });
-    this.turnOff();
+    EditSquadScene.run(this, {
+      squad,
+      units: this.units,
+      onSquadUpdated: (squad) =>
+        (this.squads = this.squads.set(squad.id, squad))
+    });
   }
 }

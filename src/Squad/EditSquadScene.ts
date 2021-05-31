@@ -8,10 +8,17 @@ import menu from "../Backgrounds/menu";
 import SmallUnitDetailsBar from "../Unit/SmallUnitDetailsBar";
 import { Container } from "../Models";
 import { Map } from "immutable";
+import * as ListSquadsScene from "./ListSquadsScene";
+import panel from "../UI/panel";
+import {SCREEN_HEIGHT, SCREEN_WIDTH} from "../constants";
 
 const SceneKey = "EditSquadScene";
 
-type EditSquadSceneParams = { squad: Squad.SquadRecord; units: UnitIndex };
+type EditSquadSceneParams = {
+  squad: Squad.SquadRecord;
+  units: UnitIndex;
+  onSquadUpdated: (s: Squad.SquadRecord) => void;
+};
 export function run(scene: Phaser.Scene, params: EditSquadSceneParams) {
   scene.scene.run(SceneKey, params);
 }
@@ -26,17 +33,23 @@ export class EditSquadScene extends Phaser.Scene {
     super(SceneKey);
   }
 
-  create({ squad, units }: EditSquadSceneParams) {
+  create({ squad, units, onSquadUpdated }: EditSquadSceneParams) {
 
-    this.renderBoard(squad, units);
+    panel(100, 100, SCREEN_WIDTH - 200, SCREEN_HEIGHT - 200, this.add.container(),this)
+
+    this.renderBoard(squad, units, onSquadUpdated);
 
     //this.renderUnitList();
 
     this.renderReturnBtn();
   }
 
-  renderBoard(squad: Squad.SquadRecord, unitIndex: UnitIndex) {
-    this.boardScene = new BoardScene(squad, () => {}, unitIndex, false);
+  renderBoard(
+    squad: Squad.SquadRecord,
+    unitIndex: UnitIndex,
+    onSquadUpdated: (s: Squad.SquadRecord) => void
+  ) {
+    this.boardScene = new BoardScene(squad, onSquadUpdated, unitIndex, false);
     this.scene.add(BOARD_SCENE_KEY, this.boardScene, true);
 
     this.boardScene.makeUnitsClickable((c) => {
@@ -142,11 +155,7 @@ export class EditSquadScene extends Phaser.Scene {
 
     button(1100, 200, "Return to List", this.add.container(0, 0), this, () => {
       this.destroyChildren();
-      this.scene.transition({
-        target: "ListSquadsScene",
-        duration: 0,
-        moveBelow: true,
-      });
+      this.scene.stop();
     });
   }
 
