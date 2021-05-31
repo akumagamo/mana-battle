@@ -1,10 +1,10 @@
 import UnitListScene from '../Unit/UnitListScene';
-import {Unit} from '../Unit/Model';
+import {Unit, UnitIndex} from '../Unit/Model';
 
 export class CreateSquadScene extends Phaser.Scene {
   unitListScene: UnitListScene | null = null;
 
-  constructor() {
+  constructor(public units: UnitIndex) {
     super('CreateSquadScene');
   }
 
@@ -17,7 +17,7 @@ export class CreateSquadScene extends Phaser.Scene {
   }
 
   renderUnitList() {
-    this.unitListScene = new UnitListScene(100, 40, 8);
+    this.unitListScene = new UnitListScene(100, 40, 8, this.units);
     this.unitListScene.onUnitClick = (unit: Unit) => console.log(unit);
     this.scene.add('UnitListScene', this.unitListScene, true);
   }

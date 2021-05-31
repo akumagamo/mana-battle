@@ -6,13 +6,14 @@ import text from "../../UI/text";
 import dispatchWindow from "../dispatchWindow";
 import { MapScene } from "../MapScene";
 import city from "./city";
-import { organize } from "./organize";
 import { squadInfo } from "./squadInfo";
 
 const BOTTOM_PANEL_WIDTH = SCREEN_WIDTH;
 const BOTTOM_PANEL_HEIGHT = 80;
 const BOTTOM_PANEL_X = 0;
 export const BOTTOM_PANEL_Y = SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT;
+
+
 
 export default (scene: MapScene, uiContainer: Container): Promise<void> => {
   const baseY = BOTTOM_PANEL_Y + 25;
@@ -25,10 +26,7 @@ export default (scene: MapScene, uiContainer: Container): Promise<void> => {
     uiContainer,
     scene
   );
-  button(50, 40, "Organize", uiContainer, scene, () => {
-    scene.turnOff();
-    organize(scene);
-  });
+  button(50, 40, "Organize", uiContainer, scene, ()=>scene.evs.OrganizeButtonClicked.emit(scene));
   button(250, 40, "Dispatch", uiContainer, scene, () => {
     scene.disableMapInput();
     dispatchWindow(scene);

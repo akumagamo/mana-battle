@@ -3,7 +3,6 @@ import TitleScene from "./Scenes/TitleScene";
 import OptionsScene from "./Scenes/OptionsScene";
 import WorldScene from "./Scenes/World";
 import defaultData from "./defaultData";
-import { EditSquadScene } from "./Squad/EditSquadScene";
 import { ListSquadsScene } from "./Squad/ListSquadsScene";
 import { ListUnitsScene } from "./Unit/ListUnits";
 import MapListScene from "./Map/MapListScene";
@@ -22,7 +21,6 @@ import {endToEndTesting} from "./endToEndTesting";
     },
     scene: [
       TitleScene,
-      EditSquadScene,
       ListSquadsScene,
       ListUnitsScene,
       MapListScene,

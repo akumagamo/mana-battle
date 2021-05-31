@@ -3,13 +3,13 @@ import Board from "../Board/StaticBoardScene";
 import { Pointer, Image, Text } from "../Models";
 import button from "../UI/button";
 import panel from "../UI/panel";
-import { PLAYER_FORCE, SCREEN_WIDTH } from "../constants";
+import { SCREEN_WIDTH } from "../constants";
 import text from "../UI/text";
 import menu from "../Backgrounds/menu";
 import { UnitIndex } from "../Unit/Model";
 import { List, Map, Set } from "immutable";
-import * as EditSquadScene from "./EditSquadScene";
-import EditSquadModal from "./EditSquadModal";
+import EditSquadModal, { EditSquadModalEvents } from "./EditSquadModal";
+import { SceneEventFactory } from "../utils";
 
 type CreateParams = {
   squads: Squad.Index;
@@ -28,6 +28,14 @@ export const run = (
 };
 
 export class ListSquadsScene extends Phaser.Scene {
+  evs = {
+    SquadClicked: SceneEventFactory<Squad.SquadRecord>(this, "SquadClicked"),
+    SquadEditClicked: SceneEventFactory<Squad.SquadRecord>(
+      this,
+      "SquadEditClicked"
+    ),
+  };
+
   boardScenes: Board[] = [];
   controls: (Image | Text)[] = [];
   page: number = 0;
@@ -38,9 +46,17 @@ export class ListSquadsScene extends Phaser.Scene {
   onDisbandSquad: (id: string) => void = () => {};
   onReturnClick: (scene: ListSquadsScene) => void | null = null;
   inputEnabled = true;
+  editSquadModalEvents: EditSquadModalEvents;
 
   constructor() {
     super(key);
+  }
+
+  init() {
+    for (const ev in this.evs) this.events.off(ev);
+
+    this.evs.SquadClicked.on(this.handleSquadClicked.bind(this));
+    this.evs.SquadEditClicked.on(this.handleSquadEditClicked.bind(this));
   }
 
   create({ squads, units, dispatched, onReturnClick }: CreateParams) {
@@ -55,7 +71,9 @@ export class ListSquadsScene extends Phaser.Scene {
 
     this.renderSquadList(squads);
     this.renderControls();
-    this.selectSquad(squads.toList().get(0));
+    this.evs.SquadClicked.emit(squads.toList().get(0));
+
+    this.game.events.emit("ListSquadsSceneCreated", this);
   }
 
   getSquads() {
@@ -115,10 +133,7 @@ export class ListSquadsScene extends Phaser.Scene {
       "Edit",
       container,
       this,
-      () => {
-        this.inputEnabled = false;
-        this.editSquad(squad);
-      },
+      () => this.evs.SquadEditClicked.emit(squad),
       dispatched
     );
 
@@ -138,6 +153,23 @@ export class ListSquadsScene extends Phaser.Scene {
     );
   }
 
+  handleSquadEditClicked(squad: Squad.SquadRecord) {
+    this.inputEnabled = false;
+
+    this.editSquadModalEvents = EditSquadModal(
+      this,
+      squad,
+      this.units,
+      (sqd) => {
+        this.squads = this.squads.set(sqd.id, sqd);
+      },
+      () => {
+        this.refresh();
+        this.inputEnabled = true;
+      }
+    );
+  }
+
   renderBoard(squad: Squad.SquadRecord, x: number, y: number) {
     const BOARD_X = 20 + x * 350;
     const BOARD_Y = 20 + y * 330;
@@ -152,7 +184,7 @@ export class ListSquadsScene extends Phaser.Scene {
     this.scene.add(`board-squad-${squad.id}`, boardScene, true);
 
     boardScene.onClick((sqd) => {
-      if (this.inputEnabled) this.selectSquad(sqd);
+      if (this.inputEnabled) this.evs.SquadClicked.emit(sqd);
     });
 
     this.boardScenes.push(boardScene);
@@ -163,7 +195,7 @@ export class ListSquadsScene extends Phaser.Scene {
 
     fn(board);
   }
-  selectSquad(sqd: Squad.SquadRecord) {
+  handleSquadClicked(sqd: Squad.SquadRecord) {
     this.squadSceneIO(sqd.id, (squadScene) => {
       this.renderSelectSquadInfo(sqd);
       this.boardScenes
@@ -254,13 +286,13 @@ export class ListSquadsScene extends Phaser.Scene {
   nextPage() {
     this.page = this.page + 1;
     this.refresh();
-    this.selectSquad(this.getSquads().get(0));
+    this.evs.SquadClicked.emit(this.getSquads().get(0));
   }
 
   prevPage() {
     this.page = this.page - 1;
     this.refresh();
-    this.selectSquad(this.getSquads().get(0));
+    this.evs.SquadClicked.emit(this.getSquads().get(0));
   }
 
   turnOff() {
@@ -274,20 +306,5 @@ export class ListSquadsScene extends Phaser.Scene {
     this.squads = Map();
     this.units = Map();
     this.scene.stop();
-  }
-
-  editSquad(squad: Squad.SquadRecord) {
-    EditSquadModal(
-      this,
-      squad,
-      this.units,
-      (sqd) => {
-        this.squads = this.squads.set(sqd.id, sqd);
-      },
-      () => {
-        this.refresh();
-        this.inputEnabled = true;
-      }
-    );
   }
 }

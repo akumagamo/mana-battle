@@ -1,8 +1,6 @@
 import { MapSquad } from "../Model";
 import button from "../../UI/button";
 import { MapScene } from "../MapScene";
-import dispatchWindow from "../dispatchWindow";
-import { organize } from "./organize";
 import EditSquadModal from "../../Squad/EditSquadModal";
 
 export default (

@@ -1,9 +1,9 @@
 import Phaser from "phaser";
-import { Unit, unitsWithoutSquad } from "./Model";
-import { getUnitsFromDB } from "../DB";
+import { Unit, UnitIndex} from "./Model";
 import { Chara } from "../Chara/Chara";
 import { error, INVALID_STATE } from "../errors";
 import { Pointer, Text, Image, Container } from "../Models";
+import { Map } from "immutable";
 
 // TODO: fix list display when unit in board is replaced with unit from list
 //
@@ -23,13 +23,14 @@ export default class UnitListScene extends Phaser.Scene {
     | ((unit: Unit, x: number, y: number, chara: Chara) => void)
     | null = null;
 
-  constructor(public x: number, public y: number, public itemsPerPage: number) {
+  constructor(public x: number, public y: number, public itemsPerPage: number, public units:UnitIndex) {
     super("UnitListScene");
     this.rows = [];
     this.page = 0;
   }
 
   create() {
+    this.events.on('shutdown', ()=>this.destroy())
     this.render();
     this.renderControls();
   }
@@ -62,8 +63,8 @@ export default class UnitListScene extends Phaser.Scene {
     this.controls.forEach((btn) => btn.destroy());
 
     // TODO: optimize to avoid reloading this
-    const units = unitsWithoutSquad(getUnitsFromDB());
-    const totalUnits = Object.keys(units).length;
+    //const units = unitsWithoutSquad(getUnitsFromDB());
+    const totalUnits = this.units.size;
 
     const next = this.add.image(this.x + 100, this.y + 580, "arrow_right");
 
@@ -120,9 +121,9 @@ export default class UnitListScene extends Phaser.Scene {
   }
 
   getUnitsToRender() {
-    const units = unitsWithoutSquad(getUnitsFromDB());
+    //const units = unitsWithoutSquad(getUnitsFromDB());
 
-    return units
+    return this.units
       .toList()
       .slice(
         this.page * this.itemsPerPage,
@@ -132,11 +133,7 @@ export default class UnitListScene extends Phaser.Scene {
 
   render() {
     const unitsToRender = this.getUnitsToRender();
-
-    console.log(`....`, unitsToRender);
-    unitsToRender.forEach((unit, index) => {
-      this.renderUnitListItem(unit, index);
-    });
+    unitsToRender.forEach( this.renderUnitListItem.bind(this));
   }
 
   private handleUnitClick(unit: Unit) {
@@ -158,10 +155,10 @@ export default class UnitListScene extends Phaser.Scene {
   }
 
   private renderUnitListItem(unit: Unit, index: number) {
-    const { charaX, charaY } = this.getRowPosition(index);
+    const { x, y } = this.getRowPosition(index);
     const key = this.makeUnitKey(unit);
 
-    const container = this.add.container(charaX, charaY);
+    const container = this.add.container(x, y);
 
     const onRowClick = this.onUnitClick
       ? this.handleUnitClick.bind(this)
@@ -192,8 +189,8 @@ export default class UnitListScene extends Phaser.Scene {
       key,
       parent: this,
       unit,
-      cy: charaX,
-      cx: charaY,
+      cx: x,
+      cy: y,
       scaleSizing: 0.5,
     });
 
@@ -212,8 +209,8 @@ export default class UnitListScene extends Phaser.Scene {
   private getRowPosition(index: number) {
     const lineHeight = 100;
     return {
-      charaX: this.x,
-      charaY: this.y + lineHeight * index,
+      x: this.x,
+      y: this.y + lineHeight * index,
     };
   }
 
@@ -266,12 +263,12 @@ export default class UnitListScene extends Phaser.Scene {
     { chara, container }: { chara: Chara; container: Container },
     index: number
   ) {
-    const { charaX, charaY } = this.getRowPosition(index);
+    const { x, y } = this.getRowPosition(index);
 
     this.tweens.add({
       targets: chara.container,
-      x: charaX,
-      y: charaY,
+      x ,
+      y,
       duration: 600,
       ease: "Cubic",
       repeat: 0,
@@ -281,8 +278,8 @@ export default class UnitListScene extends Phaser.Scene {
 
     this.tweens.add({
       targets: container,
-      x: charaX,
-      y: charaY,
+      x,
+      y,
       duration: 600,
       ease: "Cubic",
       repeat: 0,

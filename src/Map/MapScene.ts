@@ -28,11 +28,12 @@ import { delay, tween } from "../Scenes/utils";
 import { fadeIn, fadeOut } from "../UI/Transition";
 import { MapCommands } from "./MapCommands";
 import { Mode, DEFAULT_MODE } from "./Mode";
-import { getDistance } from "../utils";
+import { getDistance, SceneEventFactory } from "../utils";
 import { cellSize, CHARA_MAP_SCALE } from "./config";
 import { screenToCellPosition, cellToScreenPosition } from "./board/position";
 import * as CombatScene from "../Combat/CombatScene";
 import { handleMovePlayerSquadButtonClicked } from "./ui/playerSquad";
+import { organize } from "./ui/organize";
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 
@@ -60,17 +61,6 @@ export const startMapScene = async (
   parent.scene.add("MapScene", scene, true, cmds);
 };
 
-const SceneEventFactory = <ARGS>(scene: Phaser.Scene, key: string) => ({
-  on: (callback: (args_: ARGS) => void) => {
-    scene.events.on(key, callback);
-  },
-  once: (callback: (args_: ARGS) => void) => {
-    scene.events.once(key, callback);
-  },
-  emit: (args: ARGS) => {
-    scene.events.emit(key, args);
-  },
-});
 
 export class MapScene extends Phaser.Scene {
   evs = {
@@ -90,6 +80,10 @@ export class MapScene extends Phaser.Scene {
     CloseSquadArrivedInfoMessage: SceneEventFactory<string>(
       this,
       "CloseSquadArrivedInfoMessage"
+    ),
+    OrganizeButtonClicked: SceneEventFactory<MapScene>(
+      this,
+      "OrganizeButtonClicked"
     ),
   };
 
@@ -197,6 +191,9 @@ export class MapScene extends Phaser.Scene {
     this.evs.SquadClicked.on(this.clickSquad.bind(this));
     this.evs.CloseSquadArrivedInfoMessage.on(
       this.handleCloseSquadArrivedInfoMessage.bind(this)
+    );
+    this.evs.OrganizeButtonClicked.on(
+      this.handleOrganizeButtonClicked.bind(this)
     );
   }
 
@@ -326,7 +323,7 @@ export class MapScene extends Phaser.Scene {
       this.evs.CloseSquadArrivedInfoMessage.emit(res.portraitKey)
     );
 
-    return res.portraitKey
+    return res.portraitKey;
   }
   handleCloseSquadArrivedInfoMessage(key: string) {
     console.log(key);
@@ -998,7 +995,9 @@ export class MapScene extends Phaser.Scene {
       if (board) board.turnOff();
     });
     this.charas.forEach((chara) => {
-      const picture = this.scene.get(`speech_${chara.props.unit.id}`) as Chara | null;
+      const picture = this.scene.get(
+        `speech_${chara.props.unit.id}`
+      ) as Chara | null;
       if (picture) this.scene.remove(picture);
     });
   }
@@ -1169,5 +1168,9 @@ export class MapScene extends Phaser.Scene {
         });
       }) as Promise<void>;
     } else return Promise.resolve();
+  }
+  handleOrganizeButtonClicked() {
+    this.turnOff();
+    organize(this);
   }
 }
