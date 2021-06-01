@@ -5,7 +5,15 @@ import { PLAYER_FORCE } from "./constants";
 import { Unit } from "./Unit/Model";
 import { ListSquadsScene } from "./Squad/ListSquadsScene";
 import UnitListScene from "./Unit/UnitListScene";
+import BoardScene from "./Board/InteractiveBoardScene";
 
+const assertEquals = (condition: string, a: any, b: any) => {
+  if (a !== b)
+    throw new Error(
+      `❌ Failed assertion: ${condition} - ${a.toString()} should equals ${b.toString()}`
+    );
+  else console.log("✅:", condition);
+};
 export function endToEndTesting(game: Phaser.Game) {
   game.events.on("TitleSceneCreated", (scn: TitleScene) => {
     scn.sceneEvents.NewGameButtonClicked();
@@ -57,12 +65,19 @@ export function endToEndTesting(game: Phaser.Game) {
     scn.evs.SquadEditClicked.emit(squad);
     scn.editSquadModalEvents.AddUnitButtonClicked.emit(null);
     //scn.editSquadModalEvents.OnDrag.emit({ x: 506, y: 197 });
+    const unitListScene = scn.scene.manager.getScene(
+      "UnitListScene"
+    ) as UnitListScene;
 
-    const chara = (scn.scene.manager.getScene("UnitListScene") as UnitListScene)
-      .rows[0].chara;
+    const boardScene = scn.scene.manager.getScene("BoardScene") as BoardScene;
+
+    const chara = unitListScene.rows[0].chara;
     chara.handleDrag(500, 200);
 
-    expect(2).toBe(3)
+    assertEquals(
+      "A unit dragged from the list should paint the board cells when hovered over them",
+      boardScene.tiles[3].sprite.tintTopLeft,
+      8978227
+    );
   });
 }
- 
