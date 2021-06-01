@@ -5,7 +5,7 @@ import { PLAYER_FORCE } from "./constants";
 import { Chara } from "./Chara/Chara";
 import { Unit } from "./Unit/Model";
 import { ListSquadsScene } from "./Squad/ListSquadsScene";
-import {handleAddUnitButtonClicked} from "./Squad/EditSquadModal";
+import { handleAddUnitButtonClicked } from "./Squad/EditSquadModal";
 
 export function endToEndTesting(game: Phaser.Game) {
   game.events.on("TitleSceneCreated", (scn: TitleScene) => {
@@ -56,6 +56,7 @@ export function endToEndTesting(game: Phaser.Game) {
     const squad = scn.squads.toList().get(1);
     scn.evs.SquadClicked.emit(squad);
     scn.evs.SquadEditClicked.emit(squad);
-    scn.editSquadModalEvents.AddUnitButtonClicked.emit(null)
+    scn.editSquadModalEvents.AddUnitButtonClicked.emit(null);
+    scn.editSquadModalEvents.OnDrag.emit({ x: 506, y: 197 });
   });
 }

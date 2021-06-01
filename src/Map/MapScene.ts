@@ -34,6 +34,7 @@ import { screenToCellPosition, cellToScreenPosition } from "./board/position";
 import * as CombatScene from "../Combat/CombatScene";
 import { handleMovePlayerSquadButtonClicked } from "./ui/playerSquad";
 import { organize } from "./ui/organize";
+import {EditSquadModalEvents} from "../Squad/EditSquadModal";
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 
@@ -129,6 +130,8 @@ export class MapScene extends Phaser.Scene {
     loser: string;
     direction: string;
   } | null = null;
+
+  editSquadModalEvents: EditSquadModalEvents;
 
   constructor() {
     super("MapScene");

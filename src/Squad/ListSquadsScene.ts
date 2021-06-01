@@ -165,7 +165,6 @@ export class ListSquadsScene extends Phaser.Scene {
       },
       () => {
         this.refresh();
-        this.inputEnabled = true;
       }
     );
   }
