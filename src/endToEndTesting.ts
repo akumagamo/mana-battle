@@ -2,10 +2,9 @@ import TitleScene from "./Scenes/TitleScene";
 import CharaCreationScene from "./CharaCreation/CharaCreationScene";
 import { MapScene } from "./Map/MapScene";
 import { PLAYER_FORCE } from "./constants";
-import { Chara } from "./Chara/Chara";
 import { Unit } from "./Unit/Model";
 import { ListSquadsScene } from "./Squad/ListSquadsScene";
-import { handleAddUnitButtonClicked } from "./Squad/EditSquadModal";
+import UnitListScene from "./Unit/UnitListScene";
 
 export function endToEndTesting(game: Phaser.Game) {
   game.events.on("TitleSceneCreated", (scn: TitleScene) => {
@@ -57,6 +56,13 @@ export function endToEndTesting(game: Phaser.Game) {
     scn.evs.SquadClicked.emit(squad);
     scn.evs.SquadEditClicked.emit(squad);
     scn.editSquadModalEvents.AddUnitButtonClicked.emit(null);
-    scn.editSquadModalEvents.OnDrag.emit({ x: 506, y: 197 });
+    //scn.editSquadModalEvents.OnDrag.emit({ x: 506, y: 197 });
+
+    const chara = (scn.scene.manager.getScene("UnitListScene") as UnitListScene)
+      .rows[0].chara;
+    chara.handleDrag(500, 200);
+
+    expect(2).toBe(3)
   });
 }
+ 

@@ -12,8 +12,7 @@ import hpBar from "./hpBar";
 import { PUBLIC_URL } from "../constants";
 import { classes } from "../defaultData";
 
-
-const GAME_SPEED = parseInt(process.env.SPEED)
+const GAME_SPEED = parseInt(process.env.SPEED);
 
 interface CharaProps {
   key: string;
@@ -32,6 +31,7 @@ interface CharaProps {
 
 const CHARA_INACTIVE_COLOR = 222222;
 export class Chara extends Phaser.Scene {
+  evs: {};
   props: CharaProps;
 
   /** Container around Chara, doesn't rotate (useful for adding UI elements)*/
@@ -57,6 +57,9 @@ export class Chara extends Phaser.Scene {
   hat: Image | null = null;
 
   hpBarContainer: Container | null;
+
+  onDragStart: (unit: Unit, x: number, y: number, chara: Chara) => void;
+  onDragEnd: (unit: Unit, x: number, y: number, chara: Chara) => void;
 
   constructor({
     key,
@@ -186,37 +189,43 @@ export class Chara extends Phaser.Scene {
       fn(this);
     });
   }
+  handleDrag(x: number, y: number) {
+    this.container.setDepth(Infinity);
 
+    this.container.x = x;
+    this.container.y = y;
+
+    this.onDragStart(this.props.unit, x, y, this);
+  }
+
+  handleDragEnd(y: number) {
+    this.container.setDepth(y);
+    this.onDragEnd(
+      this.props.unit,
+      this.container.x || 0,
+      this.container.y || 0,
+      this
+    );
+  }
   enableDrag(
     dragStart: (unit: Unit, x: number, y: number, chara: Chara) => void,
     dragEnd: (unit: Unit, x: number, y: number, chara: Chara) => void
   ) {
+    this.onDragStart = dragStart;
+    this.onDragEnd = dragEnd;
     this.container.setInteractive();
     this.input.setDraggable(this.container);
 
     this.input.on(
       "drag",
-      (_pointer: Pointer, obj: Container, x: number, y: number) => {
-        this.container.setDepth(Infinity);
-
-        obj.x = x;
-        obj.y = y;
-
-        dragStart(this.props.unit, x, y, this);
-      }
+      (_pointer: Pointer, obj: Container, x: number, y: number) =>
+        this.handleDrag(x, y)
     );
 
     this.container.on(
       "dragend",
-      (_pointer: Pointer, _dragX: number, dragY: number) => {
-        this.container.setDepth(dragY);
-        dragEnd(
-          this.props.unit,
-          this.container.x || 0,
-          this.container.y || 0,
-          this
-        );
-      }
+      (_pointer: Pointer, _dragX: number, dragY: number) =>
+        this.handleDragEnd(dragY)
     );
   }
 
