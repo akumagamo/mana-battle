@@ -5,6 +5,7 @@ import {randomItem } from '../utils';
 import {SKIN_COLORS, HAIR_COLORS} from '../Chara/animations/constants';
 import {getUnitAttacks} from './Skills';
 import {baseEquips} from './Jobs';
+import {PLAYER_FORCE} from '../constants';
 
 
 
@@ -24,6 +25,7 @@ export function fromJSON(n: number): Unit {
     gender: randomItem(genders),
     equips: baseEquips[job],
     squad: null,
+    force: PLAYER_FORCE,
     lvl: 1,
     hp: 50,
     currentHp: 50,

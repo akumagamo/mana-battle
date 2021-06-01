@@ -12,9 +12,7 @@ export function organize(scene: MapScene) {
   ListSquads.run(
     {
       units: scene.state.units.filter((u) =>
-        scene.state.squads.find(
-          (s) => u.squad === s.id && s.squad.force === PLAYER_FORCE
-        )
+           u.force === PLAYER_FORCE
       ),
       squads: scene.state.squads
         .filter((s) => s.squad.force === PLAYER_FORCE)

@@ -3,7 +3,6 @@ import { Unit, UnitIndex} from "./Model";
 import { Chara } from "../Chara/Chara";
 import { error, INVALID_STATE } from "../errors";
 import { Pointer, Text, Image, Container } from "../Models";
-import { Map } from "immutable";
 
 // TODO: fix list display when unit in board is replaced with unit from list
 //

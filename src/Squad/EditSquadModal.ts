@@ -80,14 +80,13 @@ export const handleAddUnitButtonClicked = (
   scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents },
   units: UnitIndex
 ) => {
-  const list = new UnitListScene(50, 75, 5, units);
+  const list = new UnitListScene(50, 75, 5, units.filter(u=>!u.squad));
   list.onDrag = (u, x, y) => scene.editSquadModalEvents.OnDrag.emit({ x, y });
   list.onDragEnd = (u, x, y, chara) => console.log(x, y);
   scene.scene.add("UnitListScene", list, true);
 };
 
 const handleOnDragFromUnitList = (board: BoardScene, x: number, y: number) => {
-  console.log(board.tiles)
   board.tiles.forEach((tile) => tile.sprite.clearTint());
   const boardSprite = board.findTileByXY(x, y);
 

@@ -74,10 +74,31 @@ export function endToEndTesting(game: Phaser.Game) {
     const chara = unitListScene.rows[0].chara;
     chara.handleDrag(500, 200);
 
+    // TODO: improving this test: get all cell positions, hover over each one and
+    // check if only the current one is tinted
     assertEquals(
       "A unit dragged from the list should paint the board cells when hovered over them",
       boardScene.tiles[3].sprite.tintTopLeft,
       8978227
+    );
+    assertEquals(
+      "Other tiles should not be tinted",
+      boardScene.tiles.every((t, i) => i == 3 || !t.sprite.isTinted),
+      true
+    );
+    chara.handleDrag(490, 306);
+
+    // TODO: improving this test: get all cell positions, hover over each one and
+    // check if only the current one is tinted
+    assertEquals(
+      "Should paint another cell if dragged away",
+      boardScene.tiles[7].sprite.tintTopLeft,
+      8978227
+    );
+    assertEquals(
+      "Other tiles should not be tinted",
+      boardScene.tiles.every((t, i) => i == 7 || !t.sprite.isTinted),
+      true
     );
   });
 }

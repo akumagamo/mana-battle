@@ -61,6 +61,7 @@ export type Unit = {
   gender: Gender;
   movement: Movement;
   squad: string | null; // todo: remove
+  force: string;
   lvl: number;
   hp: number;
   currentHp: number;

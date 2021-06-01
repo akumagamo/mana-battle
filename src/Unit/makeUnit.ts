@@ -11,6 +11,7 @@ import {
 } from './Model';
 import { getUnitAttacks } from './Skills';
 import { baseEquips } from './Jobs';
+import {PLAYER_FORCE} from '../constants';
 
 export function makeUnit(
   job: UnitJob,
@@ -53,6 +54,7 @@ export function makeUnit(
     gender: randomItem(['male', 'female'] as Gender[]),
     exp: 0,
     squad: null,
+    force: PLAYER_FORCE,
     style: {
       skinColor: randomItem(SKIN_COLORS),
       hairColor: randomItem(HAIR_COLORS),

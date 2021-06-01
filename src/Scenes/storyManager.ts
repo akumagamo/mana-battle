@@ -23,7 +23,7 @@ export const storyManager = async (parent: TitleScene) => {
   }
 
   await fadeOut(parent, 1000 / GAME_SPEED);
-  parent.turnOff()
+  parent.turnOff();
 
   const scene = await startCharaCreationScene(parent);
 
@@ -61,6 +61,17 @@ export const storyManager = async (parent: TitleScene) => {
     d3: { ...makeUnit("fighter", "d3", 1), squad: "d" },
     d4: { ...makeUnit("fighter", "d4", 1), squad: "d" },
     d5: { ...makeUnit("fighter", "d5", 1), squad: "d" },
+
+    // units without squad
+    e5: { ...makeUnit("fighter", "e5", 1) },
+    e6: { ...makeUnit("fighter", "e6", 1) },
+    e7: { ...makeUnit("fighter", "e7", 1) },
+    e8: { ...makeUnit("fighter", "e8", 1) },
+    e9: { ...makeUnit("fighter", "e9", 1) },
+    e10: { ...makeUnit("fighter", "e10", 1) },
+    e11: { ...makeUnit("fighter", "e11", 1) },
+    e12: { ...makeUnit("fighter", "e12", 1) },
+    e13: { ...makeUnit("fighter", "r13", 1) },
   });
 
   const sqd = firstSquad.mergeDeep(
