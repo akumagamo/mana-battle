@@ -60,17 +60,17 @@ export function endToEndTesting(game: Phaser.Game) {
       });
     });
   });
-  game.events.on("ListSquadsSceneCreated", (scn: ListSquadsScene) => {
-    const squad = scn.squads.toList().get(1);
-    scn.evs.SquadClicked.emit(squad);
-    scn.evs.SquadEditClicked.emit(squad);
-    scn.editSquadModalEvents.AddUnitButtonClicked.emit(null);
+  game.events.on("ListSquadsSceneCreated", (listScene: ListSquadsScene) => {
+    const squad = listScene.squads.toList().get(1);
+    listScene.evs.SquadClicked.emit(squad);
+    listScene.evs.SquadEditClicked.emit(squad);
+    listScene.editSquadModalEvents.AddUnitButtonClicked.emit(null);
     //scn.editSquadModalEvents.OnDrag.emit({ x: 506, y: 197 });
-    const unitListScene = scn.scene.manager.getScene(
+    const unitListScene = listScene.scene.manager.getScene(
       "UnitListScene"
     ) as UnitListScene;
 
-    const boardScene = scn.scene.manager.getScene("BoardScene") as BoardScene;
+    const boardScene = listScene.scene.manager.getScene("BoardScene") as BoardScene;
 
     const chara = unitListScene.rows[0].chara;
     chara.handleDrag(500, 200);
@@ -124,6 +124,7 @@ export function endToEndTesting(game: Phaser.Game) {
       boardScene.squad.members.has(chara.props.unit.id),
       true
     );
+
 
     console.log('TEST FINISHED')
   });
