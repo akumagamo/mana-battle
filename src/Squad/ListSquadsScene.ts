@@ -133,8 +133,7 @@ export class ListSquadsScene extends Phaser.Scene {
       "Edit",
       container,
       this,
-      () => this.evs.SquadEditClicked.emit(squad),
-      dispatched
+      () => this.evs.SquadEditClicked.emit(squad)
     );
 
     button(
@@ -160,6 +159,7 @@ export class ListSquadsScene extends Phaser.Scene {
       this,
       squad,
       this.units,
+      !this.dispatched.has(squad.id),
       (sqd, added, removed) => {
         this.squads = this.squads.set(sqd.id, sqd);
         added.forEach((id) => {

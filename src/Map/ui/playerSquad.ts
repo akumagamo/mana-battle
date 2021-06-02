@@ -28,6 +28,7 @@ export default (
           mapScene,
           mapSquad.squad,
           mapScene.state.units,
+          false,
           (updatedSquad) => {
             mapScene.signal("changed unit position on board, updating", [
               // TODO: have a UPDATE_SQUAD_INFO action, this is horrible

@@ -30,6 +30,7 @@ export default function (
   scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents },
   squad: Squad.SquadRecord,
   units: UnitIndex,
+  addUnitEnabled: boolean,
   onSquadUpdated: (
     s: Squad.SquadRecord,
     added: string[],
@@ -106,7 +107,7 @@ export default function (
     onClose(boardScene.squad);
   });
   button(1100, 400, "Add Unit", container, boardScene, () =>
-    events.AddUnitButtonClicked.emit(null)
+    events.AddUnitButtonClicked.emit(null), !addUnitEnabled
   );
 
   return events;
