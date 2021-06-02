@@ -99,7 +99,6 @@ export default function (
   button(1100, 300, "Close", container, boardScene, () => {
     container.destroy();
     scene.scene.stop("UnitListScene");
-    boardScene.events.destroy()
     boardScene.destroy();
 
     for (const k in componentEvents) scene.events.off(k);

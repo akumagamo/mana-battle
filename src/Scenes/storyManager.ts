@@ -71,7 +71,7 @@ export const storyManager = async (parent: TitleScene) => {
     e10: { ...makeUnit("fighter", "e10", 1) },
     e11: { ...makeUnit("fighter", "e11", 1) },
     e12: { ...makeUnit("fighter", "e12", 1) },
-    e13: { ...makeUnit("fighter", "r13", 1) },
+    e13: { ...makeUnit("fighter", "e13", 1) },
   });
 
   const sqd = firstSquad.mergeDeep(

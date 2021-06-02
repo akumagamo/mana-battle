@@ -16,10 +16,10 @@ const assert = (condition: string, a: any, b: any) => {
 };
 
 export function endToEndTesting(game: Phaser.Game) {
-  game.events.on("TitleSceneCreated", (scn: TitleScene) => {
+  game.events.once("TitleSceneCreated", (scn: TitleScene) => {
     scn.sceneEvents.NewGameButtonClicked();
   });
-  game.events.on(
+  game.events.once(
     "CharaCreationSceneCreated",
     (
       scn: CharaCreationScene,
@@ -60,7 +60,7 @@ export function endToEndTesting(game: Phaser.Game) {
       });
     });
   });
-  game.events.on("ListSquadsSceneCreated", (listScene: ListSquadsScene) => {
+  game.events.once("ListSquadsSceneCreated", (listScene: ListSquadsScene) => {
     const squad = listScene.squads.toList().get(1);
     listScene.evs.SquadClicked.emit(squad);
     listScene.evs.SquadEditClicked.emit(squad);

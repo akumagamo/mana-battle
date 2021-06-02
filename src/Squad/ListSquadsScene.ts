@@ -230,9 +230,9 @@ export class ListSquadsScene extends Phaser.Scene {
       this.add.container(0, 0),
       this,
       () => {
-        this.turnOff();
-
         if (this.onReturnClick) this.onReturnClick(this);
+
+        this.turnOff();
       },
       !this.inputEnabled
     );
