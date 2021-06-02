@@ -11,6 +11,8 @@ import UnitListScene from "../Unit/UnitListScene";
 import { SceneEventFactory, EventFactory } from "../utils";
 import * as Squad from "./Model";
 
+const GAME_SPEED = parseInt(process.env.SPEED);
+
 const componentEvents = {
   ADD_UNIT_BUTTON_CLICKED: "ADD_UNIT_BUTTON_CLICKED",
   ON_DRAG: "ON_DRAG",
@@ -177,8 +179,9 @@ const handleOnDragEndFromUnitList = (
 
     board.squad = updatedSquad;
 
-    //remove dragged unit chara
+    //Remove dragged unit from list
     listScene.removeUnit(unit);
+
     //create new chara on board, representing same unit
     board.placeUnit({
       member: Squad.makeMember({ id: unit.id, x: cell.boardX, y: cell.boardY }),
@@ -195,7 +198,7 @@ const handleOnDragEndFromUnitList = (
         y: (charaToRemove?.container?.y || 0) - 200,
         alpha: 0,
         ease: "Cubic",
-        duration: 400,
+        duration: 400 / GAME_SPEED,
         repeat: 0,
         paused: false,
         yoyo: false,

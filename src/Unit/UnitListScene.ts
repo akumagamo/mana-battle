@@ -120,7 +120,6 @@ export default class UnitListScene extends Phaser.Scene {
   }
 
   getUnitsToRender() {
-    //const units = unitsWithoutSquad(getUnitsFromDB());
 
     return this.units
       .toList()
@@ -288,6 +287,8 @@ export default class UnitListScene extends Phaser.Scene {
   }
 
   removeUnit(unit: Unit) {
+    this.units = this.units.delete(unit.id)
+
     const findUnit = (row: { chara: Chara; text: Text }): boolean =>
       row.chara.props.unit.id === unit.id;
     this.rows.filter(findUnit).forEach((row) => {
@@ -323,5 +324,6 @@ export default class UnitListScene extends Phaser.Scene {
     if (!row) return;
 
     this.reposition(row, this.itemsPerPage - 1);
+    this.renderControls()
   }
 }
