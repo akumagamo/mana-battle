@@ -108,8 +108,14 @@ export default function (
 
     onClose(boardScene.squad);
   });
-  button(1100, 400, "Add Unit", container, boardScene, () =>
-    events.AddUnitButtonClicked.emit(null), !addUnitEnabled
+  button(
+    1100,
+    400,
+    "Add Unit",
+    container,
+    boardScene,
+    () => events.AddUnitButtonClicked.emit(null),
+    !addUnitEnabled
   );
 
   return events;
@@ -187,23 +193,30 @@ const handleOnDragEndFromUnitList = (
       member: Squad.makeMember({ id: unit.id, x: cell.boardX, y: cell.boardY }),
       fromOutside: true,
     });
+
     //remove replaced unit
     if (unitToReplace) {
       const charaToRemove = board.unitList.find(
         (chara) => chara.props.unit.id === unitToReplace.id
       );
 
+      listScene.addUnit(charaToRemove.props.unit);
+
       board.scene.scene.tweens.add({
-        targets: charaToRemove?.container,
-        y: (charaToRemove?.container?.y || 0) - 200,
+        targets: charaToRemove.container,
+        y: charaToRemove.container.y - 200,
         alpha: 0,
         ease: "Cubic",
-        duration: 400 / GAME_SPEED,
+        duration: 8400 / GAME_SPEED,
         repeat: 0,
         paused: false,
         yoyo: false,
+        onComplete: () => {
+          removeCharaFromBoard(board, charaToRemove);
+        },
       });
     }
+
     board.highlightTile(cell);
   } else {
     listScene.returnToOriginalPosition(unit);
@@ -211,5 +224,12 @@ const handleOnDragEndFromUnitList = (
     board.tiles.forEach((tile) => tile.sprite.clearTint());
   }
 };
+
+function removeCharaFromBoard(board: BoardScene, charaToRemove: Chara) {
+  board.unitList = board.unitList.filter(
+    (c) => c.props.key !== charaToRemove.props.key
+  );
+  charaToRemove.scene.remove(charaToRemove);
+}
 
 function handleOnClose() {}

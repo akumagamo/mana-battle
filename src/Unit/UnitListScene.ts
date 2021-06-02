@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { Unit, UnitIndex} from "./Model";
+import { Unit, UnitIndex } from "./Model";
 import { Chara } from "../Chara/Chara";
 import { error, INVALID_STATE } from "../errors";
 import { Pointer, Text, Image, Container } from "../Models";
@@ -22,14 +22,19 @@ export default class UnitListScene extends Phaser.Scene {
     | ((unit: Unit, x: number, y: number, chara: Chara) => void)
     | null = null;
 
-  constructor(public x: number, public y: number, public itemsPerPage: number, public units:UnitIndex) {
+  constructor(
+    public x: number,
+    public y: number,
+    public itemsPerPage: number,
+    public units: UnitIndex
+  ) {
     super("UnitListScene");
     this.rows = [];
     this.page = 0;
   }
 
   create() {
-    this.events.on('shutdown', ()=>this.destroy())
+    this.events.on("shutdown", () => this.destroy());
     this.render();
     this.renderControls();
   }
@@ -120,7 +125,6 @@ export default class UnitListScene extends Phaser.Scene {
   }
 
   getUnitsToRender() {
-
     return this.units
       .toList()
       .slice(
@@ -131,7 +135,7 @@ export default class UnitListScene extends Phaser.Scene {
 
   render() {
     const unitsToRender = this.getUnitsToRender();
-    unitsToRender.forEach( this.renderUnitListItem.bind(this));
+    unitsToRender.forEach(this.renderUnitListItem.bind(this));
   }
 
   private handleUnitClick(unit: Unit) {
@@ -265,7 +269,7 @@ export default class UnitListScene extends Phaser.Scene {
 
     this.tweens.add({
       targets: chara.container,
-      x ,
+      x,
       y,
       duration: 600,
       ease: "Cubic",
@@ -286,8 +290,13 @@ export default class UnitListScene extends Phaser.Scene {
     });
   }
 
+  addUnit(unit:Unit){
+
+    this.units = this.units.set(unit.id, unit)
+
+  }
   removeUnit(unit: Unit) {
-    this.units = this.units.delete(unit.id)
+    this.units = this.units.delete(unit.id);
 
     const findUnit = (row: { chara: Chara; text: Text }): boolean =>
       row.chara.props.unit.id === unit.id;
@@ -324,6 +333,6 @@ export default class UnitListScene extends Phaser.Scene {
     if (!row) return;
 
     this.reposition(row, this.itemsPerPage - 1);
-    this.renderControls()
+    this.renderControls();
   }
 }
