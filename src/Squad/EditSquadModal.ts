@@ -180,7 +180,7 @@ const handleOnDragEndFromUnitList = (
     listScene.removeUnit(unit);
     //create new chara on board, representing same unit
     board.placeUnit({
-      member: updatedSquad.members.get(unit.id),
+      member: Squad.makeMember({ id: unit.id, x: cell.boardX, y: cell.boardY }),
       fromOutside: true,
     });
     //remove replaced unit
