@@ -22,11 +22,11 @@ export function progressBar(scene: Phaser.Scene) {
     );
   });
 
-  scene.load.on("fileprogress", (file: Phaser.Loader.File) => {
-    console.log(file.src);
-  });
+  // scene.load.on("fileprogress", (file: Phaser.Loader.File) => {
+  //   console.log(file.src);
+  // });
   scene.load.on("complete", function () {
-    console.log("complete!");
+    //console.log("complete!");
     progressBar.destroy();
     progressBox.destroy();
   });

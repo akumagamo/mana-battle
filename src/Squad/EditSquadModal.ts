@@ -4,31 +4,39 @@ import { Vector } from "../Map/Model";
 import { Container } from "../Models";
 import button from "../UI/button";
 import panel from "../UI/panel";
-import { UnitIndex } from "../Unit/Model";
+import { Unit, UnitIndex } from "../Unit/Model";
 import SmallUnitDetailsBar from "../Unit/SmallUnitDetailsBar";
 import UnitListScene from "../Unit/UnitListScene";
 import { SceneEventFactory, EventFactory } from "../utils";
-import { SquadRecord } from "./Model";
+import * as Squad from "./Model";
 
 const componentEvents = {
   ADD_UNIT_BUTTON_CLICKED: "ADD_UNIT_BUTTON_CLICKED",
   ON_DRAG: "ON_DRAG",
+  ON_DRAG_END: "ON_DRAG_END",
 };
 
 export type EditSquadModalEvents = {
   AddUnitButtonClicked: EventFactory<null>;
   OnDrag: EventFactory<Vector>;
+  OnDragEnd: EventFactory<{ pos: Vector; unit: Unit }>;
 };
 
 export default function (
   scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents },
-  squad: SquadRecord,
+  squad: Squad.SquadRecord,
   units: UnitIndex,
-  onSquadUpdated: (s: SquadRecord) => void,
+  onSquadUpdated: (s: Squad.SquadRecord) => void,
   onClose: () => void
 ) {
   const boardScene = new BoardScene(squad, onSquadUpdated, units, true);
   scene.scene.add("editSquadModalBoard", boardScene, true);
+  const listScene = new UnitListScene(
+    50,
+    75,
+    5,
+    units.filter((u) => !u.squad)
+  );
 
   const events: EditSquadModalEvents = {
     AddUnitButtonClicked: SceneEventFactory<null>(
@@ -36,13 +44,20 @@ export default function (
       componentEvents.ADD_UNIT_BUTTON_CLICKED
     ),
     OnDrag: SceneEventFactory<Vector>(scene, componentEvents.ON_DRAG),
+    OnDragEnd: SceneEventFactory<{ pos: Vector; unit: Unit }>(
+      scene,
+      componentEvents.ON_DRAG_END
+    ),
   };
   events.AddUnitButtonClicked.on(() =>
-    handleAddUnitButtonClicked(scene, units)
+    handleAddUnitButtonClicked(scene, listScene, boardScene)
   );
 
   events.OnDrag.on(({ x, y }: { x: number; y: number }) =>
     handleOnDragFromUnitList(boardScene, x, y)
+  );
+  events.OnDragEnd.on(({ pos, unit }: { pos: Vector; unit: Unit }) =>
+    handleOnDragEndFromUnitList(pos.x, pos.y, listScene, boardScene, unit)
   );
 
   const container = scene.add.container();
@@ -78,11 +93,12 @@ export default function (
 
 export const handleAddUnitButtonClicked = (
   scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents },
-  units: UnitIndex
+  list: UnitListScene,
+  boardScene: BoardScene
 ) => {
-  const list = new UnitListScene(50, 75, 5, units.filter(u=>!u.squad));
-  list.onDrag = (u, x, y) => scene.editSquadModalEvents.OnDrag.emit({ x, y });
-  list.onDragEnd = (u, x, y, chara) => console.log(x, y);
+  list.onDrag = (_unit, x, y) => scene.editSquadModalEvents.OnDrag.emit({ x, y });
+  list.onDragEnd = (u, x, y, _chara) =>
+    handleOnDragEndFromUnitList(x, y, list, boardScene, u);
   scene.scene.add("UnitListScene", list, true);
 };
 
@@ -91,4 +107,72 @@ const handleOnDragFromUnitList = (board: BoardScene, x: number, y: number) => {
   const boardSprite = board.findTileByXY(x, y);
 
   if (boardSprite) boardSprite.sprite.setTint(0x33ff88);
+};
+
+const handleOnDragEndFromUnitList = (
+  x: number,
+  y: number,
+  listScene: UnitListScene,
+  board: BoardScene,
+  unit: Unit
+) => {
+  const cell = board.findTileByXY(x, y);
+
+  if (cell) {
+    const { updatedSquad, added, removed } = Squad.addMember(
+      unit,
+      board.squad,
+      cell.boardX,
+      cell.boardY
+    );
+
+    added.forEach(
+      () => {}
+      //saveUnitIntoDB({ ...unit, squad: boardScene.squad.id })
+    );
+
+    removed.forEach(
+      () => {}
+      // saveUnitIntoDB({ ...this.units.get(u.id), squad: null })
+    );
+
+    //saveSquadIntoDB(updatedSquad);
+
+    const unitToReplace = Squad.getMemberByPosition({
+      x: cell.boardX,
+      y: cell.boardY,
+    })(board.squad);
+
+    board.squad = updatedSquad;
+
+    //remove dragged unit chara
+    listScene.removeUnit(unit);
+    //create new chara on board, representing same unit
+    board.placeUnit({
+      member: updatedSquad.members.get(unit.id),
+      fromOutside: true,
+    });
+    //remove replaced unit
+    if (unitToReplace) {
+      const charaToRemove = board.unitList.find(
+        (chara) => chara.props.unit.id === unitToReplace.id
+      );
+
+      board.scene.scene.tweens.add({
+        targets: charaToRemove?.container,
+        y: (charaToRemove?.container?.y || 0) - 200,
+        alpha: 0,
+        ease: "Cubic",
+        duration: 400,
+        repeat: 0,
+        paused: false,
+        yoyo: false,
+      });
+    }
+    board.highlightTile(cell);
+  } else {
+    // this.unitListScene?.returnToOriginalPosition(unit);
+    // this.unitListScene?.scaleDown(chara);
+    // boardScene.tiles.forEach((tile) => tile.sprite.clearTint());
+  }
 };
