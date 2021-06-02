@@ -69,7 +69,7 @@ export class ListSquadsScene extends Phaser.Scene {
 
     menu(this);
 
-    this.renderSquadList(squads);
+    this.renderSquadList();
     this.renderControls();
     this.evs.SquadClicked.emit(squads.toList().get(0));
 
@@ -84,8 +84,8 @@ export class ListSquadsScene extends Phaser.Scene {
         this.page * this.itemsPerPage + this.itemsPerPage
       );
   }
-  renderSquadList(squads: Squad.Index) {
-    const rows = this.formatList(squads.toList(), List());
+  renderSquadList() {
+    const rows = this.formatList(this.squads.toList(), List());
 
     rows.forEach((row, y) =>
       row.forEach((col, x) => this.renderBoard(col, x, y))
@@ -160,11 +160,26 @@ export class ListSquadsScene extends Phaser.Scene {
       this,
       squad,
       this.units,
+      (sqd, added, removed) => {
+        this.squads = this.squads.set(sqd.id, sqd);
+        added.forEach((id) => {
+          this.units = this.units.update(id, (unit) => ({
+            ...unit,
+            squad: squad.id,
+          }));
+        });
+        removed.forEach((id) => {
+          this.units = this.units.update(id, (unit) => ({
+            ...unit,
+            squad: null,
+          }));
+        });
+      },
       (sqd) => {
         this.squads = this.squads.set(sqd.id, sqd);
-      },
-      () => {
+        this.inputEnabled = true;
         this.refresh();
+        this.editSquadModalEvents = null;
       }
     );
   }
@@ -180,7 +195,10 @@ export class ListSquadsScene extends Phaser.Scene {
       0.4,
       true
     );
-    this.scene.add(`board-squad-${squad.id}`, boardScene, true);
+
+    const key = `board-squad-${squad.id}`;
+    this.scene.remove(key);
+    this.scene.add(key, boardScene, true);
 
     boardScene.onClick((sqd) => {
       if (this.inputEnabled) this.evs.SquadClicked.emit(sqd);
@@ -278,7 +296,8 @@ export class ListSquadsScene extends Phaser.Scene {
     this.boardScenes.forEach((scene) => {
       scene.turnOff();
     });
-    this.renderSquadList(this.squads);
+    this.boardScenes = [];
+    this.renderSquadList();
     this.renderControls();
   }
 
@@ -295,7 +314,6 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   turnOff() {
-    console.log("turn off...");
     this.boardScenes.forEach((scene) => {
       scene.turnOff();
     });

@@ -14,6 +14,7 @@ const assert = (condition: string, a: any, b: any) => {
     );
   else console.log("✅", condition);
 };
+
 export function endToEndTesting(game: Phaser.Game) {
   game.events.on("TitleSceneCreated", (scn: TitleScene) => {
     scn.sceneEvents.NewGameButtonClicked();
@@ -123,5 +124,7 @@ export function endToEndTesting(game: Phaser.Game) {
       boardScene.squad.members.has(chara.props.unit.id),
       true
     );
+
+    console.log('TEST FINISHED')
   });
 }

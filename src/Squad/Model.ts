@@ -149,13 +149,13 @@ export const addMember = (
 
     return {
       updatedSquad,
-      added: [newMember],
-      removed: [memberToRemove],
+      added: [newMember.id],
+      removed: [memberToRemove.id],
     };
   } else {
     const updatedSquad = updateMember(squad, newMember);
 
-    return { updatedSquad, added: [newMember], removed: [] };
+    return { updatedSquad, added: [newMember.id], removed: [] as string[] };
   }
 };
 export const invertBoardPosition = (n: number) => {

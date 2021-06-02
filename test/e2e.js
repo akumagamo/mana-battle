@@ -8,7 +8,11 @@ const puppeteer = require("puppeteer");
     .then((browser) => {
       browser.newPage().then((page) => {
         page
-          .on("console", (message) => console.log(message.text()))
+          .on("console", (message) => {
+            if (message.text() === "TEST FINISHED") browser.close();
+
+            console.log(message.text());
+          })
           .on("pageerror", ({ message }) => {
             console.log(message);
 
@@ -27,7 +31,7 @@ const puppeteer = require("puppeteer");
         page.goto("http://localhost:3000").then(() => {
           setTimeout(() => {
             browser.close();
-          }, 30000);
+          }, 10000);
         });
       });
     });

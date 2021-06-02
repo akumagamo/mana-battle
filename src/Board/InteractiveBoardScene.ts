@@ -21,7 +21,7 @@ export default class BoardScene extends Phaser.Scene {
 
   constructor(
     public squad: Squad.SquadRecord,
-    public onSquadUpdated: (squad: Squad.SquadRecord) => void,
+    public onSquadUpdated: (squad: Squad.SquadRecord, added: string[], removed:string[]) => void,
     public unitIndex: UnitIndex,
     public showHpBars: boolean
   ) {
@@ -54,9 +54,7 @@ export default class BoardScene extends Phaser.Scene {
       Squad.makeMember({ id: unit.id, x, y })
     );
 
-    console.log(`...updateSquad`, updatedSquad)
-
-    this.onSquadUpdated(updatedSquad);
+    this.onSquadUpdated(updatedSquad, [], []);
     this.squad = updatedSquad;
 
     //animate updated units

@@ -26,8 +26,8 @@ export default function (
   scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents },
   squad: Squad.SquadRecord,
   units: UnitIndex,
-  onSquadUpdated: (s: Squad.SquadRecord) => void,
-  onClose: () => void
+  onSquadUpdated: (s: Squad.SquadRecord, added: string[], removed:string[]) => void,
+  onClose: (s: Squad.SquadRecord) => void
 ) {
   const boardScene = new BoardScene(squad, onSquadUpdated, units, true);
   scene.scene.add("editSquadModalBoard", boardScene, true);
@@ -50,14 +50,21 @@ export default function (
     ),
   };
   events.AddUnitButtonClicked.on(() =>
-    handleAddUnitButtonClicked(scene, listScene, boardScene)
+    handleAddUnitButtonClicked(scene, listScene, boardScene, onSquadUpdated)
   );
 
   events.OnDrag.on(({ x, y }: { x: number; y: number }) =>
     handleOnDragFromUnitList(boardScene, x, y)
   );
   events.OnDragEnd.on(({ pos, unit }: { pos: Vector; unit: Unit }) =>
-    handleOnDragEndFromUnitList(pos.x, pos.y, listScene, boardScene, unit)
+    handleOnDragEndFromUnitList(
+      pos.x,
+      pos.y,
+      listScene,
+      boardScene,
+      unit,
+      onSquadUpdated
+    )
   );
 
   const container = scene.add.container();
@@ -82,7 +89,7 @@ export default function (
 
     for (const k in componentEvents) scene.events.off(k);
 
-    onClose();
+    onClose(boardScene.squad);
   });
   button(1100, 400, "Add Unit", container, scene, () =>
     events.AddUnitButtonClicked.emit(null)
@@ -94,11 +101,13 @@ export default function (
 export const handleAddUnitButtonClicked = (
   scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents },
   list: UnitListScene,
-  boardScene: BoardScene
+  boardScene: BoardScene,
+  onSquadUpdated: (s: Squad.SquadRecord, added: string[], removed:string[]) => void
 ) => {
-  list.onDrag = (_unit, x, y) => scene.editSquadModalEvents.OnDrag.emit({ x, y });
+  list.onDrag = (_unit, x, y) =>
+    scene.editSquadModalEvents.OnDrag.emit({ x, y });
   list.onDragEnd = (u, x, y, _chara) =>
-    handleOnDragEndFromUnitList(x, y, list, boardScene, u);
+    handleOnDragEndFromUnitList(x, y, list, boardScene, u, onSquadUpdated);
   scene.scene.add("UnitListScene", list, true);
 };
 
@@ -114,7 +123,8 @@ const handleOnDragEndFromUnitList = (
   y: number,
   listScene: UnitListScene,
   board: BoardScene,
-  unit: Unit
+  unit: Unit,
+  onSquadUpdated: (s: Squad.SquadRecord, added: string[], removed: string[]) => void
 ) => {
   const cell = board.findTileByXY(x, y);
 
@@ -126,17 +136,7 @@ const handleOnDragEndFromUnitList = (
       cell.boardY
     );
 
-    added.forEach(
-      () => {}
-      //saveUnitIntoDB({ ...unit, squad: boardScene.squad.id })
-    );
-
-    removed.forEach(
-      () => {}
-      // saveUnitIntoDB({ ...this.units.get(u.id), squad: null })
-    );
-
-    //saveSquadIntoDB(updatedSquad);
+    onSquadUpdated(updatedSquad, added, removed);
 
     const unitToReplace = Squad.getMemberByPosition({
       x: cell.boardX,
