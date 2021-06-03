@@ -43,8 +43,8 @@ export default function (
   const boardScene = new BoardScene(squad, onSquadUpdated, units, true);
   scene.scene.add("editSquadModalBoard", boardScene, true);
   const listScene = new UnitListScene(
-    50,
-    75,
+    110,
+    90,
     5,
     units.filter((u) => !u.squad)
   );
@@ -86,20 +86,20 @@ export default function (
   events.OnClose.on((squad: Squad.SquadRecord) => onClose(squad));
 
   const container = boardScene.add.container();
-  panel(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, container, boardScene);
+  panel(50, 50, SCREEN_WIDTH - 100, SCREEN_HEIGHT - 150, container, boardScene);
   let details: Container | null = null;
 
   boardScene.makeUnitsClickable((c) => {
     details?.destroy();
     details = SmallUnitDetailsBar(
-      10,
-      SCREEN_HEIGHT - 100,
+      330,
+      SCREEN_HEIGHT - 180,
       boardScene,
       units.find((u) => u.id === c.props.unit.id)
     );
     container.add(details);
   });
-  button(1100, 300, "Close", container, boardScene, () => {
+  button(1100, 550, "Confirm", container, boardScene, () => {
     container.destroy();
     scene.scene.stop("UnitListScene");
     boardScene.destroy();

@@ -66,11 +66,13 @@ export default class UnitListScene extends Phaser.Scene {
   renderControls() {
     this.controls.forEach((btn) => btn.destroy());
 
+    const baseY =  490;
+
     // TODO: optimize to avoid reloading this
     //const units = unitsWithoutSquad(getUnitsFromDB());
     const totalUnits = this.units.size;
 
-    const next = this.add.image(this.x + 100, this.y + 580, "arrow_right");
+    const next = this.add.image(this.x + 100, this.y + baseY, "arrow_right");
 
     const isLastPage =
       totalUnits < this.itemsPerPage ||
@@ -85,7 +87,7 @@ export default class UnitListScene extends Phaser.Scene {
       next.setAlpha(0.5);
     }
 
-    const prev = this.add.image(this.x, this.y + 580, "arrow_right");
+    const prev = this.add.image(this.x, this.y + baseY, "arrow_right");
     prev.setScale(-1, 1);
 
     if (this.page === 0) {

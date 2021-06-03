@@ -2,8 +2,9 @@ import {Container} from '../Models';
 import {Unit, unitClassLabels} from './Model';
 import text from '../UI/text';
 import panel from '../UI/panel';
+import {SCREEN_WIDTH} from '../constants';
 
-const colWidth = 150;
+const colWidth = 130;
 
 const row = (container: Container, scene: Phaser.Scene) => (
   x: number,
@@ -27,7 +28,7 @@ export default function (
 ) {
   const container = scene.add.container();
 
-  panel(x, y, 1200, 50, container, scene);
+  panel(x, y, 5 * colWidth, 50, container, scene);
 
   unitStats(x, y, container, scene, unit);
 
@@ -48,9 +49,6 @@ function unitStats(
     unitClassLabels[unit.class],
     `Lvl ${lvl}`,
     `Exp ${exp}`,
-    '',
-    '',
-    '',
     `${currentHp} / ${hp} HP`,
   ]);
 }
