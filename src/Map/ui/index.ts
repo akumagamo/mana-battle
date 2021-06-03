@@ -13,24 +13,36 @@ const BOTTOM_PANEL_HEIGHT = 80;
 const BOTTOM_PANEL_X = 0;
 export const BOTTOM_PANEL_Y = SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT;
 
-
-
 export default (scene: MapScene, uiContainer: Container): Promise<void> => {
+  // TODO: remove this (currently we fail to select enemy squad without this)
+  // the parent is already removing (refreshUI)
+  scene.clearChildrenScenes();
   const baseY = BOTTOM_PANEL_Y + 25;
 
-  panel(
-    BOTTOM_PANEL_X,
-    BOTTOM_PANEL_Y,
-    BOTTOM_PANEL_WIDTH,
-    BOTTOM_PANEL_HEIGHT,
-    uiContainer,
-    scene
-  );
-  button(50, 40, "Organize", uiContainer, scene, ()=>scene.evs.OrganizeButtonClicked.emit(scene));
-  button(250, 40, "Dispatch", uiContainer, scene, () => {
-    scene.disableMapInput();
-    dispatchWindow(scene);
-  });
+  if (scene.mode.type !== "SELECT_SQUAD_MOVE_TARGET") {
+    button(50, 40, "Organize", uiContainer, scene, () =>
+      scene.evs.OrganizeButtonClicked.emit(scene)
+    );
+    button(250, 40, "Dispatch", uiContainer, scene, () => {
+      scene.disableMapInput();
+      dispatchWindow(scene);
+    });
+
+    button(1100, 50, "Return to Title", uiContainer, scene, () => {
+      scene.turnOff();
+      scene.scene.start("TitleScene");
+    });
+  }
+
+  if (scene.mode.type !== "NOTHING_SELECTED")
+    panel(
+      BOTTOM_PANEL_X,
+      BOTTOM_PANEL_Y,
+      BOTTOM_PANEL_WIDTH,
+      BOTTOM_PANEL_HEIGHT,
+      uiContainer,
+      scene
+    );
 
   if (scene.mode.type === "NOTHING_SELECTED") return;
 

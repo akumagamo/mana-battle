@@ -14,7 +14,7 @@ export default (
 
   if (mode === "SQUAD_SELECTED") {
     button(
-      baseX + 300,
+      baseX + 340,
       baseY,
       "♟ Formation",
       mapScene.uiContainer,
@@ -54,10 +54,9 @@ export default (
         );
       }
     );
-    button(baseX + 200, baseY, "Move", mapScene.uiContainer, mapScene, () => {
-      console.log(`move!!!`);
-      mapScene.evs.MovePlayerSquadButonClicked.emit({ mapScene, mapSquad });
-    });
+    button(baseX + 200, baseY, "➡️ Move", mapScene.uiContainer, mapScene, () =>
+      mapScene.evs.MovePlayerSquadButonClicked.emit({ mapScene, mapSquad })
+    );
   }
 };
 
@@ -68,7 +67,6 @@ export function handleMovePlayerSquadButtonClicked({
   mapScene: MapScene;
   mapSquad: MapSquad;
 }) {
-  console.log(`changing mode!!`);
   mapScene.changeMode({
     type: "SELECT_SQUAD_MOVE_TARGET",
     id: mapSquad.id,

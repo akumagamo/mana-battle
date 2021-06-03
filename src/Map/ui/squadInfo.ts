@@ -11,8 +11,6 @@ export async function squadInfo(
   baseY: number,
   id: string
 ): Promise<void> {
-  scene.clearChildrenScenes();
-
   const mapSquad = scene.getSquad(id);
 
   const leader = scene.getSquadLeader(id);

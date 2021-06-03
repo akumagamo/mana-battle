@@ -861,6 +861,7 @@ export class MapScene extends Phaser.Scene {
     const { uiContainer } = this.getContainers();
 
     uiContainer.removeAll(true);
+    this.clearChildrenScenes()
   }
 
   async refreshUI() {
@@ -872,7 +873,6 @@ export class MapScene extends Phaser.Scene {
 
     ui(this, uiContainer);
 
-    this.returnToTitleButton();
   }
 
   viewSquadDetails(id: string): void {
@@ -884,13 +884,6 @@ export class MapScene extends Phaser.Scene {
       this.state.units.filter((u) => mapSquad.squad.members.has(u.id)),
       () => this.enableInput()
     );
-  }
-
-  private returnToTitleButton() {
-    button(1100, 50, "Return to Title", this.uiContainer, this, () => {
-      this.turnOff();
-      this.scene.start("TitleScene");
-    });
   }
 
   getSquad(squadId: string) {
