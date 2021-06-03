@@ -21,7 +21,6 @@ const componentEvents = {
 };
 
 export type EditSquadModalEvents = {
-  AddUnitButtonClicked: EventFactory<null>;
   OnDrag: EventFactory<Vector>;
   OnDragEnd: EventFactory<{ pos: Vector; unit: Unit }>;
   OnClose: EventFactory<Squad.SquadRecord>;
@@ -50,10 +49,6 @@ export default function (
   );
 
   const events: EditSquadModalEvents = {
-    AddUnitButtonClicked: SceneEventFactory<null>(
-      scene,
-      componentEvents.ADD_UNIT_BUTTON_CLICKED
-    ),
     OnDrag: SceneEventFactory<Vector>(scene, componentEvents.ON_DRAG),
     OnDragEnd: SceneEventFactory<{ pos: Vector; unit: Unit }>(
       scene,
@@ -64,9 +59,6 @@ export default function (
       componentEvents.ON_CLOSE
     ),
   };
-  events.AddUnitButtonClicked.on(() =>
-    handleAddUnitButtonClicked(scene, listScene, boardScene, onSquadUpdated)
-  );
 
   events.OnDrag.on(({ x, y }: { x: number; y: number }) =>
     handleOnDragFromUnitList(boardScene, x, y)
@@ -93,13 +85,13 @@ export default function (
     details?.destroy();
     details = SmallUnitDetailsBar(
       330,
-      SCREEN_HEIGHT - 180,
+      SCREEN_HEIGHT - 160,
       boardScene,
       units.find((u) => u.id === c.props.unit.id)
     );
     container.add(details);
   });
-  button(1070, 550, "✅ Confirm", container, boardScene, () => {
+  button(1070, SCREEN_HEIGHT - 150, "✅ Confirm", container, boardScene, () => {
     container.destroy();
     scene.scene.stop("UnitListScene");
     boardScene.destroy();
@@ -108,20 +100,14 @@ export default function (
 
     onClose(boardScene.squad);
   });
-  button(
-    1070,
-    400,
-    "➕ Add Unit",
-    container,
-    boardScene,
-    () => events.AddUnitButtonClicked.emit(null),
-    !addUnitEnabled
-  );
+
+  if (addUnitEnabled)
+    createUnitListOnModal(scene, listScene, boardScene, onSquadUpdated);
 
   return events;
 }
 
-export const handleAddUnitButtonClicked = (
+export const createUnitListOnModal = (
   scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents },
   list: UnitListScene,
   boardScene: BoardScene,

@@ -20,7 +20,7 @@ export async function squadInfo(
   text(320, baseY, leader.name, uiContainer, scene);
 
   if (mapSquad.squad.force !== PLAYER_FORCE) {
-    button(430, baseY, "Squad Details", scene.uiContainer, scene, () => {
+    button(430, baseY, "🔍 Squad Details", scene.uiContainer, scene, () => {
       scene.clearChildrenScenes();
       scene.viewSquadDetails(id);
     });

@@ -16,7 +16,7 @@ export default (
     button(
       baseX + 300,
       baseY,
-      "Formation",
+      "♟ Formation",
       mapScene.uiContainer,
       mapScene,
       () => {

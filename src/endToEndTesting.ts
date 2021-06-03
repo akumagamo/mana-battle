@@ -25,6 +25,8 @@ export function endToEndTesting(game: Phaser.Game) {
       scn: CharaCreationScene,
       onHeroCreated: (value: Unit | PromiseLike<Unit>) => void
     ) => {
+      (document.getElementById("new-chara-name") as HTMLInputElement).value =
+        "TestHero";
       scn.sceneEvents.ConfirmationButtonClicked(onHeroCreated);
     }
   );
@@ -64,7 +66,6 @@ export function endToEndTesting(game: Phaser.Game) {
     const squad = listScene.squads.toList().get(1);
     listScene.evs.SquadClicked.emit(squad);
     listScene.evs.SquadEditClicked.emit(squad);
-    listScene.editSquadModalEvents.AddUnitButtonClicked.emit(null);
     //scn.editSquadModalEvents.OnDrag.emit({ x: 506, y: 197 });
     const unitListScene = listScene.scene.manager.getScene(
       "UnitListScene"
@@ -102,8 +103,11 @@ export function endToEndTesting(game: Phaser.Game) {
     );
 
     // Drag to empty cell
-    let emptyCell = boardScene.tiles.find((t) =>
-      !boardScene.squad.members.some((m) => m.x === t.boardX && m.y === t.boardY)
+    let emptyCell = boardScene.tiles.find(
+      (t) =>
+        !boardScene.squad.members.some(
+          (m) => m.x === t.boardX && m.y === t.boardY
+        )
     );
 
     chara.handleDrag(emptyCell.sprite.x, emptyCell.sprite.y - 100);
@@ -120,7 +124,7 @@ export function endToEndTesting(game: Phaser.Game) {
       true
     );
 
-    const replacedCharaEid = chara.props.unit.id 
+    const replacedCharaEid = chara.props.unit.id;
 
     const newChara = unitListScene.rows[0].chara;
 

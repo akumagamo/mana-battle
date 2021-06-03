@@ -147,6 +147,7 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   handleSquadEditClicked(squad: Squad.SquadRecord) {
+    this.inputEnabled = false;
     this.uiContainer.destroy();
 
     this.editSquadModalEvents = EditSquadModal(
@@ -222,9 +223,9 @@ export class ListSquadsScene extends Phaser.Scene {
 
     this.uiContainer = this.add.container();
     button(
-      SCREEN_WIDTH - 100,
-      40,
-      "Return",
+      SCREEN_WIDTH - 150,
+      600,
+      "✅ Confirm",
       this.uiContainer,
       this,
       () => {
@@ -236,9 +237,9 @@ export class ListSquadsScene extends Phaser.Scene {
     );
 
     button(
-      1000,
+      SCREEN_WIDTH - 370,
       600,
-      "Create Squad",
+      "✴️ Create Squad",
       this.uiContainer,
       this,
       () => {
