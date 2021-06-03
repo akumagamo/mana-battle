@@ -2,7 +2,8 @@ import Phaser from "phaser";
 import { Unit, UnitIndex } from "./Model";
 import { Chara } from "../Chara/Chara";
 import { error, INVALID_STATE } from "../errors";
-import { Pointer, Text, Image, Container } from "../Models";
+import { Pointer, Text, Image, Container, Graphics } from "../Models";
+import button from "../UI/button";
 
 // TODO: fix list display when unit in board is replaced with unit from list
 //
@@ -15,7 +16,7 @@ const rowOffsetX = -50;
 export default class UnitListScene extends Phaser.Scene {
   public rows: { chara: Chara; text: Text; container: Container }[];
   private page: number;
-  private controls: Image[] = [];
+  private pagingControls: (()=>void)[] = [];
   public onUnitClick: ((unit: Unit) => void) | null = null;
   public onDrag: ((unit: Unit, x: number, y: number) => void) | null = null;
   public onDragEnd:
@@ -64,42 +65,42 @@ export default class UnitListScene extends Phaser.Scene {
   }
 
   renderControls() {
-    this.controls.forEach((btn) => btn.destroy());
+    this.pagingControls.forEach((destroy) => destroy());
 
-    const baseY =  490;
+    const baseY = 480;
 
     // TODO: optimize to avoid reloading this
     //const units = unitsWithoutSquad(getUnitsFromDB());
     const totalUnits = this.units.size;
-
-    const next = this.add.image(this.x + 100, this.y + baseY, "arrow_right");
 
     const isLastPage =
       totalUnits < this.itemsPerPage ||
       this.itemsPerPage * (this.page + 1) >= totalUnits;
 
     if (!isLastPage) {
-      next.setInteractive();
-      next.on("pointerdown", (_: Pointer) => {
-        this.nextPage();
-      });
-    } else {
-      next.setAlpha(0.5);
+      const next = button(
+        this.x + 70,
+        this.y + baseY,
+        " ⤇ ",
+        this.add.container(),
+        this,
+        () => this.nextPage()
+      );
+
+      this.pagingControls.push(next.destroy);
     }
 
-    const prev = this.add.image(this.x, this.y + baseY, "arrow_right");
-    prev.setScale(-1, 1);
-
-    if (this.page === 0) {
-      prev.setAlpha(0.5);
-    } else {
-      prev.setInteractive();
-      prev.on("pointerdown", (_: Pointer) => {
-        this.prevPage();
-      });
+    if (this.page !== 0) {
+      const prev = button(
+        this.x - 10,
+        this.y + baseY,
+        " ⤆  ",
+        this.add.container(),
+        this,
+        () => this.prevPage()
+      );
+      this.pagingControls.push(prev.destroy);
     }
-
-    this.controls = [next, prev];
   }
 
   nextPage() {
@@ -292,10 +293,8 @@ export default class UnitListScene extends Phaser.Scene {
     });
   }
 
-  addUnit(unit:Unit){
-
-    this.units = this.units.set(unit.id, unit)
-
+  addUnit(unit: Unit) {
+    this.units = this.units.set(unit.id, unit);
   }
   removeUnit(unit: Unit) {
     this.units = this.units.delete(unit.id);

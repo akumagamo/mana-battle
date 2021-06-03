@@ -99,7 +99,7 @@ export default function (
     );
     container.add(details);
   });
-  button(1100, 550, "Confirm", container, boardScene, () => {
+  button(1070, 550, "✅ Confirm", container, boardScene, () => {
     container.destroy();
     scene.scene.stop("UnitListScene");
     boardScene.destroy();
@@ -109,9 +109,9 @@ export default function (
     onClose(boardScene.squad);
   });
   button(
-    1100,
+    1070,
     400,
-    "Add Unit",
+    "➕ Add Unit",
     container,
     boardScene,
     () => events.AddUnitButtonClicked.emit(null),

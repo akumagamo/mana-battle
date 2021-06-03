@@ -1,6 +1,6 @@
 import * as Squad from "../Squad/Model";
 import Board from "../Board/StaticBoardScene";
-import { Pointer, Image, Text } from "../Models";
+import { Pointer, Image, Text, Container } from "../Models";
 import button from "../UI/button";
 import panel from "../UI/panel";
 import { SCREEN_WIDTH } from "../constants";
@@ -37,7 +37,6 @@ export class ListSquadsScene extends Phaser.Scene {
   };
 
   boardScenes: Board[] = [];
-  controls: (Image | Text)[] = [];
   page: number = 0;
   itemsPerPage: number = 16;
   squads = Map() as Squad.Index;
@@ -47,6 +46,7 @@ export class ListSquadsScene extends Phaser.Scene {
   onReturnClick: (scene: ListSquadsScene) => void | null = null;
   inputEnabled = true;
   editSquadModalEvents: EditSquadModalEvents;
+  uiContainer: Container | null = null;
 
   constructor() {
     super(key);
@@ -110,8 +110,9 @@ export class ListSquadsScene extends Phaser.Scene {
 
   renderSelectSquadInfo(squad: Squad.SquadRecord) {
     const container = this.add.container(0, 670);
-    const panel_ = panel(0, 0, SCREEN_WIDTH, 100, container, this);
+    const panel_ = panel(0, 0, SCREEN_WIDTH, 100, this.uiContainer, this);
 
+    this.uiContainer.add(container);
     container.add([panel_]);
 
     text(
@@ -125,15 +126,8 @@ export class ListSquadsScene extends Phaser.Scene {
 
     const dispatched = this.dispatched.has(squad.id);
 
-    container.setAlpha(dispatched ? 0.3 : 1);
-
-    button(
-      200,
-      10,
-      "Edit",
-      container,
-      this,
-      () => this.evs.SquadEditClicked.emit(squad)
+    button(200, 10, "✏️ Edit", container, this, () =>
+      this.evs.SquadEditClicked.emit(squad)
     );
 
     button(
@@ -153,7 +147,7 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   handleSquadEditClicked(squad: Squad.SquadRecord) {
-    this.inputEnabled = false;
+    this.uiContainer.destroy();
 
     this.editSquadModalEvents = EditSquadModal(
       this,
@@ -179,6 +173,7 @@ export class ListSquadsScene extends Phaser.Scene {
         this.squads = this.squads.set(sqd.id, sqd);
         this.inputEnabled = true;
         this.refresh();
+        this.evs.SquadClicked.emit(sqd);
         this.editSquadModalEvents = null;
       }
     );
@@ -223,11 +218,14 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   renderControls() {
+    if (this.uiContainer) this.uiContainer.destroy();
+
+    this.uiContainer = this.add.container();
     button(
       SCREEN_WIDTH - 100,
       40,
       "Return",
-      this.add.container(0, 0),
+      this.uiContainer,
       this,
       () => {
         if (this.onReturnClick) this.onReturnClick(this);
@@ -241,7 +239,7 @@ export class ListSquadsScene extends Phaser.Scene {
       1000,
       600,
       "Create Squad",
-      this.add.container(0, 0),
+      this.uiContainer,
       this,
       () => {
         this.turnOff();
@@ -272,7 +270,7 @@ export class ListSquadsScene extends Phaser.Scene {
       });
     }
 
-    this.controls.push(prev);
+    this.uiContainer.add(prev);
 
     const next = this.add.image(NAV_X + 100, NAV_Y, "arrow_right");
 
@@ -289,7 +287,7 @@ export class ListSquadsScene extends Phaser.Scene {
       next.setAlpha(0.5);
     }
 
-    this.controls.push(next);
+    this.uiContainer.add(next);
   }
 
   refresh() {
@@ -304,12 +302,15 @@ export class ListSquadsScene extends Phaser.Scene {
   nextPage() {
     this.page = this.page + 1;
     this.refresh();
-    this.evs.SquadClicked.emit(this.getSquads().get(0));
+    this.selectFirstSquad();
   }
 
   prevPage() {
     this.page = this.page - 1;
     this.refresh();
+    this.evs.SquadClicked.emit(this.getSquads().get(0));
+  }
+  selectFirstSquad() {
     this.evs.SquadClicked.emit(this.getSquads().get(0));
   }
 
@@ -318,8 +319,6 @@ export class ListSquadsScene extends Phaser.Scene {
       scene.turnOff();
     });
     this.boardScenes = [];
-    this.controls.forEach((control) => control.destroy());
-    this.controls = [];
     this.squads = Map();
     this.units = Map();
     this.scene.stop();
