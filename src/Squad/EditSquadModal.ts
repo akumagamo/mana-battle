@@ -85,7 +85,7 @@ export default function (
   );
   events.OnClose.on((squad: Squad.SquadRecord) => onClose(squad));
 
-  const container = scene.add.container();
+  const container = boardScene.add.container();
   panel(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, container, boardScene);
   let details: Container | null = null;
 
@@ -94,7 +94,7 @@ export default function (
     details = SmallUnitDetailsBar(
       10,
       SCREEN_HEIGHT - 100,
-      scene,
+      boardScene,
       units.find((u) => u.id === c.props.unit.id)
     );
     container.add(details);

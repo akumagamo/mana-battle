@@ -79,7 +79,7 @@ export function endToEndTesting(game: Phaser.Game) {
     boardScene.tiles.forEach((t, index) => {
       chara.handleDrag(t.sprite.x, t.sprite.y - 100);
       assert(
-        "A unit dragged from the list should paint the board cells when hovered over them",
+        `A unit dragged from the list should paint the board cells when hovered over them (${t.sprite.x}, ${t.sprite.y})`,
         boardScene.tiles[index].sprite.tintTopLeft,
         8978227
       );
