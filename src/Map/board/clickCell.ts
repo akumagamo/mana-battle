@@ -79,11 +79,9 @@ async function handleSelectSquadMoveTarget(
 ) {
   const selectedSquad = scene.getSquad(id);
   if (selectedSquad && selectedSquad.squad.force === PLAYER_FORCE) {
-    const cell = screenToCellPosition({ x, y });
     await scene.moveSquadTo(selectedSquad.squad.id, { x, y });
     scene.signal("squad moved, updating position", [
       { type: "UPDATE_SQUAD_POS", id, pos: { x, y } },
     ]);
-    scene.refreshUI();
   }
 }

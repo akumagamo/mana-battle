@@ -34,7 +34,7 @@ import { screenToCellPosition, cellToScreenPosition } from "./board/position";
 import * as CombatScene from "../Combat/CombatScene";
 import { handleMovePlayerSquadButtonClicked } from "./ui/playerSquad";
 import { organize } from "./ui/organize";
-import {EditSquadModalEvents} from "../Squad/EditSquadModal";
+import { EditSquadModalEvents } from "../Squad/EditSquadModal";
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 
@@ -61,7 +61,6 @@ export const startMapScene = async (
 
   parent.scene.add("MapScene", scene, true, cmds);
 };
-
 
 export class MapScene extends Phaser.Scene {
   evs = {
@@ -122,7 +121,6 @@ export class MapScene extends Phaser.Scene {
   dragDisabled = false;
   cellClickDisabled = false;
 
-  cellHighlight: Phaser.GameObjects.Rectangle | null = null;
 
   squadsToRemove: Set<string> = Set();
   squadToPush: {
@@ -357,7 +355,9 @@ export class MapScene extends Phaser.Scene {
             return;
           }
 
+          console.time('click')
           clickCell(this, cmd.cell);
+          console.timeEnd('click')
         } else if (cmd.type === "MOVE_CAMERA_TO") {
           this.moveCameraTo({ x: cmd.x, y: cmd.y }, cmd.duration);
         } else if (cmd.type === "CLEAR_TILES") {
@@ -366,8 +366,6 @@ export class MapScene extends Phaser.Scene {
           this.clearAllTileEvents();
         } else if (cmd.type === "CLEAR_TILES_TINTING") {
           this.clearAllTileTint();
-        } else if (cmd.type === "HIGHLIGHT_CELL") {
-          this.highlightCell(cmd);
         } else if (cmd.type === "VIEW_SQUAD_DETAILS") {
           this.viewSquadDetails(cmd.id);
         } else if (cmd.type === "REFRESH_UI") {
@@ -415,23 +413,6 @@ export class MapScene extends Phaser.Scene {
     this.signal("selectCity", [
       { type: "MOVE_CAMERA_TO", x, y, duration: 500 },
     ]);
-  }
-
-  private highlightCell(cmd: { type: "HIGHLIGHT_CELL"; pos: Vector }) {
-    const { x, y } = cmd.pos;
-
-    const mapTile = this.tileAt(x, y);
-
-    this.cellHighlight?.destroy();
-    this.cellHighlight = this.add.rectangle(
-      mapTile.tile.x,
-      mapTile.tile.y,
-      cellSize,
-      cellSize
-    );
-
-    this.cellHighlight.setStrokeStyle(8, 0x1a65ac);
-    this.mapContainer.add(this.cellHighlight);
   }
 
   updateState(state: MapState) {
@@ -698,12 +679,9 @@ export class MapScene extends Phaser.Scene {
   }
   async handleCellClick({ tile, pointer }: { tile: Vector; pointer: Vector }) {
     if (!this.cellClickDisabled)
-      this.signal("regular click cell", [
-        { type: "CLICK_CELL", cell: tile },
-        { type: "HIGHLIGHT_CELL", pos: tile },
-      ]);
+      this.signal("regular click cell", [{ type: "CLICK_CELL", cell: tile }]);
 
-    await this.pingEffect(pointer);
+    this.pingEffect(pointer);
   }
 
   private async pingEffect(pointer: Vector) {
@@ -740,9 +718,6 @@ export class MapScene extends Phaser.Scene {
   async clickSquad(squad: MapSquad) {
     await this.moveCameraTo(squad.pos, 100 / GAME_SPEED);
 
-    // this.signal('clicked on unit, marking cell as selected', [
-    //   { type: 'HIGHLIGHT_CELL', pos: squad.pos },
-    // ]);
     if (squad.squad.force === PLAYER_FORCE) {
       this.handleClickOnOwnUnit();
     } else {
@@ -861,7 +836,7 @@ export class MapScene extends Phaser.Scene {
     const { uiContainer } = this.getContainers();
 
     uiContainer.removeAll(true);
-    this.clearChildrenScenes()
+    this.clearChildrenScenes();
   }
 
   async refreshUI() {
@@ -872,7 +847,6 @@ export class MapScene extends Phaser.Scene {
     const { uiContainer } = this.getContainers();
 
     ui(this, uiContainer);
-
   }
 
   viewSquadDetails(id: string): void {
@@ -957,8 +931,6 @@ export class MapScene extends Phaser.Scene {
   clearTiles() {
     this.clearAllTileTint();
 
-    //if (this.cellHighlight) this.cellHighlight.destroy();
-    //  this.clearAllTileEvents();
   }
 
   showCityInfo(id: string) {
@@ -1097,6 +1069,7 @@ export class MapScene extends Phaser.Scene {
       x,
       y,
     }));
+
     const squad = this.getSquad(id);
 
     this.squadsInMovement = this.squadsInMovement.set(id, {

@@ -18,7 +18,6 @@ export type MapCommands =
   | { type: "CLEAR_TILES_EVENTS" }
   | { type: "CLEAR_TILES_TINTING" }
   | { type: "RESET_SQUAD_POSITION"; unit: MapSquad }
-  | { type: "HIGHLIGHT_CELL"; pos: Vector }
   | { type: "SELECT_CITY"; id: string }
   | { type: "SET_SELECTED_UNIT"; id: string }
   | { type: "VIEW_SQUAD_DETAILS"; id: string }
