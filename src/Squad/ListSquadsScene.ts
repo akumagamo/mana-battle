@@ -3,7 +3,7 @@ import Board from "../Board/StaticBoardScene";
 import { Pointer, Image, Text, Container } from "../Models";
 import button from "../UI/button";
 import panel from "../UI/panel";
-import { SCREEN_WIDTH } from "../constants";
+import { PLAYER_FORCE, SCREEN_WIDTH } from "../constants";
 import text from "../UI/text";
 import menu from "../Backgrounds/menu";
 import { UnitIndex } from "../Unit/Model";
@@ -34,6 +34,7 @@ export class ListSquadsScene extends Phaser.Scene {
       this,
       "SquadEditClicked"
     ),
+    CreateSquadClicked: SceneEventFactory<null>(this, "CreateSquadClicked"),
   };
 
   boardScenes: Board[] = [];
@@ -57,6 +58,7 @@ export class ListSquadsScene extends Phaser.Scene {
 
     this.evs.SquadClicked.on(this.handleSquadClicked.bind(this));
     this.evs.SquadEditClicked.on(this.handleSquadEditClicked.bind(this));
+    this.evs.CreateSquadClicked.on(this.handleCreateSquadClicked.bind(this));
   }
 
   create({ squads, units, dispatched, onReturnClick }: CreateParams) {
@@ -179,6 +181,49 @@ export class ListSquadsScene extends Phaser.Scene {
       }
     );
   }
+  handleCreateSquadClicked() {
+    this.inputEnabled = false;
+    this.uiContainer.destroy();
+
+    this.editSquadModalEvents = EditSquadModal(
+      this,
+      Squad.makeSquad({
+        id: "squad+" + new Date().getTime(),
+        members: Map(),
+        force: PLAYER_FORCE,
+        leader: "",
+      }),
+      this.units.filter((u) => !u.squad),
+      true,
+      (sqd, added, removed) => {
+        this.squads = this.squads.set(sqd.id, sqd);
+        added.forEach((id) => {
+          this.units = this.units.update(id, (unit) => ({
+            ...unit,
+            squad: sqd.id,
+          }));
+        });
+        removed.forEach((id) => {
+          this.units = this.units.update(id, (unit) => ({
+            ...unit,
+            squad: null,
+          }));
+        });
+      },
+      (sqd) => {
+        if (sqd.members.size > 0) {
+          this.squads = this.squads.set(sqd.id, sqd);
+        }
+        this.inputEnabled = true;
+        this.refresh();
+
+        if (sqd.members.size > 0) {
+          this.evs.SquadClicked.emit(sqd);
+        }
+        this.editSquadModalEvents = null;
+      }
+    );
+  }
 
   renderBoard(squad: Squad.SquadRecord, x: number, y: number) {
     const BOARD_X = 20 + x * 350;
@@ -243,7 +288,7 @@ export class ListSquadsScene extends Phaser.Scene {
       this.uiContainer,
       this,
       () => {
-        this.turnOff();
+        this.evs.CreateSquadClicked.emit(null);
       },
 
       !this.inputEnabled

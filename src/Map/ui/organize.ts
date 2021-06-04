@@ -2,6 +2,7 @@ import { PLAYER_FORCE } from "../../constants";
 import { MapScene } from "../MapScene";
 import * as ListSquads from "../../Squad/ListSquadsScene";
 import { Map } from "immutable";
+import { toMapSquad } from "../../Unit/Model";
 
 export function organize(scene: MapScene) {
   console.log("organize btn");
@@ -19,11 +20,25 @@ export function organize(scene: MapScene) {
       dispatched: scene.state.dispatchedSquads,
       onReturnClick: (listSquadScene) => {
         scene.state.units = scene.state.units.merge(listSquadScene.units);
-        listSquadScene.squads.forEach((squad) => {
-          scene.state.squads = scene.state.squads.update(squad.id, (sqd) => ({
-            ...sqd,
-            squad: squad,
-          }));
+        listSquadScene.squads.forEach(async (squad) => {
+          const isExistingSquad = scene.state.squads.get(squad.id);
+
+          if (isExistingSquad)
+            scene.state.squads = scene.state.squads.update(squad.id, (sqd) => ({
+              ...sqd,
+              squad: squad,
+            }));
+          else {
+            const force = scene.state.forces.find(
+              (force) => force.id === squad.force
+            );
+
+            // TODO: create 'addSquadToMapScene' method
+            const city = await scene.getCity(force.initialPosition);
+
+            const mapSquad = toMapSquad(squad, { x: city.x, y: city.y });
+            scene.state.squads = scene.state.squads.set(squad.id, mapSquad);
+          }
         });
         listSquadScene.scene.stop();
         scene.scene.start("MapScene", []);

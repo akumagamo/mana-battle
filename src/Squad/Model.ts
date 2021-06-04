@@ -117,7 +117,10 @@ export const findMember = (
 export const updateMember = (
   squad: SquadRecord,
   member: MemberRecord
-): SquadRecord => squad.set("members", squad.members.set(member.id, member));
+): SquadRecord =>
+  squad
+    .set("members", squad.members.set(member.id, member))
+    .set("leader", squad.leader === "" ? member.id : squad.leader);
 
 export const removeMember = (id: string, squad: SquadRecord): SquadRecord =>
   squad.set("members", squad.members.delete(id));
