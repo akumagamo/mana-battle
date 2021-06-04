@@ -16,7 +16,7 @@ const rowOffsetX = -50;
 export default class UnitListScene extends Phaser.Scene {
   public rows: { chara: Chara; text: Text; container: Container }[];
   private page: number;
-  private pagingControls: (()=>void)[] = [];
+  private pagingControls: (() => void)[] = [];
   public onUnitClick: ((unit: Unit) => void) | null = null;
   public onDrag: ((unit: Unit, x: number, y: number) => void) | null = null;
   public onDragEnd:
@@ -38,6 +38,8 @@ export default class UnitListScene extends Phaser.Scene {
     this.events.on("shutdown", () => this.destroy());
     this.render();
     this.renderControls();
+
+    this.game.events.emit("UnitListSceneCreated", this);
   }
 
   makeBackground() {
@@ -69,8 +71,6 @@ export default class UnitListScene extends Phaser.Scene {
 
     const baseY = 480;
 
-    // TODO: optimize to avoid reloading this
-    //const units = unitsWithoutSquad(getUnitsFromDB());
     const totalUnits = this.units.size;
 
     const isLastPage =
@@ -81,7 +81,7 @@ export default class UnitListScene extends Phaser.Scene {
       const next = button(
         this.x + 70,
         this.y + baseY,
-        " ⤇ ",
+        " ➡︎ ",
         this.add.container(),
         this,
         () => this.nextPage()
@@ -94,7 +94,7 @@ export default class UnitListScene extends Phaser.Scene {
       const prev = button(
         this.x - 10,
         this.y + baseY,
-        " ⤆  ",
+        " ⬅︎ ",
         this.add.container(),
         this,
         () => this.prevPage()

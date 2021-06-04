@@ -148,6 +148,12 @@ export function endToEndTesting(game: Phaser.Game) {
       true
     );
 
+    unitListScene.nextPage();
+    assert("Should list remaining units", unitListScene.rows.length, 3);
+
+    unitListScene.prevPage();
+    assert("Should list full page", unitListScene.rows.length, 5);
+
     console.log("TEST FINISHED");
   });
 }
