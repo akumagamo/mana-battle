@@ -163,34 +163,39 @@ export function endToEndTesting(game: Phaser.Game) {
 
       listScene.editSquadModalEvents.OnClose.emit(null);
 
-      console.log(game.scene.scenes);
-      listScene.evs.CreateSquadClicked.emit(null);
-
-      const newUnitListScene = game.scene.getScene(
-        "UnitListScene"
-      ) as UnitListScene;
-
-      newUnitListScene.nextPage();
-
-      const newBoardScene = game.scene.getScene("BoardScene") as BoardScene;
-
-      [0, 0, 0].forEach((_, index) => {
-        const chara_ = newUnitListScene.unitRows[0].chara;
-
-        chara_.handleDrag(
-          newBoardScene.tiles[index].sprite.x,
-          newBoardScene.tiles[index].sprite.y - 100
-        );
-        chara_.handleDragEnd(newBoardScene.tiles[index].sprite.y - 100);
-      });
-
-      assert(
-        "Should move to previous page if current page became empty",
-        newUnitListScene.unitRows.length,
-        5
-      );
+      CreateSquadModal(listScene, game);
 
       console.log("TEST FINISHED");
     }
   );
+}
+
+function CreateSquadModal(listScene: ListSquadsScene, game: Phaser.Game) {
+  listScene.evs.CreateSquadClicked.emit(null);
+
+  const newUnitListScene = game.scene.getScene(
+    "UnitListScene"
+  ) as UnitListScene;
+
+  newUnitListScene.nextPage();
+
+  const newBoardScene = game.scene.getScene("BoardScene") as BoardScene;
+
+  [0, 0, 0].forEach((_, index) => {
+    const chara_ = newUnitListScene.unitRows[0].chara;
+
+    chara_.handleDrag(
+      newBoardScene.tiles[index].sprite.x,
+      newBoardScene.tiles[index].sprite.y - 100
+    );
+    chara_.handleDragEnd(newBoardScene.tiles[index].sprite.y - 100);
+  });
+
+  assert(
+    "Should move to previous page if current page became empty",
+    newUnitListScene.unitRows.length,
+    5
+  );
+
+  listScene.editSquadModalEvents.OnClose.emit(null)
 }

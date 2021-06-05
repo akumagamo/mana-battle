@@ -98,7 +98,7 @@ export class ListSquadsScene extends Phaser.Scene {
     squads: List<Squad.SquadRecord>,
     accumulator: List<List<Squad.SquadRecord>>
   ): List<List<Squad.SquadRecord>> {
-    const cols = 4;
+    const cols = 3;
     if (squads.size <= cols) {
       return accumulator.push(squads);
     } else {
@@ -227,7 +227,7 @@ export class ListSquadsScene extends Phaser.Scene {
 
   renderBoard(squad: Squad.SquadRecord, x: number, y: number) {
     const BOARD_X = 20 + x * 350;
-    const BOARD_Y = 20 + y * 330;
+    const BOARD_Y = 20 + y * 250;
     const boardScene = new Board(
       squad,
       this.units.filter((u) => u.squad === squad.id),
