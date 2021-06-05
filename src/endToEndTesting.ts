@@ -37,18 +37,14 @@ export function endToEndTesting(game: Phaser.Game) {
     const squad = scn.state.squads.find(
       (sqd) => sqd.squad.force === PLAYER_FORCE
     );
-    scn.evs.CellClicked.emit({
-      tile: { x: 3, y: 5 },
-      pointer: { x: 200, y: 400 },
-    });
+    clickCell(scn, 3, 5);
     scn.evs.MovePlayerSquadButonClicked.emit({
       mapScene: scn,
       mapSquad: squad,
     });
-    scn.evs.CellClicked.emit({
-      tile: { x: 4, y: 5 },
-      pointer: { x: 200, y: 400 },
-    });
+
+    clickCell(scn, 4, 5);
+
     scn.evs.SquadArrivedInfoMessageCompleted.once((portraitKey: string) => {
       scn.evs.CloseSquadArrivedInfoMessage.emit(portraitKey);
 
@@ -73,101 +69,10 @@ export function endToEndTesting(game: Phaser.Game) {
   game.events.once(
     "ListSquadsSceneCreated",
     async (listScene: ListSquadsScene) => {
-      const squad = listScene.squads.toList().get(1);
-      listScene.evs.SquadClicked.emit(squad);
-      listScene.evs.SquadEditClicked.emit(squad);
-      const unitListScene = listScene.scene.manager.getScene(
-        "UnitListScene"
-      ) as UnitListScene;
+      EditSquad(listScene);
 
-      const boardScene = listScene.scene.manager.getScene(
-        "BoardScene"
-      ) as BoardScene;
+      SquadCreation(listScene, game);
 
-      const chara = unitListScene.unitRows[0].chara;
-
-      boardScene.tiles.forEach((t, index) => {
-        chara.handleDrag(t.sprite.x, t.sprite.y - 100);
-        assert(
-          `A unit dragged from the list should paint the board cells when hovered over them (${t.sprite.x}, ${t.sprite.y})`,
-          boardScene.tiles[index].sprite.tintTopLeft,
-          8978227
-        );
-        assert(
-          "Other tiles should not be tinted",
-          boardScene.tiles.every((t, i) => i == index || !t.sprite.isTinted),
-          true
-        );
-      });
-
-      assert(
-        "Before adding a character, the squad should have 5 members",
-        boardScene.squad.members.size,
-        5
-      );
-      assert(
-        "The character is not is not in the squad",
-        boardScene.squad.members.has(chara.props.unit.id),
-        false
-      );
-      const getEmptyCell = (board: BoardScene) =>
-        board.tiles.find(
-          (t) =>
-            !boardScene.squad.members.some(
-              (m) => m.x === t.boardX && m.y === t.boardY
-            )
-        );
-
-      // Drag to empty cell
-      const emptyCell = getEmptyCell(boardScene);
-
-      chara.handleDrag(emptyCell.sprite.x, emptyCell.sprite.y - 100);
-      chara.handleDragEnd(emptyCell.sprite.y - 100);
-
-      assert(
-        "After adding a character, the squad should have 6 members",
-        boardScene.squad.members.size,
-        6
-      );
-      assert(
-        "The dragged character was added to the squad",
-        boardScene.squad.members.has(chara.props.unit.id),
-        true
-      );
-
-      const replacedCharaEid = chara.props.unit.id;
-
-      const newChara = unitListScene.unitRows[0].chara;
-
-      newChara.handleDrag(emptyCell.sprite.x, emptyCell.sprite.y - 100);
-      newChara.handleDragEnd(emptyCell.sprite.y - 100);
-
-      assert(
-        "When replacing a character, the number of units is still the same",
-        boardScene.squad.members.size,
-        6
-      );
-      assert(
-        "The dragged character was added to the squad",
-        boardScene.squad.members.has(newChara.props.unit.id),
-        true
-      );
-
-      assert(
-        "The repaced character is no longer in the squad",
-        !boardScene.squad.members.has(replacedCharaEid),
-        true
-      );
-
-      unitListScene.nextPage();
-      assert("Should list remaining units", unitListScene.unitRows.length, 3);
-
-      unitListScene.prevPage();
-      assert("Should list full page", unitListScene.unitRows.length, 5);
-
-      listScene.editSquadModalEvents.OnClose.emit(null);
-
-      CreateSquadModal(listScene, game);
       game.events.once("MapSceneCreated", (scn: MapScene) => {
         console.log(`I'm back!!`);
         console.log("TEST FINISHED");
@@ -176,7 +81,110 @@ export function endToEndTesting(game: Phaser.Game) {
   );
 }
 
-function CreateSquadModal(listScene: ListSquadsScene, game: Phaser.Game) {
+function clickCell(scn: MapScene, x:number, y:number) {
+  scn.evs.CellClicked.emit({
+    tile: { x, y },
+    pointer: { x: 200, y: 400 },
+  });
+}
+
+function EditSquad(listScene: ListSquadsScene) {
+  const squad = listScene.squads.toList().get(1);
+  listScene.evs.SquadClicked.emit(squad);
+  listScene.evs.SquadEditClicked.emit(squad);
+  const unitListScene = listScene.scene.manager.getScene(
+    "UnitListScene"
+  ) as UnitListScene;
+
+  const boardScene = listScene.scene.manager.getScene(
+    "BoardScene"
+  ) as BoardScene;
+
+  const chara = unitListScene.unitRows[0].chara;
+
+  boardScene.tiles.forEach((t, index) => {
+    chara.handleDrag(t.sprite.x, t.sprite.y - 100);
+    assert(
+      `A unit dragged from the list should paint the board cells when hovered over them (${t.sprite.x}, ${t.sprite.y})`,
+      boardScene.tiles[index].sprite.tintTopLeft,
+      8978227
+    );
+    assert(
+      "Other tiles should not be tinted",
+      boardScene.tiles.every((t, i) => i == index || !t.sprite.isTinted),
+      true
+    );
+  });
+
+  assert(
+    "Before adding a character, the squad should have 5 members",
+    boardScene.squad.members.size,
+    5
+  );
+  assert(
+    "The character is not is not in the squad",
+    boardScene.squad.members.has(chara.props.unit.id),
+    false
+  );
+  const getEmptyCell = (board: BoardScene) =>
+    board.tiles.find(
+      (t) =>
+        !boardScene.squad.members.some(
+          (m) => m.x === t.boardX && m.y === t.boardY
+        )
+    );
+
+  // Drag to empty cell
+  const emptyCell = getEmptyCell(boardScene);
+
+  chara.handleDrag(emptyCell.sprite.x, emptyCell.sprite.y - 100);
+  chara.handleDragEnd(emptyCell.sprite.y - 100);
+
+  assert(
+    "After adding a character, the squad should have 6 members",
+    boardScene.squad.members.size,
+    6
+  );
+  assert(
+    "The dragged character was added to the squad",
+    boardScene.squad.members.has(chara.props.unit.id),
+    true
+  );
+
+  const replacedCharaEid = chara.props.unit.id;
+
+  const newChara = unitListScene.unitRows[0].chara;
+
+  newChara.handleDrag(emptyCell.sprite.x, emptyCell.sprite.y - 100);
+  newChara.handleDragEnd(emptyCell.sprite.y - 100);
+
+  assert(
+    "When replacing a character, the number of units is still the same",
+    boardScene.squad.members.size,
+    6
+  );
+  assert(
+    "The dragged character was added to the squad",
+    boardScene.squad.members.has(newChara.props.unit.id),
+    true
+  );
+
+  assert(
+    "The repaced character is no longer in the squad",
+    !boardScene.squad.members.has(replacedCharaEid),
+    true
+  );
+
+  unitListScene.nextPage();
+  assert("Should list remaining units", unitListScene.unitRows.length, 3);
+
+  unitListScene.prevPage();
+  assert("Should list full page", unitListScene.unitRows.length, 5);
+
+  listScene.editSquadModalEvents.OnClose.emit(null);
+}
+
+function SquadCreation(listScene: ListSquadsScene, game: Phaser.Game) {
   listScene.evs.CreateSquadClicked.emit(null);
 
   const newUnitListScene = game.scene.getScene(
