@@ -31,7 +31,6 @@ export default class BoardScene extends Phaser.Scene {
     public showHpBars: boolean
   ) {
     super(BOARD_SCENE_KEY);
-    console.log(`boardScene constructor`);
   }
 
   create() {

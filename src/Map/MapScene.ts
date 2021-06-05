@@ -85,6 +85,8 @@ export class MapScene extends Phaser.Scene {
       this,
       "OrganizeButtonClicked"
     ),
+    CombatInitiated: SceneEventFactory<null>(this, "CombatInitiated"),
+    ReturnedFromCombat: SceneEventFactory<null>(this, "ReturnedFromCombat"),
   };
 
   isPaused = false;
@@ -120,7 +122,6 @@ export class MapScene extends Phaser.Scene {
   hasShownVictoryCondition = false;
   dragDisabled = false;
   cellClickDisabled = false;
-
 
   squadsToRemove: Set<string> = Set();
   squadToPush: {
@@ -184,9 +185,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   init() {
-    for (let ev in this.evs) {
-      this.events.off(ev);
-    }
     this.evs.CellClicked.on(this.handleCellClick.bind(this));
     this.evs.MovePlayerSquadButonClicked.on(handleMovePlayerSquadButtonClicked);
     this.evs.SquadClicked.on(this.clickSquad.bind(this));
@@ -355,9 +353,9 @@ export class MapScene extends Phaser.Scene {
             return;
           }
 
-          console.time('click')
+          console.time("click");
           clickCell(this, cmd.cell);
-          console.timeEnd('click')
+          console.timeEnd("click");
         } else if (cmd.type === "MOVE_CAMERA_TO") {
           this.moveCameraTo({ x: cmd.x, y: cmd.y }, cmd.duration);
         } else if (cmd.type === "CLEAR_TILES") {
@@ -782,11 +780,9 @@ export class MapScene extends Phaser.Scene {
         ]);
 
       // TODO: use safe start
-      this.scene.start(
-        "MapScene",
-        units.concat(commands)
-        //.concat([{type: 'END_SQUAD_TURN'}]),
-      );
+      this.scene.start("MapScene", units.concat(commands));
+
+      this.evs.ReturnedFromCombat.emit(null);
     };
 
     // URGENT TODO: type this scene integration
@@ -808,6 +804,8 @@ export class MapScene extends Phaser.Scene {
       bottom: isPlayer ? starter.id : target.id,
       onCombatFinish: combatCallback,
     });
+
+    this.evs.CombatInitiated.emit(null);
   };
 
   turnOff() {
@@ -930,7 +928,6 @@ export class MapScene extends Phaser.Scene {
 
   clearTiles() {
     this.clearAllTileTint();
-
   }
 
   showCityInfo(id: string) {

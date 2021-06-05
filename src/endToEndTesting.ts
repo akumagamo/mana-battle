@@ -34,9 +34,6 @@ export function endToEndTesting(game: Phaser.Game) {
     }
   );
   game.events.once("MapSceneCreated", (scn: MapScene) => {
-    scn.evs.OrganizeButtonClicked.emit(scn);
-
-    return;
     const squad = scn.state.squads.find(
       (sqd) => sqd.squad.force === PLAYER_FORCE
     );
@@ -52,7 +49,7 @@ export function endToEndTesting(game: Phaser.Game) {
       tile: { x: 4, y: 5 },
       pointer: { x: 200, y: 400 },
     });
-    scn.evs.SquadArrivedInfoMessageCompleted.on((portraitKey: string) => {
+    scn.evs.SquadArrivedInfoMessageCompleted.once((portraitKey: string) => {
       scn.evs.CloseSquadArrivedInfoMessage.emit(portraitKey);
 
       scn.evs.MovePlayerSquadButonClicked.emit({
@@ -63,6 +60,14 @@ export function endToEndTesting(game: Phaser.Game) {
         tile: { x: 6, y: 4 },
         pointer: { x: 200, y: 400 },
       });
+
+      scn.evs.ReturnedFromCombat.once(() => {
+        scn.evs.SquadArrivedInfoMessageCompleted.once((portraitKey: string) => {
+          scn.evs.CloseSquadArrivedInfoMessage.emit(portraitKey);
+
+          scn.evs.OrganizeButtonClicked.emit(scn);
+        });
+      });
     });
   });
   game.events.once(
@@ -71,7 +76,6 @@ export function endToEndTesting(game: Phaser.Game) {
       const squad = listScene.squads.toList().get(1);
       listScene.evs.SquadClicked.emit(squad);
       listScene.evs.SquadEditClicked.emit(squad);
-      //scn.editSquadModalEvents.OnDrag.emit({ x: 506, y: 197 });
       const unitListScene = listScene.scene.manager.getScene(
         "UnitListScene"
       ) as UnitListScene;
@@ -164,8 +168,10 @@ export function endToEndTesting(game: Phaser.Game) {
       listScene.editSquadModalEvents.OnClose.emit(null);
 
       CreateSquadModal(listScene, game);
-
-      console.log("TEST FINISHED");
+      game.events.once("MapSceneCreated", (scn: MapScene) => {
+        console.log(`I'm back!!`);
+        console.log("TEST FINISHED");
+      });
     }
   );
 }
@@ -197,5 +203,6 @@ function CreateSquadModal(listScene: ListSquadsScene, game: Phaser.Game) {
     5
   );
 
-  listScene.editSquadModalEvents.OnClose.emit(null)
+  listScene.editSquadModalEvents.OnClose.emit(null);
+  listScene.evs.ConfirmButtonClicked.emit(null);
 }
