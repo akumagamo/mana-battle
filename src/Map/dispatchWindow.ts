@@ -4,6 +4,7 @@ import button from "../UI/button";
 import panel from "../UI/panel";
 import text from "../UI/text";
 import { MapScene } from "./MapScene";
+import { MapSquad } from "./Model";
 
 export default (scene: MapScene) => {
   let container = scene.add.container();
@@ -44,38 +45,48 @@ export default (scene: MapScene) => {
     .filter((mapSquad) => !scene.state.dispatchedSquads.has(mapSquad.squad.id));
 
   squadsToRender.toList().forEach((mapSquad, i) => {
-    const event = async () => {
-      container.destroy();
-
-      await scene.dispatchSquad(mapSquad.squad);
-      scene.enableInput();
-
-      await delay(scene, 100);
-
-      scene.changeMode({ type: "SQUAD_SELECTED", id: mapSquad.squad.id });
-
-      let squad = scene.getSquad(mapSquad.squad.id);
-      scene.evs.SquadClicked.emit(squad);
-      scene.signal("clicked dispatch squad button", [
-        {
-          type: "MOVE_CAMERA_TO",
-          x: squad.pos.x,
-          y: squad.pos.y,
-          duration: 500,
-        },
-      ]);
-    };
-
-    const leader = scene.getSquadLeader(mapSquad.id)
+    const leader = scene.getSquadLeader(mapSquad.id);
     button(
       x + padding,
       y + 60 + 70 * i,
       leader.name,
       container,
       scene,
-      event,
+      () => handleDispatchSquad(container, scene, mapSquad),
       false,
       width - padding * 2
     );
   });
+
+  scene.evs.DispatchWindowRendered.emit({
+    container,
+    scene,
+    squads: squadsToRender,
+  });
+};
+
+export const handleDispatchSquad = async (
+  container: Phaser.GameObjects.Container,
+  scene: MapScene,
+  mapSquad: MapSquad
+) => {
+  container.destroy();
+
+  await scene.dispatchSquad(mapSquad.squad);
+  scene.enableInput();
+
+  await delay(scene, 100);
+
+  scene.changeMode({ type: "SQUAD_SELECTED", id: mapSquad.squad.id });
+
+  let squad = scene.getSquad(mapSquad.squad.id);
+  scene.evs.SquadClicked.emit(squad);
+  scene.signal("clicked dispatch squad button", [
+    {
+      type: "MOVE_CAMERA_TO",
+      x: squad.pos.x,
+      y: squad.pos.y,
+      duration: 500,
+    },
+  ]);
 };

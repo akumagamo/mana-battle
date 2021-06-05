@@ -23,10 +23,7 @@ export default (scene: MapScene, uiContainer: Container): Promise<void> => {
     button(50, 40, "Organize", uiContainer, scene, () =>
       scene.evs.OrganizeButtonClicked.emit(scene)
     );
-    button(250, 40, "Dispatch", uiContainer, scene, () => {
-      scene.disableMapInput();
-      dispatchWindow(scene);
-    });
+    button(250, 40, "Dispatch", uiContainer, scene, () => scene.handleDispatchClick() );
 
     button(1100, 50, "Return to Title", uiContainer, scene, () => {
       scene.turnOff();

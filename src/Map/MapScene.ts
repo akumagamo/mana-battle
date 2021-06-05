@@ -35,6 +35,7 @@ import * as CombatScene from "../Combat/CombatScene";
 import { handleMovePlayerSquadButtonClicked } from "./ui/playerSquad";
 import { organize } from "./ui/organize";
 import { EditSquadModalEvents } from "../Squad/EditSquadModal";
+import dispatchWindow from "./dispatchWindow";
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 
@@ -87,6 +88,11 @@ export class MapScene extends Phaser.Scene {
     ),
     CombatInitiated: SceneEventFactory<null>(this, "CombatInitiated"),
     ReturnedFromCombat: SceneEventFactory<null>(this, "ReturnedFromCombat"),
+    DispatchWindowRendered: SceneEventFactory<{
+      container: Container;
+      scene: MapScene;
+      squads: Map<string, MapSquad>;
+    }>(this, "DispatchWindowRendered"),
   };
 
   isPaused = false;
@@ -254,17 +260,14 @@ export class MapScene extends Phaser.Scene {
   }
 
   private async finishMovement(path: Vector[], squad: MapSquad) {
-    console.log("arrived at checkpoint!");
     const [, ...remaining] = path;
 
     if (remaining.length > 0) {
-      console.log(`removing checkpoint, as there are checkpoins remaining`);
       this.squadsInMovement = this.squadsInMovement.set(squad.id, {
         path: remaining,
         squad,
       });
     } else {
-      console.log("no checkpoints remaining, arrived at finale!");
       this.squadsInMovement = this.squadsInMovement.delete(squad.id);
 
       const chara = await this.getChara(squad.id);
@@ -325,17 +328,14 @@ export class MapScene extends Phaser.Scene {
     return res.portraitKey;
   }
   handleCloseSquadArrivedInfoMessage(key: string) {
-    console.log(key);
     this.scene.remove(key);
     this.refreshUI();
     this.isPaused = false;
   }
 
   async signal(eventName: string, cmds: MapCommands[]) {
-    console.log(`💁 ::: SIGNAL ::: ${eventName}`, cmds);
     await Promise.all(
       cmds.map(async (cmd) => {
-        console.time(cmd.type);
         if (cmd.type === "DESTROY_TEAM") {
           this.markSquadForRemoval(cmd.target);
         } else if (cmd.type === "UPDATE_STATE") {
@@ -349,13 +349,10 @@ export class MapScene extends Phaser.Scene {
           this.state.units = this.state.units.set(cmd.unit.id, cmd.unit);
         } else if (cmd.type === "CLICK_CELL") {
           if (this.cellClickDisabled) {
-            console.log(`Cell click disabled! Cancelling click`);
             return;
           }
 
-          console.time("click");
           clickCell(this, cmd.cell);
-          console.timeEnd("click");
         } else if (cmd.type === "MOVE_CAMERA_TO") {
           this.moveCameraTo({ x: cmd.x, y: cmd.y }, cmd.duration);
         } else if (cmd.type === "CLEAR_TILES") {
@@ -375,12 +372,8 @@ export class MapScene extends Phaser.Scene {
         } else if (cmd.type === "PUSH_SQUAD") {
           this.squadToPush = cmd;
         }
-
-        console.timeEnd(cmd.type);
       })
     );
-
-    console.log(`🙅 ::: finish signal ${eventName}`);
   }
 
   private captureCity(cmd: {
@@ -1090,7 +1083,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   changeMode(mode: Mode) {
-    console.log("CHANGING MODE", mode);
     this.mode = mode;
     this.refreshUI();
   }
@@ -1115,8 +1107,6 @@ export class MapScene extends Phaser.Scene {
         y: chara.container.y + yPush,
       };
 
-      console.log(`NEWPOS::`, newPos);
-
       return new Promise((resolve) => {
         this.add.tween({
           targets: chara.container,
@@ -1138,5 +1128,9 @@ export class MapScene extends Phaser.Scene {
   handleOrganizeButtonClicked() {
     this.turnOff();
     organize(this);
+  }
+  handleDispatchClick() {
+    this.disableMapInput();
+    dispatchWindow(this);
   }
 }

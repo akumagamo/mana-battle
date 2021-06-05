@@ -6,6 +6,9 @@ import { Unit } from "./Unit/Model";
 import { ListSquadsScene } from "./Squad/ListSquadsScene";
 import UnitListScene from "./Unit/UnitListScene";
 import BoardScene from "./Board/InteractiveBoardScene";
+import { handleDispatchSquad } from "./Map/dispatchWindow";
+import { MapSquad } from "./Map/Model";
+import { handleMovePlayerSquadButtonClicked } from "./Map/ui/playerSquad";
 
 const wait = (n: number) =>
   new Promise<void>((resolve) => setTimeout(() => resolve(), n));
@@ -52,10 +55,8 @@ export function endToEndTesting(game: Phaser.Game) {
         mapScene: scn,
         mapSquad: squad,
       });
-      scn.evs.CellClicked.emit({
-        tile: { x: 6, y: 4 },
-        pointer: { x: 200, y: 400 },
-      });
+
+      clickCell(scn, 6, 4);
 
       scn.evs.ReturnedFromCombat.once(() => {
         scn.evs.SquadArrivedInfoMessageCompleted.once((portraitKey: string) => {
@@ -73,15 +74,46 @@ export function endToEndTesting(game: Phaser.Game) {
 
       SquadCreation(listScene, game);
 
-      game.events.once("MapSceneCreated", (scn: MapScene) => {
-        console.log(`I'm back!!`);
-        console.log("TEST FINISHED");
+      game.events.once("MapSceneCreated", (mapScene: MapScene) => {
+        mapScene.evs.DispatchWindowRendered.once(
+          async ({ squads, container, scene }) => {
+            assert("Should render three squads to dispatch", squads.size, 3);
+
+            await handleDispatchSquad(container, scene, squads.first());
+
+            const dispatched = mapScene.state.squads.get(
+              (squads.first() as MapSquad).id
+            );
+
+            assert("Dispatch window was destroyed", container.visible, false);
+            assert(
+              "Selected squad was dispached",
+              dispatched.id,
+              (squads.first() as MapSquad).id
+            );
+            handleMovePlayerSquadButtonClicked({
+              mapScene,
+              mapSquad: dispatched,
+            });
+
+            clickCell(mapScene, 6, 6);
+
+            mapScene.evs.SquadArrivedInfoMessageCompleted.once(
+              (portraitKey: string) => {
+                mapScene.evs.CloseSquadArrivedInfoMessage.emit(portraitKey);
+              }
+            );
+            console.log("TEST FINISHED");
+          }
+        );
+
+        mapScene.handleDispatchClick();
       });
     }
   );
 }
 
-function clickCell(scn: MapScene, x:number, y:number) {
+function clickCell(scn: MapScene, x: number, y: number) {
   scn.evs.CellClicked.emit({
     tile: { x, y },
     pointer: { x: 200, y: 400 },
