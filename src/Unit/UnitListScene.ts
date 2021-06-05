@@ -4,6 +4,7 @@ import { Chara } from "../Chara/Chara";
 import { error, INVALID_STATE } from "../errors";
 import { Pointer, Text, Image, Container, Graphics } from "../Models";
 import button from "../UI/button";
+import { Map } from "immutable";
 
 // TODO: fix list display when unit in board is replaced with unit from list
 //
@@ -14,7 +15,7 @@ const rowOffsetY = -30;
 const rowOffsetX = -50;
 
 export default class UnitListScene extends Phaser.Scene {
-  public rows: { chara: Chara; text: Text; container: Container }[];
+  public unitRows: { chara: Chara; text: Text; container: Container }[];
   private page: number;
   private pagingControls: (() => void)[] = [];
   public onUnitClick: ((unit: Unit) => void) | null = null;
@@ -30,7 +31,7 @@ export default class UnitListScene extends Phaser.Scene {
     public units: UnitIndex
   ) {
     super("UnitListScene");
-    this.rows = [];
+    this.unitRows = [];
     this.page = 0;
   }
 
@@ -60,10 +61,11 @@ export default class UnitListScene extends Phaser.Scene {
   }
 
   destroy() {
-    this.rows.forEach((row) =>
-      this.scene.remove(this.makeUnitKey(row.chara.props.unit))
-    );
-    this.scene.remove();
+    this.unitRows.forEach((row) => {
+      this.scene.remove(row.chara.scene.key);
+    });
+    this.unitRows = [];
+    this.units = Map();
   }
 
   renderControls() {
@@ -119,12 +121,12 @@ export default class UnitListScene extends Phaser.Scene {
   }
 
   clearUnitList() {
-    this.rows.forEach((row) => {
+    this.unitRows.forEach((row) => {
       this.scene.remove(row.chara.props.key);
       this.children.remove(row.container);
     });
 
-    this.rows = [];
+    this.unitRows = [];
   }
 
   getUnitsToRender() {
@@ -206,7 +208,7 @@ export default class UnitListScene extends Phaser.Scene {
 
     container.add(text);
     //TODO: move background createion to
-    this.rows.push({ chara, text, container });
+    this.unitRows.push({ chara, text, container });
 
     return chara;
   }
@@ -220,13 +222,15 @@ export default class UnitListScene extends Phaser.Scene {
   }
 
   private getUnitIndex(unit: Unit) {
-    return this.rows.findIndex((row) => row.chara.props.unit.id === unit.id);
+    return this.unitRows.findIndex(
+      (row) => row.chara.props.unit.id === unit.id
+    );
   }
 
   returnToOriginalPosition(unit: Unit) {
     const index = this.getUnitIndex(unit);
 
-    const row = this.rows.find(
+    const row = this.unitRows.find(
       (row) => row.chara.props.key === this.makeUnitKey(unit)
     );
 
@@ -296,26 +300,30 @@ export default class UnitListScene extends Phaser.Scene {
   addUnit(unit: Unit) {
     this.units = this.units.set(unit.id, unit);
   }
-  removeUnit(unit: Unit) {
+  removeUnitFromList(unit: Unit) {
     this.units = this.units.delete(unit.id);
 
     const findUnit = (row: { chara: Chara; text: Text }): boolean =>
       row.chara.props.unit.id === unit.id;
-    this.rows.filter(findUnit).forEach((row) => {
-      this.scene.remove(row.chara);
-      this.children.remove(row.container);
+    this.unitRows.filter(findUnit).forEach((row) => {
+      this.removeUnitRow(row);
     });
 
-    this.rows = this.rows.filter((row) => !findUnit(row));
-    this.rows.forEach((row, index) => this.reposition(row, index));
+    this.unitRows = this.unitRows.filter((row) => !findUnit(row));
+    this.unitRows.forEach((row, index) => this.reposition(row, index));
 
     const unitsToRender = this.getUnitsToRender();
+
+    if (unitsToRender.size < 1 && this.units.size > 1) {
+      this.prevPage();
+      return;
+    }
 
     if (unitsToRender.size < 1) return;
 
     const last = unitsToRender.get(unitsToRender.size - 1);
 
-    const isAlreadyRendered = this.rows.some(
+    const isAlreadyRendered = this.unitRows.some(
       (row) => row.chara.props.unit.id === last.id
     );
 
@@ -323,17 +331,26 @@ export default class UnitListScene extends Phaser.Scene {
 
     const newChara = this.renderUnitListItem(last, this.itemsPerPage - 1);
 
-    if (newChara.container)
-      newChara.container.setPosition(
-        newChara.container.x,
-        newChara.container.y + 300
-      );
+    newChara.container.setPosition(
+      newChara.container.x,
+      newChara.container.y + 300
+    );
 
-    const row = this.rows[this.rows.length - 1];
+    const row = this.unitRows[this.unitRows.length - 1];
 
     if (!row) return;
 
     this.reposition(row, this.itemsPerPage - 1);
+
     this.renderControls();
+  }
+
+  private removeUnitRow(row: {
+    chara: Chara;
+    text: Text;
+    container: Container;
+  }) {
+    this.scene.remove(row.chara);
+    this.children.remove(row.container);
   }
 }

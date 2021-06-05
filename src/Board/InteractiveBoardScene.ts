@@ -4,6 +4,7 @@ import * as Squad from "../Squad/Model";
 import { cartesianToIsometric } from "../utils/isometric";
 import { Unit, UnitIndex } from "../Unit/Model";
 import { tileWidth, tileHeight } from "../constants";
+import { Map } from "immutable";
 
 type BoardTile = {
   sprite: Image;
@@ -271,12 +272,13 @@ export default class BoardScene extends Phaser.Scene {
   destroy() {
     this.tiles.forEach((tile) => tile.sprite.destroy());
 
-    this.unitList.forEach((chara) =>
-      this.scene.remove(this.makeUnitKey(chara.props.unit))
-    );
+    this.unitList.forEach((chara) => this.scene.remove(chara.scene.key));
+    this.tiles = [];
+    this.unitList = [];
 
+    this.unitIndex = Map();
     this.events.destroy();
-    this.scene.remove();
+    this.scene.remove(this);
   }
 }
 

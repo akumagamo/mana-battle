@@ -98,7 +98,7 @@ export class EditSquadScene extends Phaser.Scene {
       boardScene.squad = updatedSquad;
 
       //remove dragged unit chara
-      this.unitListScene?.removeUnit(unit);
+      this.unitListScene?.removeUnitFromList(unit);
       //create new chara on board, representing same unit
       boardScene.placeUnit({
         member: updatedSquad.members.get(unit.id),

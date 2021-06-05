@@ -7,7 +7,7 @@ import { ListSquadsScene } from "./Squad/ListSquadsScene";
 import { ListUnitsScene } from "./Unit/ListUnits";
 import MapListScene from "./Map/MapListScene";
 import CombatScene from "./Combat/CombatScene";
-import {endToEndTesting} from "./endToEndTesting";
+import { endToEndTesting } from "./endToEndTesting";
 
 (() => {
   const config: Phaser.Types.Core.GameConfig = {
@@ -42,6 +42,9 @@ import {endToEndTesting} from "./endToEndTesting";
   game.scale.lockOrientation(Phaser.Scale.PORTRAIT);
 
   if (process.env.NODE_ENV === "development") {
+    // @ts-ignore
+    window.game = game;
+
     endToEndTesting(game);
   }
 })();

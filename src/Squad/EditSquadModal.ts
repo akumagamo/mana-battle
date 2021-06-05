@@ -23,7 +23,7 @@ const componentEvents = {
 export type EditSquadModalEvents = {
   OnDrag: EventFactory<Vector>;
   OnDragEnd: EventFactory<{ pos: Vector; unit: Unit }>;
-  OnClose: EventFactory<Squad.SquadRecord>;
+  OnClose: EventFactory<null>;
 };
 
 export default function (
@@ -41,6 +41,7 @@ export default function (
 ) {
   const boardScene = new BoardScene(squad, onSquadUpdated, units, true);
   scene.scene.add("editSquadModalBoard", boardScene, true);
+
   const listScene = new UnitListScene(
     110,
     90,
@@ -54,10 +55,7 @@ export default function (
       scene,
       componentEvents.ON_DRAG_END
     ),
-    OnClose: SceneEventFactory<Squad.SquadRecord>(
-      scene,
-      componentEvents.ON_CLOSE
-    ),
+    OnClose: SceneEventFactory<null>(scene, componentEvents.ON_CLOSE),
   };
 
   events.OnDrag.on(({ x, y }: { x: number; y: number }) =>
@@ -75,7 +73,18 @@ export default function (
         chara
       )
   );
-  events.OnClose.on((squad: Squad.SquadRecord) => onClose(squad));
+
+  const handleOnCloseEditSquadModal = () => {
+    container.destroy();
+    listScene.destroy();
+    scene.scene.remove("UnitListScene");
+    boardScene.destroy();
+
+    for (const k in componentEvents) scene.events.off(k);
+
+    onClose(boardScene.squad);
+  };
+  events.OnClose.on(handleOnCloseEditSquadModal);
 
   const container = boardScene.add.container();
   panel(50, 50, SCREEN_WIDTH - 100, SCREEN_HEIGHT - 150, container, boardScene);
@@ -91,15 +100,9 @@ export default function (
     );
     container.add(details);
   });
-  button(1070, SCREEN_HEIGHT - 150, "✅ Confirm", container, boardScene, () => {
-    container.destroy();
-    scene.scene.stop("UnitListScene");
-    boardScene.destroy();
-
-    for (const k in componentEvents) scene.events.off(k);
-
-    onClose(boardScene.squad);
-  });
+  button(1070, SCREEN_HEIGHT - 150, "✅ Confirm", container, boardScene, () =>
+    events.OnClose.emit(null)
+  );
 
   if (addUnitEnabled)
     createUnitListOnModal(scene, listScene, boardScene, onSquadUpdated);
@@ -172,7 +175,7 @@ const handleOnDragEndFromUnitList = (
     board.squad = updatedSquad;
 
     //Remove dragged unit from list
-    listScene.removeUnit(unit);
+    listScene.removeUnitFromList(unit);
 
     //create new chara on board, representing same unit
     board.placeUnit({

@@ -7,6 +7,9 @@ import { ListSquadsScene } from "./Squad/ListSquadsScene";
 import UnitListScene from "./Unit/UnitListScene";
 import BoardScene from "./Board/InteractiveBoardScene";
 
+const wait = (n: number) =>
+  new Promise<void>((resolve) => setTimeout(() => resolve(), n));
+
 const assert = (condition: string, a: any, b: any) => {
   if (a !== b)
     throw new Error(
@@ -62,98 +65,132 @@ export function endToEndTesting(game: Phaser.Game) {
       });
     });
   });
-  game.events.once("ListSquadsSceneCreated", (listScene: ListSquadsScene) => {
-    const squad = listScene.squads.toList().get(1);
-    listScene.evs.SquadClicked.emit(squad);
-    listScene.evs.SquadEditClicked.emit(squad);
-    //scn.editSquadModalEvents.OnDrag.emit({ x: 506, y: 197 });
-    const unitListScene = listScene.scene.manager.getScene(
-      "UnitListScene"
-    ) as UnitListScene;
+  game.events.once(
+    "ListSquadsSceneCreated",
+    async (listScene: ListSquadsScene) => {
+      const squad = listScene.squads.toList().get(1);
+      listScene.evs.SquadClicked.emit(squad);
+      listScene.evs.SquadEditClicked.emit(squad);
+      //scn.editSquadModalEvents.OnDrag.emit({ x: 506, y: 197 });
+      const unitListScene = listScene.scene.manager.getScene(
+        "UnitListScene"
+      ) as UnitListScene;
 
-    const boardScene = listScene.scene.manager.getScene(
-      "BoardScene"
-    ) as BoardScene;
+      const boardScene = listScene.scene.manager.getScene(
+        "BoardScene"
+      ) as BoardScene;
 
-    const chara = unitListScene.rows[0].chara;
+      const chara = unitListScene.unitRows[0].chara;
 
-    boardScene.tiles.forEach((t, index) => {
-      chara.handleDrag(t.sprite.x, t.sprite.y - 100);
+      boardScene.tiles.forEach((t, index) => {
+        chara.handleDrag(t.sprite.x, t.sprite.y - 100);
+        assert(
+          `A unit dragged from the list should paint the board cells when hovered over them (${t.sprite.x}, ${t.sprite.y})`,
+          boardScene.tiles[index].sprite.tintTopLeft,
+          8978227
+        );
+        assert(
+          "Other tiles should not be tinted",
+          boardScene.tiles.every((t, i) => i == index || !t.sprite.isTinted),
+          true
+        );
+      });
+
       assert(
-        `A unit dragged from the list should paint the board cells when hovered over them (${t.sprite.x}, ${t.sprite.y})`,
-        boardScene.tiles[index].sprite.tintTopLeft,
-        8978227
+        "Before adding a character, the squad should have 5 members",
+        boardScene.squad.members.size,
+        5
       );
       assert(
-        "Other tiles should not be tinted",
-        boardScene.tiles.every((t, i) => i == index || !t.sprite.isTinted),
+        "The character is not is not in the squad",
+        boardScene.squad.members.has(chara.props.unit.id),
+        false
+      );
+      const getEmptyCell = (board: BoardScene) =>
+        board.tiles.find(
+          (t) =>
+            !boardScene.squad.members.some(
+              (m) => m.x === t.boardX && m.y === t.boardY
+            )
+        );
+
+      // Drag to empty cell
+      const emptyCell = getEmptyCell(boardScene);
+
+      chara.handleDrag(emptyCell.sprite.x, emptyCell.sprite.y - 100);
+      chara.handleDragEnd(emptyCell.sprite.y - 100);
+
+      assert(
+        "After adding a character, the squad should have 6 members",
+        boardScene.squad.members.size,
+        6
+      );
+      assert(
+        "The dragged character was added to the squad",
+        boardScene.squad.members.has(chara.props.unit.id),
         true
       );
-    });
 
-    assert(
-      "Before adding a character, the squad should have 5 members",
-      boardScene.squad.members.size,
-      5
-    );
-    assert(
-      "The character is not is not in the squad",
-      boardScene.squad.members.has(chara.props.unit.id),
-      false
-    );
+      const replacedCharaEid = chara.props.unit.id;
 
-    // Drag to empty cell
-    let emptyCell = boardScene.tiles.find(
-      (t) =>
-        !boardScene.squad.members.some(
-          (m) => m.x === t.boardX && m.y === t.boardY
-        )
-    );
+      const newChara = unitListScene.unitRows[0].chara;
 
-    chara.handleDrag(emptyCell.sprite.x, emptyCell.sprite.y - 100);
-    chara.handleDragEnd(emptyCell.sprite.y - 100);
+      newChara.handleDrag(emptyCell.sprite.x, emptyCell.sprite.y - 100);
+      newChara.handleDragEnd(emptyCell.sprite.y - 100);
 
-    assert(
-      "After adding a character, the squad should have 6 members",
-      boardScene.squad.members.size,
-      6
-    );
-    assert(
-      "The dragged character was added to the squad",
-      boardScene.squad.members.has(chara.props.unit.id),
-      true
-    );
+      assert(
+        "When replacing a character, the number of units is still the same",
+        boardScene.squad.members.size,
+        6
+      );
+      assert(
+        "The dragged character was added to the squad",
+        boardScene.squad.members.has(newChara.props.unit.id),
+        true
+      );
 
-    const replacedCharaEid = chara.props.unit.id;
+      assert(
+        "The repaced character is no longer in the squad",
+        !boardScene.squad.members.has(replacedCharaEid),
+        true
+      );
 
-    const newChara = unitListScene.rows[0].chara;
+      unitListScene.nextPage();
+      assert("Should list remaining units", unitListScene.unitRows.length, 3);
 
-    newChara.handleDrag(emptyCell.sprite.x, emptyCell.sprite.y - 100);
-    newChara.handleDragEnd(emptyCell.sprite.y - 100);
+      unitListScene.prevPage();
+      assert("Should list full page", unitListScene.unitRows.length, 5);
 
-    assert(
-      "When replacing a character, the number of units is still the same",
-      boardScene.squad.members.size,
-      6
-    );
-    assert(
-      "The dragged character was added to the squad",
-      boardScene.squad.members.has(newChara.props.unit.id),
-      true
-    );
+      listScene.editSquadModalEvents.OnClose.emit(null);
 
-    assert(
-      "The repaced character is no longer in the squad",
-      !boardScene.squad.members.has(replacedCharaEid),
-      true
-    );
+      console.log(game.scene.scenes);
+      listScene.evs.CreateSquadClicked.emit(null);
 
-    unitListScene.nextPage();
-    assert("Should list remaining units", unitListScene.rows.length, 3);
+      const newUnitListScene = game.scene.getScene(
+        "UnitListScene"
+      ) as UnitListScene;
 
-    unitListScene.prevPage();
-    assert("Should list full page", unitListScene.rows.length, 5);
+      newUnitListScene.nextPage();
 
-    console.log("TEST FINISHED");
-  });
+      const newBoardScene = game.scene.getScene("BoardScene") as BoardScene;
+
+      [0, 0, 0].forEach((_, index) => {
+        const chara_ = newUnitListScene.unitRows[0].chara;
+
+        chara_.handleDrag(
+          newBoardScene.tiles[index].sprite.x,
+          newBoardScene.tiles[index].sprite.y - 100
+        );
+        chara_.handleDragEnd(newBoardScene.tiles[index].sprite.y - 100);
+      });
+
+      assert(
+        "Should move to previous page if current page became empty",
+        newUnitListScene.unitRows.length,
+        5
+      );
+
+      console.log("TEST FINISHED");
+    }
+  );
 }
