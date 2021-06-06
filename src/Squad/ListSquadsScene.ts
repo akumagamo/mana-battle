@@ -110,38 +110,34 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   renderSelectSquadInfo(squad: Squad.SquadRecord) {
-    this.uiContainer.destroy();
-    this.uiContainer = this.add.container();
-    const container = this.add.container(0, 650);
-    const panel_ = panel(0, 0, SCREEN_WIDTH, 100, this.uiContainer, this);
+    const baseY = 650;
+    const panel_ = panel(0, baseY, SCREEN_WIDTH, 100, this.uiContainer, this);
 
     panel_.setAlpha(0.5);
-    this.uiContainer.add(container);
-    container.add(panel_);
 
     const leader = this.units.get(squad.leader).name;
 
-    const leaderTitle = text(20, 10, `Leader`, container, this);
+    const leaderTitle = text(20, baseY + 10, `Leader`, this.uiContainer, this);
     leaderTitle.setFontSize(16);
 
-    text(20, 40, leader, container, this);
+    text(20, baseY + 40, leader, this.uiContainer, this);
 
     const dispatched = this.dispatched.has(squad.id);
 
-    button(300, 20, "✏️ Edit", container, this, () =>
+    button(300, baseY + 20, "✏️ Edit", this.uiContainer, this, () =>
       this.evs.SquadEditClicked.emit(squad)
     );
 
     button(
       1000,
-      20,
+      baseY + 20,
       "Disband Squad",
-      container,
+      this.uiContainer,
       this,
       () => {
         this.onDisbandSquad(squad.id);
-        container.destroy();
-        this.refresh();
+        this.refreshBoards();
+        this.refreshUI(this.getSquads().first());
       },
       dispatched
     );
@@ -149,7 +145,8 @@ export class ListSquadsScene extends Phaser.Scene {
 
   handleSquadEditClicked(squad: Squad.SquadRecord) {
     this.inputEnabled = false;
-    this.uiContainer.destroy();
+
+    this.uiContainer = this.add.container();
 
     this.editSquadModalEvents = EditSquadModal(
       this,
@@ -174,7 +171,7 @@ export class ListSquadsScene extends Phaser.Scene {
       (sqd) => {
         this.squads = this.squads.set(sqd.id, sqd);
         this.inputEnabled = true;
-        this.refresh();
+        this.refreshBoards();
         this.handleSquadClicked(sqd);
         this.editSquadModalEvents = null;
       }
@@ -182,7 +179,7 @@ export class ListSquadsScene extends Phaser.Scene {
   }
   handleCreateSquadClicked() {
     this.inputEnabled = false;
-    this.uiContainer.destroy();
+    this.uiContainer = this.add.container();
 
     this.editSquadModalEvents = EditSquadModal(
       this,
@@ -214,7 +211,7 @@ export class ListSquadsScene extends Phaser.Scene {
           this.squads = this.squads.set(sqd.id, sqd);
         }
         this.inputEnabled = true;
-        this.refresh();
+        this.refreshBoards();
 
         if (sqd.members.size > 0) {
           this.handleSquadClicked(sqd);
@@ -253,18 +250,16 @@ export class ListSquadsScene extends Phaser.Scene {
     fn(board);
   }
   handleSquadClicked(sqd: Squad.SquadRecord) {
-    console.log('handleSquadClicked')
     this.squadSceneIO(sqd.id, (squadScene) => {
-      this.renderSelectSquadInfo(sqd);
       this.boardScenes
         .filter((scene) => scene.isSelected)
         .forEach((scene) => scene.deselect());
       squadScene.select();
+      this.refreshUI(sqd);
     });
   }
 
   handleOnConfirmButtonClicked() {
-    console.log('handleOnConfirmButtonClicked')
     if (this.onReturnClick) this.onReturnClick(this);
 
     this.turnOff();
@@ -297,6 +292,7 @@ export class ListSquadsScene extends Phaser.Scene {
     this.renderNavigation();
   }
   renderNavigation() {
+
     const { squads } = this;
 
     const NAV_X = 500;
@@ -330,26 +326,33 @@ export class ListSquadsScene extends Phaser.Scene {
     }
   }
 
-  refresh() {
+  refreshUI(sqd: Squad.SquadRecord) {
     this.uiContainer.destroy();
     this.uiContainer = this.add.container();
+
+    this.renderControls();
+
+    this.renderSelectSquadInfo(sqd);
+  }
+
+  refreshBoards() {
     this.boardScenes.forEach((scene) => {
       scene.turnOff();
     });
     this.boardScenes = [];
+
     this.renderSquadList();
-    this.renderControls();
   }
 
   nextPage() {
     this.page = this.page + 1;
-    this.refresh();
+    this.refreshBoards();
     this.selectFirstSquad();
   }
 
   prevPage() {
     this.page = this.page - 1;
-    this.refresh();
+    this.refreshBoards();
     this.handleSquadClicked(this.getSquads().get(0));
   }
   selectFirstSquad() {

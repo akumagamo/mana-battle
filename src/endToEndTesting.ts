@@ -9,6 +9,7 @@ import BoardScene from "./Board/InteractiveBoardScene";
 import { handleDispatchSquad } from "./Map/dispatchWindow";
 import { MapSquad } from "./Map/Model";
 import { handleMovePlayerSquadButtonClicked } from "./Map/ui/playerSquad";
+import {Map} from "immutable";
 
 const wait = (n: number) =>
   new Promise<void>((resolve) => setTimeout(() => resolve(), n));
@@ -46,7 +47,7 @@ export function endToEndTesting(game: Phaser.Game) {
       mapSquad: squad,
     });
 
-    clickCell(scn, 4, 5);
+    clickCell(scn, 7, 5);
 
     scn.evs.SquadArrivedInfoMessageCompleted.once((portraitKey: string) => {
       scn.evs.CloseSquadArrivedInfoMessage.emit(portraitKey);
@@ -56,23 +57,12 @@ export function endToEndTesting(game: Phaser.Game) {
         mapSquad: squad,
       });
 
-      //clickCell(scn, 6, 4);
-
       scn.evs.OrganizeButtonClicked.emit(scn);
-
-      scn.evs.ReturnedFromCombat.once(() => {
-        scn.evs.SquadArrivedInfoMessageCompleted.once((portraitKey: string) => {
-          scn.evs.CloseSquadArrivedInfoMessage.emit(portraitKey);
-
-          scn.evs.OrganizeButtonClicked.emit(scn);
-        });
-      });
     });
   });
   game.events.once(
     "ListSquadsSceneCreated",
     async (listScene: ListSquadsScene) => {
-
       EditSquad(listScene);
 
       SquadCreation(listScene, game);
@@ -80,32 +70,30 @@ export function endToEndTesting(game: Phaser.Game) {
       game.events.once("MapSceneCreated", (mapScene: MapScene) => {
         mapScene.evs.DispatchWindowRendered.once(
           async ({ squads, container, scene }) => {
-            assert("Should render three squads to dispatch", squads.size, 3);
-
-            await handleDispatchSquad(container, scene, squads.first());
-
-            const dispatched = mapScene.state.squads.get(
-              (squads.first() as MapSquad).id
-            );
-
-            assert("Dispatch window was destroyed", container.visible, false);
-            assert(
-              "Selected squad was dispached",
-              dispatched.id,
-              (squads.first() as MapSquad).id
+            const dispatched = await DispatchSquads(
+              squads,
+              container,
+              scene,
+              mapScene
             );
             handleMovePlayerSquadButtonClicked({
               mapScene,
               mapSquad: dispatched,
             });
 
-            clickCell(mapScene, 3, 6);
-
+            clickCell(mapScene, 6, 4);
             mapScene.evs.SquadArrivedInfoMessageCompleted.once(
               (portraitKey: string) => {
                 mapScene.evs.CloseSquadArrivedInfoMessage.emit(portraitKey);
               }
             );
+            mapScene.evs.ReturnedFromCombat.once(() => {
+              mapScene.evs.SquadArrivedInfoMessageCompleted.once(
+                (portraitKey: string) => {
+                  mapScene.evs.CloseSquadArrivedInfoMessage.emit(portraitKey);
+                }
+              );
+            });
             console.log("TEST FINISHED");
           }
         );
@@ -114,6 +102,27 @@ export function endToEndTesting(game: Phaser.Game) {
       });
     }
   );
+}
+
+async function DispatchSquads(
+  squads: Map<string, MapSquad>,
+  container: Phaser.GameObjects.Container,
+  scene: MapScene,
+  mapScene: MapScene
+) {
+  assert("Should render three squads to dispatch", squads.size, 3);
+
+  await handleDispatchSquad(container, scene, squads.first());
+
+  const dispatched = mapScene.state.squads.get((squads.first() as MapSquad).id);
+
+  assert("Dispatch window was destroyed", container.visible, false);
+  assert(
+    "Selected squad was dispached",
+    dispatched.id,
+    (squads.first() as MapSquad).id
+  );
+  return dispatched;
 }
 
 function clickCell(scn: MapScene, x: number, y: number) {
