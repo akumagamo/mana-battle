@@ -72,6 +72,7 @@ export function endToEndTesting(game: Phaser.Game) {
   game.events.once(
     "ListSquadsSceneCreated",
     async (listScene: ListSquadsScene) => {
+
       EditSquad(listScene);
 
       SquadCreation(listScene, game);
@@ -124,7 +125,7 @@ function clickCell(scn: MapScene, x: number, y: number) {
 
 function EditSquad(listScene: ListSquadsScene) {
   const squad = listScene.squads.toList().get(1);
-  listScene.evs.SquadClicked.emit(squad);
+  listScene.handleSquadClicked(squad);
   listScene.evs.SquadEditClicked.emit(squad);
   const unitListScene = listScene.scene.manager.getScene(
     "UnitListScene"

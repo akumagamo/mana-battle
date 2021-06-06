@@ -191,6 +191,8 @@ export class MapScene extends Phaser.Scene {
   }
 
   init() {
+    for (const ev in this.evs) this.events.off(ev);
+
     this.evs.CellClicked.on(this.handleCellClick.bind(this));
     this.evs.MovePlayerSquadButonClicked.on(handleMovePlayerSquadButtonClicked);
     this.evs.SquadClicked.on(this.clickSquad.bind(this));

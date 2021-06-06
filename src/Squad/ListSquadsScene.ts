@@ -29,7 +29,6 @@ export const run = (
 
 export class ListSquadsScene extends Phaser.Scene {
   evs = {
-    SquadClicked: SceneEventFactory<Squad.SquadRecord>(this, "SquadClicked"),
     SquadEditClicked: SceneEventFactory<Squad.SquadRecord>(
       this,
       "SquadEditClicked"
@@ -55,9 +54,6 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   init() {
-    for (const ev in this.evs) this.events.off(ev);
-
-    this.evs.SquadClicked.on(this.handleSquadClicked.bind(this));
     this.evs.SquadEditClicked.on(this.handleSquadEditClicked.bind(this));
     this.evs.CreateSquadClicked.on(this.handleCreateSquadClicked.bind(this));
     this.evs.ConfirmButtonClicked.on(
@@ -70,12 +66,13 @@ export class ListSquadsScene extends Phaser.Scene {
     this.units = units;
     this.dispatched = dispatched;
     this.onReturnClick = onReturnClick;
+    this.uiContainer = this.add.container();
 
     menu(this);
 
     this.renderSquadList();
     this.renderControls();
-    this.evs.SquadClicked.emit(squads.toList().get(0));
+    this.handleSquadClicked(squads.toList().get(0));
 
     this.game.events.emit("ListSquadsSceneCreated", this);
   }
@@ -178,7 +175,7 @@ export class ListSquadsScene extends Phaser.Scene {
         this.squads = this.squads.set(sqd.id, sqd);
         this.inputEnabled = true;
         this.refresh();
-        this.evs.SquadClicked.emit(sqd);
+        this.handleSquadClicked(sqd);
         this.editSquadModalEvents = null;
       }
     );
@@ -220,7 +217,7 @@ export class ListSquadsScene extends Phaser.Scene {
         this.refresh();
 
         if (sqd.members.size > 0) {
-          this.evs.SquadClicked.emit(sqd);
+          this.handleSquadClicked(sqd);
         }
         this.editSquadModalEvents = null;
       }
@@ -244,7 +241,7 @@ export class ListSquadsScene extends Phaser.Scene {
     this.scene.add(key, boardScene, true);
 
     boardScene.onClick((sqd) => {
-      if (this.inputEnabled) this.evs.SquadClicked.emit(sqd);
+      if (this.inputEnabled) this.handleSquadClicked(sqd);
     });
 
     this.boardScenes.push(boardScene);
@@ -256,6 +253,7 @@ export class ListSquadsScene extends Phaser.Scene {
     fn(board);
   }
   handleSquadClicked(sqd: Squad.SquadRecord) {
+    console.log('handleSquadClicked')
     this.squadSceneIO(sqd.id, (squadScene) => {
       this.renderSelectSquadInfo(sqd);
       this.boardScenes
@@ -266,15 +264,13 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   handleOnConfirmButtonClicked() {
+    console.log('handleOnConfirmButtonClicked')
     if (this.onReturnClick) this.onReturnClick(this);
 
     this.turnOff();
   }
 
   renderControls() {
-    if (this.uiContainer) this.uiContainer.destroy();
-
-    this.uiContainer = this.add.container();
     button(
       SCREEN_WIDTH - 150,
       600,
@@ -335,14 +331,14 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   refresh() {
+    this.uiContainer.destroy();
+    this.uiContainer = this.add.container();
     this.boardScenes.forEach((scene) => {
       scene.turnOff();
     });
     this.boardScenes = [];
     this.renderSquadList();
     this.renderControls();
-    this.uiContainer.destroy();
-    this.uiContainer = this.add.container();
   }
 
   nextPage() {
@@ -354,10 +350,10 @@ export class ListSquadsScene extends Phaser.Scene {
   prevPage() {
     this.page = this.page - 1;
     this.refresh();
-    this.evs.SquadClicked.emit(this.getSquads().get(0));
+    this.handleSquadClicked(this.getSquads().get(0));
   }
   selectFirstSquad() {
-    this.evs.SquadClicked.emit(this.getSquads().get(0));
+    this.handleSquadClicked(this.getSquads().get(0));
   }
 
   turnOff() {
@@ -369,5 +365,7 @@ export class ListSquadsScene extends Phaser.Scene {
     this.units = Map();
     this.uiContainer.destroy();
     this.scene.stop(key);
+
+    for (const ev in this.evs) this.events.off(ev);
   }
 }
