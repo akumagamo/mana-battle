@@ -56,7 +56,9 @@ export function endToEndTesting(game: Phaser.Game) {
         mapSquad: squad,
       });
 
-      clickCell(scn, 6, 4);
+      //clickCell(scn, 6, 4);
+
+      scn.evs.OrganizeButtonClicked.emit(scn);
 
       scn.evs.ReturnedFromCombat.once(() => {
         scn.evs.SquadArrivedInfoMessageCompleted.once((portraitKey: string) => {
@@ -96,7 +98,7 @@ export function endToEndTesting(game: Phaser.Game) {
               mapSquad: dispatched,
             });
 
-            clickCell(mapScene, 6, 6);
+            clickCell(mapScene, 3, 6);
 
             mapScene.evs.SquadArrivedInfoMessageCompleted.once(
               (portraitKey: string) => {
