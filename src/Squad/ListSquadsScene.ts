@@ -1,6 +1,6 @@
 import * as Squad from "../Squad/Model";
 import Board from "../Board/StaticBoardScene";
-import { Pointer, Image, Text, Container } from "../Models";
+import { Pointer, Container } from "../Models";
 import button from "../UI/button";
 import panel from "../UI/panel";
 import { PLAYER_FORCE, SCREEN_WIDTH } from "../constants";
@@ -44,7 +44,6 @@ export class ListSquadsScene extends Phaser.Scene {
   squads = Map() as Squad.Index;
   units = Map() as UnitIndex;
   dispatched: Set<string> = Set();
-  onDisbandSquad: (id: string) => void = () => {};
   onReturnClick: (scene: ListSquadsScene) => void | null = null;
   inputEnabled = true;
   editSquadModalEvents: EditSquadModalEvents;
@@ -373,4 +372,11 @@ export class ListSquadsScene extends Phaser.Scene {
 
     for (const ev in this.evs) this.events.off(ev);
   }
+
+  onDisbandSquad: (id: string) => void = (id: string) => {
+    this.squads = this.squads.delete(id);
+    this.units = this.units.map((u) =>
+      u.squad === id ? { ...u, squad: null } : u
+    );
+  };
 }
