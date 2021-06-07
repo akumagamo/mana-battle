@@ -11,7 +11,7 @@ export async function squadInfo(
   baseY: number,
   id: string
 ): Promise<void> {
-  const mapSquad = scene.getSquad(id);
+  const mapSquad = scene.getMapSquad(id);
 
   const leader = scene.getSquadLeader(id);
 

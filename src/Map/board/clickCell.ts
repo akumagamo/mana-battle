@@ -56,7 +56,7 @@ async function handleMovingSquad(
   y: number,
   id: string
 ) {
-  const selectedSquad = scene.getSquad(id);
+  const selectedSquad = scene.getMapSquad(id);
 
   if (selectedSquad && selectedSquad.squad.force === PLAYER_FORCE) {
     const isWalkable = scene.moveableCells.has(makeVector({ x, y }));
@@ -77,7 +77,7 @@ async function handleSelectSquadMoveTarget(
   y: number,
   id: string
 ) {
-  const selectedSquad = scene.getSquad(id);
+  const selectedSquad = scene.getMapSquad(id);
   if (selectedSquad && selectedSquad.squad.force === PLAYER_FORCE) {
     await scene.moveSquadTo(selectedSquad.squad.id, { x, y });
     scene.signal("squad moved, updating position", [

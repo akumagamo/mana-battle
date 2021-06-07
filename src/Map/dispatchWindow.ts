@@ -79,7 +79,7 @@ export const handleDispatchSquad = async (
 
   scene.changeMode({ type: "SQUAD_SELECTED", id: mapSquad.squad.id });
 
-  let squad = scene.getSquad(mapSquad.squad.id);
+  let squad = scene.getMapSquad(mapSquad.squad.id);
   scene.evs.SquadClicked.emit(squad);
   scene.signal("clicked dispatch squad button", [
     {

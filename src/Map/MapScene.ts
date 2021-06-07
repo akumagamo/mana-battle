@@ -242,23 +242,21 @@ export class MapScene extends Phaser.Scene {
       // how: have indexes per team
       this.charas
         .filter((c) => {
-          const a = this.getSquad(c.props.unit.squad).squad.force;
-          const b = this.getSquad(sqd).squad.force;
+          const a = this.getMapSquad(c.props.unit.squad).squad.force;
+          const b = this.getMapSquad(sqd).squad.force;
 
           return a !== b;
         })
         .forEach((c) => {
-          if (c.props.key !== current.props.key) {
-            const distance = getDistance(c.container, current.container);
+          const distance = getDistance(c.container, current.container);
 
-            if (distance < cellSize * 0.8) {
-              this.isPaused = true;
-              this.startCombat(
-                this.getSquad(sqd),
-                this.getSquad(c.props.unit.squad),
-                direction
-              );
-            }
+          if (distance < cellSize * 0.8) {
+            this.isPaused = true;
+            this.startCombat(
+              this.getMapSquad(sqd),
+              this.getMapSquad(c.props.unit.squad),
+              direction
+            );
           }
         });
     });
@@ -663,7 +661,7 @@ export class MapScene extends Phaser.Scene {
       this.mode.type === "SQUAD_SELECTED" ||
       this.mode.type === "MOVING_SQUAD"
     )
-      return this.getSquad(this.mode.id);
+      return this.getMapSquad(this.mode.id);
   }
   makeInteractive(cell: MapTile) {
     cell.tile.on("pointerup", (pointer: Pointer) =>
@@ -848,7 +846,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   viewSquadDetails(id: string): void {
-    const mapSquad = this.getSquad(id);
+    const mapSquad = this.getMapSquad(id);
     this.disableMapInput();
     squadDetails(
       this,
@@ -858,17 +856,17 @@ export class MapScene extends Phaser.Scene {
     );
   }
 
-  getSquad(squadId: string) {
+  getMapSquad(squadId: string) {
     return this.state.squads.get(squadId);
   }
   squadAt(x: number, y: number) {
     return this.state.dispatchedSquads
-      .map((id) => this.getSquad(id))
+      .map((id) => this.getMapSquad(id))
       .find((s) => getDistance(cellToScreenPosition({ x, y }), s.pos) < 50);
   }
 
   getSquadLeader(squadId: string) {
-    let squad = this.getSquad(squadId);
+    let squad = this.getMapSquad(squadId);
 
     return this.state.units.get(squad.squad.leader);
   }
@@ -1057,7 +1055,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   async moveSquadTo(id: string, target: Vector) {
-    const source = this.getSquad(id);
+    const source = this.getMapSquad(id);
 
     const grid = this.makeWalkableGrid();
 
@@ -1067,7 +1065,7 @@ export class MapScene extends Phaser.Scene {
       y,
     }));
 
-    const squad = this.getSquad(id);
+    const squad = this.getMapSquad(id);
 
     this.squadsInMovement = this.squadsInMovement.set(id, {
       path,
@@ -1096,7 +1094,7 @@ export class MapScene extends Phaser.Scene {
 
   async pushLoser() {
     if (this.squadToPush) {
-      const loser = this.getSquad(this.squadToPush.loser);
+      const loser = this.getMapSquad(this.squadToPush.loser);
 
       const { direction } = this.squadToPush;
       const dist = cellSize;
