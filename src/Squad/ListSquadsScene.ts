@@ -10,6 +10,7 @@ import { UnitIndex } from "../Unit/Model";
 import { List, Map, Set } from "immutable";
 import EditSquadModal, { EditSquadModalEvents } from "./EditSquadModal";
 import { SceneEventFactory } from "../utils";
+import { GAME_SPEED } from "../env";
 
 type CreateParams = {
   squads: Squad.Index;
@@ -62,6 +63,8 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   create({ squads, units, dispatched, onReturnClick }: CreateParams) {
+    this.cameras.main.fadeIn(1000 / GAME_SPEED);
+
     this.squads = squads;
     this.units = units;
     this.dispatched = dispatched;
@@ -292,7 +295,6 @@ export class ListSquadsScene extends Phaser.Scene {
     this.renderNavigation();
   }
   renderNavigation() {
-
     const { squads } = this;
 
     const NAV_X = 500;
