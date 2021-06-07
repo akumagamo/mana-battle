@@ -191,8 +191,6 @@ export class MapScene extends Phaser.Scene {
   }
 
   init() {
-    for (const ev in this.evs) this.events.off(ev);
-
     this.evs.CellClicked.on(this.handleCellClick.bind(this));
     this.evs.MovePlayerSquadButonClicked.on(handleMovePlayerSquadButtonClicked);
     this.evs.SquadClicked.on(this.clickSquad.bind(this));
@@ -243,7 +241,12 @@ export class MapScene extends Phaser.Scene {
       // TODO: only enemies
       // how: have indexes per team
       this.charas
-        .filter((c) => c.props.unit.squad !== sqd)
+        .filter((c) => {
+          const a = this.getSquad(c.props.unit.squad).squad.force;
+          const b = this.getSquad(sqd).squad.force;
+
+          return a !== b;
+        })
         .forEach((c) => {
           if (c.props.key !== current.props.key) {
             const distance = getDistance(c.container, current.container);
@@ -628,7 +631,7 @@ export class MapScene extends Phaser.Scene {
     return this.state.cities.find((c) => c.x === x && c.y === y);
   }
 
-  async getForce(id: string) {
+  getForce(id: string) {
     return this.state.forces.find((f) => f.id === id);
   }
 
@@ -819,6 +822,8 @@ export class MapScene extends Phaser.Scene {
     this.tileIndex = [[]];
 
     this.mode = DEFAULT_MODE;
+
+    for (const ev in this.evs) this.events.off(ev);
   }
 
   tintClickableCells(cell: MapTile) {
