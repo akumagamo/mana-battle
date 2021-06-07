@@ -66,7 +66,6 @@ export default (
     if (disabled) return;
     defaultFill();
     fill();
-    text_.setColor("#000000");
     if (process.env.SOUND_ENABLED) scene.sound.add("click1").play();
     clickZone.removeAllListeners();
     onClick();
