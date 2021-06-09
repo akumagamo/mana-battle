@@ -11,6 +11,7 @@ import { List, Map, Set } from "immutable";
 import EditSquadModal, { EditSquadModalEvents } from "./EditSquadModal";
 import { SceneEventFactory } from "../utils";
 import { GAME_SPEED } from "../env";
+import Phaser from "phaser";
 
 type CreateParams = {
   squads: Squad.Index;
@@ -287,8 +288,7 @@ export class ListSquadsScene extends Phaser.Scene {
       () => {
         this.evs.CreateSquadClicked.emit(null);
       },
-
-      !this.inputEnabled
+      !this.inputEnabled || this.units.every(u=>!!u.squad)
     );
 
     this.renderNavigation();
