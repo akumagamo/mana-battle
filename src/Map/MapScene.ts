@@ -1136,6 +1136,7 @@ export class MapScene extends Phaser.Scene {
   }
   handleDispatchClick() {
     this.disableMapInput();
+    this.isPaused = true;
     dispatchWindow(this);
   }
 }

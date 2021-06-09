@@ -15,7 +15,7 @@ module.exports = merge(common, {
   plugins: [
     new webpack.EnvironmentPlugin({
       SOUND_ENABLED: false,
-      SPEED: 10 // Larger numbers will make things break, as there will be multiple events in the same frame
+      SPEED: 1 // Larger numbers will make things break, as there will be multiple events in the same frame
     }),
   ],
 });

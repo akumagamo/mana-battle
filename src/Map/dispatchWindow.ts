@@ -74,6 +74,7 @@ export const handleDispatchSquad = async (
 
   await scene.dispatchSquad(mapSquad.squad);
   scene.enableInput();
+  scene.isPaused = false;
 
   await delay(scene, 100);
 

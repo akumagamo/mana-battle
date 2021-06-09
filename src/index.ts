@@ -45,6 +45,6 @@ import { endToEndTesting } from "./endToEndTesting";
     // @ts-ignore
     window.game = game;
 
-    endToEndTesting(game);
+    //endToEndTesting(game);
   }
 })();

@@ -72,4 +72,5 @@ export function handleMovePlayerSquadButtonClicked({
     id: mapSquad.id,
     start: mapSquad.pos,
   });
+  mapScene.isPaused = true;
 }

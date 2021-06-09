@@ -52,7 +52,7 @@ export default (scene: MapScene, uiContainer: Container): Promise<void> => {
       return city(scene, uiContainer, baseY, scene.mode.id);
     case "SELECT_SQUAD_MOVE_TARGET":
       return new Promise(() => {
-        panel(SCREEN_WIDTH / 2, 10, 220, 50, uiContainer, scene);
+        panel(SCREEN_WIDTH / 2, 15, 220, 50, uiContainer, scene);
         text(
           SCREEN_WIDTH / 2 + 10,
           14,

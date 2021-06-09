@@ -80,6 +80,7 @@ async function handleSelectSquadMoveTarget(
   const selectedSquad = scene.getMapSquad(id);
   if (selectedSquad && selectedSquad.squad.force === PLAYER_FORCE) {
     await scene.moveSquadTo(selectedSquad.squad.id, { x, y });
+    scene.isPaused = false;
     scene.signal("squad moved, updating position", [
       { type: "UPDATE_SQUAD_POS", id, pos: { x, y } },
     ]);
