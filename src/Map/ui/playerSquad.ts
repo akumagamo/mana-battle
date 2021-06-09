@@ -14,9 +14,9 @@ export default (
 
   if (mode === "SQUAD_SELECTED") {
     button(
-      baseX + 340,
+      baseX + 400,
       baseY,
-      "♟ Formation",
+      "Formation",
       mapScene.uiContainer,
       mapScene,
       () => {
@@ -54,7 +54,7 @@ export default (
         );
       }
     );
-    button(baseX + 200, baseY, "➡️ Move", mapScene.uiContainer, mapScene, () =>
+    button(baseX + 200, baseY, "Move", mapScene.uiContainer, mapScene, () =>
       mapScene.evs.MovePlayerSquadButonClicked.emit({ mapScene, mapSquad })
     );
   }

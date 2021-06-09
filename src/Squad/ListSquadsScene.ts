@@ -63,6 +63,7 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   create({ squads, units, dispatched, onReturnClick }: CreateParams) {
+
     this.cameras.main.fadeIn(1000 / GAME_SPEED);
 
     this.squads = squads;
@@ -127,7 +128,7 @@ export class ListSquadsScene extends Phaser.Scene {
 
     const dispatched = this.dispatched.has(squad.id);
 
-    button(300, baseY + 20, "✏️ Edit", this.uiContainer, this, () =>
+    button(300, baseY + 20, "Edit", this.uiContainer, this, () =>
       this.evs.SquadEditClicked.emit(squad)
     );
 
@@ -272,7 +273,7 @@ export class ListSquadsScene extends Phaser.Scene {
     button(
       SCREEN_WIDTH - 150,
       600,
-      "✅ Confirm",
+      "Confirm",
       this.uiContainer,
       this,
       this.handleOnConfirmButtonClicked.bind(this),
@@ -282,7 +283,7 @@ export class ListSquadsScene extends Phaser.Scene {
     button(
       SCREEN_WIDTH - 370,
       600,
-      "✴️ Create Squad",
+      "Create Squad",
       this.uiContainer,
       this,
       () => {

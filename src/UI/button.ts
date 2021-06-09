@@ -18,14 +18,20 @@ export default (
   height?: number,
   active?: boolean
 ) => {
-  const text_ = text(x, y, label, container, scene);
+
+
+  const w = width ? width : 170;
+  const h = height ? height : 40;
+
+  const text_ = text(x + (w / 2), y + (h/2), label, container, scene);
+  text_.setOrigin(0.5)
   text_.setShadow(2, 2, "#000");
   text_.setColor("#fff");
 
-  const rectX = x - 15;
-  const rectY = y - 10;
-  const rectWidth = width ? width : text_.width + 30;
-  const rectHeight = height ? height : text_.height + 20;
+  const rectX = x;
+  const rectY = y;
+  const rectWidth = w;
+  const rectHeight = h;
 
   const btn = scene.add.graphics();
 
