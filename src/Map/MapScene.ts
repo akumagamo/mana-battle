@@ -93,6 +93,7 @@ export class MapScene extends Phaser.Scene {
       scene: MapScene;
       squads: Map<string, MapSquad>;
     }>(this, "DispatchWindowRendered"),
+    SquadDispatched: SceneEventFactory<string>(this, "SquadDispatched"),
   };
 
   isPaused = false;
@@ -876,7 +877,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   async dispatchSquad(squad: SquadRecord) {
-    const force = await this.getForce(PLAYER_FORCE);
+    const force = this.getForce(PLAYER_FORCE);
     let mapSquad = toMapSquad(squad, await this.getCity(force.initialPosition));
 
     this.state.dispatchedSquads = this.state.dispatchedSquads.add(squad.id);

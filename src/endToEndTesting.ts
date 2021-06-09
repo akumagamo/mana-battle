@@ -9,7 +9,7 @@ import BoardScene from "./Board/InteractiveBoardScene";
 import { handleDispatchSquad } from "./Map/dispatchWindow";
 import { MapSquad } from "./Map/Model";
 import { handleMovePlayerSquadButtonClicked } from "./Map/ui/playerSquad";
-import {Map} from "immutable";
+import { Map } from "immutable";
 
 const wait = (n: number) =>
   new Promise<void>((resolve) => setTimeout(() => resolve(), n));
@@ -46,8 +46,17 @@ export function endToEndTesting(game: Phaser.Game) {
       mapScene: scn,
       mapSquad: squad,
     });
+    assert("MapScene is paused after clicking 'Move'", scn.isPaused, true);
 
     clickCell(scn, 7, 5);
+
+    scn.evs.SquadDispatched.once((id) => {
+      assert(
+        "MapScene is no longer paused selecting move destination",
+        scn.isPaused,
+        false
+      );
+    });
 
     scn.evs.SquadArrivedInfoMessageCompleted.once((portraitKey: string) => {
       scn.evs.CloseSquadArrivedInfoMessage.emit(portraitKey);
@@ -70,6 +79,12 @@ export function endToEndTesting(game: Phaser.Game) {
       game.events.once("MapSceneCreated", (mapScene: MapScene) => {
         mapScene.evs.DispatchWindowRendered.once(
           async ({ squads, container, scene }) => {
+            assert(
+              "MapScene is paused when dispatch window is rendered",
+              scene.isPaused,
+              true
+            );
+
             const dispatched = await DispatchSquads(
               squads,
               container,
@@ -82,6 +97,7 @@ export function endToEndTesting(game: Phaser.Game) {
             });
 
             clickCell(mapScene, 6, 4);
+
             mapScene.evs.SquadArrivedInfoMessageCompleted.once(
               (portraitKey: string) => {
                 mapScene.evs.CloseSquadArrivedInfoMessage.emit(portraitKey);
@@ -121,6 +137,11 @@ async function DispatchSquads(
     "Selected squad was dispached",
     dispatched.id,
     (squads.first() as MapSquad).id
+  );
+  assert(
+    "MapScene is no longer paused after team is dispatched",
+    scene.isPaused,
+    false
   );
   return dispatched;
 }

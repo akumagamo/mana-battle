@@ -72,12 +72,9 @@ export const handleDispatchSquad = async (
 ) => {
   container.destroy();
 
-  await scene.dispatchSquad(mapSquad.squad);
+  scene.dispatchSquad(mapSquad.squad);
   scene.enableInput();
   scene.isPaused = false;
-
-  await delay(scene, 100);
-
   scene.changeMode({ type: "SQUAD_SELECTED", id: mapSquad.squad.id });
 
   let squad = scene.getMapSquad(mapSquad.squad.id);
@@ -90,4 +87,6 @@ export const handleDispatchSquad = async (
       duration: 500,
     },
   ]);
+
+  scene.evs.SquadDispatched.emit(mapSquad.id);
 };
