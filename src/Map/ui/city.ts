@@ -1,6 +1,7 @@
 import { Container } from "../../Models";
 import text from "../../UI/text";
-import { getCity, MapScene } from "../MapScene";
+import { MapScene } from "../MapScene";
+import { getCity, getForce } from "../Model";
 
 export default async (
   scene: MapScene,
@@ -8,12 +9,12 @@ export default async (
   baseY: number,
   id: string
 ): Promise<void> => {
-  const city = await getCity(scene.state, id);
+  const city = getCity(scene.state, id);
 
   text(20, baseY, city.name, uiContainer, scene);
 
   if (city.force) {
-    const force = scene.getForce(city.force);
+    const force = getForce(scene.state, city.force);
     text(1000, baseY, `Controlled by ${force.name}`, uiContainer, scene);
   }
 };

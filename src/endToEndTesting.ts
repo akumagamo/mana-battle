@@ -3,7 +3,7 @@ import CharaCreationScene from "./CharaCreation/CharaCreationScene";
 import { MapScene } from "./Map/MapScene";
 import { PLAYER_FORCE } from "./constants";
 import { Unit } from "./Unit/Model";
-import { ListSquadsScene } from "./Squad/ListSquadsScene";
+import { ListSquadsScene } from "./Squad/ListSquadsScene/ListSquadsScene";
 import UnitListScene from "./Unit/UnitListScene";
 import BoardScene from "./Board/InteractiveBoardScene";
 import { handleDispatchSquad } from "./Map/dispatchWindow";

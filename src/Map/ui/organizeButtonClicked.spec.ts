@@ -1,8 +1,8 @@
-import { organize } from "./organize";
+import { organizeButtonClicked } from "./organizeButtonClicked";
 import { Map, Set } from "immutable";
-import { createMapSquad } from "../Model";
+import { createMapSquad, MapState } from "../Model";
 import { makeSquad } from "../../Squad/Model";
-import { run } from "../../Squad/ListSquadsScene";
+import { run } from "../../Squad/ListSquadsScene/ListSquadsScene";
 
 //ListSquadsScene  is now a mock constructor
 jest.mock("../../Squad/ListSquadsScene", () => ({
@@ -23,40 +23,38 @@ jest.mock("../MapScene", () => ({
   MapScene: {},
 }));
 
+const defaultProps = {
+  turnOff: jest.fn(),
+  state: {
+    id: "a",
+    name: "a",
+    author: "a",
+    description: "a",
+    cells: [
+      [1, 2, 3],
+      [1, 2, 3],
+    ],
+    forces: [],
+    cities: [],
+    squads: Map({
+      a: createMapSquad(
+        makeSquad({ id: "s1", members: Map(), force: "f1", leader: "u1" })
+      ),
+    }),
+    units: Map(),
+    ai: Map(),
+    dispatchedSquads: Set(),
+  } as MapState,
+  scene: { manager: { stop: jest.fn(), start: jest.fn() } as any },
+};
+
 beforeEach(() => {
   //@ts-ignore
   run.mockClear();
 });
 
 it("should start ListSquadScene when clicked", () => {
-  const manager = {
-    stop: () => console.log(`aaaa`),
-  };
-
-  organize(
-    {
-      id: "a",
-      name: "a",
-      author: "a",
-      description: "a",
-      cells: [
-        [1, 2, 3],
-        [1, 2, 3],
-      ],
-      forces: [],
-      cities: [],
-      squads: Map({
-        a: createMapSquad(
-          makeSquad({ id: "s1", members: Map(), force: "f1", leader: "u1" })
-        ),
-      }),
-      units: Map(),
-      ai: Map(),
-      dispatchedSquads: Set(),
-    },
-    //@ts-ignore
-    manager
-  );
+  organizeButtonClicked(defaultProps, () => {});
 });
 
 it.todo("should stop MapScene when clicked");

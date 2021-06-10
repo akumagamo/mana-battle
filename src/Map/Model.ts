@@ -1,6 +1,6 @@
-import { SquadRecord } from "../Squad/Model";
-import { Unit, UnitIndex } from "../Unit/Model";
 import { Map, List, Set } from "immutable";
+import { SquadRecord } from "../Squad/Model";
+import { UnitIndex } from "../Unit/Model";
 export type UnitId = string;
 export type ForceId = string;
 export type CityId = string;
@@ -204,3 +204,16 @@ export const translateTiles = (tiles: CellNumber[][]) => {
 export type BattleFieldMap = {
   [x: string]: MapState;
 };
+
+export function getCity(state: MapState, id: string) {
+  return state.cities.find((c) => c.id === id);
+}
+export function getForceUnits(state: MapState, force: string) {
+  return state.units.filter((u) => u.force === force);
+}
+export function getForceSquads(state: MapState, force: string) {
+  return state.squads.filter((u) => u.squad.force === force);
+}
+export function getForce(state: MapState, id: string) {
+  return state.forces.find((f) => f.id === id);
+}

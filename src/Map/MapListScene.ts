@@ -2,15 +2,9 @@ import Phaser from "phaser";
 import { preload } from "../preload";
 import button from "../UI/button";
 import maps from "../maps";
-import { MapCommands } from "./MapCommands";
-import { toMapSquad } from "../Unit/Model";
 import { Container } from "../Models";
 import { MapState } from "./Model";
 import { fadeIn } from "../UI/Transition";
-import { List, Set } from "immutable";
-import { SquadRecord } from "../Squad/Model";
-
-const GAME_SPEED = parseInt(process.env.SPEED);
 
 export default class MapListScene extends Phaser.Scene {
   constructor(public speed: number) {
@@ -34,11 +28,11 @@ export default class MapListScene extends Phaser.Scene {
   ) => {
     const map = map_();
     button(0, index * 100, map.name, container, this, () =>
-      this.onMapSelected(index)
+      this.onMapSelected()
     );
   };
 
-  onMapSelected(n: number) {
+  onMapSelected() {
     // const map = maps[n]();
 
     // this.cameras.main.fadeOut(1000/ GAME_SPEED, 0, 0, 0);

@@ -1,17 +1,16 @@
-import * as Squad from "../Squad/Model";
-import Board from "../Board/StaticBoardScene";
-import { Pointer, Container } from "../Models";
-import button from "../UI/button";
-import panel from "../UI/panel";
-import { PLAYER_FORCE, SCREEN_WIDTH } from "../constants";
-import text from "../UI/text";
-import menu from "../Backgrounds/menu";
-import { UnitIndex } from "../Unit/Model";
-import { List, Map, Set } from "immutable";
-import EditSquadModal, { EditSquadModalEvents } from "./EditSquadModal";
-import { SceneEventFactory } from "../utils";
-import { GAME_SPEED } from "../env";
-import Phaser from "phaser";
+import {List, Map, Set} from "immutable";
+import menu from "../../Backgrounds/menu";
+import Board from "../../Board/StaticBoardScene";
+import {SCREEN_WIDTH, PLAYER_FORCE} from "../../constants";
+import {GAME_SPEED} from "../../env";
+import {Container, Pointer} from "../../Models";
+import button from "../../UI/button";
+import panel from "../../UI/panel";
+import text from "../../UI/text";
+import {UnitIndex} from "../../Unit/Model";
+import {SceneEventFactory} from "../../utils";
+import EditSquadModal, {EditSquadModalEvents} from "../EditSquadModal";
+import * as Squad from "../Model"
 
 type CreateParams = {
   squads: Squad.Index;

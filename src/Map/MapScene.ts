@@ -4,7 +4,7 @@ import button from "../UI/button";
 import { Container, Image, Pointer } from "../Models";
 import panel from "../UI/panel";
 import { squadsFromForce as getSquadsFromForce, getPathTo } from "./api";
-import { Vector, MapSquad, MapState, Force, City } from "./Model";
+import { Vector, MapSquad, MapState, Force, getCity, getForce } from "./Model";
 import {
   SCREEN_WIDTH,
   SCREEN_HEIGHT,
@@ -33,9 +33,10 @@ import { cellSize, CHARA_MAP_SCALE } from "./config";
 import { screenToCellPosition, cellToScreenPosition } from "./board/position";
 import * as CombatScene from "../Combat/CombatScene";
 import { handleMovePlayerSquadButtonClicked } from "./ui/playerSquad";
-import { organize } from "./ui/organize";
+import { organizeButtonClicked } from "./ui/organizeButtonClicked";
 import { EditSquadModalEvents } from "../Squad/EditSquadModal";
 import dispatchWindow from "./dispatchWindow";
+import returnButtonClicked from "../Squad/ListSquadsScene/events/returnButtonClicked";
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 
@@ -198,8 +199,15 @@ export class MapScene extends Phaser.Scene {
     this.evs.CloseSquadArrivedInfoMessage.on(
       this.handleCloseSquadArrivedInfoMessage.bind(this)
     );
-    this.evs.OrganizeButtonClicked.on(
-      this.handleOrganizeButtonClicked.bind(this)
+    this.evs.OrganizeButtonClicked.on(() =>
+      organizeButtonClicked(
+        {
+          turnOff: this.turnOff.bind(this),
+          state: this.state,
+          scene: this.scene,
+        },
+        (listScene) => returnButtonClicked(this)(listScene)
+      )
     );
   }
 
@@ -403,7 +411,7 @@ export class MapScene extends Phaser.Scene {
 
   async selectCity(id: string) {
     this.refreshUI();
-    const { x, y } = await getCity(this.state, id);
+    const { x, y } = getCity(this.state, id);
 
     this.signal("selectCity", [
       { type: "MOVE_CAMERA_TO", x, y, duration: 500 },
@@ -411,7 +419,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   updateState(state: MapState) {
-    this.state = state;
+    this.state = { ...this.state, ...state };
   }
 
   async create(data: MapCommands[]) {
@@ -630,10 +638,6 @@ export class MapScene extends Phaser.Scene {
     return this.state.cities.find((c) => c.x === x && c.y === y);
   }
 
-  getForce(id: string) {
-    return this.state.forces.find((f) => f.id === id);
-  }
-
   getDefeatedForces(): Set<string> {
     return this.state.forces
       .map((f) => f.id)
@@ -819,6 +823,8 @@ export class MapScene extends Phaser.Scene {
     this.mode = DEFAULT_MODE;
 
     for (const ev in this.evs) this.events.off(ev);
+
+    this.scene.manager.stop("MapScene");
   }
 
   tintClickableCells(cell: MapTile) {
@@ -873,10 +879,10 @@ export class MapScene extends Phaser.Scene {
   }
 
   async dispatchSquad(squad: SquadRecord) {
-    const force = this.getForce(PLAYER_FORCE);
+    const force = getForce(this.state, PLAYER_FORCE);
     let mapSquad = toMapSquad(
       squad,
-      await getCity(this.state, force.initialPosition)
+      getCity(this.state, force.initialPosition)
     );
 
     this.state.dispatchedSquads = this.state.dispatchedSquads.add(squad.id);
@@ -1130,23 +1136,9 @@ export class MapScene extends Phaser.Scene {
       }) as Promise<void>;
     } else return Promise.resolve();
   }
-  handleOrganizeButtonClicked() {
-    this.turnOff();
-    organize(this.state, this.scene.manager);
-  }
   handleDispatchClick() {
     this.disableMapInput();
     this.isPaused = true;
     dispatchWindow(this);
   }
-}
-
-export function getCity(state: MapState, id: string) {
-  return state.cities.find((c) => c.id === id);
-}
-export function getForceUnits(state: MapState, force: string) {
-  return state.units.filter((u) => u.force === force);
-}
-export function getForceSquads(state: MapState, force: string) {
-  return state.squads.filter((u) => u.squad.force === force);
 }
