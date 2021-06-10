@@ -1,5 +1,4 @@
 import Phaser from "phaser";
-import { getOptions } from "../DB";
 import { preload } from "../preload";
 import button from "../UI/button";
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../constants";
@@ -16,8 +15,8 @@ export default class TitleScene extends Phaser.Scene {
   charas: Chara[] = [];
   container: Container | null = null;
   sceneEvents = {
-    NewGameButtonClicked: this.handleNewGameClick.bind(this)
-  }
+    NewGameButtonClicked: this.handleNewGameClick.bind(this),
+  };
   constructor() {
     super("TitleScene");
   }
@@ -80,7 +79,14 @@ export default class TitleScene extends Phaser.Scene {
       window.document.body.requestFullscreen();
     });
 
-    button(SCREEN_WIDTH / 2, 550, "New Game", this.container, this, this.sceneEvents.NewGameButtonClicked.bind(this));
+    button(
+      SCREEN_WIDTH / 2,
+      550,
+      "New Game",
+      this.container,
+      this,
+      this.sceneEvents.NewGameButtonClicked.bind(this)
+    );
 
     button(SCREEN_WIDTH / 2, 620, "Options", this.container, this, () => {
       this.scene.transition({
@@ -102,10 +108,10 @@ export default class TitleScene extends Phaser.Scene {
 
     if (this.music) this.music.destroy();
 
-    if (getOptions().musicEnabled) {
-      this.music = this.sound.add(key);
-      this.music.play();
-    }
+    //    if (getOptions().musicEnabled) {
+    this.music = this.sound.add(key);
+    this.music.play();
+    //   }
   }
 
   async mapsEvent() {

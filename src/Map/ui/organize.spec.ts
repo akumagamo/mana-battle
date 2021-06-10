@@ -54,7 +54,8 @@ it("should start ListSquadScene when clicked", () => {
       ai: Map(),
       dispatchedSquads: Set(),
     },
-    manager as Phaser.Scenes.SceneManager
+    //@ts-ignore
+    manager
   );
 });
 

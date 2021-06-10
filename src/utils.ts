@@ -1,7 +1,8 @@
+import { Map } from "immutable";
 import { Vector } from "./Map/Model";
 
-export const indexById = (list: { id: string }[]) =>
-  list.reduce((acc, curr) => ({ ...acc, [curr.id]: curr }), {});
+export const indexById = (xs: Map<string, { id: string }>, x: { id: string }) =>
+  xs.set(x.id, x);
 
 export const maybeZero = (v: number | undefined | null) => (v ? v : 0);
 

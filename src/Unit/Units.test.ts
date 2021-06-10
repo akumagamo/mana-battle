@@ -1,7 +1,4 @@
-import { items } from '../defaultData';
-import { getActualStat } from './Model';
-import { fromJSON } from './serializer';
-test('Obtains actual stat value', () => {
+test.todo('Obtains actual stat value', () => {
 
   // TODO: test with specific char classes / equips
   // var unit = fromJSON(1);

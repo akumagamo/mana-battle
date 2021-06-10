@@ -1,7 +1,6 @@
 import { Modifier, ItemSlot, ItemMap, ItemType } from '../Item/Model';
 import { sum } from '../utils/math';
 import { Container } from '../Models';
-import { getItemsFromDB } from '../DB';
 import { UnitAttacks } from './Skills';
 import { MapSquad, Vector } from '../Map/Model';
 import { SquadRecord } from '../Squad/Model';
@@ -136,7 +135,7 @@ function getItemModifier({
 }) {
   const itemId = unit.equips[slot];
 
-  const item = items[itemId];
+  const item = items.get(itemId);
 
   if (!item) {
     throw new Error('Invalid State: Item should be in index');
@@ -197,12 +196,13 @@ export type Job = {
 const slash: Skill = {
   name: 'slash',
   formula: (unit) => {
-    const items = getItemsFromDB();
-    const weapon = items[unit.equips.mainHand];
-    const str = getActualStat('str', items, unit);
-    const dex = getActualStat('dex', items, unit);
+    // const items = getItemsFromDB();
+    // const weapon = items.get( unit.equips.mainHand );
+    // const str = getActualStat('str', items, unit);
+    // const dex = getActualStat('dex', items, unit);
 
-    return str + dex / 4 + weapon.modifiers.atk;
+    // return str + dex / 4 + weapon.modifiers.atk;
+     return 3
   },
   attacksPerRow: {
     front: 2,

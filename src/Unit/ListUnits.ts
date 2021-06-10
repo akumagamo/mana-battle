@@ -1,4 +1,3 @@
-import * as api from "../DB";
 import { Text, Image } from "../Models";
 import { Chara } from "../Chara/Chara";
 import { Unit, UnitIndex } from "./Model";
@@ -23,12 +22,13 @@ export class ListUnitsScene extends Phaser.Scene {
   }
 
   getUnits() {
-    return api
-      .getUnitsFromDB()
-      .slice(
-        this.page * this.itemsPerPage,
-        this.page * this.itemsPerPage + this.itemsPerPage
-      );
+    // return api
+    //   .getUnitsFromDB()
+    //   .slice(
+    //     this.page * this.itemsPerPage,
+    //     this.page * this.itemsPerPage + this.itemsPerPage
+    //   );
+    return {} as UnitIndex
   }
   create() {
     menu(this);

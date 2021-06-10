@@ -5,7 +5,6 @@ import { ItemSlot } from "../Item/Model";
 import { ItemDetailWindowScene } from "../Item/ItemDetailWindowScene";
 import text from "../UI/text";
 import button from "../UI/button";
-import * as api from "../DB";
 import panel from "../UI/panel";
 
 export class UnitDetailsBarScene extends Phaser.Scene {
@@ -116,54 +115,54 @@ export class UnitDetailsBarScene extends Phaser.Scene {
     const boxSize = iconSize + padding + margin;
 
     const item = (x: number, y: number, slotId: ItemSlot) => {
-      const itemId = unit.equips[slotId];
-      const slot = itemId !== "none" ? api.getItemFromDB(itemId) : null;
+      //const itemId = unit.equips[slotId];
+      //const slot = itemId !== "none" ? api.getItemFromDB(itemId) : null;
 
-      const bg = this.add.image(x, y, "panel");
+      //const bg = this.add.image(x, y, "panel");
 
-      bg.displayWidth = iconSize + padding;
-      bg.displayHeight = iconSize + padding;
+      //bg.displayWidth = iconSize + padding;
+      //bg.displayHeight = iconSize + padding;
 
-      this.container?.add(bg);
+      //this.container?.add(bg);
 
-      // TODO: implement adding a item to an empty slot
-      if (slot) {
-        const icon = this.add.image(x, y, slot.id);
-        icon.displayWidth = iconSize;
-        icon.displayHeight = iconSize;
+      //// TODO: implement adding a item to an empty slot
+      //if (slot) {
+      //  const icon = this.add.image(x, y, slot.id);
+      //  icon.displayWidth = iconSize;
+      //  icon.displayHeight = iconSize;
 
-        icon.setInteractive();
-        icon.on("pointerdown", () => {
-          this.itemDetail?.render(slot.id, unit.id, () => this.render(unit));
-          //this.renderItemDetails()
-        });
+      //  icon.setInteractive();
+      //  icon.on("pointerdown", () => {
+      //    this.itemDetail?.render(slot.id, unit.id, () => this.render(unit));
+      //    //this.renderItemDetails()
+      //  });
 
-        this.container?.add(icon);
+      //  this.container?.add(icon);
 
-        if (this.container)
-          text(
-            x + iconSize / 2 + margin + padding,
-            y,
-            slot.name,
-            this.container,
-            this
-          );
-      }
+      //  if (this.container)
+      //    text(
+      //      x + iconSize / 2 + margin + padding,
+      //      y,
+      //      slot.name,
+      //      this.container,
+      //      this
+      //    );
+      // }
     };
 
-    item(baseX, baseY, "mainHand");
-    item(baseX, baseY + boxSize, "offHand");
-    item(baseX + boxSize + textWidth, baseY, "chest");
-    item(baseX + boxSize + textWidth, baseY + boxSize, "ornament");
+    // item(baseX, baseY, "mainHand");
+    // item(baseX, baseY + boxSize, "offHand");
+    // item(baseX + boxSize + textWidth, baseY, "chest");
+    // item(baseX + boxSize + textWidth, baseY + boxSize, "ornament");
   }
 
   unitControls(unit: Unit) {
     if (this.container && this.showToggleHat)
       button(600, 20, "Toggle Hat", this.container, this, () => {
-        api.saveUnitIntoDB({
-          ...unit,
-          style: { ...unit.style, displayHat: !unit.style.displayHat },
-        });
+        // api.saveUnitIntoDB({
+        //   ...unit,
+        //   style: { ...unit.style, displayHat: !unit.style.displayHat },
+        // });
 
         if (this.onHatToggle) this.onHatToggle(unit);
       });

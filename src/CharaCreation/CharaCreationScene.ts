@@ -1,11 +1,11 @@
 import { SKIN_COLORS, HAIR_COLORS } from "../Chara/animations/constants";
 import { Chara } from "../Chara/Chara";
 import { PUBLIC_URL, SCENES, SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
-import { classes, classLabels } from "../defaultData";
 import { Container } from "../Models";
 import button from "../UI/button";
 import panel from "../UI/panel";
 import text from "../UI/text";
+import {classes, classLabels} from "../Unit/Jobs";
 import { makeUnit } from "../Unit/makeUnit";
 import { genderLabels, genders, HAIR_STYLES, Unit } from "../Unit/Model";
 

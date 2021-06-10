@@ -1147,3 +1147,6 @@ export function getCity(state: MapState, id: string) {
 export function getForceUnits(state: MapState, force: string) {
   return state.units.filter((u) => u.force === force);
 }
+export function getForceSquads(state: MapState, force: string) {
+  return state.squads.filter((u) => u.squad.force === force);
+}

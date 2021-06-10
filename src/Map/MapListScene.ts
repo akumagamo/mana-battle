@@ -4,7 +4,6 @@ import button from "../UI/button";
 import maps from "../maps";
 import { MapCommands } from "./MapCommands";
 import { toMapSquad } from "../Unit/Model";
-import { getSquadsFromDB, getUnitsFromDB } from "../DB";
 import { Container } from "../Models";
 import { MapState } from "./Model";
 import { fadeIn } from "../UI/Transition";
@@ -40,39 +39,39 @@ export default class MapListScene extends Phaser.Scene {
   };
 
   onMapSelected(n: number) {
-    const map = maps[n]();
+    // const map = maps[n]();
 
-    this.cameras.main.fadeOut(1000/ GAME_SPEED, 0, 0, 0);
+    // this.cameras.main.fadeOut(1000/ GAME_SPEED, 0, 0, 0);
 
-    const alliedUnits = getUnitsFromDB();
+    // const alliedUnits = getUnitsFromDB();
 
-    const firstSquad = getSquadsFromDB().first<SquadRecord>().id;
+    // const firstSquad = getSquadsFromDB().first<SquadRecord>().id;
 
-    let commands: MapCommands[] = [
-      {
-        type: "UPDATE_STATE",
-        target: {
-          ...map,
-          dispatchedSquads: Set(List([firstSquad]).concat(map.squads.keySeq())),
-          squads: map.squads.merge(
-            getSquadsFromDB().map((s) =>
-              toMapSquad(
-                s,
-                map.cities.find((c) => c.id === "castle1")
-              )
-            )
-          ),
+    // let commands: MapCommands[] = [
+    //   {
+    //     type: "UPDATE_STATE",
+    //     target: {
+    //       ...map,
+    //       dispatchedSquads: Set(List([firstSquad]).concat(map.squads.keySeq())),
+    //       squads: map.squads.merge(
+    //         getSquadsFromDB().map((s) =>
+    //           toMapSquad(
+    //             s,
+    //             map.cities.find((c) => c.id === "castle1")
+    //           )
+    //         )
+    //       ),
 
-          units: map.units.merge(alliedUnits),
-        },
-      },
-    ];
+    //       units: map.units.merge(alliedUnits),
+    //     },
+    //   },
+    // ];
 
-    this.scene.transition({
-      target: "MapScene",
-      duration: 1000,
-      moveBelow: true,
-      data: commands,
-    });
+    // this.scene.transition({
+    //   target: "MapScene",
+    //   duration: 1000,
+    //   moveBelow: true,
+    //   data: commands,
+    // });
   }
 }

@@ -1,6 +1,5 @@
 import { List, Map, Set } from "immutable";
 import { CellNumber, City, MapState } from "../Map/Model";
-import { getSquadsFromDB } from "../DB";
 import { makeUnit } from "../Unit/makeUnit";
 import { toMapSquad } from "../Unit/Model";
 import { CPU_FORCE, PLAYER_FORCE } from "../constants";
@@ -28,7 +27,6 @@ const tiles: CellNumber[][] = [
   [3, 3, 3, 3, 3, 3, 3, 2, 1, 2, 0, 0, 1, 2],
 ];
 const map: () => MapState = () => {
-  const playerSquad = Object.keys(getSquadsFromDB())[0];
 
   return {
     id: "greenHarbor",
@@ -71,7 +69,7 @@ const map: () => MapState = () => {
       {
         id: PLAYER_FORCE,
         name: "Lankel Knights",
-        squads: [playerSquad],
+        squads: [],
         relations: { [CPU_FORCE]: "hostile" },
         initialPosition: "castle1",
       },

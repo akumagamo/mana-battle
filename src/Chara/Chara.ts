@@ -10,7 +10,7 @@ import bowAttack from "./animations/bowAttack";
 import initial from "./animations/initial";
 import hpBar from "./hpBar";
 import { PUBLIC_URL } from "../constants";
-import { classes } from "../defaultData";
+import {classes} from "../Unit/Jobs";
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 

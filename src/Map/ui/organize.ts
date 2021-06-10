@@ -3,19 +3,16 @@ import * as ListSquads from "../../Squad/ListSquadsScene";
 import { Map } from "immutable";
 import { toMapSquad } from "../../Unit/Model";
 import { MapState } from "../Model";
-import { getCity } from "../MapScene";
+import { getCity, getForceUnits, getForceSquads } from "../MapScene";
+import { indexById } from "../../utils";
 
 export function organize(state: MapState, manager: Phaser.Scenes.SceneManager) {
-
   manager.stop("MapScene");
 
   ListSquads.run(
     {
-      units: state.units.filter((u) => u.force === PLAYER_FORCE),
-      squads: state.squads
-        .filter((s) => s.squad.force === PLAYER_FORCE)
-        .map((s) => s.squad)
-        .reduce((xs, x) => xs.set(x.id, x), Map()),
+      units: getForceUnits(state, PLAYER_FORCE),
+      squads: getForceSquads(state, PLAYER_FORCE).map((s) => s.squad),
       dispatched: state.dispatchedSquads,
       onReturnClick: (listSquadScene) => {
         state.units = state.units.merge(listSquadScene.units);

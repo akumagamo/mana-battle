@@ -98,9 +98,7 @@ export interface Item {
   modifiers: ItemModifiers;
 }
 
-export type ItemMap = {
-  [id: string]: Item;
-};
+export type ItemMap = Map<string, Item>
 
 export type ItemModifiers = {
   [x in Modifier]: number;
