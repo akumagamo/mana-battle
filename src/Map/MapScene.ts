@@ -1141,6 +1141,9 @@ export class MapScene extends Phaser.Scene {
   }
 }
 
-export async function getCity(state: MapState, id: string): Promise<City> {
+export function getCity(state: MapState, id: string) {
   return state.cities.find((c) => c.id === id);
+}
+export function getForceUnits(state: MapState, force: string) {
+  return state.units.filter((u) => u.force === force);
 }
