@@ -403,7 +403,7 @@ export class MapScene extends Phaser.Scene {
 
   async selectCity(id: string) {
     this.refreshUI();
-    const { x, y } = await this.getCity(id);
+    const { x, y } = await getCity(this.state, id);
 
     this.signal("selectCity", [
       { type: "MOVE_CAMERA_TO", x, y, duration: 500 },
@@ -633,10 +633,6 @@ export class MapScene extends Phaser.Scene {
   getForce(id: string) {
     return this.state.forces.find((f) => f.id === id);
   }
-
-  getCity = async (id: string): Promise<City> => {
-    return this.state.cities.find((c) => c.id === id);
-  };
 
   getDefeatedForces(): Set<string> {
     return this.state.forces
@@ -878,7 +874,10 @@ export class MapScene extends Phaser.Scene {
 
   async dispatchSquad(squad: SquadRecord) {
     const force = this.getForce(PLAYER_FORCE);
-    let mapSquad = toMapSquad(squad, await this.getCity(force.initialPosition));
+    let mapSquad = toMapSquad(
+      squad,
+      await getCity(this.state, force.initialPosition)
+    );
 
     this.state.dispatchedSquads = this.state.dispatchedSquads.add(squad.id);
 
@@ -1133,11 +1132,15 @@ export class MapScene extends Phaser.Scene {
   }
   handleOrganizeButtonClicked() {
     this.turnOff();
-    organize(this);
+    organize(this.state, this.scene.manager);
   }
   handleDispatchClick() {
     this.disableMapInput();
     this.isPaused = true;
     dispatchWindow(this);
   }
+}
+
+export async function getCity(state: MapState, id: string): Promise<City> {
+  return state.cities.find((c) => c.id === id);
 }
