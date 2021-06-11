@@ -22,7 +22,7 @@ export type MemberIndex = Map<string, MemberRecord>;
 
 export type Index = Map<string, SquadRecord>;
 
-export const makeSquad = Record(
+export const createSquad = Record(
   {
     id: "",
     members: Map<string, MemberRecord>(),
@@ -43,7 +43,7 @@ export const squadBuilder = ({
   leader: string;
   members: [string, number, number][];
 }) =>
-  makeSquad({
+  createSquad({
     id,
     members: members.reduce(
       (xs, [id, x, y]) => xs.set(id, makeMember({ id, x, y })),

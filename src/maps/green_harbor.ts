@@ -3,7 +3,7 @@ import { CellNumber, City, MapState } from "../Map/Model";
 import { makeUnit } from "../Unit/makeUnit";
 import { toMapSquad } from "../Unit/Model";
 import { CPU_FORCE, PLAYER_FORCE } from "../constants";
-import { makeSquad, makeMember } from "../Squad/Model";
+import { createSquad, makeMember } from "../Squad/Model";
 
 const enemyCastle: City = {
   id: "castle2",
@@ -37,7 +37,7 @@ const map: () => MapState = () => {
     cells: tiles,
     squads: List([
       toMapSquad(
-        makeSquad({
+        createSquad({
           id: "squad1",
           leader: "enemy1",
           members: Map({
@@ -51,7 +51,7 @@ const map: () => MapState = () => {
         { x: 6, y: 4 }
       ),
       toMapSquad(
-        makeSquad({
+        createSquad({
           id: "squad2",
           leader: "enemy5",
           members: Map({

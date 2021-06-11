@@ -1,7 +1,7 @@
 import { initiativeList, runCombat } from "./turns";
 import { assignSquad } from "../Unit/Model";
 import { makeUnit } from "../Unit/makeUnit";
-import { makeSquad, makeMember } from "../Squad/Model";
+import { createSquad, makeMember } from "../Squad/Model";
 import { List, Map } from "immutable";
 import { equals } from "../test/utils";
 
@@ -30,7 +30,7 @@ test("Combat should have the expected outcome", () => {
   });
 
   const squadIndex = Map({
-    s1: makeSquad({
+    s1: createSquad({
       id: "s1",
       leader: "0",
       force: "player",
@@ -40,7 +40,7 @@ test("Combat should have the expected outcome", () => {
         "2": makeMember({ id: "2", x: 3, y: 2 }),
       }),
     }),
-    s2: makeSquad({
+    s2: createSquad({
       id: "s2",
       leader: "3",
       force: "cpu",

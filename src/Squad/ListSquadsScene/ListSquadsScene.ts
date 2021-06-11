@@ -186,7 +186,7 @@ export class ListSquadsScene extends Phaser.Scene {
 
     this.editSquadModalEvents = EditSquadModal(
       this,
-      Squad.makeSquad({
+      Squad.createSquad({
         id: "squad+" + new Date().getTime(),
         members: Map(),
         force: PLAYER_FORCE,

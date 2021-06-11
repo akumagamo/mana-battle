@@ -1,35 +1,64 @@
 import { organizeButtonClicked } from "./organizeButtonClicked";
 import { Map, Set } from "immutable";
-import { createMapSquad, MapState } from "../Model";
-import { makeSquad } from "../../Squad/Model";
+import { createCity, createForce, createMapSquad, MapState } from "../Model";
+import { createSquad } from "../../Squad/Model";
 import { run } from "../../Squad/ListSquadsScene/ListSquadsScene";
+import { CPU_FORCE, PLAYER_FORCE } from "../../constants";
+import { createUnit } from "../../Unit/Model";
 
-//ListSquadsScene  is now a mock constructor
-jest.mock("../../Squad/ListSquadsScene/ListSquadsScene", () => ({
-  run: jest.fn(),
-}));
+jest.mock("../../Squad/ListSquadsScene/ListSquadsScene");
 
 const defaultProps = {
   turnOff: jest.fn(),
   state: {
-    id: "a",
-    name: "a",
-    author: "a",
-    description: "a",
+    id: "test",
+    name: "test_map",
+    author: "lfarroco",
+    description: "test map",
     cells: [
-      [1, 2, 3],
-      [1, 2, 3],
+      [1, 1, 1],
+      [1, 1, 1],
+      [1, 1, 1],
     ],
-    forces: [],
-    cities: [],
+    forces: [
+      createForce(PLAYER_FORCE, "Player", ["player_squad_1"], "city_1"),
+      createForce(CPU_FORCE, "CPU", ["cpu_squad_1"], "city_2"),
+    ],
+    cities: [
+      { ...createCity("city_1", 1, 1), force: PLAYER_FORCE },
+      { ...createCity("city_2", 3, 3), force: CPU_FORCE },
+    ],
     squads: Map({
-      a: createMapSquad(
-        makeSquad({ id: "s1", members: Map(), force: "f1", leader: "u1" })
-      ),
+      player_squad_1: {
+        ...createMapSquad(
+          createSquad({
+            id: "player_squad_1",
+            members: Map(),
+            force: PLAYER_FORCE,
+            leader: "player_unit_1",
+          })
+        ),
+        pos: { x: 1, y: 1 },
+      },
+
+      cpu_squad_1: {
+        ...createMapSquad(
+          createSquad({
+            id: "cpu_squad_1",
+            members: Map(),
+            force: PLAYER_FORCE,
+            leader: "cpu_unit_1",
+          })
+        ),
+        pos: { x: 3, y: 3 },
+      },
     }),
-    units: Map(),
+    units: Map({
+      player_unit_1: createUnit("player_unit_1"),
+      cpu_squad_1: createUnit("cpu_squad_1"),
+    }),
     ai: Map(),
-    dispatchedSquads: Set(),
+    dispatchedSquads: Set(["player_unit_1", "cpu_squad_1"]),
   } as MapState,
   scene: { manager: { stop: jest.fn(), start: jest.fn() } as any },
 };

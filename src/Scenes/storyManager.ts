@@ -5,7 +5,7 @@ import { startCharaCreationScene } from "../CharaCreation/CharaCreationScene";
 import { MapCommands } from "../Map/MapCommands";
 import maps from "../maps";
 import { startMapScene } from "../Map/MapScene";
-import { makeSquad, makeMember, squadBuilder } from "../Squad/Model";
+import { createSquad, makeMember, squadBuilder } from "../Squad/Model";
 import { toMapSquad } from "../Unit/Model";
 import TitleScene from "./TitleScene";
 import { makeUnit } from "../Unit/makeUnit";
@@ -31,7 +31,7 @@ export const storyManager = async (parent: TitleScene) => {
   // const answers = await startTheaterScene(parent, chapter_1_intro(unit));
   // console.log(`answers`, answers);
 
-  const firstSquad = makeSquad({
+  const firstSquad = createSquad({
     id: "1",
     force: PLAYER_FORCE,
     members: Map({

@@ -1,5 +1,5 @@
 import { Map } from "immutable";
-import { makeSquad, makeMember, squadBuilder } from "../Squad/Model";
+import { createSquad, makeMember, squadBuilder } from "../Squad/Model";
 import { printSquad } from "../Squad/Model.test";
 import { equals } from "../test/utils";
 import { makeUnit } from "../Unit/makeUnit";
@@ -31,7 +31,7 @@ test("Should get correct melee targets", () => {
   // 4 -> 6
 
   const squadIndex = Map({
-    "1": makeSquad({
+    "1": createSquad({
       id: "1",
       force: "player",
       leader: "0",
@@ -43,7 +43,7 @@ test("Should get correct melee targets", () => {
         "4": makeMember({ id: "4", x: 1, y: 3 }),
       }),
     }),
-    "2": makeSquad({
+    "2": createSquad({
       id: "2",
       force: "cpu",
       leader: "5",

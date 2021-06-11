@@ -35,6 +35,7 @@ export type MapState = {
   squads: Map<string, MapSquad>;
   units: UnitIndex;
   ai: Map<string, AICommand>;
+  /** Contains the ids from all dispatched squads (from all forces). Should this move to the force? */
   dispatchedSquads: Set<string>;
 };
 export type Force = {
@@ -45,6 +46,15 @@ export type Force = {
   initialPosition: string;
 };
 
+export function createForce(
+  id: ForceId,
+  name: string,
+  squads: string[],
+  initialPosition: string
+): Force {
+  return { id, name, squads, initialPosition, relations: {} };
+}
+
 export type City = {
   id: CityId;
   name: string;
@@ -53,6 +63,16 @@ export type City = {
   force: ForceId | null;
   type: "town" | "castle" | "shop";
 };
+export function createCity(id: string, x: number, y: number): City {
+  return {
+    id,
+    name: "",
+    x,
+    y,
+    force: null,
+    type: "town",
+  };
+}
 
 export type Vector = { x: number; y: number };
 export type ValidStep = { target: Vector; steps: Vector[] };
@@ -195,7 +215,7 @@ export type BattleFieldMap = {
   [x: string]: MapState;
 };
 
-export function getCity(state: MapState, id: string) {
+export function getCity(state: MapState, id: string): City {
   return state.cities.find((c) => c.id === id);
 }
 export function getForceUnits(state: MapState, force: string) {

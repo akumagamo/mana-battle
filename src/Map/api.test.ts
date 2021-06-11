@@ -1,227 +1,71 @@
 // @ts-nocheck
 
-import { getPossibleMoves } from "./api";
-import { Range, Set, fromJS, List, Map } from "immutable";
-import { TurnManager } from "./Model";
-import { equals } from "../test/utils";
-import { squadBuilder } from "../Squad/Model";
-const defaultParams: TurnManager = {
-  currentForce: "a",
-  forces: [
-    {
-      id: "a",
-      squads: ["a1"],
-      name: "a",
-      relations: { ["b"]: "hostile" },
-      initialPosition: "castle1",
-    },
-    {
-      id: "b",
-      squads: ["b1"],
-      name: "b",
-      relations: { ["a"]: "hostile" },
-      initialPosition: "castle2",
-    },
-  ],
-  grid: [
-    [0, 1, 1, 1, 1],
-    [0, 1, 0, 0, 0],
-    [0, 1, 0, 1, 0],
-    [0, 0, 0, 1, 0],
-    [1, 1, 1, 1, 1],
-  ],
-  walkableCells: [0],
-  mapSquads: [
-    {
-      id: "a1",
-      pos: { x: 0, y: 0 },
-      enemiesInRange: [],
-      validSteps: [],
-      range: 2,
-      status: "alive",
-      squad: squadBuilder({
-        id: "a1",
-        leader: "u1",
-        members: Map(),
-        force: "a",
-      }),
-    },
-    {
-      id: "b1",
-      pos: { x: 3, y: 3 },
-      enemiesInRange: [],
-      validSteps: [],
-      range: 2,
-      status: "alive",
-      squad: squadBuilder({
-        id: "b1",
-        leader: "u2",
-        members: Map(),
-        force: "b",
-      }),
-    },
-  ],
-};
+import { getPathTo } from "./api";
+
+const defaultGrid = [
+  [0, 1, 1, 1, 1],
+  [0, 1, 0, 0, 0],
+  [0, 1, 0, 1, 0],
+  [0, 0, 0, 1, 0],
+  [1, 1, 1, 1, 1],
+];
 
 test("Get moves in straight line", () => {
-  const cells = getPossibleMoves(defaultParams)[0].validSteps.map(
-    (t) => t.target
-  );
+  const path = getPathTo(defaultGrid)({ x: 0, y: 1 })({ x: 0, y: 3 });
 
-  const expected = List([
-    { x: 0, y: 1 },
-    { x: 0, y: 2 },
-  ]);
+  const expected = [
+    [0, 1],
+    [0, 2],
+    [0, 3],
+  ];
 
-  equals(cells, expected);
+  expect(path).toEqual(expected);
 });
 
 test("Make a turn", () => {
-  const longerRange = {
-    ...defaultParams,
-
-    mapSquads: defaultParams.mapSquads.map((unit) =>
-      unit.id === "a1" ? { ...unit, range: 4 } : unit
-    ),
-  };
-  const moves = getPossibleMoves(longerRange);
-
-  const lens = (c) => c[0].validSteps.map((t) => t.target).toJS();
+  const moves = getPathTo(defaultGrid)({ x: 0, y: 1 })({ x: 1, y: 3 });
 
   const expected = [
-    { x: 0, y: 1 },
-    { x: 0, y: 2 },
-    { x: 0, y: 3 },
-    { x: 1, y: 3 },
+    [0, 1],
+    [0, 2],
+    [0, 3],
+    [1, 3],
   ];
 
-  expect(lens(moves)).toEqual(expected);
+  expect(moves).toEqual(expected);
 });
 
-test("Get moves in blocked path ", () => {
-  const path = {
-    ...defaultParams,
-    grid: [
-      [0, 1, 1, 1, 1],
-      [0, 1, 0, 0, 0],
-      [0, 1, 0, 1, 0],
-      [1, 0, 0, 1, 0],
-      [1, 1, 1, 1, 1],
-    ],
-
-    mapSquads: defaultParams.mapSquads.map((unit) =>
-      unit.id === "a1" ? { ...unit, range: 4 } : unit
-    ),
-  };
-  const moves = getPossibleMoves(path);
-
-  const lens = (c) => c[0].validSteps.map((t) => t.target).toJS();
-  const expected = [
-    { x: 0, y: 1 },
-    { x: 0, y: 2 },
+test("Returns an empty path if blocked", () => {
+  const grid = [
+    [0, 1, 1, 1, 1],
+    [0, 1, 0, 0, 0],
+    [0, 1, 0, 1, 0],
+    [1, 0, 0, 1, 0],
+    [1, 1, 1, 1, 1],
   ];
 
-  expect(lens(moves)).toEqual(expected);
+  const moves = getPathTo(grid)({ x: 0, y: 0 })({ x: 2, y: 2 });
+  const expected = [];
+  expect(moves).toEqual(expected);
 });
 
-test("Get moves in forked path ", () => {
-  const path = {
-    ...defaultParams,
-    grid: [
-      [0, 1, 1, 1, 1],
-      [0, 0, 0, 0, 0],
-      [0, 1, 0, 1, 0],
-      [0, 0, 0, 1, 0],
-      [1, 1, 1, 1, 1],
-    ],
-
-    mapSquads: defaultParams.mapSquads.map((unit) =>
-      unit.id === "a1" ? { ...unit, range: 4 } : unit
-    ),
-  };
-  const moves = getPossibleMoves(path);
-
-  const expected = Set(
-    [
-      { x: 0, y: 1 },
-      { x: 0, y: 2 },
-      { x: 0, y: 3 },
-      { x: 1, y: 1 },
-      { x: 1, y: 3 },
-      { x: 2, y: 1 },
-      { x: 2, y: 2 },
-      { x: 3, y: 1 },
-    ].map((v) => fromJS(v))
-  );
-
-  const result = Set(
-    fromJS(moves[0].validSteps.map((t) => t.target).map((v) => fromJS(v)))
-  );
-
-  expect(result.equals(expected)).toBe(true);
-});
-
-test("Enemy blocks path", () => {
-  const path = {
-    ...defaultParams,
-    mapSquads: defaultParams.mapSquads
-      .map((unit) => (unit.id === "a1" ? { ...unit, range: 4 } : unit))
-      .map((unit) =>
-        unit.id === "b1" ? { ...unit, pos: { x: 0, y: 3 } } : unit
-      ),
-  };
-  const moves = getPossibleMoves(path);
+test("Get shortest path in moves in a forked path ", () => {
+  const grid = [
+    [0, 1, 1, 1, 1],
+    [0, 0, 0, 0, 0],
+    [0, 1, 0, 1, 0],
+    [0, 0, 0, 1, 0],
+    [1, 1, 1, 1, 1],
+  ];
+  const moves = getPathTo(grid)({ x: 0, y: 0 })({ x: 3, y: 1 });
 
   const expected = [
-    {
-      steps: [
-        {
-          x: 0,
-          y: 0,
-        },
-        {
-          x: 0,
-          y: 1,
-        },
-      ],
-      target: {
-        x: 0,
-        y: 1,
-      },
-    },
-    {
-      steps: [
-        {
-          x: 0,
-          y: 0,
-        },
-        {
-          x: 0,
-          y: 1,
-        },
-        {
-          x: 0,
-          y: 2,
-        },
-      ],
-      target: {
-        x: 0,
-        y: 2,
-      },
-    },
+    [0, 0],
+    [0, 1],
+    [1, 1],
+    [2, 1],
+    [3, 1],
   ];
 
-  const result = moves[0].validSteps.toJS();
-
-  expect(fromJS(result).equals(fromJS(expected))).toBe(true);
-  //expect(result).toEqual(expected);
-});
-test("Large map - performance check", () => {
-  const path = {
-    ...defaultParams,
-    grid: Range(0, 50)
-      .map(() => Range(0, 50).map(() => 0))
-      .toJS(),
-  };
-  getPossibleMoves(path);
+  expect(moves).toEqual(expected);
 });

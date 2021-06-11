@@ -1,4 +1,4 @@
-import { SquadRecord, MemberIndex, makeMember, makeSquad } from "./Model";
+import { SquadRecord, MemberIndex, makeMember, createSquad } from "./Model";
 import { UnitClass, UnitIndex } from "../Unit/Model";
 import { Map } from "immutable";
 import { makeUnit } from "../Unit/makeUnit";
@@ -58,7 +58,7 @@ export function squadGenerator(
     );
   }, Map() as MemberIndex);
 
-  const squad: SquadRecord = makeSquad({
+  const squad: SquadRecord = createSquad({
     id: squadId,
     leader: units.get(unitId(0)).id,
     members,

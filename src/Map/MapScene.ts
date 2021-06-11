@@ -21,7 +21,7 @@ import renderSquads, { renderSquad } from "./board/renderSquads";
 import renderStructures from "./board/renderStructures";
 import ui from "./ui";
 import squadDetails from "./effects/squadDetails";
-import { Index, makeSquad, SquadRecord } from "../Squad/Model";
+import { Index, createSquad, SquadRecord } from "../Squad/Model";
 import { VectorRec } from "./makeVector";
 //import announcement from "../UI/announcement";
 import { delay, tween } from "../Scenes/utils";
@@ -787,7 +787,7 @@ export class MapScene extends Phaser.Scene {
     CombatScene.start(this, {
       squads: this.state.squads
         .filter((sqd) => [starter.id, target.id].includes(sqd.id))
-        .reduce((xs, x) => xs.set(x.id, makeSquad(x.squad)), Map()) as Index,
+        .reduce((xs, x) => xs.set(x.id, createSquad(x.squad)), Map()) as Index,
       units: this.state.units.filter((u) =>
         [starter.id, target.id].includes(u.squad)
       ),
