@@ -3,8 +3,8 @@ import { INVALID_STATE } from "../errors";
 import button from "../UI/button";
 import { Container, Image, Pointer } from "../Models";
 import panel from "../UI/panel";
-import { squadsFromForce as getSquadsFromForce, getPathTo } from "./api";
-import { Vector, MapSquad, MapState, Force, getCity, getForce } from "./Model";
+import { getPathTo } from "./api";
+import { Vector, MapSquad, MapState, Force, getCity, getForce, getForceSquads } from "./Model";
 import {
   SCREEN_WIDTH,
   SCREEN_HEIGHT,
@@ -345,7 +345,7 @@ export class MapScene extends Phaser.Scene {
     this.isPaused = false;
   }
 
-  async signal(eventName: string, cmds: MapCommands[]) {
+  async signal(_eventName: string, cmds: MapCommands[]) {
     await Promise.all(
       cmds.map(async (cmd) => {
         if (cmd.type === "DESTROY_TEAM") {
@@ -927,7 +927,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   getAliveSquadsFromForce(forceId: string) {
-    return getSquadsFromForce(this.state)(forceId);
+    return getForceSquads(this.state,forceId);
   }
 
   clearTiles() {

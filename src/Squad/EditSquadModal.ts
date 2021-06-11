@@ -100,7 +100,7 @@ export default function (
     );
     container.add(details);
   });
-  button(1070, SCREEN_HEIGHT - 150, "✅ Confirm", container, boardScene, () =>
+  button(1070, SCREEN_HEIGHT - 150, "Confirm", container, boardScene, () =>
     events.OnClose.emit(null)
   );
 

@@ -18,7 +18,7 @@ export async function squadInfo(
   text(320, baseY, leader.name, uiContainer, scene);
 
   if (mapSquad.squad.force !== PLAYER_FORCE) {
-    button(430, baseY, "🔍 Squad Details", scene.uiContainer, scene, () => {
+    button(430, baseY, "Squad Details", scene.uiContainer, scene, () => {
       scene.clearChildrenScenes();
       scene.viewSquadDetails(id);
     });
@@ -27,6 +27,8 @@ export async function squadInfo(
   if (mapSquad.squad.force === PLAYER_FORCE) {
     playerSquad(scene, baseY, mapSquad, uiContainer);
   }
+
+  // TODO: have all boards loaded, and switch them when clicking
   const boardScene = new StaticBoardScene(
     mapSquad.squad,
 

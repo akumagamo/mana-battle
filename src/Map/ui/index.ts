@@ -3,7 +3,6 @@ import { Container } from "../../Models";
 import button from "../../UI/button";
 import panel from "../../UI/panel";
 import text from "../../UI/text";
-import dispatchWindow from "../dispatchWindow";
 import { MapScene } from "../MapScene";
 import city from "./city";
 import { squadInfo } from "./squadInfo";

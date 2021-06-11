@@ -5,22 +5,8 @@ import { makeSquad } from "../../Squad/Model";
 import { run } from "../../Squad/ListSquadsScene/ListSquadsScene";
 
 //ListSquadsScene  is now a mock constructor
-jest.mock("../../Squad/ListSquadsScene", () => ({
+jest.mock("../../Squad/ListSquadsScene/ListSquadsScene", () => ({
   run: jest.fn(),
-}));
-
-jest.mock("../../Board/StaticBoardScene", () => ({
-  default: {},
-}));
-
-jest.mock("../../Board/InteractiveBoardScene", () => ({
-  default: {},
-}));
-jest.mock("../../Chara/Chara", () => ({
-  Chara: {},
-}));
-jest.mock("../MapScene", () => ({
-  MapScene: {},
 }));
 
 const defaultProps = {

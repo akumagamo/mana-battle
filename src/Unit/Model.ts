@@ -91,11 +91,6 @@ export function toMapSquad(squad: SquadRecord, pos: Vector): MapSquad {
     id: squad.id,
     squad,
     pos: cellToScreenPosition({ x: pos.x, y: pos.y }),
-    range: 5,
-    validSteps: List(),
-    steps: Set(),
-    enemiesInRange: [],
-    pathFinder: () => () => [],
     status: 'alive',
   };
 }

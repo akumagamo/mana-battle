@@ -1,4 +1,4 @@
-import { Map, List, Set } from "immutable";
+import { Map, Set } from "immutable";
 import { SquadRecord } from "../Squad/Model";
 import { UnitIndex } from "../Unit/Model";
 export type UnitId = string;
@@ -61,11 +61,6 @@ export type MapSquad = {
   id: string;
   squad: SquadRecord;
   pos: Vector;
-  range: number;
-  validSteps: List<ValidStep>;
-  steps: Set<Vector>;
-  enemiesInRange: EnemyInRange[];
-  pathFinder: (v: Vector) => (v: Vector) => Vector[];
   status: "alive" | "defeated" | "retreated" | "hidden";
 };
 
@@ -74,11 +69,6 @@ export function createMapSquad(squad: SquadRecord): MapSquad {
     id: squad.id,
     squad,
     pos: { x: 1, y: 1 },
-    range: 3,
-    validSteps: List(),
-    steps: Set(),
-    enemiesInRange: [],
-    pathFinder: () => () => [],
     status: "alive",
   };
 }
