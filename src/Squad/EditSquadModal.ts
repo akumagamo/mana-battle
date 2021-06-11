@@ -87,7 +87,7 @@ export default function (
   events.OnClose.on(handleOnCloseEditSquadModal);
 
   const container = boardScene.add.container();
-  panel(50, 50, SCREEN_WIDTH - 100, SCREEN_HEIGHT - 150, container, boardScene);
+  panel(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, container, boardScene);
   let details: Container | null = null;
 
   boardScene.makeUnitsClickable((c) => {

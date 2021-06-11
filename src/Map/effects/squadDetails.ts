@@ -44,7 +44,7 @@ export default (
 
   detailsBar(defaultUnit);
 
-  button(1050, 250, "Close", container, scene, () => {
+  button(1050, 550, "Close", container, scene, () => {
     boardScene.turnOff();
     charaStats.destroy();
     backdrop_.destroy();
@@ -75,7 +75,7 @@ function renderUnitDetailsBar(
 ) {
   return function (unit: Unit) {
     details?.destroy();
-    details = SmallUnitDetailsBar(10, 500, scene, unit);
+    details = SmallUnitDetailsBar(330, 480, scene, unit);
     parent.add(details);
   };
 }
