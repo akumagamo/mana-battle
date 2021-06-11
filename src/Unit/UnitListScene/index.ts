@@ -76,7 +76,7 @@ export default class UnitListScene extends Phaser.Scene {
 
     if (this.page !== 0) {
       const prev = button(
-        this.x-20,
+        this.x - 20,
         this.y + baseY,
         " <= ",
         this.add.container(),
@@ -302,6 +302,15 @@ export default class UnitListScene extends Phaser.Scene {
 
   addUnit(unit: Unit) {
     this.units = this.units.set(unit.id, unit);
+
+    if (this.units.size < this.itemsPerPage) {
+      const newChara = this.renderUnitListItem(unit, this.units.size - 1);
+
+      newChara.container.setPosition(
+        newChara.container.x,
+        newChara.container.y
+      );
+    }
   }
   removeUnitFromList(unit: Unit) {
     this.units = this.units.delete(unit.id);
