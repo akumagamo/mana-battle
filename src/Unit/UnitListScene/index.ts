@@ -1,13 +1,12 @@
 import Phaser from "phaser";
-import { Unit, UnitIndex } from "./Model";
-import { Chara } from "../Chara/Chara";
-import { error, INVALID_STATE } from "../errors";
-import { Pointer, Text, Image, Container, Graphics } from "../Models";
-import button from "../UI/button";
+import { Unit, UnitIndex } from "../Model";
+import { Chara } from "../../Chara/Chara";
+import { error, INVALID_STATE } from "../../errors";
+import { Text, Container } from "../../Models";
+import button from "../../UI/button";
 import { Map } from "immutable";
 
 // TODO: fix list display when unit in board is replaced with unit from list
-//
 
 const rowWidth = 200;
 const rowHeight = 90;
@@ -75,33 +74,37 @@ export default class UnitListScene extends Phaser.Scene {
 
     const totalUnits = this.units.size;
 
+    if (this.page !== 0) {
+      const prev = button(
+        this.x-20,
+        this.y + baseY,
+        " <= ",
+        this.add.container(),
+        this,
+        () => this.prevPage(),
+        false,
+        50
+      );
+      this.pagingControls.push(prev.destroy);
+    }
+
     const isLastPage =
       totalUnits < this.itemsPerPage ||
       this.itemsPerPage * (this.page + 1) >= totalUnits;
 
     if (!isLastPage) {
       const next = button(
-        this.x + 70,
+        this.x + 50,
         this.y + baseY,
-        " ➡︎ ",
+        " => ",
         this.add.container(),
         this,
-        () => this.nextPage()
+        () => this.nextPage(),
+        false,
+        50
       );
 
       this.pagingControls.push(next.destroy);
-    }
-
-    if (this.page !== 0) {
-      const prev = button(
-        this.x - 10,
-        this.y + baseY,
-        " ⬅︎ ",
-        this.add.container(),
-        this,
-        () => this.prevPage()
-      );
-      this.pagingControls.push(prev.destroy);
     }
   }
 
