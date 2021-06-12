@@ -347,6 +347,8 @@ export class MapScene extends Phaser.Scene {
       this.evs.CloseSquadArrivedInfoMessage.emit(res.portrait)
     );
 
+    this.uiContainer.add(res.portrait.charaWrapper);
+
     return res.portrait;
   }
   handleCloseSquadArrivedInfoMessage(chara: Chara) {

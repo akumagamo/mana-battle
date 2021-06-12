@@ -28,7 +28,7 @@ export async function squadInfo(
   }
 
   // TODO: have all boards loaded, and switch them when clicking
-  createStaticBoard(
+  const squad = createStaticBoard(
     scene,
     mapSquad.squad,
     scene.getSquadUnits(id),
@@ -36,4 +36,6 @@ export async function squadInfo(
     600,
     0.4
   );
+
+  uiContainer.add(squad.container);
 }
