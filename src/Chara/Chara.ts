@@ -174,14 +174,6 @@ export class Chara extends Phaser.Scene {
       fn(this);
     });
   }
-  handleDrag(x: number, y: number) {
-    this.container.setDepth(Infinity);
-
-    this.container.x = x;
-    this.container.y = y;
-
-    this.onDragStart(this.props.unit, x, y, this);
-  }
 
   handleDragEnd(y: number) {
     this.container.setDepth(y);

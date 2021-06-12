@@ -1,6 +1,7 @@
 import { Pointer, Container } from "../../Models";
 import { Unit } from "../../Unit/Model";
 import { Chara } from "../Chara";
+import onDrag from "./onDrag";
 
 export default function onEnableDrag(
   chara: Chara,
@@ -15,7 +16,7 @@ export default function onEnableDrag(
   chara.input.on(
     "drag",
     (_pointer: Pointer, _obj: Container, x: number, y: number) =>
-      chara.handleDrag(x, y)
+      onDrag(chara, x, y)
   );
 
   chara.container.on(

@@ -10,9 +10,7 @@ import { handleDispatchSquad } from "./Map/dispatchWindow";
 import { MapSquad } from "./Map/Model";
 import { handleMovePlayerSquadButtonClicked } from "./Map/ui/playerSquad";
 import { Map } from "immutable";
-
-const wait = (n: number) =>
-  new Promise<void>((resolve) => setTimeout(() => resolve(), n));
+import onDrag from "./Chara/events/onDrag";
 
 const assert = (condition: string, a: any, b: any) => {
   if (a !== b)
@@ -50,7 +48,7 @@ export function endToEndTesting(game: Phaser.Game) {
 
     clickCell(scn, 7, 5);
 
-    scn.evs.SquadDispatched.once((id) => {
+    scn.evs.SquadDispatched.once((_id) => {
       assert(
         "MapScene is no longer paused selecting move destination",
         scn.isPaused,
@@ -168,7 +166,7 @@ function EditSquad(listScene: ListSquadsScene) {
   const chara = unitListScene.unitRows[0].chara;
 
   boardScene.tiles.forEach((t, index) => {
-    chara.handleDrag(t.sprite.x, t.sprite.y - 100);
+    onDrag(chara, t.sprite.x, t.sprite.y - 100);
     assert(
       `A unit dragged from the list should paint the board cells when hovered over them (${t.sprite.x}, ${t.sprite.y})`,
       boardScene.tiles[index].sprite.tintTopLeft,
@@ -202,7 +200,7 @@ function EditSquad(listScene: ListSquadsScene) {
   // Drag to empty cell
   const emptyCell = getEmptyCell(boardScene);
 
-  chara.handleDrag(emptyCell.sprite.x, emptyCell.sprite.y - 100);
+  onDrag(chara, emptyCell.sprite.x, emptyCell.sprite.y - 100);
   chara.handleDragEnd(emptyCell.sprite.y - 100);
 
   assert(
@@ -220,7 +218,7 @@ function EditSquad(listScene: ListSquadsScene) {
 
   const newChara = unitListScene.unitRows[0].chara;
 
-  newChara.handleDrag(emptyCell.sprite.x, emptyCell.sprite.y - 100);
+  onDrag(chara, emptyCell.sprite.x, emptyCell.sprite.y - 100);
   newChara.handleDragEnd(emptyCell.sprite.y - 100);
 
   assert(
@@ -263,7 +261,7 @@ function SquadCreation(listScene: ListSquadsScene, game: Phaser.Game) {
   [0, 0, 0].forEach((_, index) => {
     const chara_ = newUnitListScene.unitRows[0].chara;
 
-    chara_.handleDrag(
+    onDrag( chara_, 
       newBoardScene.tiles[index].sprite.x,
       newBoardScene.tiles[index].sprite.y - 100
     );
