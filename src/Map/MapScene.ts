@@ -30,7 +30,6 @@ import ui from './ui';
 import squadDetails from './effects/squadDetails';
 import { Index, createSquad, SquadRecord } from '../Squad/Model';
 import { VectorRec } from './makeVector';
-//import announcement from "../UI/announcement";
 import { delay, tween } from '../Scenes/utils';
 import { fadeIn, fadeOut } from '../UI/Transition';
 import { MapCommands } from './MapCommands';

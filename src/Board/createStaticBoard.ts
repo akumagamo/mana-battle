@@ -35,7 +35,7 @@ export default (
     destroy: () => container.destroy(),
   };
 
-  placeUnits(board);
+  placeUnits(board)
 
   // DEBUG DRAG CONTAINER
   //debugMakeOverlay(board);

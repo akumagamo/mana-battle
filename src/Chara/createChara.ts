@@ -101,11 +101,11 @@ export default (props: {
     destroy: () => charaWrapper.destroy(),
   };
 
+  initial(chara, headOnly);
+
   if (showHpBar) {
     hpBar(chara, unit.currentHp);
   }
-
-  initial(chara, headOnly);
 
   if (animated) stand(chara);
 
