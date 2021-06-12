@@ -228,8 +228,8 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   renderBoard(squad: Squad.SquadRecord, x: number, y: number) {
-    const BOARD_X = 20 + x * 350;
-    const BOARD_Y = 20 + y * 250;
+    const BOARD_X = 170 + x * 350;
+    const BOARD_Y = 110 + y * 250;
     const board = createStaticBoard(
       this,
       squad,
@@ -247,18 +247,19 @@ export class ListSquadsScene extends Phaser.Scene {
     this.boards.push(board);
   }
 
-  squadSceneIO(id: string, fn: (board: StaticBoard) => void) {
+  getBoard(id: string, fn: (board: StaticBoard) => void) {
     const board = this.boards.find((e) => e.squad.id === id);
 
     fn(board);
   }
-  handleSquadClicked(sqd: Squad.SquadRecord) {
-    this.squadSceneIO(sqd.id, (squadScene) => {
-      this.boards
-        .filter((scene) => scene.isSelected)
-        .forEach((scene) => onBoardDeselected(scene));
 
-      onBoardSelected(squadScene);
+  handleSquadClicked(sqd: Squad.SquadRecord) {
+    this.getBoard(sqd.id, (board) => {
+      this.boards
+        .filter((board) => board.isSelected)
+        .forEach(onBoardDeselected);
+
+      onBoardSelected(board);
       this.refreshUI(sqd);
     });
   }

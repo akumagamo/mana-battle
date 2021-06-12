@@ -32,7 +32,14 @@ export default (
 
   const detailsBar = renderUnitDetailsBar(scene, details, container);
 
-  const boardScene = createStaticBoard(scene,   mapSquad.squad, units, 200, 50, 0.7);
+  const boardScene = createStaticBoard(
+    scene,
+    mapSquad.squad,
+    units,
+    SCREEN_WIDTH / 2,
+    SCREEN_HEIGHT / 3,
+    0.7
+  );
   onBoardUnitClicked(boardScene, (chara) => {
     charaStats.removeAll();
 

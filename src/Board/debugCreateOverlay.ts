@@ -1,17 +1,14 @@
-import {
-  BOARD_HEIGHT,
-  BOARD_OFFSET_X,
-  BOARD_OFFSET_Y,
-  BOARD_WIDTH,
-} from './constants';
+import { tileHeight, tileWidth } from '../constants';
 import { StaticBoard } from './Model';
 
 export default (board: StaticBoard) => {
+  const width = board.tiles[0].sprite.width * board.scale * 3;
+  const height = board.tiles[0].sprite.height * board.scale * 3;
   var rect = new Phaser.Geom.Rectangle(
-    board.x + BOARD_OFFSET_X,
-    board.y + BOARD_OFFSET_Y,
-    BOARD_WIDTH,
-    BOARD_HEIGHT
+    board.x - width / 2,
+    board.y - height / 2,
+    width,
+    height + height / 3
   );
   var graphics = board.scene.add.graphics({
     fillStyle: { color: 0x0000ff },
