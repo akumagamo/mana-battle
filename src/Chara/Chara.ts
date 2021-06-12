@@ -1,15 +1,9 @@
 import { Unit } from "../Unit/Model";
 import { Container, Pointer, Image } from "../Models";
-import stand from "./animations/stand";
-import flinch from "./animations/flinch";
-import slash from "./animations/slash";
-import bowAttack from "./animations/bowAttack";
-import initial from "./animations/initial";
 import { PUBLIC_URL } from "../constants";
 import {classes} from "../Unit/Jobs";
-import hpBar from "./ui/hpBar";
+import createChara from "./createChara";
 
-const GAME_SPEED = parseInt(process.env.SPEED);
 
 interface CharaProps {
   key: string;
@@ -93,68 +87,7 @@ export class Chara extends Phaser.Scene {
   }
 
   create() {
-    //the unit has two wrappers to allow multiple tweens at once
-    this.charaWrapper = this.add.container();
-
-    const {
-      cx,
-      cy,
-      headOnly,
-      animated,
-      showHpBar,
-      unit,
-      scaleSizing,
-    } = this.props;
-
-    this.container = this.add.container(cx, cy);
-
-    this.charaWrapper.add(this.container);
-
-    this.container.setDepth(cy);
-
-    initial(this, headOnly);
-
-    if (animated) stand(this);
-
-    const container_width = 100;
-    const container_height = 170;
-
-    this.container.setSize(container_width, container_height);
-
-    // DEBUG DRAG CONTAINER
-    //var rect = new Phaser.Geom.Rectangle(
-    //  (-1 * container_width) / 2,
-    //  (-1 * container_height) / 2,
-    //  container_width,
-    //  container_height,
-    //);
-    //
-    //var graphics = this.add.graphics({fillStyle: {color: 0x0000ff}});
-    //graphics.alpha = 0.5;
-    //
-    //graphics.fillRectShape(rect);
-    //this.container.add(graphics);
-    //
-    // DEBUG ORIGIN
-    // var origin = new Phaser.Geom.Rectangle(
-    //   0,
-    //   0,
-    //   20,
-    //   20
-    // );
-
-    // var originGraphic = this.add.graphics({ fillStyle: { color: 0xff0000 } });
-    // originGraphic.alpha = 1;
-
-    // originGraphic.fillRectShape(origin);
-    // this.container.add(originGraphic);
-
-    if (showHpBar) {
-      hpBar(this, unit.currentHp);
-    }
-
-    this.container.scale = scaleSizing;
-
+    createChara(this)
   }
 
   onClick(fn: (chara: Chara) => void) {
