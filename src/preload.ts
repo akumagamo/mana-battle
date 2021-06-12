@@ -1,3 +1,4 @@
+import preloadCharaAssets from "./Chara/preloadCharaAssets";
 import { PUBLIC_URL } from "./constants";
 import { progressBar } from "./progressBar";
 
@@ -53,6 +54,8 @@ export function preload(this: Phaser.Scene) {
   this.load.image("map_select", `${PUBLIC_URL}/scenes/map_select.jpg`);
 
   this.load.html("nameform", "assets/chara-creation/input.html");
+
+  preloadCharaAssets(this)
 
   progressBar(this);
 }

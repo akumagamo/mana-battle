@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { preload } from "../preload";
 import button from "../UI/button";
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../constants";
-import { Chara, loadCharaAssets } from "../Chara/Chara";
+import { Chara } from "../Chara/Chara";
 import { Container } from "../Models";
 import { fadeOut } from "../UI/Transition";
 import { makeUnit } from "../Unit/makeUnit";
@@ -22,7 +22,6 @@ export default class TitleScene extends Phaser.Scene {
   }
   preload() {
     preload.bind(this)();
-    loadCharaAssets(this);
   }
 
   create() {
