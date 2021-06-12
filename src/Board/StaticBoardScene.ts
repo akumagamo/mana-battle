@@ -5,6 +5,7 @@ import { BoardTile } from "./Model";
 import { Graphics } from "../Models";
 import { Unit, UnitIndex } from "../Unit/Model";
 import { Vector } from "../Map/Model";
+import tint from "../Chara/animations/tint";
 
 const BOARD_WIDTH = 250;
 const BOARD_HEIGHT = 150;
@@ -135,7 +136,7 @@ export default class StaticBoardScene extends Phaser.Scene {
     y = y * this.scaleSizing + this.y;
 
     const key = this.makeUnitKey(unit);
-    const c = new Chara({
+    const chara = new Chara({
       key,
       parent: this,
       unit,
@@ -147,9 +148,9 @@ export default class StaticBoardScene extends Phaser.Scene {
       showHpBar: true,
     });
 
-    if (c.props.unit.currentHp < 1) c.tint(222222);
+    if (chara.props.unit.currentHp < 1) tint(chara, 222222);
 
-    return c;
+    return chara;
   }
 
   placeUnits() {

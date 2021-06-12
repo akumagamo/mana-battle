@@ -1,13 +1,13 @@
 import { Chara } from "../Chara";
 import { maybeZero } from "../../utils";
 import upAndDown from "./upAndDown";
+import defaultPose from "./defaultPose";
 
 // TODO: ^^^^ these constants belong to something that we may call "default pose"
 //
 const GAME_SPEED = parseInt(process.env.SPEED);
 
 const front = (chara: Chara) => {
-  chara.clearAnimations();
 
   chara.add.tween({
     targets: chara.leftFoot,
@@ -55,7 +55,6 @@ const front = (chara: Chara) => {
 };
 
 const back = (chara: Chara) => {
-  chara.clearAnimations();
 
   const bounce = upAndDown(chara);
 
@@ -107,6 +106,7 @@ const back = (chara: Chara) => {
 };
 
 export default (chara: Chara) => {
+  defaultPose(chara)
   if (chara.props.front) {
     front(chara);
   } else {

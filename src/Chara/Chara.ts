@@ -1,8 +1,5 @@
 import { Unit } from "../Unit/Model";
 import { Container, Pointer, Image } from "../Models";
-import run from "./animations/run";
-
-import defaultPose from "./animations/defaultPose";
 import stand from "./animations/stand";
 import flinch from "./animations/flinch";
 import slash from "./animations/slash";
@@ -117,7 +114,7 @@ export class Chara extends Phaser.Scene {
 
     initial(this, headOnly);
 
-    if (animated) this.stand();
+    if (animated) stand(this);
 
     const container_width = 100;
     const container_height = 170;
@@ -168,99 +165,6 @@ export class Chara extends Phaser.Scene {
     });
   }
 
-  // ANIMATIONS
-
-  clearAnimations() {
-    defaultPose(this);
-  }
-  // TODO: add speed parameter
-  stand() {
-    stand(this);
-  }
-
-  performBowAttack(onComplete: () => void) {
-    bowAttack(this, onComplete);
-  }
-
-  slash(onComplete: () => void) {
-    slash(this, onComplete);
-  }
-
-  flinch(damage: number, isKilled: boolean) {
-    if (this.props.showHpBar) hpBar(this,damage);
-    flinch(this, damage, isKilled);
-  }
-
-  die() {
-    this.tweens.add({
-      targets: this.container,
-      alpha: 0,
-      duration: 1000 / GAME_SPEED,
-    });
-  }
-
-  run() {
-    run(this);
-  }
-
-  async fadeOut() {
-    return new Promise<void>((resolve) => {
-      const duration = 500;
-
-      this.time.addEvent({
-        delay: duration * 2,
-        callback: resolve,
-      });
-      this.tweens.addCounter({
-        from: 255,
-        to: 0,
-        duration,
-        onComplete: () => {
-          this.tweens.add({
-            targets: this.container,
-            alpha: 0,
-            duration,
-          });
-        },
-        onUpdate: (tween) => {
-          var value = Math.floor(tween.getValue());
-
-          this.tint(value);
-        },
-      });
-    });
-  }
-
-  tint(value: number) {
-    this.container.iterate(
-      (child: Phaser.GameObjects.Image | Phaser.GameObjects.Container) => {
-        if (child.type === "Container") {
-          (child as Phaser.GameObjects.Container).iterate(
-            (grand: Phaser.GameObjects.Image) => {
-              grand.setTint(Phaser.Display.Color.GetColor(value, value, value));
-            }
-          );
-        } else {
-          (child as Phaser.GameObjects.Image).setTint(
-            Phaser.Display.Color.GetColor(value, value, value)
-          );
-        }
-      }
-    );
-  }
-  setSkinColor(value: number) {
-    this.head.setTint(value);
-    this.leftHand.setTint(value);
-    this.rightHand.setTint(value);
-    this.leftFoot.setTint(value);
-    this.rightFoot.setTint(value);
-  }
-
-  flip() {
-    this.props.front = !this.props.front;
-    this.charaWrapper.destroy();
-    this.create();
-  }
 }
 export const loadCharaAssets = (scene: Phaser.Scene) => {
   [

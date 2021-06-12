@@ -19,6 +19,12 @@ import { PUBLIC_URL, SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
 import panel from "../UI/panel";
 import { Scene } from "phaser";
 import hpBar from "../Chara/ui/hpBar";
+import defaultPose from "../Chara/animations/defaultPose";
+import run from "../Chara/animations/run";
+import stand from "../Chara/animations/stand";
+import bowAttack from "../Chara/animations/bowAttack";
+import slash from "../Chara/animations/slash";
+import flinch from "../Chara/animations/flinch";
 
 const COMBAT_CHARA_SCALE = 1;
 const WALK_DURATION = 500;
@@ -332,11 +338,11 @@ export default class CombatScene extends Phaser.Scene {
   }
 
   moveUnit(sourceId: string, targetId: string) {
-    const unit = this.getChara(sourceId);
+    const chara = this.getChara(sourceId);
     const target = this.getChara(targetId);
 
-    unit.clearAnimations();
-    unit.run();
+    defaultPose(chara);
+    run(chara);
 
     if (!target.props.unit.squad) throw new Error(INVALID_STATE);
 
@@ -355,7 +361,7 @@ export default class CombatScene extends Phaser.Scene {
     );
 
     const config = (onComplete: () => void) => ({
-      targets: unit.container,
+      targets: chara.container,
       x: x,
       y: y,
       duration: WALK_DURATION / GAME_SPEED,
@@ -386,8 +392,7 @@ export default class CombatScene extends Phaser.Scene {
 
   async retreatUnits() {
     return this.charas.map((chara) => {
-      chara.clearAnimations();
-      chara.run();
+      run(chara);
 
       if (!chara.props.unit.squad) throw new Error(INVALID_STATE);
 
@@ -428,7 +433,7 @@ export default class CombatScene extends Phaser.Scene {
     const target = this.getChara(targetId);
 
     return new Promise<void>((resolve) => {
-      source.slash(resolve);
+      slash(source, resolve);
       this.damageUnit(target, damage, updatedTarget, targetId);
     });
   }
@@ -439,7 +444,10 @@ export default class CombatScene extends Phaser.Scene {
     updatedTarget: Unit,
     targetId: string
   ) {
-    chara.flinch(damage, updatedTarget.currentHp === 0);
+    if (chara.props.showHpBar) hpBar(chara, damage);
+
+    flinch(chara, damage, updatedTarget.currentHp === 0);
+
     this.updateMinisquadHP(targetId, updatedTarget.currentHp);
   }
 
@@ -471,7 +479,7 @@ export default class CombatScene extends Phaser.Scene {
     if (!source.props.front) arrow.scaleX = -1;
 
     return new Promise<void>((resolve) => {
-      source.performBowAttack(resolve);
+      bowAttack(source, resolve);
       this.add.tween({
         targets: arrow,
         x: target.container?.x,
@@ -519,8 +527,8 @@ export default class CombatScene extends Phaser.Scene {
 
   returnToPosition(id: string) {
     const chara = this.getChara(id);
-    chara.clearAnimations();
-    chara.run();
+    defaultPose(chara);
+    run(chara);
 
     if (!chara.props.unit.squad) throw new Error(INVALID_STATE);
     const coords = getBoardCoords(this.top === chara.props.unit.squad)(
@@ -556,7 +564,7 @@ export default class CombatScene extends Phaser.Scene {
       y: y,
       duration: WALK_DURATION / GAME_SPEED,
       onComplete: () => {
-        chara.stand();
+        stand(chara);
         onComplete();
       },
     });

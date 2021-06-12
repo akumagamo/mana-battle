@@ -37,6 +37,9 @@ import { organizeButtonClicked } from "./ui/organizeButtonClicked";
 import { EditSquadModalEvents } from "../Squad/EditSquadModal";
 import dispatchWindow from "./dispatchWindow";
 import returnButtonClicked from "../Squad/ListSquadsScene/events/returnButtonClicked";
+import run from "../Chara/animations/run";
+import stand from "../Chara/animations/stand";
+import fadeOutChara from "../Chara/animations/fadeOutChara";
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 
@@ -283,7 +286,7 @@ export class MapScene extends Phaser.Scene {
       this.squadsInMovement = this.squadsInMovement.delete(squad.id);
 
       const chara = await this.getChara(squad.id);
-      chara.stand();
+      stand(chara)
       const portraitKey = await this.speak(squad);
       this.evs.SquadArrivedInfoMessageCompleted.emit(portraitKey);
     }
@@ -404,7 +407,7 @@ export class MapScene extends Phaser.Scene {
   private async destroySquad(id: string) {
     const chara = await this.getChara(id);
 
-    await chara.fadeOut();
+    await fadeOutChara(chara);
 
     await this.removeSquadFromState(id);
   }
@@ -1080,7 +1083,7 @@ export class MapScene extends Phaser.Scene {
 
     const chara = await this.getChara(id);
 
-    chara.run();
+    run(chara)
 
     this.changeMode({ type: "SQUAD_SELECTED", id });
   }

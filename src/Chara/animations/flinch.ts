@@ -1,4 +1,5 @@
 import { Chara } from "../Chara";
+import die from "./die";
 import { displayDamage } from "./displayDamage";
 
 const GAME_SPEED = parseInt(process.env.SPEED);
@@ -20,7 +21,7 @@ export default (
       chara.time.addEvent({
         delay: 20 / GAME_SPEED,
         // TODO: the animation should not have the power to control this
-        callback: () => (isKilled ? chara.die() : null),
+        callback: () => (isKilled ? die(chara) : null),
       });
     },
   });

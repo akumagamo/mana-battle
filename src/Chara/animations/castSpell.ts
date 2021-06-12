@@ -1,9 +1,10 @@
 import { Chara } from "../Chara";
+import defaultPose from "./defaultPose";
 
 const ATTACK_DURATION = 500;
 
 export default (chara: Chara, onComplete: () => void) => {
-  chara.clearAnimations();
+  defaultPose(chara)
 
   chara.props.parent.tweens.add({
     targets: chara?.mainHandContainer,

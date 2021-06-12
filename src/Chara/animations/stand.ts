@@ -5,11 +5,12 @@ import {
   LEFT_HAND_FRONT_Y,
   RIGHT_HAND_FRONT_Y,
 } from './constants';
+import defaultPose from './defaultPose';
 import upAndDown from './upAndDown';
 
 const front = (chara: Chara) => {
-  chara.clearAnimations();
 
+  defaultPose(chara)
   chara.tweens.add({
     targets: chara.head,
     y: HEAD_FRONT_Y - 2,
@@ -55,8 +56,9 @@ const front = (chara: Chara) => {
 };
 
 const back = (chara: Chara) => {
-  chara.clearAnimations();
 
+  defaultPose(chara)
+  
   const bounce = upAndDown(chara);
 
   bounce(chara.head, -2, 1600);

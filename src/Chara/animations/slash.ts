@@ -1,12 +1,14 @@
 import { Chara } from "../Chara";
+import defaultPose from "./defaultPose";
 
 const ATTACK_DURATION = 250;
 
 const GAME_SPEED = parseInt(process.env.SPEED)
 
 export default (chara: Chara, onComplete: () => void) => {
-  chara.clearAnimations();
 
+  defaultPose(chara)
+  
   chara.props.parent.tweens.add({
     targets: chara?.mainHandContainer,
     rotation: chara.props.front ? 1.9 : -1.9,
