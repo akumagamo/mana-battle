@@ -1,11 +1,12 @@
-import Phaser from "phaser";
-import { Unit } from "../Model";
-import { Chara } from "../../Chara/Chara";
-import { error, INVALID_STATE } from "../../errors";
-import { Text, Container } from "../../Models";
-import button from "../../UI/button";
-import { List } from "immutable";
-import onEnableDrag from "../../Chara/events/onEnableDrag";
+import Phaser from 'phaser';
+import { Unit } from '../Model';
+import { Chara } from '../../Chara/Model';
+import { error, INVALID_STATE } from '../../errors';
+import { Text, Container } from '../../Models';
+import button from '../../UI/button';
+import { List } from 'immutable';
+import onEnableDrag from '../../Chara/events/onEnableDrag';
+import createChara from '../../Chara/createChara';
 
 // TODO: fix list display when unit in board is replaced with unit from list
 
@@ -28,17 +29,17 @@ export default class UnitListScene extends Phaser.Scene {
     public itemsPerPage: number,
     public units: List<Unit>
   ) {
-    super("UnitListScene");
+    super('UnitListScene');
     this.unitRows = [];
     this.page = 0;
   }
 
   create() {
-    this.events.on("shutdown", () => this.destroy());
+    this.events.on('shutdown', () => this.destroy());
     this.render();
     this.renderControls();
 
-    this.game.events.emit("UnitListSceneCreated", this);
+    this.game.events.emit('UnitListSceneCreated', this);
   }
 
   makeBackground() {
@@ -60,7 +61,7 @@ export default class UnitListScene extends Phaser.Scene {
 
   destroy() {
     this.unitRows.forEach((row) => {
-      this.scene.remove(row.chara.scene.key);
+      row.chara.destroy();
     });
     this.unitRows = [];
     this.units = List();
@@ -77,7 +78,7 @@ export default class UnitListScene extends Phaser.Scene {
       const prev = button(
         this.x - 20,
         this.y + baseY,
-        " <= ",
+        ' <= ',
         this.add.container(),
         this,
         () => this.prevPage(),
@@ -95,7 +96,7 @@ export default class UnitListScene extends Phaser.Scene {
       const next = button(
         this.x + 50,
         this.y + baseY,
-        " => ",
+        ' => ',
         this.add.container(),
         this,
         () => this.nextPage(),
@@ -124,7 +125,7 @@ export default class UnitListScene extends Phaser.Scene {
 
   clearUnitList() {
     this.unitRows.forEach((row) => {
-      this.scene.remove(row.chara.props.key);
+      row.chara.destroy();
       this.children.remove(row.container);
     });
 
@@ -145,7 +146,8 @@ export default class UnitListScene extends Phaser.Scene {
 
   private handleUnitDrag(unit: Unit, x: number, y: number, chara: Chara) {
     this.scaleUp(chara);
-    this.scene.bringToTop(chara.props.key);
+    // TODO: this might not be working
+    chara.charaWrapper.z = Infinity;
     return this.onDrag(unit, x, y);
   }
 
@@ -171,13 +173,12 @@ export default class UnitListScene extends Phaser.Scene {
 
     container.add(background);
 
-    const chara = new Chara({
-      key,
+    const chara = createChara({
       parent: this,
       unit,
-      cx: x,
-      cy: y,
-      scaleSizing: 0.5,
+      x,
+      y,
+      scale: 0.5,
     });
 
     onEnableDrag(
@@ -212,9 +213,7 @@ export default class UnitListScene extends Phaser.Scene {
   returnToOriginalPosition(chara: Chara) {
     const index = this.getUnitIndex(chara.props.unit);
 
-    const row = this.unitRows.find(
-      (row) => row.chara.props.key === chara.props.key
-    );
+    const row = this.unitRows.find((row) => row.chara.id === chara.id);
 
     if (!row) {
       return error(INVALID_STATE);
@@ -228,7 +227,7 @@ export default class UnitListScene extends Phaser.Scene {
       targets: chara.container,
       scale: 1,
       duration: 400,
-      ease: "Cubic",
+      ease: 'Cubic',
       repeat: 0,
       paused: false,
       yoyo: false,
@@ -239,7 +238,7 @@ export default class UnitListScene extends Phaser.Scene {
       targets: chara.container,
       scale: 0.5,
       duration: 400,
-      ease: "Cubic",
+      ease: 'Cubic',
       repeat: 0,
       paused: false,
       yoyo: false,
@@ -247,7 +246,7 @@ export default class UnitListScene extends Phaser.Scene {
   }
 
   makeUnitKey(unit: Unit) {
-    return "unit-list-" + unit.id;
+    return 'unit-list-' + unit.id;
   }
 
   reposition(
@@ -261,7 +260,7 @@ export default class UnitListScene extends Phaser.Scene {
       x,
       y,
       duration: 600,
-      ease: "Cubic",
+      ease: 'Cubic',
       repeat: 0,
       paused: false,
       yoyo: false,
@@ -272,7 +271,7 @@ export default class UnitListScene extends Phaser.Scene {
       x,
       y,
       duration: 600,
-      ease: "Cubic",
+      ease: 'Cubic',
       repeat: 0,
       paused: false,
       yoyo: false,
@@ -335,7 +334,7 @@ export default class UnitListScene extends Phaser.Scene {
     text: Text;
     container: Container;
   }) {
-    this.scene.remove(row.chara);
+    row.chara.charaWrapper.destroy();
     this.children.remove(row.container);
   }
 }

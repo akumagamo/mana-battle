@@ -1,5 +1,5 @@
 import { Pointer } from "../../Models";
-import { Chara } from "../Chara";
+import { Chara } from "../Model";
 
 export default (chara: Chara, fn: (chara: Chara) => void) => {
   chara.container.setInteractive();

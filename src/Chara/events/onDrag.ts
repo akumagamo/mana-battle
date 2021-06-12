@@ -1,5 +1,5 @@
-import { Unit } from "../../Unit/Model";
-import { Chara } from "../Chara";
+import { Unit } from '../../Unit/Model';
+import { Chara } from '../Model';
 
 export default function onDrag(
   chara: Chara,

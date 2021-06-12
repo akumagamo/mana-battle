@@ -1,14 +1,15 @@
-import { Chara } from "../Chara/Chara";
-import { Image } from "../Models";
-import * as Squad from "../Squad/Model";
-import { cartesianToIsometric } from "../utils/isometric";
-import { Unit, UnitIndex } from "../Unit/Model";
-import { tileWidth, tileHeight } from "../constants";
-import { Map } from "immutable";
-import onEnableDrag from "../Chara/events/onEnableDrag";
-import onUnitDrag from "./events/onUnitDrag";
-import onUnitDragEnd from "./events/onUnitDragEnd";
-import onClick from "../Chara/events/onClick";
+import { Chara } from '../Chara/Model';
+import { Image } from '../Models';
+import * as Squad from '../Squad/Model';
+import { cartesianToIsometric } from '../utils/isometric';
+import { Unit, UnitIndex } from '../Unit/Model';
+import { tileWidth, tileHeight } from '../constants';
+import { Map } from 'immutable';
+import onEnableDrag from '../Chara/events/onEnableDrag';
+import onUnitDrag from './events/onUnitDrag';
+import onUnitDragEnd from './events/onUnitDragEnd';
+import onClick from '../Chara/events/onClick';
+import createChara from '../Chara/createChara';
 
 type BoardTile = {
   sprite: Image;
@@ -18,7 +19,7 @@ type BoardTile = {
   boardY: number;
 };
 
-export const BOARD_SCENE_KEY = "BoardScene";
+export const BOARD_SCENE_KEY = 'BoardScene';
 
 export default class BoardScene extends Phaser.Scene {
   tiles: BoardTile[] = [];
@@ -83,22 +84,20 @@ export default class BoardScene extends Phaser.Scene {
       targets: chara?.container,
       x: pos.x,
       y: pos.y,
-      ease: "Cubic",
+      ease: 'Cubic',
       duration: 400,
       repeat: 0,
       paused: false,
       yoyo: false,
     });
     // TODO: optimize, fire only once if multiple units were move at the same time
-    tween.on("complete", () => {
+    tween.on('complete', () => {
       this.sortUnitsByDepth();
     });
   }
 
   getChara(unit: { id: string }) {
-    return this.unitList.find(
-      (chara) => chara.props.key === this.makeUnitKey(unit)
-    );
+    return this.unitList.find((chara) => chara.id === unit.id);
   }
   placeTiles({ mapWidth, mapHeight }: { mapWidth: number; mapHeight: number }) {
     var grid: null[][] = [[]];
@@ -113,7 +112,7 @@ export default class BoardScene extends Phaser.Scene {
       row.forEach((_, xIndex) => {
         var { x, y } = cartesianToIsometric(xIndex, yIndex);
 
-        const tileSprite = this.add.image(x, y, "tile");
+        const tileSprite = this.add.image(x, y, 'tile');
         tileSprite.depth = y;
 
         tileSprite.setInteractive();
@@ -140,15 +139,13 @@ export default class BoardScene extends Phaser.Scene {
 
     const unit = this.getUnit(squadMember.id);
 
-    if (!unit) throw new Error("Invalid member supplied.");
+    if (!unit) throw new Error('Invalid member supplied.');
 
-    const key = this.makeUnitKey(unit);
-    const chara = new Chara({
-      key,
+    const chara = createChara({
       parent: this,
       unit,
-      cx: x,
-      cy: y,
+      x: x,
+      y: y,
       showHpBar: this.showHpBars,
     });
 
@@ -209,23 +206,17 @@ export default class BoardScene extends Phaser.Scene {
     }
   }
 
-  makeUnitKey(unit: { id: string }) {
-    return `board-${unit.id}`;
-  }
-
   sortUnitsByDepth() {
     this.unitList.forEach((chara) =>
       chara.container.setDepth(chara.container?.y)
     );
 
-    this.unitList
-      .sort((a, b) => (a.container?.depth || 0) - (b.container?.depth || 0))
-      .forEach((chara) => chara.scene.bringToTop());
+    this.unitList.sort((a, b) => a.container.depth - b.container.depth);
   }
   destroy() {
     this.tiles.forEach((tile) => tile.sprite.destroy());
 
-    this.unitList.forEach((chara) => this.scene.remove(chara.scene.key));
+    this.unitList.forEach((chara) => chara.destroy);
     this.tiles = [];
     this.unitList = [];
 

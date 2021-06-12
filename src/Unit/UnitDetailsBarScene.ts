@@ -1,11 +1,12 @@
 import { Container } from "../Models";
-import { Chara } from "../Chara/Chara";
 import { Unit, unitClassLabels } from "./Model";
 import { ItemSlot } from "../Item/Model";
 import { ItemDetailWindowScene } from "../Item/ItemDetailWindowScene";
 import text from "../UI/text";
 import button from "../UI/button";
 import panel from "../UI/panel";
+import {Chara} from "../Chara/Model";
+import createChara from "../Chara/createChara";
 
 export class UnitDetailsBarScene extends Phaser.Scene {
   colWidth = 150;
@@ -76,13 +77,12 @@ export class UnitDetailsBarScene extends Phaser.Scene {
     ]);
 
     this.scene.remove("pic");
-    const pic = new Chara({
-      key: "pic",
+    const pic = createChara({
       parent: this,
       unit,
-      cx: baseX + 80,
-      cy: baseY + 130,
-      scaleSizing: 1.3,
+      x: baseX + 80,
+      y: baseY + 130,
+      scale: 1.3,
       headOnly: true,
     });
 

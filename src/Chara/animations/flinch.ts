@@ -1,14 +1,10 @@
-import { Chara } from "../Chara";
-import die from "./die";
-import { displayDamage } from "./displayDamage";
+import { Chara } from '../Model';
+import die from './die';
+import { displayDamage } from './displayDamage';
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 
-export default (
-  chara: Chara,
-  damage: number,
-  isKilled: boolean
-) => {
+export default (chara: Chara, damage: number, isKilled: boolean) => {
   const FLINCH_DURATION = 200 / GAME_SPEED;
   const FLINCH_ROTATION = -0.2;
 
@@ -18,7 +14,7 @@ export default (
     yoyo: !isKilled,
     duration: isKilled ? FLINCH_DURATION : FLINCH_DURATION,
     onComplete: () => {
-      chara.time.addEvent({
+      chara.scene.time.addEvent({
         delay: 20 / GAME_SPEED,
         // TODO: the animation should not have the power to control this
         callback: () => (isKilled ? die(chara) : null),
@@ -26,7 +22,7 @@ export default (
     },
   });
 
-  chara.tweens.add({
+  chara.scene.tweens.add({
     targets: chara?.container,
     alpha: 0,
     yoyo: true,

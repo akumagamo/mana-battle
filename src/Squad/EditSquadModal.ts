@@ -1,23 +1,23 @@
-import BoardScene from "../Board/InteractiveBoardScene";
-import { Chara } from "../Chara/Chara";
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../constants";
-import { Vector } from "../Map/Model";
-import { Container } from "../Models";
-import button from "../UI/button";
-import panel from "../UI/panel";
-import { Unit, UnitIndex } from "../Unit/Model";
-import SmallUnitDetailsBar from "../Unit/SmallUnitDetailsBar";
-import UnitListScene from "../Unit/UnitListScene";
-import { SceneEventFactory, EventFactory } from "../utils";
-import * as Squad from "./Model";
+import BoardScene from '../Board/InteractiveBoardScene';
+import { Chara } from '../Chara/Model';
+import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../constants';
+import { Vector } from '../Map/Model';
+import { Container } from '../Models';
+import button from '../UI/button';
+import panel from '../UI/panel';
+import { Unit, UnitIndex } from '../Unit/Model';
+import SmallUnitDetailsBar from '../Unit/SmallUnitDetailsBar';
+import UnitListScene from '../Unit/UnitListScene';
+import { SceneEventFactory, EventFactory } from '../utils';
+import * as Squad from './Model';
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 
 const componentEvents = {
-  ADD_UNIT_BUTTON_CLICKED: "ADD_UNIT_BUTTON_CLICKED",
-  ON_DRAG: "ON_DRAG",
-  ON_DRAG_END: "ON_DRAG_END",
-  ON_CLOSE: "ON_CLOSE",
+  ADD_UNIT_BUTTON_CLICKED: 'ADD_UNIT_BUTTON_CLICKED',
+  ON_DRAG: 'ON_DRAG',
+  ON_DRAG_END: 'ON_DRAG_END',
+  ON_CLOSE: 'ON_CLOSE',
 };
 
 export type EditSquadModalEvents = {
@@ -40,7 +40,7 @@ export default function (
   onClose: (s: Squad.SquadRecord) => void
 ) {
   const boardScene = new BoardScene(squad, onSquadUpdated, units, true);
-  scene.scene.add("editSquadModalBoard", boardScene, true);
+  scene.scene.add('editSquadModalBoard', boardScene, true);
 
   const listScene = new UnitListScene(
     110,
@@ -69,14 +69,14 @@ export default function (
         listScene,
         boardScene,
         chara,
-        onSquadUpdated,
+        onSquadUpdated
       )
   );
 
   const handleOnCloseEditSquadModal = () => {
     container.destroy();
     listScene.destroy();
-    scene.scene.remove("UnitListScene");
+    scene.scene.remove('UnitListScene');
     boardScene.destroy();
 
     for (const k in componentEvents) scene.events.off(k);
@@ -99,7 +99,7 @@ export default function (
     );
     container.add(details);
   });
-  button(1070, SCREEN_HEIGHT - 150, "Confirm", container, boardScene, () =>
+  button(1070, SCREEN_HEIGHT - 150, 'Confirm', container, boardScene, () =>
     events.OnClose.emit(null)
   );
 
@@ -122,15 +122,8 @@ export const createUnitListOnModal = (
   list.onDrag = (_unit, x, y) =>
     scene.editSquadModalEvents.OnDrag.emit({ x, y });
   list.onDragEnd = (chara, x, y) =>
-    handleOnDragEndFromUnitList(
-      x,
-      y,
-      list,
-      boardScene,
-      chara,
-      onSquadUpdated,
-    );
-  scene.scene.add("UnitListScene", list, true);
+    handleOnDragEndFromUnitList(x, y, list, boardScene, chara, onSquadUpdated);
+  scene.scene.add('UnitListScene', list, true);
 };
 
 const handleOnDragFromUnitList = (board: BoardScene, x: number, y: number) => {
@@ -153,7 +146,7 @@ const handleOnDragEndFromUnitList = (
   ) => void
 ) => {
   const cell = board.findTileByXY(x, y);
-  const {unit} = chara.props
+  const { unit } = chara.props;
 
   if (cell) {
     const { updatedSquad, added, removed } = Squad.addMember(
@@ -190,7 +183,7 @@ const handleOnDragEndFromUnitList = (
         targets: charaToRemove.container,
         y: charaToRemove.container.y - 200,
         alpha: 0,
-        ease: "Cubic",
+        ease: 'Cubic',
         duration: 8400 / GAME_SPEED,
         repeat: 0,
         paused: false,
@@ -214,8 +207,7 @@ const handleOnDragEndFromUnitList = (
 
 function removeCharaFromBoard(board: BoardScene, charaToRemove: Chara) {
   board.unitList = board.unitList.filter(
-    (c) => c.props.key !== charaToRemove.props.key
+    (c) => c.props.unit.id !== charaToRemove.props.unit.id
   );
-  charaToRemove.scene.remove(charaToRemove);
+  charaToRemove.charaWrapper.destroy();
 }
-

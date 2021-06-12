@@ -1,5 +1,5 @@
-import {INVALID_STATE} from '../../errors';
-import {Chara} from '../Chara';
+import { INVALID_STATE } from '../../errors';
+import { Chara } from '../Model';
 import {
   CHARA_WRAPPER_X,
   CHARA_WRAPPER_Y,
@@ -26,20 +26,7 @@ import {
 } from './constants';
 
 export default (chara: Chara) => {
-  chara.tweens.killAll();
-  if (
-    !chara.head ||
-    !chara.trunk ||
-    !chara.leftHand ||
-    !chara.rightHand ||
-    !chara.mainHandContainer ||
-    !chara.offHandContainer ||
-    !chara.leftFoot ||
-    !chara.rightFoot ||
-    !chara.charaWrapper
-  ) {
-    throw new Error(INVALID_STATE);
-  }
+  chara.scene.tweens.killAll();
 
   chara.head.rotation = 0;
   chara.leftFoot.rotation = 0;
@@ -70,10 +57,9 @@ export default (chara: Chara) => {
     chara.offHandContainer.y = LEFT_HAND_FRONT_Y;
 
     // TODO: weapon-> stance type mapping
-    if(chara.props.unit.equips.mainHand === "iron_spear"){
-        chara.leftHand.setPosition(LEFT_HAND_FRONT_X + 5, LEFT_HAND_FRONT_Y+10)
+    if (chara.props.unit.equips.mainHand === 'iron_spear') {
+      chara.leftHand.setPosition(LEFT_HAND_FRONT_X + 5, LEFT_HAND_FRONT_Y + 10);
     }
-
   } else {
     chara.charaWrapper.x = CHARA_WRAPPER_X;
     chara.charaWrapper.y = CHARA_WRAPPER_Y;

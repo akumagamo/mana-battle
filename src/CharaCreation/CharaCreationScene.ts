@@ -1,13 +1,14 @@
-import { SKIN_COLORS, HAIR_COLORS } from "../Chara/animations/constants";
-import { Chara } from "../Chara/Chara";
-import { PUBLIC_URL, SCENES, SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
-import { Container } from "../Models";
-import button from "../UI/button";
-import panel from "../UI/panel";
-import text from "../UI/text";
-import {classes, classLabels} from "../Unit/Jobs";
-import { makeUnit } from "../Unit/makeUnit";
-import { genderLabels, genders, HAIR_STYLES, Unit } from "../Unit/Model";
+import { SKIN_COLORS, HAIR_COLORS } from '../Chara/animations/constants';
+import createChara from '../Chara/createChara';
+import { Chara } from '../Chara/Model';
+import { PUBLIC_URL, SCENES, SCREEN_HEIGHT, SCREEN_WIDTH } from '../constants';
+import { Container } from '../Models';
+import button from '../UI/button';
+import panel from '../UI/panel';
+import text from '../UI/text';
+import { classes, classLabels } from '../Unit/Jobs';
+import { makeUnit } from '../Unit/makeUnit';
+import { genderLabels, genders, HAIR_STYLES, Unit } from '../Unit/Model';
 
 const { CHARA_CREATION_SCENE } = SCENES;
 
@@ -44,9 +45,9 @@ export default class CharaCreationScene extends Phaser.Scene {
   }
   preload() {
     if (process.env.SOUND_ENABLED) {
-      const id = "jshaw_dream_of_first_flight";
+      const id = 'jshaw_dream_of_first_flight';
       this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
-      this.load.on("complete", () => {
+      this.load.on('complete', () => {
         this.onSceneCreated(this);
       });
     } else {
@@ -62,7 +63,7 @@ export default class CharaCreationScene extends Phaser.Scene {
     return new Promise<Unit>(async (onHeroCreated) => {
       if (process.env.SOUND_ENABLED) {
         this.sound.stopAll();
-        const music = this.sound.add("jshaw_dream_of_first_flight");
+        const music = this.sound.add('jshaw_dream_of_first_flight');
         music.play();
       }
       this.cameras.main.fadeIn(1000 / GAME_SPEED);
@@ -73,7 +74,7 @@ export default class CharaCreationScene extends Phaser.Scene {
       const prop = (
         y: number,
         label: string,
-        prop: "hair" | "hairColor" | "skinColor",
+        prop: 'hair' | 'hairColor' | 'skinColor',
         index: any[]
       ) =>
         this.propSelector(
@@ -93,29 +94,29 @@ export default class CharaCreationScene extends Phaser.Scene {
       this.radio(
         baseX + 300,
         baseY,
-        "Gender",
-        "gender",
+        'Gender',
+        'gender',
         genders,
         genderLabels,
         300
       );
 
-      prop(baseY + panelHeight, "Skin Color", "skinColor", SKIN_COLORS);
-      prop(baseY + panelHeight * 2, "Hair Color", "hairColor", HAIR_COLORS);
-      prop(baseY + panelHeight * 3, "Hair Style", "hair", HAIR_STYLES);
+      prop(baseY + panelHeight, 'Skin Color', 'skinColor', SKIN_COLORS);
+      prop(baseY + panelHeight * 2, 'Hair Color', 'hairColor', HAIR_COLORS);
+      prop(baseY + panelHeight * 3, 'Hair Style', 'hair', HAIR_STYLES);
 
       this.radio(
         baseX,
         baseY + panelHeight * 4,
-        "Class",
-        "class",
+        'Class',
+        'class',
         classes,
         classLabels
       );
 
       this.confirmButton(onHeroCreated);
 
-      this.game.events.emit("CharaCreationSceneCreated", this, onHeroCreated);
+      this.game.events.emit('CharaCreationSceneCreated', this, onHeroCreated);
     });
   }
   private confirmButton(
@@ -124,11 +125,11 @@ export default class CharaCreationScene extends Phaser.Scene {
     const img = this.add.image(
       SCREEN_WIDTH - 100,
       SCREEN_HEIGHT - 100,
-      "arrow_right"
+      'arrow_right'
     );
     this.container.add(img);
     img.setInteractive();
-    img.on("pointerdown", () =>
+    img.on('pointerdown', () =>
       this.sceneEvents.ConfirmationButtonClicked(onHeroCreated)
     );
   }
@@ -137,20 +138,20 @@ export default class CharaCreationScene extends Phaser.Scene {
     onHeroCreated: (value: Unit | PromiseLike<Unit>) => void
   ) {
     const name: string = (<HTMLInputElement>(
-      document.getElementById("new-chara-name")
+      document.getElementById('new-chara-name')
     )).value;
     const unit: Unit = { ...this.chara.props.unit, name };
 
-    this.scene.remove(this.chara);
+    this.chara.destroy();
     this.scene.remove(this);
 
     onHeroCreated(unit);
   }
 
   private nameInput(x: number, y: number) {
-    this.panel(x, y, "Character Name", 300);
+    this.panel(x, y, 'Character Name', 300);
 
-    var element = this.add.dom(x + 10, y + 50).createFromCache("nameform");
+    var element = this.add.dom(x + 10, y + 50).createFromCache('nameform');
     element.setPerspective(800);
     element.setOrigin(0);
   }
@@ -170,13 +171,13 @@ export default class CharaCreationScene extends Phaser.Scene {
   }
 
   private bg() {
-    const bg = this.add.image(0, 0, "map_select");
+    const bg = this.add.image(0, 0, 'map_select');
     bg.setOrigin(0);
     bg.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
   }
 
   private initialState() {
-    const unit = makeUnit("fighter", "new_chara", 1);
+    const unit = makeUnit('fighter', 'new_chara', 1);
     this.unit = {
       ...unit,
       style: {
@@ -213,7 +214,7 @@ export default class CharaCreationScene extends Phaser.Scene {
     btn.setFillStyle(c, 1);
     btn.setInteractive();
     return new Promise<number>((resolve) => {
-      btn.on("pointerdown", async () => {
+      btn.on('pointerdown', async () => {
         resolve(c);
         btn.destroy();
       });
@@ -224,7 +225,7 @@ export default class CharaCreationScene extends Phaser.Scene {
     x: number,
     y: number,
     label: string,
-    prop: "class" | "gender",
+    prop: 'class' | 'gender',
     items: string[],
     labelIndex: { [id: string]: string },
     width?: number
@@ -266,7 +267,7 @@ export default class CharaCreationScene extends Phaser.Scene {
     y: number,
     index: number,
     label: string,
-    prop: "hair" | "skinColor" | "hairColor",
+    prop: 'hair' | 'skinColor' | 'hairColor',
     items: any[]
   ) {
     const panel_ = this.panel(x, y, label);
@@ -281,7 +282,7 @@ export default class CharaCreationScene extends Phaser.Scene {
     const prev = button(
       20 + baseX,
       y + 60,
-      "<=",
+      '<=',
       this.container,
       this,
       () => {
@@ -293,7 +294,7 @@ export default class CharaCreationScene extends Phaser.Scene {
     const next = button(
       160 + baseX,
       y + 60,
-      "=>",
+      '=>',
       this.container,
       this,
       () => {
@@ -314,7 +315,7 @@ export default class CharaCreationScene extends Phaser.Scene {
   private refreshProp(
     label: string,
     index: number,
-    currentProp: "hair" | "skinColor" | "hairColor",
+    currentProp: 'hair' | 'skinColor' | 'hairColor',
     items: string[] | number[],
     x: number,
     y: number
@@ -331,14 +332,14 @@ export default class CharaCreationScene extends Phaser.Scene {
   }
 
   refreshChara() {
-    this.scene.remove("new_chara");
-    this.chara = new Chara({
-      key: "new_chara",
+    if (this.chara) this.chara.destroy();
+
+    this.chara = createChara({
       parent: this,
       unit: this.unit,
-      cx: 250,
-      cy: 250,
-      scaleSizing: 3,
+      x: 250,
+      y: 250,
+      scale: 3,
       showWeapon: false,
     });
   }

@@ -1,10 +1,10 @@
-import { Chara } from "../Chara";
-import defaultPose from "./defaultPose";
+import { Chara } from '../Model';
+import defaultPose from './defaultPose';
 
 const ATTACK_DURATION = 500;
 
 export default (chara: Chara, onComplete: () => void) => {
-  defaultPose(chara)
+  defaultPose(chara);
 
   chara.props.parent.tweens.add({
     targets: chara?.mainHandContainer,
@@ -12,7 +12,7 @@ export default (chara: Chara, onComplete: () => void) => {
     x: chara.mainHandContainer?.x + (chara.props.front ? -5 : 5),
     y: chara.mainHandContainer?.y - 5,
     duration: ATTACK_DURATION,
-    ease: "ExpoOut",
+    ease: 'ExpoOut',
     onComplete: () => {
       onComplete();
     },
@@ -25,10 +25,10 @@ export default (chara: Chara, onComplete: () => void) => {
     x: chara.offHandContainer.x + (chara.props.front ? 5 : -5),
     Y: chara.offHandContainer.y - 5,
     duration: ATTACK_DURATION,
-    ease: "ExpoOut",
+    ease: 'ExpoOut',
   });
 
   if (process.env.SOUND_ENABLED) {
-    chara.sound.add("fireball").play();
+    chara.scene.sound.add('fireball').play();
   }
 };

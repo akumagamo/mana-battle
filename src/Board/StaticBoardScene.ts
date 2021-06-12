@@ -1,12 +1,13 @@
-import { Chara } from "../Chara/Chara";
-import * as Squad from "../Squad/Model";
-import { cartesianToIsometric } from "../utils/isometric";
-import { BoardTile } from "./Model";
-import { Graphics } from "../Models";
-import { Unit, UnitIndex } from "../Unit/Model";
-import { Vector } from "../Map/Model";
-import tint from "../Chara/animations/tint";
-import onClick from "../Chara/events/onClick";
+import { Chara } from '../Chara/Model';
+import * as Squad from '../Squad/Model';
+import { cartesianToIsometric } from '../utils/isometric';
+import { BoardTile } from './Model';
+import { Graphics } from '../Models';
+import { Unit, UnitIndex } from '../Unit/Model';
+import { Vector } from '../Map/Model';
+import tint from '../Chara/animations/tint';
+import onClick from '../Chara/events/onClick';
+import createChara from '../Chara/createChara';
 
 const BOARD_WIDTH = 250;
 const BOARD_HEIGHT = 150;
@@ -109,7 +110,7 @@ export default class StaticBoardScene extends Phaser.Scene {
         x = x * this.scaleSizing + this.x;
         y = y * this.scaleSizing + this.y;
 
-        const tileSprite = this.add.image(x, y, "tile");
+        const tileSprite = this.add.image(x, y, 'tile');
         tileSprite.scale = this.scaleSizing;
         tileSprite.depth = y;
 
@@ -137,13 +138,12 @@ export default class StaticBoardScene extends Phaser.Scene {
     y = y * this.scaleSizing + this.y;
 
     const key = this.makeUnitKey(unit);
-    const chara = new Chara({
-      key,
+    const chara = createChara({
       parent: this,
       unit,
-      cx: x,
-      cy: y,
-      scaleSizing: this.scaleSizing,
+      x: x,
+      y: y,
+      scale: this.scaleSizing,
       front: this.front,
       animated: false,
       showHpBar: true,
@@ -177,9 +177,7 @@ export default class StaticBoardScene extends Phaser.Scene {
       chara.container.setDepth(chara.container?.y)
     );
 
-    this.unitList
-      .sort((a, b) => (a.container?.depth || 0) - (b.container?.depth || 0))
-      .forEach((chara) => chara.scene.bringToTop());
+    this.unitList.sort((a, b) => a.container.depth - b.container.depth);
   }
   getUnitPositionInScreen(squadMember: Vector) {
     const x_ = this.front

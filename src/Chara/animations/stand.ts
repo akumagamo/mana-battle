@@ -1,4 +1,4 @@
-import {Chara} from '../Chara';
+import { Chara } from '../Model';
 import {
   HEAD_FRONT_Y,
   TRUNK_FRONT_Y,
@@ -9,9 +9,8 @@ import defaultPose from './defaultPose';
 import upAndDown from './upAndDown';
 
 const front = (chara: Chara) => {
-
-  defaultPose(chara)
-  chara.tweens.add({
+  defaultPose(chara);
+  chara.scene.tweens.add({
     targets: chara.head,
     y: HEAD_FRONT_Y - 2,
     duration: 1600,
@@ -19,7 +18,7 @@ const front = (chara: Chara) => {
     repeat: -1,
   });
 
-  chara.tweens.add({
+  chara.scene.tweens.add({
     targets: chara.trunk,
     y: TRUNK_FRONT_Y + 2,
     duration: 1600,
@@ -29,7 +28,7 @@ const front = (chara: Chara) => {
 
   //TODO: create weapon->stance type mapping
   if (chara.props.unit.equips.mainHand === 'iron_spear') {
-    chara.tweens.add({
+    chara.scene.tweens.add({
       targets: chara.offHandContainer,
       y: LEFT_HAND_FRONT_Y,
       duration: 1600,
@@ -37,7 +36,7 @@ const front = (chara: Chara) => {
       repeat: -1,
     });
   } else {
-    chara.tweens.add({
+    chara.scene.tweens.add({
       targets: chara.offHandContainer,
       y: LEFT_HAND_FRONT_Y + 8,
       duration: 1600,
@@ -46,7 +45,7 @@ const front = (chara: Chara) => {
     });
   }
 
-  chara.tweens.add({
+  chara.scene.tweens.add({
     targets: chara.mainHandContainer,
     y: RIGHT_HAND_FRONT_Y - 4,
     duration: 1600,
@@ -56,9 +55,8 @@ const front = (chara: Chara) => {
 };
 
 const back = (chara: Chara) => {
+  defaultPose(chara);
 
-  defaultPose(chara)
-  
   const bounce = upAndDown(chara);
 
   bounce(chara.head, -2, 1600);

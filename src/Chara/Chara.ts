@@ -17,7 +17,7 @@ interface CharaProps {
   showWeapon?: boolean;
 }
 
-export class Chara extends Phaser.Scene {
+type Chara = {
   props: CharaProps;
 
   /** Container around Chara, doesn't rotate (useful for adding UI elements)*/
@@ -26,60 +26,38 @@ export class Chara extends Phaser.Scene {
 
   //body parts
 
-  hair: Image | null = null;
-  head: Image | null = null;
-  trunk: Image | null = null;
-  leftHand: Image | null = null;
-  rightHand: Image | null = null;
-  leftFoot: Image | null = null;
-  rightFoot: Image | null = null;
+  hair: Image | null ;
+  head: Image | null ;
+  trunk: Image | null ;
+  leftHand: Image | null ;
+  rightHand: Image | null;
+  leftFoot: Image | null ;
+  rightFoot: Image | null;
 
-  mainHandContainer: Container | null = null;
-  offHandContainer: Container | null = null;
+  mainHandContainer: Container | null;
+  offHandContainer: Container | null;
 
   //Equips
-  rightHandEquip: Image | null = null;
-  leftHandEquip: Image | null = null;
-  hat: Image | null = null;
+  rightHandEquip: Image | null;
+  leftHandEquip: Image | null;
+  hat: Image | null ;
 
   hpBarContainer: Container | null;
 
-  constructor({
-    key,
-    parent,
-    unit,
-    cx = 0,
-    cy = 0,
-    scaleSizing = 1,
-    front = true,
-    animated = true,
-    headOnly = false,
-    showHpBar = false,
-    showWeapon = true,
-  }: CharaProps) {
-    super(key);
+  // constructor({
+  //   key,
+  //   parent,
+  //   unit,
+  //   cx = 0,
+  //   cy = 0,
+  //   scaleSizing = 1,
+  //   front = true,
+  //   animated = true,
+  //   headOnly = false,
+  //   showHpBar = false,
+  //   showWeapon = true,
+  // }: CharaProps) {
+  //   super(key);
 
-    this.props = {
-      key,
-      parent,
-      unit,
-      cx,
-      cy,
-      scaleSizing,
-      front,
-      animated,
-      headOnly,
-      showHpBar,
-      showWeapon,
-    };
-
-    parent.scene.add(key, this, true);
-
-    return this;
-  }
-
-  create() {
-    createChara(this);
-  }
 
 }

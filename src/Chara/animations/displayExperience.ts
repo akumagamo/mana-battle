@@ -1,5 +1,5 @@
 import text from '../../UI/text';
-import {Chara} from '../Chara';
+import { Chara } from '../Model';
 
 export function displayExperience(chara: Chara, experience: number) {
   const xp = text(
@@ -7,7 +7,7 @@ export function displayExperience(chara: Chara, experience: number) {
     -100,
     `${experience.toString()} xp`,
     chara.charaWrapper,
-    chara.props.parent,
+    chara.props.parent
   );
   xp.setScale(1.5);
   xp.setShadow(0, 0, '#000', 2);

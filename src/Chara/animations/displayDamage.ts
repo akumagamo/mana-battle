@@ -1,5 +1,5 @@
 import text from "../../UI/text";
-import { Chara } from "../Chara";
+import { Chara } from "../Model";
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 export function displayDamage(chara: Chara, damage: number) {

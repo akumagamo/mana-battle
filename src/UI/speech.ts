@@ -1,9 +1,9 @@
-import { Scene } from "phaser";
-import { Chara } from "../Chara/Chara";
-import { Container } from "../Models";
-import { Unit } from "../Unit/Model";
-import panel from "./panel";
-import text from "./text";
+import { Scene } from 'phaser';
+import createChara from '../Chara/createChara';
+import { Container } from '../Models';
+import { Unit } from '../Unit/Model';
+import panel from './panel';
+import text from './text';
 
 /**
  * Be careful calling this after MapScene's CLICK_SQUAD, as refreshing
@@ -19,12 +19,11 @@ export default async (
   scene: Scene,
   speed: number
 ) => {
-  const portrait = new Chara({
-    key: `speech_${unit.id}`,
+  const portrait = createChara({
     parent: scene,
     unit,
-    cx: x + 70,
-    cy: y + 70,
+    x: x + 70,
+    y: y + 70,
     headOnly: true,
     animated: false,
   });
@@ -49,5 +48,5 @@ export default async (
   const textCompleted = Promise.resolve();
 
   //TODO: return function that destroys the component and removes the portrait scene
-  return { bg, portraitKey: portrait.scene.key, speechText, textCompleted };
+  return { bg, portrait, speechText, textCompleted };
 };

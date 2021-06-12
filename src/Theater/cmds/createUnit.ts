@@ -1,9 +1,10 @@
-import { Chara } from "../../Chara/Chara";
-import { Unit } from "../../Unit/Model";
-import TheaterScene from "../TheaterScene";
+import createChara from '../../Chara/createChara';
+import { Chara } from '../../Chara/Model';
+import { Unit } from '../../Unit/Model';
+import TheaterScene from '../TheaterScene';
 
 export type CreateUnit = {
-  type: "CREATE_UNIT";
+  type: 'CREATE_UNIT';
   unit: Unit;
   x: number;
   y: number;
@@ -16,13 +17,12 @@ export const createUnit = (
   { unit, x, y, front, showWeapon }: CreateUnit
 ) => {
   const key = scene.charaKey(unit.id);
-  const chara = new Chara({
-    key,
+  const chara = createChara({
     parent: scene,
     unit,
-    cx: x,
-    cy: y,
-    scaleSizing: 1,
+    x: x,
+    y: y,
+    scale: 1,
     front,
     showWeapon,
   });

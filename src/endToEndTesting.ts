@@ -1,44 +1,44 @@
-import TitleScene from "./Scenes/TitleScene";
-import CharaCreationScene from "./CharaCreation/CharaCreationScene";
-import { MapScene } from "./Map/MapScene";
-import { PLAYER_FORCE } from "./constants";
-import { Unit } from "./Unit/Model";
-import { ListSquadsScene } from "./Squad/ListSquadsScene/ListSquadsScene";
-import UnitListScene from "./Unit/UnitListScene";
-import BoardScene from "./Board/InteractiveBoardScene";
-import { handleDispatchSquad } from "./Map/dispatchWindow";
-import { MapSquad } from "./Map/Model";
-import { handleMovePlayerSquadButtonClicked } from "./Map/ui/playerSquad";
-import { Map } from "immutable";
-import onDrag from "./Chara/events/onDrag";
-import onUnitDrag from "./Board/events/onUnitDrag";
-import onDragEnd from "./Chara/events/onDragEnd";
-import onUnitDragEnd from "./Board/events/onUnitDragEnd";
+import TitleScene from './Scenes/TitleScene';
+import CharaCreationScene from './CharaCreation/CharaCreationScene';
+import { MapScene } from './Map/MapScene';
+import { PLAYER_FORCE } from './constants';
+import { Unit } from './Unit/Model';
+import { ListSquadsScene } from './Squad/ListSquadsScene/ListSquadsScene';
+import UnitListScene from './Unit/UnitListScene';
+import BoardScene from './Board/InteractiveBoardScene';
+import { handleDispatchSquad } from './Map/dispatchWindow';
+import { MapSquad } from './Map/Model';
+import { handleMovePlayerSquadButtonClicked } from './Map/ui/playerSquad';
+import { Map } from 'immutable';
+import onDrag from './Chara/events/onDrag';
+import onUnitDrag from './Board/events/onUnitDrag';
+import onDragEnd from './Chara/events/onDragEnd';
+import onUnitDragEnd from './Board/events/onUnitDragEnd';
 
 const assert = (condition: string, a: any, b: any) => {
   if (a !== b)
     throw new Error(
       `❌ ${condition} - ${a.toString()} should equals ${b.toString()}`
     );
-  else console.log("✅", condition);
+  else console.log('✅', condition);
 };
 
 export function endToEndTesting(game: Phaser.Game) {
-  game.events.once("TitleSceneCreated", (scn: TitleScene) => {
+  game.events.once('TitleSceneCreated', (scn: TitleScene) => {
     scn.sceneEvents.NewGameButtonClicked();
   });
   game.events.once(
-    "CharaCreationSceneCreated",
+    'CharaCreationSceneCreated',
     (
       scn: CharaCreationScene,
       onHeroCreated: (value: Unit | PromiseLike<Unit>) => void
     ) => {
-      (document.getElementById("new-chara-name") as HTMLInputElement).value =
-        "TestHero";
+      (document.getElementById('new-chara-name') as HTMLInputElement).value =
+        'TestHero';
       scn.sceneEvents.ConfirmationButtonClicked(onHeroCreated);
     }
   );
-  game.events.once("MapSceneCreated", (scn: MapScene) => {
+  game.events.once('MapSceneCreated', (scn: MapScene) => {
     const squad = scn.state.squads.find(
       (sqd) => sqd.squad.force === PLAYER_FORCE
     );
@@ -53,14 +53,14 @@ export function endToEndTesting(game: Phaser.Game) {
 
     scn.evs.SquadDispatched.once((_id) => {
       assert(
-        "MapScene is no longer paused selecting move destination",
+        'MapScene is no longer paused selecting move destination',
         scn.isPaused,
         false
       );
     });
 
-    scn.evs.SquadArrivedInfoMessageCompleted.once((portraitKey: string) => {
-      scn.evs.CloseSquadArrivedInfoMessage.emit(portraitKey);
+    scn.evs.SquadArrivedInfoMessageCompleted.once((chara) => {
+      scn.evs.CloseSquadArrivedInfoMessage.emit(chara);
 
       scn.evs.MovePlayerSquadButonClicked.emit({
         mapScene: scn,
@@ -71,17 +71,17 @@ export function endToEndTesting(game: Phaser.Game) {
     });
   });
   game.events.once(
-    "ListSquadsSceneCreated",
+    'ListSquadsSceneCreated',
     async (listScene: ListSquadsScene) => {
       EditSquad(listScene);
 
       SquadCreation(listScene, game);
 
-      game.events.once("MapSceneCreated", (mapScene: MapScene) => {
+      game.events.once('MapSceneCreated', (mapScene: MapScene) => {
         mapScene.evs.DispatchWindowRendered.once(
           async ({ squads, container, scene }) => {
             assert(
-              "MapScene is paused when dispatch window is rendered",
+              'MapScene is paused when dispatch window is rendered',
               scene.isPaused,
               true
             );
@@ -99,19 +99,15 @@ export function endToEndTesting(game: Phaser.Game) {
 
             clickCell(mapScene, 6, 4);
 
-            mapScene.evs.SquadArrivedInfoMessageCompleted.once(
-              (portraitKey: string) => {
-                mapScene.evs.CloseSquadArrivedInfoMessage.emit(portraitKey);
-              }
-            );
-            mapScene.evs.ReturnedFromCombat.once(() => {
-              mapScene.evs.SquadArrivedInfoMessageCompleted.once(
-                (portraitKey: string) => {
-                  mapScene.evs.CloseSquadArrivedInfoMessage.emit(portraitKey);
-                }
-              );
+            mapScene.evs.SquadArrivedInfoMessageCompleted.once((chara) => {
+              mapScene.evs.CloseSquadArrivedInfoMessage.emit(chara);
             });
-            console.log("TEST FINISHED");
+            mapScene.evs.ReturnedFromCombat.once(() => {
+              mapScene.evs.SquadArrivedInfoMessageCompleted.once((chara) => {
+                mapScene.evs.CloseSquadArrivedInfoMessage.emit(chara);
+              });
+            });
+            console.log('TEST FINISHED');
           }
         );
 
@@ -127,20 +123,20 @@ async function DispatchSquads(
   scene: MapScene,
   mapScene: MapScene
 ) {
-  assert("Should render three squads to dispatch", squads.size, 3);
+  assert('Should render three squads to dispatch', squads.size, 3);
 
   await handleDispatchSquad(container, scene, squads.first());
 
   const dispatched = mapScene.state.squads.get((squads.first() as MapSquad).id);
 
-  assert("Dispatch window was destroyed", container.visible, false);
+  assert('Dispatch window was destroyed', container.visible, false);
   assert(
-    "Selected squad was dispached",
+    'Selected squad was dispached',
     dispatched.id,
     (squads.first() as MapSquad).id
   );
   assert(
-    "MapScene is no longer paused after team is dispatched",
+    'MapScene is no longer paused after team is dispatched',
     scene.isPaused,
     false
   );
@@ -159,11 +155,11 @@ function EditSquad(listScene: ListSquadsScene) {
   listScene.handleSquadClicked(squad);
   listScene.evs.SquadEditClicked.emit(squad);
   const unitListScene = listScene.scene.manager.getScene(
-    "UnitListScene"
+    'UnitListScene'
   ) as UnitListScene;
 
   const boardScene = listScene.scene.manager.getScene(
-    "BoardScene"
+    'BoardScene'
   ) as BoardScene;
 
   const chara = unitListScene.unitRows[0].chara;
@@ -176,19 +172,19 @@ function EditSquad(listScene: ListSquadsScene) {
       8978227
     );
     assert(
-      "Other tiles should not be tinted",
+      'Other tiles should not be tinted',
       boardScene.tiles.every((t, i) => i == index || !t.sprite.isTinted),
       true
     );
   });
 
   assert(
-    "Before adding a character, the squad should have 5 members",
+    'Before adding a character, the squad should have 5 members',
     boardScene.squad.members.size,
     5
   );
   assert(
-    "The character is not is not in the squad",
+    'The character is not is not in the squad',
     boardScene.squad.members.has(chara.props.unit.id),
     false
   );
@@ -213,12 +209,12 @@ function EditSquad(listScene: ListSquadsScene) {
   onDragEnd(chara)(emptyCell.sprite.y - 100, onUnitDragEnd(boardScene)(chara));
 
   assert(
-    "After adding a character, the squad should have 6 members",
+    'After adding a character, the squad should have 6 members',
     boardScene.squad.members.size,
     6
   );
   assert(
-    "The dragged character was added to the squad",
+    'The dragged character was added to the squad',
     boardScene.squad.members.has(chara.props.unit.id),
     true
   );
@@ -236,27 +232,27 @@ function EditSquad(listScene: ListSquadsScene) {
   onDragEnd(chara)(emptyCell.sprite.y - 100, onUnitDragEnd(boardScene)(chara));
 
   assert(
-    "When replacing a character, the number of units is still the same",
+    'When replacing a character, the number of units is still the same',
     boardScene.squad.members.size,
     6
   );
   assert(
-    "The dragged character was added to the squad",
+    'The dragged character was added to the squad',
     boardScene.squad.members.has(newChara.props.unit.id),
     true
   );
 
   assert(
-    "The repaced character is no longer in the squad",
+    'The repaced character is no longer in the squad',
     !boardScene.squad.members.has(replacedCharaEid),
     true
   );
 
   unitListScene.nextPage();
-  assert("Should list remaining units", unitListScene.unitRows.length, 3);
+  assert('Should list remaining units', unitListScene.unitRows.length, 3);
 
   unitListScene.prevPage();
-  assert("Should list full page", unitListScene.unitRows.length, 5);
+  assert('Should list full page', unitListScene.unitRows.length, 5);
 
   listScene.editSquadModalEvents.OnClose.emit(null);
 }
@@ -265,12 +261,12 @@ function SquadCreation(listScene: ListSquadsScene, game: Phaser.Game) {
   listScene.evs.CreateSquadClicked.emit(null);
 
   const newUnitListScene = game.scene.getScene(
-    "UnitListScene"
+    'UnitListScene'
   ) as UnitListScene;
 
   newUnitListScene.nextPage();
 
-  const newBoardScene = game.scene.getScene("BoardScene") as BoardScene;
+  const newBoardScene = game.scene.getScene('BoardScene') as BoardScene;
 
   [0, 0, 0].forEach((_, index) => {
     const chara_ = newUnitListScene.unitRows[0].chara;
@@ -288,7 +284,7 @@ function SquadCreation(listScene: ListSquadsScene, game: Phaser.Game) {
   });
 
   assert(
-    "Should move to previous page if current page became empty",
+    'Should move to previous page if current page became empty',
     newUnitListScene.unitRows.length,
     5
   );

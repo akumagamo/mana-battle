@@ -1,5 +1,5 @@
-import { Unit } from "../../Unit/Model";
-import BoardScene from "../InteractiveBoardScene";
+import { Unit } from '../../Unit/Model';
+import BoardScene from '../InteractiveBoardScene';
 
 export default (board: BoardScene) => (unit: Unit, x: number, y: number) => {
   const tile = board.findTileByXY(x, y);
@@ -7,5 +7,6 @@ export default (board: BoardScene) => (unit: Unit, x: number, y: number) => {
   if (tile) {
     board.highlightTile(tile);
   }
-  board.scene.bringToTop(board.makeUnitKey(unit));
+
+  board.unitList.find((u) => u.id === unit.id).charaWrapper.depth = Infinity;
 };

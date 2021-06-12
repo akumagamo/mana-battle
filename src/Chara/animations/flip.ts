@@ -1,7 +1,9 @@
-import {Chara} from "../Chara";
+import createChara from '../createChara';
+import { Chara } from '../Model';
 
 export default (chara: Chara) => {
   chara.props.front = !chara.props.front;
   chara.charaWrapper.destroy();
-  chara.create();
+  chara.destroy();
+  createChara(chara.props);
 };

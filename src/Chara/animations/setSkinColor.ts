@@ -1,4 +1,4 @@
-import { Chara } from "../Chara";
+import { Chara } from '../Model';
 
 export default (chara: Chara, value: number) => {
   chara.head.setTint(value);

@@ -1,36 +1,95 @@
-import initial from "./animations/initial";
-import stand from "./animations/stand";
-import { Chara } from "./Chara";
-import hpBar from "./ui/hpBar";
+import { stringify } from 'querystring';
+import initial from './animations/initial';
+import stand from './animations/stand';
+import { Chara, CharaProps } from './Model';
+import hpBar from './ui/hpBar';
 
-export default (chara: Chara) => {
+//props: CharaProps;
+
+///** Container around Chara, doesn't rotate (useful for adding UI elements)*/
+//charaWrapper: Container;
+//container: Container;
+
+////body parts
+
+//hair: Image | null = null;
+//head: Image | null = null;
+//trunk: Image | null = null;
+//leftHand: Image | null = null;
+//rightHand: Image | null = null;
+//leftFoot: Image | null = null;
+//rightFoot: Image | null = null;
+
+//mainHandContainer: Container | null = null;
+//offHandContainer: Container | null = null;
+
+////Equips
+//rightHandEquip: Image | null = null;
+//leftHandEquip: Image | null = null;
+//hat: Image | null = null;
+
+//hpBarContainer: Container | null;
+
+// constructor({
+//   key,
+//   parent,
+//   unit,
+//   cx = 0,
+//   cy = 0,
+//   scaleSizing = 1,
+//   front = true,
+//   animated = true,
+//   headOnly = false,
+//   showHpBar = false,
+//   showWeapon = true,
+// }: CharaProps) {
+//   super(key);
+
+export default (props: CharaProps): Chara => {
+  const { x, y, headOnly, animated, showHpBar, unit, scale, parent } = props;
   //the unit has two wrappers to allow multiple tweens at once
-  chara.charaWrapper = chara.add.container();
+  const charaWrapper = parent.add.container();
+  const container = parent.add.container(x, y);
+  charaWrapper.add(container);
 
-  const {
-    cx,
-    cy,
-    headOnly,
-    animated,
-    showHpBar,
-    unit,
-    scaleSizing,
-  } = chara.props;
+  container.setDepth(y);
+  const container_width = 100;
+  const container_height = 170;
+  container.setSize(container_width, container_height);
+  container.setScale(scale);
 
-  chara.container = chara.add.container(cx, cy);
+  const chara: Chara = {
+    id: unit.id,
+    props,
+    scene: parent,
+    charaWrapper,
+    container,
+    hpBarContainer: parent.add.container(),
 
-  chara.charaWrapper.add(chara.container);
+    hair: null,
+    head: null,
+    trunk: null,
+    leftHand: null,
+    rightHand: null,
+    leftFoot: null,
+    rightFoot: null,
 
-  chara.container.setDepth(cy);
+    mainHandContainer: null,
+    offHandContainer: null,
+
+    rightHandEquip: null,
+    leftHandEquip: null,
+    hat: null,
+    destroy: () => charaWrapper.destroy(),
+  };
+
+  if (showHpBar) {
+    hpBar(chara, unit.currentHp);
+  }
 
   initial(chara, headOnly);
 
   if (animated) stand(chara);
-
-  const container_width = 100;
-  const container_height = 170;
-
-  chara.container.setSize(container_width, container_height);
 
   // DEBUG DRAG CONTAINER
   //var rect = new Phaser.Geom.Rectangle(
@@ -40,7 +99,7 @@ export default (chara: Chara) => {
   //  container_height,
   //);
   //
-  //var graphics = chara.add.graphics({fillStyle: {color: 0x0000ff}});
+  //var graphics = chara.scene.add.graphics({fillStyle: {color: 0x0000ff}});
   //graphics.alpha = 0.5;
   //
   //graphics.fillRectShape(rect);
@@ -54,15 +113,11 @@ export default (chara: Chara) => {
   //   20
   // );
 
-  // var originGraphic = chara.add.graphics({ fillStyle: { color: 0xff0000 } });
+  // var originGraphic = chara.scene.add.graphics({ fillStyle: { color: 0xff0000 } });
   // originGraphic.alpha = 1;
 
   // originGraphic.fillRectShape(origin);
   // chara.container.add(originGraphic);
 
-  if (showHpBar) {
-    hpBar(chara, unit.currentHp);
-  }
-
-  chara.container.scale = scaleSizing;
+  return chara;
 };

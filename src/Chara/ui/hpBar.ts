@@ -1,8 +1,8 @@
-import { Container } from "../../Models";
-import text from "../../UI/text";
-import tint from "../animations/tint";
-import { Chara } from "../Chara";
-import { CHARA_INACTIVE_COLOR } from "../colors";
+import { Container } from '../../Models';
+import text from '../../UI/text';
+import tint from '../animations/tint';
+import { CHARA_INACTIVE_COLOR } from '../colors';
+import { Chara } from '../Model';
 
 const createHpBar = (
   scene: Phaser.Scene,
@@ -37,11 +37,11 @@ const createHpBar = (
   hpBar.fillRect(borderWidth, borderWidth, fillSize, height);
 
   const hp = text(30, -50, hpAmount, container, scene);
-  hp.setStyle({ fontStyle: "bold", align: "center" });
+  hp.setStyle({ fontStyle: 'bold', align: 'center' });
   container.add(hp);
 
-  hp.setColor("#ffffff");
-  hp.setStroke("#000000", 6);
+  hp.setColor('#ffffff');
+  hp.setStroke('#000000', 6);
   hp.setFontSize(50);
 
   return container;
@@ -56,7 +56,7 @@ export default function (chara: Chara, hpAmount: number) {
   }
 
   chara.hpBarContainer = createHpBar(
-    chara,
+    chara.scene,
     chara.container,
     hpAmount,
     chara.props.unit.hp

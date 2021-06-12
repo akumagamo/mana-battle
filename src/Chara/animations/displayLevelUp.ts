@@ -1,8 +1,14 @@
 import text from '../../UI/text';
-import {Chara} from '../Chara';
+import { Chara } from '../Model';
 
 export async function displayLevelUp(chara: Chara) {
-  const lvlUp = text(-100, -100, 'Level up!', chara.charaWrapper, chara.props.parent);
+  const lvlUp = text(
+    -100,
+    -100,
+    'Level up!',
+    chara.charaWrapper,
+    chara.props.parent
+  );
   lvlUp.setScale(1.5);
   lvlUp.setShadow(0, 0, '#000', 2);
   lvlUp.setStroke('#000000', 2);
