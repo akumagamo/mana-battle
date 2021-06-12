@@ -1,4 +1,8 @@
+import createStaticBoard from '../Board/createStaticBoard';
+import findTileByXY from '../Board/findTileByXY';
+import highlightTile from '../Board/highlightTile';
 import BoardScene from '../Board/InteractiveBoardScene';
+import { StaticBoard } from '../Board/Model';
 import { Chara } from '../Chara/Model';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../constants';
 import { Vector } from '../Map/Model';
@@ -39,8 +43,19 @@ export default function (
   ) => void,
   onClose: (s: Squad.SquadRecord) => void
 ) {
-  const boardScene = new BoardScene(squad, onSquadUpdated, units, true);
-  scene.scene.add('editSquadModalBoard', boardScene, true);
+  const boardScene = createStaticBoard(
+    scene,
+    squad,
+    units,
+    SCREEN_WIDTH / 2,
+    SCREEN_HEIGHT / 4,
+    1,
+    true,
+    false,
+    onSquadUpdated
+  );
+
+  //  new BoardScene(squad, onSquadUpdated, units, true);
 
   const listScene = new UnitListScene(
     110,
@@ -74,7 +89,7 @@ export default function (
   );
 
   const handleOnCloseEditSquadModal = () => {
-    container.destroy();
+    //container.destroy();
     listScene.destroy();
     scene.scene.remove('UnitListScene');
     boardScene.destroy();
@@ -85,26 +100,39 @@ export default function (
   };
   events.OnClose.on(handleOnCloseEditSquadModal);
 
-  const container = boardScene.add.container();
-  panel(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, container, boardScene);
+  //const container = boardScene.add.container();
+  const panel_ = panel(
+    -SCREEN_WIDTH / 2,
+    -SCREEN_HEIGHT / 4,
+    SCREEN_WIDTH,
+    SCREEN_HEIGHT,
+    boardScene.container,
+    boardScene.scene
+  );
+  boardScene.container.sendToBack(panel_);
   let details: Container | null = null;
 
-  boardScene.makeUnitsClickable((c) => {
-    details?.destroy();
-    details = SmallUnitDetailsBar(
-      330,
-      SCREEN_HEIGHT - 160,
-      boardScene,
-      units.find((u) => u.id === c.props.unit.id)
-    );
-    container.add(details);
-  });
-  button(1070, SCREEN_HEIGHT - 150, 'Confirm', container, boardScene, () =>
-    events.OnClose.emit(null)
+  // boardScene.makeUnitsClickable((c) => {
+  //   details?.destroy();
+  //   details = SmallUnitDetailsBar(
+  //     330,
+  //     SCREEN_HEIGHT - 160,
+  //     boardScene,
+  //     units.find((u) => u.id === c.props.unit.id)
+  //   );
+  //   container.add(details);
+  // });
+  button(
+    1070,
+    SCREEN_HEIGHT - 150,
+    'Confirm',
+    boardScene.container,
+    boardScene.scene,
+    () => events.OnClose.emit(null)
   );
 
-  if (addUnitEnabled)
-    createUnitListOnModal(scene, listScene, boardScene, onSquadUpdated);
+  // if (addUnitEnabled)
+  //   createUnitListOnModal(scene, listScene, boardScene, onSquadUpdated);
 
   return events;
 }
@@ -112,7 +140,7 @@ export default function (
 export const createUnitListOnModal = (
   scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents },
   list: UnitListScene,
-  boardScene: BoardScene,
+  boardScene: StaticBoard,
   onSquadUpdated: (
     s: Squad.SquadRecord,
     added: string[],
@@ -126,9 +154,9 @@ export const createUnitListOnModal = (
   scene.scene.add('UnitListScene', list, true);
 };
 
-const handleOnDragFromUnitList = (board: BoardScene, x: number, y: number) => {
+const handleOnDragFromUnitList = (board: StaticBoard, x: number, y: number) => {
   board.tiles.forEach((tile) => tile.sprite.clearTint());
-  const boardSprite = board.findTileByXY(x, y);
+  const boardSprite = findTileByXY(board, x, y);
 
   if (boardSprite) boardSprite.sprite.setTint(0x33ff88);
 };
@@ -137,7 +165,7 @@ const handleOnDragEndFromUnitList = (
   x: number,
   y: number,
   listScene: UnitListScene,
-  board: BoardScene,
+  board: StaticBoard,
   chara: Chara,
   onSquadUpdated: (
     s: Squad.SquadRecord,
@@ -145,7 +173,7 @@ const handleOnDragEndFromUnitList = (
     removed: string[]
   ) => void
 ) => {
-  const cell = board.findTileByXY(x, y);
+  const cell = findTileByXY(board, x, y);
   const { unit } = chara.props;
 
   if (cell) {
@@ -166,10 +194,10 @@ const handleOnDragEndFromUnitList = (
     board.squad = updatedSquad;
 
     //create new chara on board, representing same unit
-    board.placeUnit({
-      member: Squad.makeMember({ id: unit.id, x: cell.boardX, y: cell.boardY }),
-      fromOutside: true,
-    });
+    // board.placeUnit({
+    //   member: Squad.makeMember({ id: unit.id, x: cell.boardX, y: cell.boardY }),
+    //   fromOutside: true,
+    // });
 
     //remove replaced unit
     if (unitToReplace) {
@@ -179,7 +207,7 @@ const handleOnDragEndFromUnitList = (
 
       listScene.addUnit(charaToRemove.props.unit);
 
-      board.scene.scene.tweens.add({
+      board.scene.tweens.add({
         targets: charaToRemove.container,
         y: charaToRemove.container.y - 200,
         alpha: 0,
@@ -197,7 +225,7 @@ const handleOnDragEndFromUnitList = (
     //Remove dragged unit from list
     listScene.removeUnitFromList(unit);
 
-    board.highlightTile(cell);
+    highlightTile(board, cell);
   } else {
     listScene.returnToOriginalPosition(chara);
     listScene.scaleDown(chara);
@@ -205,7 +233,7 @@ const handleOnDragEndFromUnitList = (
   }
 };
 
-function removeCharaFromBoard(board: BoardScene, charaToRemove: Chara) {
+function removeCharaFromBoard(board: StaticBoard, charaToRemove: Chara) {
   board.unitList = board.unitList.filter(
     (c) => c.props.unit.id !== charaToRemove.props.unit.id
   );

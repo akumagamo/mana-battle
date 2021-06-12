@@ -149,7 +149,7 @@ export default class BoardScene extends Phaser.Scene {
       showHpBar: this.showHpBars,
     });
 
-    onEnableDrag(chara, onUnitDrag(this), onUnitDragEnd(this));
+    //onEnableDrag(chara, onUnitDrag(this), onUnitDragEnd(this));
 
     return chara;
   }

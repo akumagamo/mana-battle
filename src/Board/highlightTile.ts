@@ -6,7 +6,9 @@ export default (
 ): void => {
   board.tiles.forEach((tile) => tile.sprite.clearTint());
 
-  board.tiles
-    .filter((t) => t.boardX === x && t.boardY === y)
-    .map((t) => t.sprite.setTint(0x00cc00));
+  board.tiles.filter((t) => t.boardX === x && t.boardY === y);
+
+  const tile = board.tiles.find((t) => t.boardX === x && t.boardY === y);
+
+  tile.sprite.setTint(0x00cc00);
 };

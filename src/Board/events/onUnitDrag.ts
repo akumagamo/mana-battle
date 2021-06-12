@@ -1,10 +1,13 @@
-import { Unit } from "../../Unit/Model";
-import BoardScene from "../InteractiveBoardScene";
+import { Unit } from '../../Unit/Model';
+import findTileByXY from '../findTileByXY';
+import highlightTile from '../highlightTile';
+import { StaticBoard } from '../Model';
 
-export default (board: BoardScene) => (unit: Unit, x: number, y: number) => {
-  const tile = board.findTileByXY(x, y);
+export default (board: StaticBoard) => (unit: Unit, x: number, y: number) => {
+  const tile = findTileByXY(board, x, y);
 
+  // todo: refactor this, as tile is already known
   if (tile) {
-    board.highlightTile(tile);
+    highlightTile(board, { x: tile.boardX, y: tile.boardY });
   }
 };

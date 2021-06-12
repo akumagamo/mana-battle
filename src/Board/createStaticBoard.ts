@@ -1,5 +1,6 @@
+import { Chara } from '../Chara/Model';
 import { SquadRecord } from '../Squad/Model';
-import { UnitIndex } from '../Unit/Model';
+import { Unit, UnitIndex } from '../Unit/Model';
 import { StaticBoard } from './Model';
 import createTiles from './placeTiles';
 import placeUnits from './placeUnits';
@@ -12,9 +13,13 @@ export default (
   y: number,
   scale = 1,
   front = true,
-  isSelected = false
+  isSelected = false,
+  onSquadUpdated?: (
+    squad: SquadRecord,
+    added: string[],
+    removed: string[]
+  ) => void
 ) => {
-
   const container = scene.add.container(x, y);
   const tiles = createTiles(scene, scale, {
     mapWidth: 3,

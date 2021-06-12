@@ -5,5 +5,5 @@ export default (chara: Chara) => (
   onDragEnd: (x: number, y: number) => void
 ) => {
   chara.container.setDepth(y);
-  onDragEnd(chara.container.x || 0, chara.container.y || 0);
+  onDragEnd(chara.container.x, chara.container.y);
 };

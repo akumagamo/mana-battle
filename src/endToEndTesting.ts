@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import TitleScene from './Scenes/TitleScene';
 import CharaCreationScene from './CharaCreation/CharaCreationScene';
 import { MapScene } from './Map/MapScene';
@@ -39,6 +41,7 @@ export function endToEndTesting(game: Phaser.Game) {
     }
   );
   game.events.once('MapSceneCreated', (scn: MapScene) => {
+    return;
     const squad = scn.state.squads.find(
       (sqd) => sqd.squad.force === PLAYER_FORCE
     );
@@ -73,6 +76,7 @@ export function endToEndTesting(game: Phaser.Game) {
   game.events.once(
     'ListSquadsSceneCreated',
     async (listScene: ListSquadsScene) => {
+      return;
       EditSquad(listScene);
 
       SquadCreation(listScene, game);
