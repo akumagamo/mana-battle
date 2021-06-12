@@ -6,6 +6,7 @@ import { Unit, UnitIndex } from "../Unit/Model";
 import { tileWidth, tileHeight } from "../constants";
 import { Map } from "immutable";
 import onEnableDrag from "../Chara/events/onEnableDrag";
+import onUnitDrag from "./events/onUnitDrag";
 
 type BoardTile = {
   sprite: Image;
@@ -190,7 +191,7 @@ export default class BoardScene extends Phaser.Scene {
       showHpBar: this.showHpBars,
     });
 
-    onEnableDrag(chara, this.onUnitDrag.bind(this), this.onUnitDragEnd.bind(this))
+    onEnableDrag(chara, onUnitDrag(this), this.onUnitDragEnd.bind(this));
 
     return chara;
   }
@@ -215,15 +216,6 @@ export default class BoardScene extends Phaser.Scene {
       });
     });
   }
-
-  onUnitDrag = (unit: Unit, x: number, y: number) => {
-    const tile = this.findTileByXY(x, y);
-
-    if (tile) {
-      this.highlightTile(tile);
-    }
-    this.scene.bringToTop(this.makeUnitKey(unit));
-  };
 
   highlightTile(boardSprite: BoardTile) {
     this.tiles.forEach((tile) => tile.sprite.clearTint());
@@ -256,7 +248,7 @@ export default class BoardScene extends Phaser.Scene {
     }
   }
 
-  private makeUnitKey(unit: { id: string }) {
+  makeUnitKey(unit: { id: string }) {
     return `board-${unit.id}`;
   }
 

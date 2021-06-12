@@ -8,7 +8,6 @@ export default function onEnableDrag(
   dragStart: (unit: Unit, x: number, y: number, chara: Chara) => void,
   dragEnd: (unit: Unit, x: number, y: number, chara: Chara) => void
 ) {
-  chara.onDragStart = dragStart;
   chara.onDragEnd = dragEnd;
   chara.container.setInteractive();
   chara.input.setDraggable(chara.container);
@@ -16,7 +15,7 @@ export default function onEnableDrag(
   chara.input.on(
     "drag",
     (_pointer: Pointer, _obj: Container, x: number, y: number) =>
-      onDrag(chara, x, y)
+      onDrag(chara, x, y, dragStart)
   );
 
   chara.container.on(

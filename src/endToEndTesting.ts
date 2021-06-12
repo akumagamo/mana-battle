@@ -11,6 +11,7 @@ import { MapSquad } from "./Map/Model";
 import { handleMovePlayerSquadButtonClicked } from "./Map/ui/playerSquad";
 import { Map } from "immutable";
 import onDrag from "./Chara/events/onDrag";
+import onUnitDrag from "./Board/events/onUnitDrag";
 
 const assert = (condition: string, a: any, b: any) => {
   if (a !== b)
@@ -166,7 +167,7 @@ function EditSquad(listScene: ListSquadsScene) {
   const chara = unitListScene.unitRows[0].chara;
 
   boardScene.tiles.forEach((t, index) => {
-    onDrag(chara, t.sprite.x, t.sprite.y - 100);
+    onDrag(chara, t.sprite.x, t.sprite.y - 100, onUnitDrag(boardScene));
     assert(
       `A unit dragged from the list should paint the board cells when hovered over them (${t.sprite.x}, ${t.sprite.y})`,
       boardScene.tiles[index].sprite.tintTopLeft,
@@ -200,7 +201,13 @@ function EditSquad(listScene: ListSquadsScene) {
   // Drag to empty cell
   const emptyCell = getEmptyCell(boardScene);
 
-  onDrag(chara, emptyCell.sprite.x, emptyCell.sprite.y - 100);
+  onDrag(
+    chara,
+    emptyCell.sprite.x,
+    emptyCell.sprite.y - 100,
+    onUnitDrag(boardScene)
+  );
+
   chara.handleDragEnd(emptyCell.sprite.y - 100);
 
   assert(
@@ -218,7 +225,12 @@ function EditSquad(listScene: ListSquadsScene) {
 
   const newChara = unitListScene.unitRows[0].chara;
 
-  onDrag(chara, emptyCell.sprite.x, emptyCell.sprite.y - 100);
+  onDrag(
+    chara,
+    emptyCell.sprite.x,
+    emptyCell.sprite.y - 100,
+    onUnitDrag(boardScene)
+  );
   newChara.handleDragEnd(emptyCell.sprite.y - 100);
 
   assert(
@@ -261,9 +273,11 @@ function SquadCreation(listScene: ListSquadsScene, game: Phaser.Game) {
   [0, 0, 0].forEach((_, index) => {
     const chara_ = newUnitListScene.unitRows[0].chara;
 
-    onDrag( chara_, 
+    onDrag(
+      chara_,
       newBoardScene.tiles[index].sprite.x,
-      newBoardScene.tiles[index].sprite.y - 100
+      newBoardScene.tiles[index].sprite.y - 100,
+      onUnitDrag(newBoardScene)
     );
     chara_.handleDragEnd(newBoardScene.tiles[index].sprite.y - 100);
   });

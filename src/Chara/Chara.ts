@@ -57,7 +57,6 @@ export class Chara extends Phaser.Scene {
 
   hpBarContainer: Container | null;
 
-  onDragStart: (unit: Unit, x: number, y: number, chara: Chara) => void;
   onDragEnd: (unit: Unit, x: number, y: number, chara: Chara) => void;
 
   constructor({
@@ -161,11 +160,7 @@ export class Chara extends Phaser.Scene {
 
     this.container.scale = scaleSizing;
 
-    // TODO: is this necessary?
-    this.container.name = unit.id;
   }
-
-  
 
   onClick(fn: (chara: Chara) => void) {
     this.container.setInteractive();
