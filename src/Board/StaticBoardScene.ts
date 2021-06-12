@@ -6,6 +6,7 @@ import { Graphics } from "../Models";
 import { Unit, UnitIndex } from "../Unit/Model";
 import { Vector } from "../Map/Model";
 import tint from "../Chara/animations/tint";
+import onClick from "../Chara/events/onClick";
 
 const BOARD_WIDTH = 250;
 const BOARD_HEIGHT = 150;
@@ -195,7 +196,7 @@ export default class StaticBoardScene extends Phaser.Scene {
 
   onUnitClick(fn: (c: Chara) => void) {
     this.unitList.forEach((chara) => {
-      chara.onClick(() => {
+      onClick(chara, () => {
         const pos = this.squad.members.get(chara.props.unit.id);
         this.highlightTile(pos);
         fn(chara);

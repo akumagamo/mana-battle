@@ -5,6 +5,7 @@ import { UnitDetailsBarScene } from "./UnitDetailsBarScene";
 import button from "../UI/button";
 import menu from "../Backgrounds/menu";
 import { List } from "immutable";
+import onClick from "../Chara/events/onClick";
 
 type ListUnit = {
   tile: Image;
@@ -28,7 +29,7 @@ export class ListUnitsScene extends Phaser.Scene {
     //     this.page * this.itemsPerPage,
     //     this.page * this.itemsPerPage + this.itemsPerPage
     //   );
-    return {} as UnitIndex
+    return {} as UnitIndex;
   }
   create() {
     menu(this);
@@ -99,7 +100,7 @@ export class ListUnitsScene extends Phaser.Scene {
       scaleSizing: 0.6,
     });
 
-    chara.onClick(() => this.selectUnit(unit.id));
+    onClick(chara, () => this.selectUnit(unit.id));
 
     tile.setInteractive();
     tile.on("pointerdown", () => this.selectUnit(unit.id));

@@ -8,6 +8,7 @@ import { Map } from "immutable";
 import onEnableDrag from "../Chara/events/onEnableDrag";
 import onUnitDrag from "./events/onUnitDrag";
 import onUnitDragEnd from "./events/onUnitDragEnd";
+import onClick from "../Chara/events/onClick";
 
 type BoardTile = {
   sprite: Image;
@@ -162,7 +163,7 @@ export default class BoardScene extends Phaser.Scene {
 
   makeUnitsClickable(fn: (u: Chara) => void) {
     this.unitList.forEach((chara) => {
-      chara.onClick((c) => {
+      onClick(chara, (c) => {
         const member = Squad.findMember(
           (mem) => mem.id === chara.props.unit.id,
           this.squad

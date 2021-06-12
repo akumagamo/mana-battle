@@ -82,11 +82,4 @@ export class Chara extends Phaser.Scene {
     createChara(this);
   }
 
-  onClick(fn: (chara: Chara) => void) {
-    this.container.setInteractive();
-
-    this.container.on("pointerdown", (_pointer: Pointer) => {
-      fn(this);
-    });
-  }
 }
