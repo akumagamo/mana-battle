@@ -1,16 +1,20 @@
-import {List, Map, Set} from "immutable";
-import menu from "../../Backgrounds/menu";
-import Board from "../../Board/StaticBoardScene";
-import {SCREEN_WIDTH, PLAYER_FORCE} from "../../constants";
-import {GAME_SPEED} from "../../env";
-import {Container, Pointer} from "../../Models";
-import button from "../../UI/button";
-import panel from "../../UI/panel";
-import text from "../../UI/text";
-import {UnitIndex} from "../../Unit/Model";
-import {SceneEventFactory} from "../../utils";
-import EditSquadModal, {EditSquadModalEvents} from "../EditSquadModal";
-import * as Squad from "../Model"
+import { List, Map, Set } from 'immutable';
+import menu from '../../Backgrounds/menu';
+import createStaticBoard from '../../Board/createStaticBoard';
+import onBoardClicked from '../../Board/events/onBoardClicked';
+import onBoardDeselected from '../../Board/events/onBoardDeselected';
+import onBoardSelected from '../../Board/events/onBoardSelected';
+import { StaticBoard } from '../../Board/Model';
+import { SCREEN_WIDTH, PLAYER_FORCE } from '../../constants';
+import { GAME_SPEED } from '../../env';
+import { Container, Pointer } from '../../Models';
+import button from '../../UI/button';
+import panel from '../../UI/panel';
+import text from '../../UI/text';
+import { UnitIndex } from '../../Unit/Model';
+import { SceneEventFactory } from '../../utils';
+import EditSquadModal, { EditSquadModalEvents } from '../EditSquadModal';
+import * as Squad from '../Model';
 
 type CreateParams = {
   squads: Squad.Index;
@@ -19,7 +23,7 @@ type CreateParams = {
   dispatched: Set<string>;
 };
 
-export const key = "ListSquadsScene";
+export const key = 'ListSquadsScene';
 
 export const run = (
   params: CreateParams,
@@ -32,13 +36,13 @@ export class ListSquadsScene extends Phaser.Scene {
   evs = {
     SquadEditClicked: SceneEventFactory<Squad.SquadRecord>(
       this,
-      "SquadEditClicked"
+      'SquadEditClicked'
     ),
-    CreateSquadClicked: SceneEventFactory<null>(this, "CreateSquadClicked"),
-    ConfirmButtonClicked: SceneEventFactory<null>(this, "ConfirmButtonClicked"),
+    CreateSquadClicked: SceneEventFactory<null>(this, 'CreateSquadClicked'),
+    ConfirmButtonClicked: SceneEventFactory<null>(this, 'ConfirmButtonClicked'),
   };
 
-  boardScenes: Board[] = [];
+  boards: StaticBoard[] = [];
   page: number = 0;
   itemsPerPage: number = 16;
   squads = Map() as Squad.Index;
@@ -62,7 +66,6 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   create({ squads, units, dispatched, onReturnClick }: CreateParams) {
-
     this.cameras.main.fadeIn(1000 / GAME_SPEED);
 
     this.squads = squads;
@@ -77,7 +80,7 @@ export class ListSquadsScene extends Phaser.Scene {
     this.renderControls();
     this.handleSquadClicked(squads.toList().get(0));
 
-    this.game.events.emit("ListSquadsSceneCreated", this);
+    this.game.events.emit('ListSquadsSceneCreated', this);
   }
 
   getSquads() {
@@ -127,14 +130,14 @@ export class ListSquadsScene extends Phaser.Scene {
 
     const dispatched = this.dispatched.has(squad.id);
 
-    button(300, baseY + 20, "Edit", this.uiContainer, this, () =>
+    button(300, baseY + 20, 'Edit', this.uiContainer, this, () =>
       this.evs.SquadEditClicked.emit(squad)
     );
 
     button(
       1000,
       baseY + 20,
-      "Disband Squad",
+      'Disband Squad',
       this.uiContainer,
       this,
       () => {
@@ -187,10 +190,10 @@ export class ListSquadsScene extends Phaser.Scene {
     this.editSquadModalEvents = EditSquadModal(
       this,
       Squad.createSquad({
-        id: "squad+" + new Date().getTime(),
+        id: 'squad+' + new Date().getTime(),
         members: Map(),
         force: PLAYER_FORCE,
-        leader: "",
+        leader: '',
       }),
       this.units.filter((u) => !u.squad),
       true,
@@ -227,7 +230,8 @@ export class ListSquadsScene extends Phaser.Scene {
   renderBoard(squad: Squad.SquadRecord, x: number, y: number) {
     const BOARD_X = 20 + x * 350;
     const BOARD_Y = 20 + y * 250;
-    const boardScene = new Board(
+    const board = createStaticBoard(
+      this,
       squad,
       this.units.filter((u) => u.squad === squad.id),
       BOARD_X,
@@ -236,28 +240,25 @@ export class ListSquadsScene extends Phaser.Scene {
       true
     );
 
-    const key = `board-squad-${squad.id}`;
-    this.scene.remove(key);
-    this.scene.add(key, boardScene, true);
-
-    boardScene.onClick((sqd) => {
+    onBoardClicked(board, (sqd) => {
       if (this.inputEnabled) this.handleSquadClicked(sqd);
     });
 
-    this.boardScenes.push(boardScene);
+    this.boards.push(board);
   }
 
-  squadSceneIO(id: string, fn: (board: Board) => void) {
-    const board = this.boardScenes.find((e) => e.squad.id === id);
+  squadSceneIO(id: string, fn: (board: StaticBoard) => void) {
+    const board = this.boards.find((e) => e.squad.id === id);
 
     fn(board);
   }
   handleSquadClicked(sqd: Squad.SquadRecord) {
     this.squadSceneIO(sqd.id, (squadScene) => {
-      this.boardScenes
+      this.boards
         .filter((scene) => scene.isSelected)
-        .forEach((scene) => scene.deselect());
-      squadScene.select();
+        .forEach((scene) => onBoardDeselected(scene));
+
+      onBoardSelected(squadScene);
       this.refreshUI(sqd);
     });
   }
@@ -272,7 +273,7 @@ export class ListSquadsScene extends Phaser.Scene {
     button(
       SCREEN_WIDTH - 150,
       600,
-      "Confirm",
+      'Confirm',
       this.uiContainer,
       this,
       this.handleOnConfirmButtonClicked.bind(this),
@@ -282,13 +283,13 @@ export class ListSquadsScene extends Phaser.Scene {
     button(
       SCREEN_WIDTH - 370,
       600,
-      "Create Squad",
+      'Create Squad',
       this.uiContainer,
       this,
       () => {
         this.evs.CreateSquadClicked.emit(null);
       },
-      !this.inputEnabled || this.units.every(u=>!!u.squad)
+      !this.inputEnabled || this.units.every((u) => !!u.squad)
     );
 
     this.renderNavigation();
@@ -302,10 +303,10 @@ export class ListSquadsScene extends Phaser.Scene {
     const totalSquads = Object.keys(squads).length;
 
     if (this.page !== 0) {
-      const prev = this.add.image(NAV_X, NAV_Y, "arrow_right");
+      const prev = this.add.image(NAV_X, NAV_Y, 'arrow_right');
       prev.setScale(-1, 1);
       prev.setInteractive();
-      prev.on("pointerdown", (_pointer: Pointer) => {
+      prev.on('pointerdown', (_pointer: Pointer) => {
         if (this.inputEnabled) this.prevPage();
       });
 
@@ -317,9 +318,9 @@ export class ListSquadsScene extends Phaser.Scene {
       this.itemsPerPage * (this.page + 1) >= totalSquads;
 
     if (!isLastPage) {
-      const next = this.add.image(NAV_X + 100, NAV_Y, "arrow_right");
+      const next = this.add.image(NAV_X + 100, NAV_Y, 'arrow_right');
       next.setInteractive();
-      next.on("pointerdown", () => {
+      next.on('pointerdown', () => {
         if (this.inputEnabled) this.nextPage();
       });
 
@@ -337,10 +338,10 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   refreshBoards() {
-    this.boardScenes.forEach((scene) => {
-      scene.turnOff();
+    this.boards.forEach((board) => {
+      board.destroy();
     });
-    this.boardScenes = [];
+    this.boards = [];
 
     this.renderSquadList();
   }
@@ -361,10 +362,7 @@ export class ListSquadsScene extends Phaser.Scene {
   }
 
   turnOff() {
-    this.boardScenes.forEach((scene) => {
-      scene.turnOff();
-    });
-    this.boardScenes = [];
+    this.boards = [];
     this.squads = Map();
     this.units = Map();
     this.uiContainer.destroy();

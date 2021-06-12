@@ -1,0 +1,12 @@
+import { StaticBoard } from './Model';
+
+export default (
+  board: StaticBoard,
+  { x, y }: { x: number; y: number }
+): void => {
+  board.tiles.forEach((tile) => tile.sprite.clearTint());
+
+  board.tiles
+    .filter((t) => t.boardX === x && t.boardY === y)
+    .map((t) => t.sprite.setTint(0x00cc00));
+};

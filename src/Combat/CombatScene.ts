@@ -14,7 +14,6 @@ import announcement from '../UI/announcement';
 import { fadeIn, fadeOut } from '../UI/Transition';
 import { displayExperience } from '../Chara/animations/displayExperience';
 import { displayLevelUp } from '../Chara/animations/displayLevelUp';
-import StaticBoardScene from '../Board/StaticBoardScene';
 import { PUBLIC_URL, SCREEN_HEIGHT, SCREEN_WIDTH } from '../constants';
 import panel from '../UI/panel';
 import { Scene } from 'phaser';
@@ -26,6 +25,8 @@ import bowAttack from '../Chara/animations/bowAttack';
 import slash from '../Chara/animations/slash';
 import flinch from '../Chara/animations/flinch';
 import createChara from '../Chara/createChara';
+import { StaticBoard } from '../Board/Model';
+import createStaticBoard from '../Board/createStaticBoard';
 
 const COMBAT_CHARA_SCALE = 1;
 const WALK_DURATION = 500;
@@ -57,8 +58,8 @@ export default class CombatScene extends Phaser.Scene {
   squads: Squad.Index = Map();
   unitIndex: UnitIndex = Map();
   miniSquads: {
-    top: StaticBoardScene | null;
-    bottom: StaticBoardScene | null;
+    top: StaticBoard | null;
+    bottom: StaticBoard | null;
   } = {
     top: null,
     bottom: null,
@@ -188,7 +189,8 @@ export default class CombatScene extends Phaser.Scene {
     panel_(bottom).setAlpha(0.3);
 
     const render = (squadId: string) =>
-      new StaticBoardScene(
+      createStaticBoard(
+        this,
         this.squads.find((s) => s.id === squadId),
         this.unitIndex.filter((u) => u.squad === squadId),
         pos[squadId].x,
@@ -199,9 +201,6 @@ export default class CombatScene extends Phaser.Scene {
 
     this.miniSquads.top = render(top);
     this.miniSquads.bottom = render(bottom);
-
-    this.scene.add(this.miniSquadId(top), this.miniSquads.top, true);
-    this.scene.add(this.miniSquadId(bottom), this.miniSquads.bottom, true);
 
     const push = (c: Chara) => this.miniSquadCharas.push(c);
 
@@ -224,11 +223,7 @@ export default class CombatScene extends Phaser.Scene {
     this.charas.forEach((chara) => chara.destroy());
     this.charas = [];
 
-    this.miniSquads.top.turnOff();
-    this.miniSquads.bottom.turnOff();
-
-    this.scene.remove(this.miniSquads.top);
-    this.scene.remove(this.miniSquads.bottom);
+    this.miniSquadCharas.forEach((board) => board.destroy());
     this.miniSquadCharas = [];
   }
 

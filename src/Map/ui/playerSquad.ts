@@ -1,7 +1,7 @@
-import { MapSquad } from "../Model";
-import button from "../../UI/button";
-import { MapScene } from "../MapScene";
-import EditSquadModal from "../../Squad/EditSquadModal";
+import { MapSquad } from '../Model';
+import button from '../../UI/button';
+import { MapScene } from '../MapScene';
+import EditSquadModal from '../../Squad/EditSquadModal';
 
 export default (
   mapScene: MapScene,
@@ -12,16 +12,15 @@ export default (
   const baseX = 300;
   const mode = mapScene.mode.type;
 
-  if (mode === "SQUAD_SELECTED") {
+  if (mode === 'SQUAD_SELECTED') {
     button(
       baseX + 400,
       baseY,
-      "Formation",
+      'Formation',
       mapScene.uiContainer,
       mapScene,
       () => {
-        mapScene.clearChildrenScenes();
-        mapScene.changeMode({ type: "CHANGING_SQUAD_FORMATION" });
+        mapScene.changeMode({ type: 'CHANGING_SQUAD_FORMATION' });
         mapScene.disableMapInput();
 
         EditSquadModal(
@@ -30,10 +29,10 @@ export default (
           mapScene.state.units,
           false,
           (updatedSquad) => {
-            mapScene.signal("changed unit position on board, updating", [
+            mapScene.signal('changed unit position on board, updating', [
               // TODO: have a UPDATE_SQUAD_INFO action, this is horrible
               {
-                type: "UPDATE_STATE",
+                type: 'UPDATE_STATE',
                 target: {
                   ...mapScene.state,
                   squads: mapScene.state.squads.set(mapSquad.id, {
@@ -47,14 +46,14 @@ export default (
           () => {
             mapScene.enableInput();
             mapScene.changeMode({
-              type: "SQUAD_SELECTED",
+              type: 'SQUAD_SELECTED',
               id: mapSquad.squad.id,
             });
           }
         );
       }
     );
-    button(baseX + 200, baseY, "Move", mapScene.uiContainer, mapScene, () =>
+    button(baseX + 200, baseY, 'Move', mapScene.uiContainer, mapScene, () =>
       mapScene.evs.MovePlayerSquadButonClicked.emit({ mapScene, mapSquad })
     );
   }
@@ -68,7 +67,7 @@ export function handleMovePlayerSquadButtonClicked({
   mapSquad: MapSquad;
 }) {
   mapScene.changeMode({
-    type: "SELECT_SQUAD_MOVE_TARGET",
+    type: 'SELECT_SQUAD_MOVE_TARGET',
     id: mapSquad.id,
     start: mapSquad.pos,
   });

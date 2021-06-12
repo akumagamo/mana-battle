@@ -1,9 +1,9 @@
-import StaticBoardScene from "../../Board/StaticBoardScene";
-import { PLAYER_FORCE } from "../../constants";
-import button from "../../UI/button";
-import text from "../../UI/text";
-import { MapScene } from "../MapScene";
-import playerSquad from "./playerSquad";
+import createStaticBoard from '../../Board/createStaticBoard';
+import { PLAYER_FORCE } from '../../constants';
+import button from '../../UI/button';
+import text from '../../UI/text';
+import { MapScene } from '../MapScene';
+import playerSquad from './playerSquad';
 
 export async function squadInfo(
   scene: MapScene,
@@ -18,8 +18,7 @@ export async function squadInfo(
   text(320, baseY, leader.name, uiContainer, scene);
 
   if (mapSquad.squad.force !== PLAYER_FORCE) {
-    button(430, baseY, "Squad Details", scene.uiContainer, scene, () => {
-      scene.clearChildrenScenes();
+    button(430, baseY, 'Squad Details', scene.uiContainer, scene, () => {
       scene.viewSquadDetails(id);
     });
   }
@@ -29,14 +28,15 @@ export async function squadInfo(
   }
 
   // TODO: have all boards loaded, and switch them when clicking
-  const boardScene = new StaticBoardScene(
+  console.time('board');
+  createStaticBoard(
+    scene,
     mapSquad.squad,
-
     scene.getSquadUnits(id),
     -100,
     480,
     0.4,
     true
   );
-  scene.scene.add(`static-squad-${id}`, boardScene, true);
+  console.timeEnd('board');
 }

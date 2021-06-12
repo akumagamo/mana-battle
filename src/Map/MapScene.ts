@@ -22,7 +22,6 @@ import {
 import { toMapSquad, Unit } from '../Unit/Model';
 import { Map, Set, List } from 'immutable';
 import speech from '../UI/speech';
-import StaticBoardScene from '../Board/StaticBoardScene';
 import clickCell from './board/clickCell';
 import renderMap from './board/renderMap';
 import renderSquads, { renderSquad } from './board/renderSquads';
@@ -48,6 +47,7 @@ import returnButtonClicked from '../Squad/ListSquadsScene/events/returnButtonCli
 import run from '../Chara/animations/run';
 import stand from '../Chara/animations/stand';
 import fadeOutChara from '../Chara/animations/fadeOutChara';
+import createStaticBoard from '../Board/createStaticBoard';
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 
@@ -813,7 +813,6 @@ export class MapScene extends Phaser.Scene {
   };
 
   turnOff() {
-    this.clearChildrenScenes();
     this.mapContainer.destroy();
     this.uiContainer.destroy();
     this.charas.forEach((chara) => chara.destroy());
@@ -839,7 +838,6 @@ export class MapScene extends Phaser.Scene {
     const { uiContainer } = this.getContainers();
 
     uiContainer.removeAll(true);
-    this.clearChildrenScenes();
   }
 
   async refreshUI() {
@@ -959,20 +957,8 @@ export class MapScene extends Phaser.Scene {
     return this.state.units.filter((u) => u.squad === id);
   }
 
-  clearChildrenScenes() {
-    this.state.squads.forEach((_, id) => {
-      const board = this.scene.get(
-        `static-squad-${id}`
-      ) as StaticBoardScene | null;
-
-      if (board) board.turnOff();
-    });
-  }
-
   // TODO: handle scenario where none of the engaging squads belongs to the player
   async startCombat(squadA: MapSquad, squadB: MapSquad, direction: string) {
-    this.clearChildrenScenes();
-
     const baseX = 200;
     const baseY = 200;
     const scale = 0.5;
@@ -991,7 +977,8 @@ export class MapScene extends Phaser.Scene {
 
     const enemyUnits = this.getSquadUnits(squadB.id);
 
-    const enemy = new StaticBoardScene(
+    const enemy = createStaticBoard(
+      this,
       squadB.squad,
       enemyUnits,
       baseX + 10,
@@ -1000,11 +987,10 @@ export class MapScene extends Phaser.Scene {
       true
     );
 
-    this.scene.add('enemy_board', enemy, true);
-
     const alliedUnits = this.state.units.filter((u) => u.squad === squadA.id);
 
-    const ally = new StaticBoardScene(
+    const ally = createStaticBoard(
+      this,
       squadA.squad,
       alliedUnits,
       baseX + 200,
@@ -1012,8 +998,6 @@ export class MapScene extends Phaser.Scene {
       scale,
       false
     );
-
-    this.scene.add('ally_board', ally, true);
 
     const { portrait } = await speech(
       leader,
@@ -1029,8 +1013,8 @@ export class MapScene extends Phaser.Scene {
 
     portrait.destroy();
 
-    ally.turnOff();
-    enemy.turnOff();
+    ally.destroy();
+    enemy.destroy();
 
     this.attack(squadA, squadB, direction);
   }
