@@ -5,6 +5,7 @@ import { cartesianToIsometric } from "../utils/isometric";
 import { Unit, UnitIndex } from "../Unit/Model";
 import { tileWidth, tileHeight } from "../constants";
 import { Map } from "immutable";
+import onEnableDrag from "../Chara/events/onEnableDrag";
 
 type BoardTile = {
   sprite: Image;
@@ -189,7 +190,7 @@ export default class BoardScene extends Phaser.Scene {
       showHpBar: this.showHpBars,
     });
 
-    chara.enableDrag(this.onUnitDrag.bind(this), this.onUnitDragEnd.bind(this));
+    onEnableDrag(chara, this.onUnitDrag.bind(this), this.onUnitDragEnd.bind(this))
 
     return chara;
   }

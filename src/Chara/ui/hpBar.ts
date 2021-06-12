@@ -1,7 +1,10 @@
-import { Container } from "../Models";
-import text from "../UI/text";
+import {Container} from "../../Models";
+import text from "../../UI/text";
+import {Chara} from "../Chara";
+import {CHARA_INACTIVE_COLOR} from "../colors";
 
-export default (
+
+const createHpBar = (
   scene: Phaser.Scene,
   parent: Container,
   hpAmount: number,
@@ -43,3 +46,21 @@ export default (
 
   return container;
 };
+
+export default function (chara:Chara, hpAmount: number) {
+    if (chara.hpBarContainer) chara.hpBarContainer.destroy();
+
+    if (hpAmount < 1) {
+      chara.tint(CHARA_INACTIVE_COLOR);
+      return;
+    }
+
+    chara.hpBarContainer = createHpBar(
+      chara,
+      chara.container,
+      hpAmount,
+      chara.props.unit.hp
+    );
+  }
+
+

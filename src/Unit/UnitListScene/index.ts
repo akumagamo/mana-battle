@@ -5,6 +5,7 @@ import { error, INVALID_STATE } from "../../errors";
 import { Text, Container } from "../../Models";
 import button from "../../UI/button";
 import { List } from "immutable";
+import onEnableDrag from "../../Chara/events/onEnableDrag";
 
 // TODO: fix list display when unit in board is replaced with unit from list
 
@@ -203,12 +204,12 @@ export default class UnitListScene extends Phaser.Scene {
     });
 
     if (onDrag && onDragEnd)
-      chara.enableDrag(onDrag.bind(this), onDragEnd.bind(this));
+      onEnableDrag(chara, onDrag.bind(this), onDragEnd.bind(this));
 
     const text = this.add.text(40, 30, unit.name);
 
     container.add(text);
-    //TODO: move background createion to
+    //TODO: move background creation to
     this.unitRows.push({ chara, text, container });
 
     return chara;

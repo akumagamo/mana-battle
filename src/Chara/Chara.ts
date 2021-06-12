@@ -8,9 +8,9 @@ import flinch from "./animations/flinch";
 import slash from "./animations/slash";
 import bowAttack from "./animations/bowAttack";
 import initial from "./animations/initial";
-import hpBar from "./hpBar";
 import { PUBLIC_URL } from "../constants";
 import {classes} from "../Unit/Jobs";
+import hpBar from "./ui/hpBar";
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 
@@ -29,7 +29,6 @@ interface CharaProps {
   showWeapon?: boolean;
 }
 
-const CHARA_INACTIVE_COLOR = 222222;
 export class Chara extends Phaser.Scene {
   evs: {};
   props: CharaProps;
@@ -157,7 +156,7 @@ export class Chara extends Phaser.Scene {
     // this.container.add(originGraphic);
 
     if (showHpBar) {
-      this.renderHPBar(unit.currentHp);
+      hpBar(this, unit.currentHp);
     }
 
     this.container.scale = scaleSizing;
@@ -166,21 +165,7 @@ export class Chara extends Phaser.Scene {
     this.container.name = unit.id;
   }
 
-  public renderHPBar(hpAmount: number) {
-    if (this.hpBarContainer) this.hpBarContainer.destroy();
-
-    if (hpAmount < 1) {
-      this.tint(CHARA_INACTIVE_COLOR);
-      return;
-    }
-
-    this.hpBarContainer = hpBar(
-      this,
-      this.container,
-      hpAmount,
-      this.props.unit.hp
-    );
-  }
+  
 
   onClick(fn: (chara: Chara) => void) {
     this.container.setInteractive();
@@ -207,33 +192,7 @@ export class Chara extends Phaser.Scene {
       this
     );
   }
-  enableDrag(
-    dragStart: (unit: Unit, x: number, y: number, chara: Chara) => void,
-    dragEnd: (unit: Unit, x: number, y: number, chara: Chara) => void
-  ) {
-    this.onDragStart = dragStart;
-    this.onDragEnd = dragEnd;
-    this.container.setInteractive();
-    this.input.setDraggable(this.container);
 
-    this.input.on(
-      "drag",
-      (_pointer: Pointer, obj: Container, x: number, y: number) =>
-        this.handleDrag(x, y)
-    );
-
-    this.container.on(
-      "dragend",
-      (_pointer: Pointer, _dragX: number, dragY: number) =>
-        this.handleDragEnd(dragY)
-    );
-  }
-
-  handleClick(fn: (chara: Chara, pointer: Pointer) => void) {
-    this.container.on("pointerdown", (pointer: Pointer) => {
-      fn(this, pointer);
-    });
-  }
 
   // ANIMATIONS
 
@@ -254,7 +213,7 @@ export class Chara extends Phaser.Scene {
   }
 
   flinch(damage: number, isKilled: boolean) {
-    if (this.props.showHpBar) this.renderHPBar(damage);
+    if (this.props.showHpBar) hpBar(this,damage);
     flinch(this, damage, isKilled);
   }
 

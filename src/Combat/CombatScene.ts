@@ -18,6 +18,7 @@ import StaticBoardScene from "../Board/StaticBoardScene";
 import { PUBLIC_URL, SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
 import panel from "../UI/panel";
 import { Scene } from "phaser";
+import hpBar from "../Chara/ui/hpBar";
 
 const COMBAT_CHARA_SCALE = 1;
 const WALK_DURATION = 500;
@@ -445,7 +446,7 @@ export default class CombatScene extends Phaser.Scene {
   updateMinisquadHP(id: string, hp: number) {
     const chara = this.miniSquadCharas.find((c) => c.props.unit.id === id);
 
-    chara.renderHPBar(hp);
+    hpBar(chara, hp);
   }
 
   bowAttack(
