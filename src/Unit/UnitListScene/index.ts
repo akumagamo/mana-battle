@@ -19,10 +19,8 @@ export default class UnitListScene extends Phaser.Scene {
   private page: number;
   private pagingControls: (() => void)[] = [];
   public onUnitClick: ((unit: Unit) => void) | null = null;
-  public onDrag: ((unit: Unit, x: number, y: number) => void) | null = null;
-  public onDragEnd:
-    | ((unit: Unit, x: number, y: number, chara: Chara) => void)
-    | null = null;
+  public onDrag: (unit: Unit, x: number, y: number) => void;
+  public onDragEnd: (chara: Chara, x: number, y: number) => void;
 
   constructor(
     public x: number,
@@ -145,37 +143,22 @@ export default class UnitListScene extends Phaser.Scene {
     unitsToRender.forEach(this.renderUnitListItem.bind(this));
   }
 
-  private handleUnitClick(unit: Unit) {
-    if (this.onUnitClick) {
-      console.log(`An event to handle unit click has been defined`, unit);
-      this.onUnitClick(unit);
-    }
-  }
-
   private handleUnitDrag(unit: Unit, x: number, y: number, chara: Chara) {
     this.scaleUp(chara);
     this.scene.bringToTop(chara.props.key);
-    if (this.onDrag) return this.onDrag(unit, x, y);
+    return this.onDrag(unit, x, y);
   }
 
-  private handleUnitDragEnd(unit: Unit, x: number, y: number, chara: Chara) {
+  private handleUnitDragEnd = (chara: Chara) => (x: number, y: number) => {
     this.renderControls();
-    if (this.onDragEnd) this.onDragEnd(unit, x, y, chara);
-  }
+    if (this.onDragEnd) this.onDragEnd(chara, x, y);
+  };
 
   private renderUnitListItem(unit: Unit, index: number) {
     const { x, y } = this.getRowPosition(index);
     const key = this.makeUnitKey(unit);
 
     const container = this.add.container(x, y);
-
-    const onRowClick = this.onUnitClick
-      ? this.handleUnitClick.bind(this)
-      : undefined;
-    const onDrag = this.onDrag ? this.handleUnitDrag.bind(this) : undefined;
-    const onDragEnd = this.onDragEnd
-      ? this.handleUnitDragEnd.bind(this)
-      : undefined;
 
     var rect = new Phaser.Geom.Rectangle(
       rowOffsetX,
@@ -188,12 +171,6 @@ export default class UnitListScene extends Phaser.Scene {
 
     container.add(background);
 
-    if (onRowClick) {
-      background.on(`pointerdown`, () => {
-        onRowClick(unit);
-      });
-    }
-
     const chara = new Chara({
       key,
       parent: this,
@@ -203,8 +180,11 @@ export default class UnitListScene extends Phaser.Scene {
       scaleSizing: 0.5,
     });
 
-    if (onDrag && onDragEnd)
-      onEnableDrag(chara, onDrag.bind(this), onDragEnd.bind(this));
+    onEnableDrag(
+      chara,
+      (unit, x, y, chara) => this.handleUnitDrag(unit, x, y, chara),
+      (chara) => (x, y) => this.handleUnitDragEnd(chara)(x, y)
+    );
 
     const text = this.add.text(40, 30, unit.name);
 
@@ -229,11 +209,11 @@ export default class UnitListScene extends Phaser.Scene {
     );
   }
 
-  returnToOriginalPosition(unit: Unit) {
-    const index = this.getUnitIndex(unit);
+  returnToOriginalPosition(chara: Chara) {
+    const index = this.getUnitIndex(chara.props.unit);
 
     const row = this.unitRows.find(
-      (row) => row.chara.props.key === this.makeUnitKey(unit)
+      (row) => row.chara.props.key === chara.props.key
     );
 
     if (!row) {

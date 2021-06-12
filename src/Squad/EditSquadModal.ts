@@ -62,15 +62,14 @@ export default function (
     handleOnDragFromUnitList(boardScene, x, y)
   );
   events.OnDragEnd.on(
-    ({ pos, unit, chara }: { pos: Vector; unit: Unit; chara: Chara }) =>
+    ({ pos, chara }: { pos: Vector; unit: Unit; chara: Chara }) =>
       handleOnDragEndFromUnitList(
         pos.x,
         pos.y,
         listScene,
         boardScene,
-        unit,
+        chara,
         onSquadUpdated,
-        chara
       )
   );
 
@@ -122,15 +121,14 @@ export const createUnitListOnModal = (
 ) => {
   list.onDrag = (_unit, x, y) =>
     scene.editSquadModalEvents.OnDrag.emit({ x, y });
-  list.onDragEnd = (u, x, y, chara) =>
+  list.onDragEnd = (chara, x, y) =>
     handleOnDragEndFromUnitList(
       x,
       y,
       list,
       boardScene,
-      u,
+      chara,
       onSquadUpdated,
-      chara
     );
   scene.scene.add("UnitListScene", list, true);
 };
@@ -147,15 +145,15 @@ const handleOnDragEndFromUnitList = (
   y: number,
   listScene: UnitListScene,
   board: BoardScene,
-  unit: Unit,
+  chara: Chara,
   onSquadUpdated: (
     s: Squad.SquadRecord,
     added: string[],
     removed: string[]
-  ) => void,
-  chara: Chara
+  ) => void
 ) => {
   const cell = board.findTileByXY(x, y);
+  const {unit} = chara.props
 
   if (cell) {
     const { updatedSquad, added, removed } = Squad.addMember(
@@ -208,7 +206,7 @@ const handleOnDragEndFromUnitList = (
 
     board.highlightTile(cell);
   } else {
-    listScene.returnToOriginalPosition(unit);
+    listScene.returnToOriginalPosition(chara);
     listScene.scaleDown(chara);
     board.tiles.forEach((tile) => tile.sprite.clearTint());
   }
@@ -221,4 +219,3 @@ function removeCharaFromBoard(board: BoardScene, charaToRemove: Chara) {
   charaToRemove.scene.remove(charaToRemove);
 }
 
-function handleOnClose() {}

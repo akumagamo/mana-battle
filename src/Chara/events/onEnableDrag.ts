@@ -2,13 +2,13 @@ import { Pointer, Container } from "../../Models";
 import { Unit } from "../../Unit/Model";
 import { Chara } from "../Chara";
 import onDrag from "./onDrag";
+import onDragEnd from "./onDragEnd";
 
 export default function onEnableDrag(
   chara: Chara,
   dragStart: (unit: Unit, x: number, y: number, chara: Chara) => void,
-  dragEnd: (unit: Unit, x: number, y: number, chara: Chara) => void
+  dragEnd: (chara: Chara) => (x: number, y: number) => void
 ) {
-  chara.onDragEnd = dragEnd;
   chara.container.setInteractive();
   chara.input.setDraggable(chara.container);
 
@@ -21,6 +21,6 @@ export default function onEnableDrag(
   chara.container.on(
     "dragend",
     (_pointer: Pointer, _dragX: number, dragY: number) =>
-      chara.handleDragEnd(dragY)
+      onDragEnd(chara)(dragY, dragEnd(chara))
   );
 }

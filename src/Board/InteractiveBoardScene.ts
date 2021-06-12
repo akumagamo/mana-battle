@@ -7,6 +7,7 @@ import { tileWidth, tileHeight } from "../constants";
 import { Map } from "immutable";
 import onEnableDrag from "../Chara/events/onEnableDrag";
 import onUnitDrag from "./events/onUnitDrag";
+import onUnitDragEnd from "./events/onUnitDragEnd";
 
 type BoardTile = {
   sprite: Image;
@@ -93,48 +94,7 @@ export default class BoardScene extends Phaser.Scene {
     });
   }
 
-  onUnitDragEnd = (unit: Unit, x: number, y: number) => {
-    const { squad } = this;
-
-    const boardSprite = this.findTileByXY(x, y);
-
-    const squadMember = Squad.getMember(unit.id, squad);
-
-    if (!squadMember)
-      throw new Error("Invalid state. Unit should be in board object.");
-
-    const isMoved = (boardSprite: BoardTile) =>
-      squadMember.x !== boardSprite.boardX ||
-      squadMember.y !== boardSprite.boardY;
-
-    if (boardSprite && isMoved(boardSprite)) {
-      this.changeUnitPositionInBoard({
-        unit,
-        x: boardSprite.boardX,
-        y: boardSprite.boardY,
-      });
-    } else {
-      const { x, y } = getUnitPositionInScreen(squadMember);
-
-      // return to original position
-      this.tweens.add({
-        targets: this.getChara(unit)?.container,
-        x: x,
-        y: y,
-        ease: "Cubic",
-        duration: 400,
-        repeat: 0,
-        paused: false,
-        yoyo: false,
-      });
-      this.tiles.forEach((sprite) => {
-        if (sprite.boardX === squadMember.x && sprite.boardY === squadMember.y)
-          this.highlightTile(sprite);
-        else sprite.sprite.clearTint();
-      });
-    }
-  };
-  private getChara(unit: { id: string }) {
+  getChara(unit: { id: string }) {
     return this.unitList.find(
       (chara) => chara.props.key === this.makeUnitKey(unit)
     );
@@ -191,7 +151,11 @@ export default class BoardScene extends Phaser.Scene {
       showHpBar: this.showHpBars,
     });
 
-    onEnableDrag(chara, onUnitDrag(this), this.onUnitDragEnd.bind(this));
+    onEnableDrag(
+      chara,
+      onUnitDrag(this),
+      onUnitDragEnd(this)
+    );
 
     return chara;
   }
@@ -274,7 +238,7 @@ export default class BoardScene extends Phaser.Scene {
   }
 }
 
-function getUnitPositionInScreen(squadMember: Squad.MemberRecord) {
+export function getUnitPositionInScreen(squadMember: Squad.MemberRecord) {
   const { x, y } = cartesianToIsometric(squadMember.x, squadMember.y);
 
   //FIXME: unit should be rendered at origin 0.5

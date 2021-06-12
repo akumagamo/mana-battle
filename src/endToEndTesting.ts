@@ -12,6 +12,8 @@ import { handleMovePlayerSquadButtonClicked } from "./Map/ui/playerSquad";
 import { Map } from "immutable";
 import onDrag from "./Chara/events/onDrag";
 import onUnitDrag from "./Board/events/onUnitDrag";
+import onDragEnd from "./Chara/events/onDragEnd";
+import onUnitDragEnd from "./Board/events/onUnitDragEnd";
 
 const assert = (condition: string, a: any, b: any) => {
   if (a !== b)
@@ -208,7 +210,7 @@ function EditSquad(listScene: ListSquadsScene) {
     onUnitDrag(boardScene)
   );
 
-  chara.handleDragEnd(emptyCell.sprite.y - 100);
+  onDragEnd(chara)(emptyCell.sprite.y - 100, onUnitDragEnd(boardScene)(chara));
 
   assert(
     "After adding a character, the squad should have 6 members",
@@ -231,7 +233,7 @@ function EditSquad(listScene: ListSquadsScene) {
     emptyCell.sprite.y - 100,
     onUnitDrag(boardScene)
   );
-  newChara.handleDragEnd(emptyCell.sprite.y - 100);
+  onDragEnd(chara)(emptyCell.sprite.y - 100, onUnitDragEnd(boardScene)(chara));
 
   assert(
     "When replacing a character, the number of units is still the same",
@@ -279,7 +281,10 @@ function SquadCreation(listScene: ListSquadsScene, game: Phaser.Game) {
       newBoardScene.tiles[index].sprite.y - 100,
       onUnitDrag(newBoardScene)
     );
-    chara_.handleDragEnd(newBoardScene.tiles[index].sprite.y - 100);
+    onDragEnd(chara_)(
+      newBoardScene.tiles[index].sprite.y - 100,
+      onUnitDragEnd(newBoardScene)(chara_)
+    );
   });
 
   assert(

@@ -57,8 +57,6 @@ export class Chara extends Phaser.Scene {
 
   hpBarContainer: Container | null;
 
-  onDragEnd: (unit: Unit, x: number, y: number, chara: Chara) => void;
-
   constructor({
     key,
     parent,
@@ -169,17 +167,6 @@ export class Chara extends Phaser.Scene {
       fn(this);
     });
   }
-
-  handleDragEnd(y: number) {
-    this.container.setDepth(y);
-    this.onDragEnd(
-      this.props.unit,
-      this.container.x || 0,
-      this.container.y || 0,
-      this
-    );
-  }
-
 
   // ANIMATIONS
 
