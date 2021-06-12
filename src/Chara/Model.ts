@@ -3,22 +3,20 @@ import { Container, Image } from '../Models';
 
 export type CharaProps = {
   parent: Phaser.Scene;
-  // TODO: remove unit, we should have just the eid (avoid data dup)
   unit: Unit;
-  x?: number;
-  y?: number;
-  scale?: number;
-  front?: boolean;
-  animated?: boolean;
-  headOnly?: boolean;
-  showHpBar?: boolean;
-  showWeapon?: boolean;
+  x: number;
+  y: number;
+  scale: number;
+  front: boolean;
+  animated: boolean;
+  headOnly: boolean;
+  showHpBar: boolean;
+  showWeapon: boolean;
 };
 
 export type Chara = {
   id: string;
   props: CharaProps;
-
   scene: Phaser.Scene;
   /** Container around Chara, doesn't rotate (useful for adding UI elements)*/
   charaWrapper: Container;

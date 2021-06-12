@@ -1,4 +1,5 @@
 import { stringify } from 'querystring';
+import { Unit } from '../Unit/Model';
 import initial from './animations/initial';
 import stand from './animations/stand';
 import { Chara, CharaProps } from './Model';
@@ -30,23 +31,30 @@ import hpBar from './ui/hpBar';
 
 //hpBarContainer: Container | null;
 
-// constructor({
-//   key,
-//   parent,
-//   unit,
-//   cx = 0,
-//   cy = 0,
-//   scaleSizing = 1,
-//   front = true,
-//   animated = true,
-//   headOnly = false,
-//   showHpBar = false,
-//   showWeapon = true,
-// }: CharaProps) {
-//   super(key);
-
-export default (props: CharaProps): Chara => {
-  const { x, y, headOnly, animated, showHpBar, unit, scale, parent } = props;
+export default (props: {
+  parent: Phaser.Scene;
+  unit: Unit;
+  x?: number;
+  y?: number;
+  scale?: number;
+  front?: boolean;
+  animated?: boolean;
+  headOnly?: boolean;
+  showHpBar?: boolean;
+  showWeapon?: boolean;
+}): Chara => {
+  const {
+    parent,
+    unit,
+    x = 0,
+    y = 0,
+    scale = 1,
+    front = true,
+    animated = true,
+    headOnly = false,
+    showHpBar = false,
+    showWeapon = false,
+  } = props;
   //the unit has two wrappers to allow multiple tweens at once
   const charaWrapper = parent.add.container();
   const container = parent.add.container(x, y);
@@ -60,7 +68,17 @@ export default (props: CharaProps): Chara => {
 
   const chara: Chara = {
     id: unit.id,
-    props,
+    props: {
+      ...props,
+      x,
+      y,
+      scale,
+      front,
+      animated,
+      headOnly,
+      showHpBar,
+      showWeapon,
+    },
     scene: parent,
     charaWrapper,
     container,
