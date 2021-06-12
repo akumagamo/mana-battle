@@ -28,15 +28,12 @@ export async function squadInfo(
   }
 
   // TODO: have all boards loaded, and switch them when clicking
-  console.time('board');
   createStaticBoard(
     scene,
     mapSquad.squad,
     scene.getSquadUnits(id),
-    -100,
-    480,
-    0.4,
-    true
+    170,
+    600,
+    0.4
   );
-  console.timeEnd('board');
 }

@@ -9,5 +9,5 @@ export default (board: StaticBoard) => {
     board.unitList = board.unitList.concat([chara]);
   });
 
-  sortUnitsByDepth(this);
+  sortUnitsByDepth(board);
 };

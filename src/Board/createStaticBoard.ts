@@ -1,4 +1,3 @@
-import { Map } from 'immutable';
 import { SquadRecord } from '../Squad/Model';
 import { UnitIndex } from '../Unit/Model';
 import { StaticBoard } from './Model';
@@ -35,6 +34,8 @@ export default (
     scale,
     destroy: () => container.destroy(),
   };
+
+  placeUnits(board);
 
   // DEBUG DRAG CONTAINER
   //debugMakeOverlay(board);

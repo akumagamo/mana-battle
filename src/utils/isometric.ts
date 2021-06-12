@@ -1,4 +1,4 @@
-import {tileWidth, tileHeight, centerX, centerY} from '../constants';
+import { tileWidth, tileHeight, centerX, centerY } from '../constants';
 
 /**
  *
@@ -10,8 +10,8 @@ import {tileWidth, tileHeight, centerX, centerY} from '../constants';
 
 export function cartesianToIsometric(x: number, y: number) {
   return {
-    x: (x - y) * tileWidth + centerX,
-    y: (x + y) * tileHeight + centerY - 50,
+    x: (x - y) * tileWidth,
+    y: (x + y) * tileHeight - 50,
   };
 }
 
@@ -25,7 +25,7 @@ export function cartesianToIsometric(x: number, y: number) {
 export function cartesianToIsometricBattle(
   isTopSquad: boolean,
   x: number,
-  y: number,
+  y: number
 ) {
   const TOP_SQUAD_OFFSET_X = 350;
   const TOP_SQUAD_OFFSET_Y = 50;

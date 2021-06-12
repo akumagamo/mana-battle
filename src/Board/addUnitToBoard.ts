@@ -5,8 +5,6 @@ import { getUnitPositionInScreen } from './InteractiveBoardScene';
 import { StaticBoard } from './Model';
 
 export default (board: StaticBoard, unit: Unit) => {
-  if (!unit.squad) return;
-
   const pos = board.squad.members.get(unit.id);
 
   let { x, y } = getUnitPositionInScreen(pos);
@@ -15,7 +13,7 @@ export default (board: StaticBoard, unit: Unit) => {
   y = y * board.scale + board.y;
 
   const chara = createChara({
-    parent: this,
+    parent: board.scene,
     unit,
     x: x,
     y: y,

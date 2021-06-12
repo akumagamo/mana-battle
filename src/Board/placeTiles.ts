@@ -11,26 +11,26 @@ export default (
   let grid: null[][] = [[]];
   let tiles: BoardTile[] = [];
 
-  for (var x = 0; x < mapWidth; x++) {
-    grid[x] = [];
-    for (var y = 0; y < mapHeight; y++) grid[x][y] = null;
+  for (let x_ = 0; x_ < mapWidth; x_++) {
+    grid[x_] = [];
+    for (let y_ = 0; y_ < mapHeight; y_++) grid[x_][y_] = null;
   }
 
   grid.forEach((row, yIndex) => {
     row.forEach((_, xIndex) => {
-      let { x, y } = cartesianToIsometric(xIndex, yIndex);
+      let pos = cartesianToIsometric(xIndex, yIndex);
 
-      x = x * scale + x;
-      y = y * scale + y;
+      const x_ = pos.x * scale + x;
+      const y_ = pos.y * scale + y;
 
-      const tileSprite = scene.add.image(x, y, 'tile');
+      const tileSprite = scene.add.image(x_, y_, 'tile');
       tileSprite.scale = scale;
       tileSprite.depth = y;
 
       tiles.push({
         sprite: tileSprite,
-        x,
-        y,
+        x: x_,
+        y: y_,
         boardX: xIndex + 1,
         boardY: yIndex + 1,
       });
