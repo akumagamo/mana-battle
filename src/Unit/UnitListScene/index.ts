@@ -1,10 +1,10 @@
 import Phaser from "phaser";
-import { Unit, UnitIndex } from "../Model";
+import { Unit } from "../Model";
 import { Chara } from "../../Chara/Chara";
 import { error, INVALID_STATE } from "../../errors";
 import { Text, Container } from "../../Models";
 import button from "../../UI/button";
-import { Map } from "immutable";
+import { List } from "immutable";
 
 // TODO: fix list display when unit in board is replaced with unit from list
 
@@ -27,7 +27,7 @@ export default class UnitListScene extends Phaser.Scene {
     public x: number,
     public y: number,
     public itemsPerPage: number,
-    public units: UnitIndex
+    public units: List<Unit>
   ) {
     super("UnitListScene");
     this.unitRows = [];
@@ -64,7 +64,7 @@ export default class UnitListScene extends Phaser.Scene {
       this.scene.remove(row.chara.scene.key);
     });
     this.unitRows = [];
-    this.units = Map();
+    this.units = List();
   }
 
   renderControls() {
@@ -133,12 +133,10 @@ export default class UnitListScene extends Phaser.Scene {
   }
 
   getUnitsToRender() {
-    return this.units
-      .toList()
-      .slice(
-        this.page * this.itemsPerPage,
-        this.page * this.itemsPerPage + this.itemsPerPage
-      );
+    return this.units.slice(
+      this.page * this.itemsPerPage,
+      this.page * this.itemsPerPage + this.itemsPerPage
+    );
   }
 
   render() {
@@ -301,7 +299,7 @@ export default class UnitListScene extends Phaser.Scene {
   }
 
   addUnit(unit: Unit) {
-    this.units = this.units.set(unit.id, unit);
+    this.units = this.units.push(unit);
 
     if (this.units.size < this.itemsPerPage) {
       const newChara = this.renderUnitListItem(unit, this.units.size - 1);
@@ -313,9 +311,9 @@ export default class UnitListScene extends Phaser.Scene {
     }
   }
   removeUnitFromList(unit: Unit) {
-    this.units = this.units.delete(unit.id);
+    this.units = this.units.filter((u) => u.id !== unit.id);
 
-    const findUnit = (row: { chara: Chara; text: Text }): boolean =>
+    const findUnit = (row: { chara: Chara }): boolean =>
       row.chara.props.unit.id === unit.id;
     this.unitRows.filter(findUnit).forEach((row) => {
       this.removeUnitRow(row);
@@ -333,26 +331,20 @@ export default class UnitListScene extends Phaser.Scene {
 
     if (unitsToRender.size < 1) return;
 
-    const last = unitsToRender.get(unitsToRender.size - 1);
+    unitsToRender.toJS().map((u, index) => {
+      const row = this.unitRows.find((row) => row.chara.props.unit.id === u.id);
 
-    const isAlreadyRendered = this.unitRows.some(
-      (row) => row.chara.props.unit.id === last.id
-    );
+      if (row) {
+        this.reposition(row, index);
+      } else {
+        const newChara = this.renderUnitListItem(u, index);
 
-    if (isAlreadyRendered) return;
-
-    const newChara = this.renderUnitListItem(last, this.itemsPerPage - 1);
-
-    newChara.container.setPosition(
-      newChara.container.x,
-      newChara.container.y + 300
-    );
-
-    const row = this.unitRows[this.unitRows.length - 1];
-
-    if (!row) return;
-
-    this.reposition(row, this.itemsPerPage - 1);
+        newChara.container.setPosition(
+          newChara.container.x,
+          newChara.container.y
+        );
+      }
+    });
 
     this.renderControls();
   }

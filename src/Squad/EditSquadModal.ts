@@ -46,7 +46,7 @@ export default function (
     110,
     90,
     5,
-    units.filter((u) => !u.squad)
+    units.toList().filter((u) => !u.squad)
   );
 
   const events: EditSquadModalEvents = {
@@ -174,9 +174,6 @@ const handleOnDragEndFromUnitList = (
 
     board.squad = updatedSquad;
 
-    //Remove dragged unit from list
-    listScene.removeUnitFromList(unit);
-
     //create new chara on board, representing same unit
     board.placeUnit({
       member: Squad.makeMember({ id: unit.id, x: cell.boardX, y: cell.boardY }),
@@ -205,6 +202,9 @@ const handleOnDragEndFromUnitList = (
         },
       });
     }
+
+    //Remove dragged unit from list
+    listScene.removeUnitFromList(unit);
 
     board.highlightTile(cell);
   } else {
