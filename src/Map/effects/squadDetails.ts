@@ -40,6 +40,9 @@ export default (
     SCREEN_HEIGHT / 3,
     0.7
   );
+
+  container.add(boardScene.container);
+
   onBoardUnitClicked(boardScene, (chara) => {
     charaStats.removeAll();
 

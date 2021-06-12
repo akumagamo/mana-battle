@@ -14,11 +14,12 @@ export default (
   front = true,
   isSelected = false
 ) => {
-  const tiles = createTiles(x, y, scene, scale, {
+
+  const container = scene.add.container(x, y);
+  const tiles = createTiles(scene, scale, {
     mapWidth: 3,
     mapHeight: 3,
   });
-  const container = scene.add.container();
   container.add(tiles.map((t) => t.sprite));
   const board: StaticBoard = {
     scene,
@@ -35,7 +36,7 @@ export default (
     destroy: () => container.destroy(),
   };
 
-  placeUnits(board)
+  placeUnits(board);
 
   // DEBUG DRAG CONTAINER
   //debugMakeOverlay(board);

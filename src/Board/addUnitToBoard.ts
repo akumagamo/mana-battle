@@ -9,8 +9,8 @@ export default (board: StaticBoard, unit: Unit) => {
 
   let { x, y } = getUnitPositionInScreen(pos);
 
-  x = x * board.scale + board.x;
-  y = y * board.scale + board.y;
+  x = x * board.scale;
+  y = y * board.scale;
 
   const chara = createChara({
     parent: board.scene,
@@ -22,6 +22,8 @@ export default (board: StaticBoard, unit: Unit) => {
     animated: false,
     showHpBar: true,
   });
+
+  board.container.add(chara.charaWrapper);
 
   if (chara.props.unit.currentHp < 1) tint(chara, 222222);
 

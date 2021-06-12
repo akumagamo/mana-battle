@@ -2,8 +2,6 @@ import { cartesianToIsometric } from '../utils/isometric';
 import { BoardTile } from './Model';
 
 export default (
-  x: number,
-  y: number,
   scene: Phaser.Scene,
   scale: number,
   { mapWidth, mapHeight }: { mapWidth: number; mapHeight: number }
@@ -20,12 +18,12 @@ export default (
     row.forEach((_, xIndex) => {
       let pos = cartesianToIsometric(xIndex, yIndex);
 
-      const x_ = pos.x * scale + x;
-      const y_ = pos.y * scale + y;
+      const x_ = pos.x * scale ;
+      const y_ = pos.y * scale ;
 
       const tileSprite = scene.add.image(x_, y_, 'tile');
       tileSprite.scale = scale;
-      tileSprite.depth = y;
+      tileSprite.depth = y_;
 
       tiles.push({
         sprite: tileSprite,
