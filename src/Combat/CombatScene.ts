@@ -26,7 +26,7 @@ import slash from '../Chara/animations/slash';
 import flinch from '../Chara/animations/flinch';
 import createChara from '../Chara/createChara';
 import { StaticBoard } from '../Board/Model';
-import createStaticBoard from '../Board/createStaticBoard';
+import createStaticBoard from '../Board/createBoard';
 
 const COMBAT_CHARA_SCALE = 1;
 const WALK_DURATION = 500;

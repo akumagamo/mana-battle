@@ -1,5 +1,5 @@
 import { getMember } from '../Squad/Model';
-import { getUnitPositionInScreen } from './InteractiveBoardScene';
+import getUnitPositionOnScreen from './getUnitPositionOnScreen';
 import { StaticBoard } from './Model';
 import sortUnitsByDepth from './sortUnitsByDepth';
 
@@ -8,7 +8,7 @@ export default (board: StaticBoard, id: string) => {
 
   const { unit } = chara.props;
 
-  const pos = getUnitPositionInScreen(getMember(unit.id, board.squad));
+  const pos = getUnitPositionOnScreen(getMember(unit.id, board.squad));
 
   const tween = board.scene.tweens.add({
     targets: chara?.container,

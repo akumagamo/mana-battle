@@ -1,13 +1,13 @@
 import tint from '../Chara/animations/tint';
 import createChara from '../Chara/createChara';
 import { Unit } from '../Unit/Model';
-import { getUnitPositionInScreen } from './InteractiveBoardScene';
+import getUnitPositionOnScreen from './getUnitPositionOnScreen';
 import { StaticBoard } from './Model';
 
 export default (board: StaticBoard, unit: Unit) => {
   const member = board.squad.members.get(unit.id);
 
-  const { x, y } = getUnitPositionInScreen(member);
+  const { x, y } = getUnitPositionOnScreen(member);
 
   const chara = createChara({
     parent: board.scene,

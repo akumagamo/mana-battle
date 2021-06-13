@@ -1,6 +1,6 @@
 import { List, Map, Set } from 'immutable';
 import menu from '../../Backgrounds/menu';
-import createStaticBoard from '../../Board/createStaticBoard';
+import createStaticBoard from '../../Board/createBoard';
 import onBoardClicked from '../../Board/events/onBoardClicked';
 import onBoardDeselected from '../../Board/events/onBoardDeselected';
 import onBoardSelected from '../../Board/events/onBoardSelected';

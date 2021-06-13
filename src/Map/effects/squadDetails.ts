@@ -8,7 +8,7 @@ import SmallUnitDetailsBar from '../../Unit/SmallUnitDetailsBar';
 import { MapScene } from '../MapScene';
 import { findMember } from '../../Squad/Model';
 import onBoardUnitClicked from '../../Board/events/onBoardUnitClicked';
-import createStaticBoard from '../../Board/createStaticBoard';
+import createStaticBoard from '../../Board/createBoard';
 import highlightTile from '../../Board/highlightTile';
 
 export default (

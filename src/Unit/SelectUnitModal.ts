@@ -1,12 +1,9 @@
-import BoardScene from '../Board/InteractiveBoardScene';
 import createChara from '../Chara/createChara';
-import { Chara } from '../Chara/Model';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../constants';
 import { Container } from '../Models';
 import button from '../UI/button';
 import panel from '../UI/panel';
 import { UnitIndex, Unit } from './Model';
-import SmallUnitDetailsBar from './SmallUnitDetailsBar';
 
 export default function (
   scene: Phaser.Scene,

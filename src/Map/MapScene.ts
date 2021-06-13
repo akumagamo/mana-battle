@@ -46,7 +46,7 @@ import returnButtonClicked from '../Squad/ListSquadsScene/events/returnButtonCli
 import run from '../Chara/animations/run';
 import stand from '../Chara/animations/stand';
 import fadeOutChara from '../Chara/animations/fadeOutChara';
-import createStaticBoard from '../Board/createStaticBoard';
+import createStaticBoard from '../Board/createBoard';
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 

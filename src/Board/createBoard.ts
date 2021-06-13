@@ -16,7 +16,7 @@ export default (
   front = true,
   isSelected = false,
   interactive?: {
-    onSquadUpdated?: (
+    onSquadUpdated: (
       squad: SquadRecord,
       added: string[],
       removed: string[]

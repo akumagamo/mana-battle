@@ -1,4 +1,4 @@
-import createStaticBoard from '../../Board/createStaticBoard';
+import createStaticBoard from '../../Board/createBoard';
 import { PLAYER_FORCE } from '../../constants';
 import button from '../../UI/button';
 import text from '../../UI/text';

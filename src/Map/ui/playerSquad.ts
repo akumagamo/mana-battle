@@ -30,7 +30,6 @@ export default (
           false,
           (updatedSquad) => {
             mapScene.signal('changed unit position on board, updating', [
-              // TODO: have a UPDATE_SQUAD_INFO action, this is horrible
               {
                 type: 'UPDATE_STATE',
                 target: {

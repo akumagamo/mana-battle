@@ -3,6 +3,7 @@ import { Chara } from '../Chara/Model';
 import { SquadRecord } from '../Squad/Model';
 import { Unit } from '../Unit/Model';
 import changeUnitPositionInBoard from './changeUnitPositionInBoard';
+import onUnitDrag from './events/onUnitDrag';
 import { StaticBoard } from './Model';
 
 export default (
@@ -12,26 +13,26 @@ export default (
     added: string[],
     removed: string[]
   ) => void,
-  onDragStart: (unit: Unit, x: number, y: number, chara: Chara) => void,
-  onDragEnd: (chara: Chara) => (x: number, y: number) => void
+  onDragStart?: (unit: Unit, x: number, y: number, chara: Chara) => void,
+  onDragEnd?: (chara: Chara) => (x: number, y: number) => void
 ) => {
   board.unitList.forEach((chara) => {
-    onEnableDrag(chara, onDragStart, (c) => (x, y) => {
-      changeUnitPositionInBoard(
-        board,
-        { unit: c.props.unit, x, y },
-        onSquadUpdated
-      );
+    onEnableDrag(
+      chara,
+      (u, x, y, chara) => {
+        onUnitDrag(board)(u, x, y);
 
-      onDragEnd(c)(x, y);
-    });
+        if (onDragStart) onDragStart(u, x, y, chara);
+      },
+      (c) => (x, y) => {
+        changeUnitPositionInBoard(
+          board,
+          { unit: c.props.unit, x, y },
+          onSquadUpdated
+        );
+
+        if (onDragEnd) onDragEnd(c)(x, y);
+      }
+    );
   });
 };
-
-function onSquadUpdated(
-  board: any,
-  arg1: { unit: Unit; x: number; y: number },
-  onSquadUpdated: any
-) {
-  throw new Error('Function not implemented.');
-}

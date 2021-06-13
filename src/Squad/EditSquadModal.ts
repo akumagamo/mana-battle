@@ -1,4 +1,5 @@
-import createStaticBoard from '../Board/createStaticBoard';
+import createStaticBoard from '../Board/createBoard';
+import onBoardUnitClicked from '../Board/events/onBoardUnitClicked';
 import findTileByXY from '../Board/findTileByXY';
 import highlightTile from '../Board/highlightTile';
 import { StaticBoard } from '../Board/Model';
@@ -24,8 +25,8 @@ const componentEvents = {
 };
 
 export type EditSquadModalEvents = {
-  OnDrag: EventFactory<Vector>;
-  OnDragEnd: EventFactory<{ pos: Vector; unit: Unit }>;
+  OnDragFromUnitList: EventFactory<Vector>;
+  OnDragEndFromUnitList: EventFactory<{ pos: Vector; unit: Unit }>;
   OnClose: EventFactory<null>;
 };
 
@@ -42,30 +43,6 @@ export default function (
   ) => void,
   onClose: (s: Squad.SquadRecord) => void
 ) {
-  const events: EditSquadModalEvents = {
-    OnDrag: SceneEventFactory<Vector>(scene, componentEvents.ON_DRAG),
-    OnDragEnd: SceneEventFactory<{ pos: Vector; unit: Unit }>(
-      scene,
-      componentEvents.ON_DRAG_END
-    ),
-    OnClose: SceneEventFactory<null>(scene, componentEvents.ON_CLOSE),
-  };
-
-  //  new BoardScene(squad, onSquadUpdated, units, true);
-  events.OnDrag.on(({ x, y }: { x: number; y: number }) =>
-    handleOnDragFromUnitList(boardScene, x, y)
-  );
-  events.OnDragEnd.on(
-    ({ pos, chara }: { pos: Vector; unit: Unit; chara: Chara }) =>
-      handleOnDragEndFromUnitList(
-        pos.x,
-        pos.y,
-        listScene,
-        boardScene,
-        chara,
-        onSquadUpdated
-      )
-  );
   const boardScene = createStaticBoard(
     scene,
     squad,
@@ -89,8 +66,17 @@ export default function (
     units.toList().filter((u) => !u.squad)
   );
 
+  if (addUnitEnabled)
+    createUnitListOnModal(scene, listScene, boardScene, onSquadUpdated);
+
+  const events: EditSquadModalEvents = createEvents(
+    scene,
+    boardScene,
+    listScene,
+    onSquadUpdated
+  );
+
   const handleOnCloseEditSquadModal = () => {
-    //container.destroy();
     listScene.destroy();
     scene.scene.remove('UnitListScene');
     boardScene.destroy();
@@ -101,7 +87,6 @@ export default function (
   };
   events.OnClose.on(handleOnCloseEditSquadModal);
 
-  //const container = boardScene.add.container();
   const panel_ = panel(
     -SCREEN_WIDTH / 2,
     -SCREEN_HEIGHT / 4,
@@ -113,16 +98,16 @@ export default function (
   boardScene.container.sendToBack(panel_);
   let details: Container | null = null;
 
-  // boardScene.makeUnitsClickable((c) => {
-  //   details?.destroy();
-  //   details = SmallUnitDetailsBar(
-  //     330,
-  //     SCREEN_HEIGHT - 160,
-  //     boardScene,
-  //     units.find((u) => u.id === c.props.unit.id)
-  //   );
-  //   container.add(details);
-  // });
+  onBoardUnitClicked(boardScene, (c) => {
+    details?.destroy();
+    details = SmallUnitDetailsBar(
+      330,
+      SCREEN_HEIGHT - 160,
+      boardScene.scene,
+      units.find((u) => u.id === c.props.unit.id)
+    );
+    boardScene.container.add(details);
+  });
   button(
     0,
     SCREEN_HEIGHT - 350,
@@ -131,9 +116,6 @@ export default function (
     boardScene.scene,
     () => events.OnClose.emit(null)
   );
-
-  // if (addUnitEnabled)
-  //   createUnitListOnModal(scene, listScene, boardScene, onSquadUpdated);
 
   return events;
 }
@@ -149,7 +131,7 @@ export const createUnitListOnModal = (
   ) => void
 ) => {
   list.onDrag = (_unit, x, y) =>
-    scene.editSquadModalEvents.OnDrag.emit({ x, y });
+    scene.editSquadModalEvents.OnDragFromUnitList.emit({ x, y });
   list.onDragEnd = (chara, x, y) =>
     handleOnDragEndFromUnitList(x, y, list, boardScene, chara, onSquadUpdated);
   scene.scene.add('UnitListScene', list, true);
@@ -233,6 +215,45 @@ const handleOnDragEndFromUnitList = (
     board.tiles.forEach((tile) => tile.sprite.clearTint());
   }
 };
+
+function createEvents(
+  scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents },
+  boardScene: StaticBoard,
+  listScene: UnitListScene,
+  onSquadUpdated: (
+    s: Squad.SquadRecord,
+    added: string[],
+    removed: string[]
+  ) => void
+) {
+  const events: EditSquadModalEvents = {
+    OnDragFromUnitList: SceneEventFactory<Vector>(
+      scene,
+      componentEvents.ON_DRAG
+    ),
+    OnDragEndFromUnitList: SceneEventFactory<{ pos: Vector; unit: Unit }>(
+      scene,
+      componentEvents.ON_DRAG_END
+    ),
+    OnClose: SceneEventFactory<null>(scene, componentEvents.ON_CLOSE),
+  };
+
+  events.OnDragFromUnitList.on(({ x, y }: { x: number; y: number }) =>
+    handleOnDragFromUnitList(boardScene, x, y)
+  );
+  events.OnDragEndFromUnitList.on(
+    ({ pos, chara }: { pos: Vector; unit: Unit; chara: Chara }) =>
+      handleOnDragEndFromUnitList(
+        pos.x,
+        pos.y,
+        listScene,
+        boardScene,
+        chara,
+        onSquadUpdated
+      )
+  );
+  return events;
+}
 
 function removeCharaFromBoard(board: StaticBoard, charaToRemove: Chara) {
   board.unitList = board.unitList.filter(

@@ -1,15 +1,19 @@
-import BoardScene, { getUnitPositionInScreen } from '../InteractiveBoardScene';
 import { BoardTile, StaticBoard } from '../Model';
 import * as Squad from '../../Squad/Model';
 import { Chara } from '../../Chara/Model';
 import findTileByXY from '../findTileByXY';
 import changeUnitPositionInBoard from '../changeUnitPositionInBoard';
 import highlightTile from '../highlightTile';
+import getUnitPositionOnScreen from '../getUnitPositionOnScreen';
 
 export default (board: StaticBoard) => (chara: Chara) => (
   x: number,
   y: number,
-  onSquadUpdated: () => void
+  onSquadUpdated: (
+    squad: Squad.SquadRecord,
+    added: string[],
+    removed: string[]
+  ) => void
 ) => {
   const {
     props: { unit },
@@ -19,9 +23,6 @@ export default (board: StaticBoard) => (chara: Chara) => (
   const boardSprite = findTileByXY(board, x, y);
 
   const squadMember = Squad.getMember(unit.id, squad);
-
-  if (!squadMember)
-    throw new Error('Invalid state. Unit should be in board object.');
 
   const isMoved = (boardSprite: BoardTile) =>
     squadMember.x !== boardSprite.boardX ||
@@ -38,7 +39,7 @@ export default (board: StaticBoard) => (chara: Chara) => (
       onSquadUpdated
     );
   } else {
-    const { x, y } = getUnitPositionInScreen(squadMember);
+    const { x, y } = getUnitPositionOnScreen(squadMember);
 
     // return to original position
     board.scene.tweens.add({
