@@ -11,7 +11,10 @@ import button from '../UI/button';
 import panel from '../UI/panel';
 import { Unit, UnitIndex } from '../Unit/Model';
 import SmallUnitDetailsBar from '../Unit/SmallUnitDetailsBar';
-import UnitListScene from '../Unit/UnitListScene';
+import { createUnitList, reposition, scaleDown } from '../Unit/UnitList';
+import addUnit from '../Unit/UnitList/actions/addUnit';
+import removeUnitFromList from '../Unit/UnitList/actions/removeUnit';
+import { destroy, UnitList } from '../Unit/UnitList/Model';
 import { SceneEventFactory, EventFactory } from '../utils';
 import * as Squad from './Model';
 
@@ -59,11 +62,15 @@ export default function (
     }
   );
 
-  const listScene = new UnitListScene(
+  const listScene = createUnitList(
+    scene,
     110,
     90,
     5,
-    units.toList().filter((u) => !u.squad)
+    units.toList().filter((u) => !u.squad),
+    () => {},
+    () => {},
+    () => {}
   );
 
   if (addUnitEnabled)
@@ -77,8 +84,7 @@ export default function (
   );
 
   const handleOnCloseEditSquadModal = () => {
-    listScene.destroy();
-    scene.scene.remove('UnitListScene');
+    destroy(listScene);
     boardScene.destroy();
 
     for (const k in componentEvents) scene.events.off(k);
@@ -122,7 +128,7 @@ export default function (
 
 export const createUnitListOnModal = (
   scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents },
-  list: UnitListScene,
+  list: UnitList,
   boardScene: StaticBoard,
   onSquadUpdated: (
     s: Squad.SquadRecord,
@@ -134,7 +140,6 @@ export const createUnitListOnModal = (
     scene.editSquadModalEvents.OnDragFromUnitList.emit({ x, y });
   list.onDragEnd = (chara, x, y) =>
     handleOnDragEndFromUnitList(x, y, list, boardScene, chara, onSquadUpdated);
-  scene.scene.add('UnitListScene', list, true);
 };
 
 const handleOnDragFromUnitList = (board: StaticBoard, x: number, y: number) => {
@@ -147,7 +152,7 @@ const handleOnDragFromUnitList = (board: StaticBoard, x: number, y: number) => {
 const handleOnDragEndFromUnitList = (
   x: number,
   y: number,
-  listScene: UnitListScene,
+  listScene: UnitList,
   board: StaticBoard,
   chara: Chara,
   onSquadUpdated: (
@@ -188,7 +193,7 @@ const handleOnDragEndFromUnitList = (
         (chara) => chara.props.unit.id === unitToReplace.id
       );
 
-      listScene.addUnit(charaToRemove.props.unit);
+      addUnit(listScene, charaToRemove.props.unit);
 
       board.scene.tweens.add({
         targets: charaToRemove.container,
@@ -206,12 +211,12 @@ const handleOnDragEndFromUnitList = (
     }
 
     //Remove dragged unit from list
-    listScene.removeUnitFromList(unit);
+    removeUnitFromList(listScene, unit);
 
     highlightTile(board, cell);
   } else {
-    listScene.returnToOriginalPosition(chara);
-    listScene.scaleDown(chara);
+    reposition(listScene, chara);
+    scaleDown(listScene, chara);
     board.tiles.forEach((tile) => tile.sprite.clearTint());
   }
 };
@@ -219,7 +224,7 @@ const handleOnDragEndFromUnitList = (
 function createEvents(
   scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents },
   boardScene: StaticBoard,
-  listScene: UnitListScene,
+  listScene: UnitList,
   onSquadUpdated: (
     s: Squad.SquadRecord,
     added: string[],

@@ -6,7 +6,7 @@ import { MapScene } from './Map/MapScene';
 import { PLAYER_FORCE } from './constants';
 import { Unit } from './Unit/Model';
 import { ListSquadsScene } from './Squad/ListSquadsScene/ListSquadsScene';
-import UnitListScene from './Unit/UnitListScene';
+import UnitList from './Unit/UnitList';
 import BoardScene from './Board/InteractiveBoardScene';
 import { handleDispatchSquad } from './Map/dispatchWindow';
 import { MapSquad } from './Map/Model';
@@ -160,7 +160,7 @@ function EditSquad(listScene: ListSquadsScene) {
   listScene.evs.SquadEditClicked.emit(squad);
   const unitListScene = listScene.scene.manager.getScene(
     'UnitListScene'
-  ) as UnitListScene;
+  ) as UnitList;
 
   const boardScene = listScene.scene.manager.getScene(
     'BoardScene'
@@ -266,7 +266,7 @@ function SquadCreation(listScene: ListSquadsScene, game: Phaser.Game) {
 
   const newUnitListScene = game.scene.getScene(
     'UnitListScene'
-  ) as UnitListScene;
+  ) as UnitList;
 
   newUnitListScene.nextPage();
 
