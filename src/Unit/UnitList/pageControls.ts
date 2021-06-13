@@ -2,6 +2,7 @@ import { renderRows } from '.';
 import { SCREEN_HEIGHT } from '../../constants';
 import button from '../../UI/button';
 import clearList from './actions/clearList';
+import refresh from './actions/refresh';
 import { UnitList } from './Model';
 
 export function pageControls(unitList: UnitList) {
@@ -47,14 +48,10 @@ export function pageControls(unitList: UnitList) {
 
 export function nextPage(unitList: UnitList) {
   unitList.page = unitList.page + 1;
-  clearList(unitList);
-  renderRows(unitList);
-  pageControls(unitList);
+  refresh(unitList)
 }
 
 export function prevPage(unitList: UnitList) {
   unitList.page = unitList.page - 1;
-  clearList(unitList);
-  renderRows(unitList);
-  pageControls(unitList);
+  refresh(unitList)
 }

@@ -5,6 +5,7 @@ import { List } from 'immutable';
 import renderListItem from './renderListItem';
 import { UnitList } from './Model';
 import { pageControls } from './pageControls';
+import refresh from './actions/refresh';
 
 export function createUnitList(
   scene: Phaser.Scene,
@@ -26,9 +27,7 @@ export function createUnitList(
     charas: List(),
   };
 
-  renderRows(unitList);
-
-  pageControls(unitList);
+  refresh(unitList);
 
   scene.game.events.emit('UnitListSceneCreated', unitList);
   return unitList;
