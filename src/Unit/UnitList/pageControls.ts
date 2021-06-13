@@ -1,10 +1,12 @@
 import { renderRows } from '.';
+import { SCREEN_HEIGHT } from '../../constants';
 import button from '../../UI/button';
 import clearList from './actions/clearList';
 import { UnitList } from './Model';
 
 export function pageControls(unitList: UnitList) {
-  const baseY = 280;
+  const baseX = 30;
+  const baseY = SCREEN_HEIGHT - 100;
 
   const totalUnits = unitList.units.size;
 
@@ -12,7 +14,7 @@ export function pageControls(unitList: UnitList) {
     const container = unitList.scene.add.container();
     unitList.container.add(container);
     button(
-      200,
+      baseX,
       baseY,
       ' <= ',
       container,
@@ -31,7 +33,7 @@ export function pageControls(unitList: UnitList) {
     const container = unitList.scene.add.container();
     unitList.container.add(container);
     button(
-      250,
+      baseX + 60,
       baseY,
       ' => ',
       container,

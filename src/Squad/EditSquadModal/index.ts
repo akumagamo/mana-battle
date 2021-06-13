@@ -15,16 +15,17 @@ import SmallUnitDetailsBar from '../../Unit/SmallUnitDetailsBar';
 import { createUnitList, reposition, scaleDown } from '../../Unit/UnitList';
 import addUnit from '../../Unit/UnitList/actions/addUnit';
 import removeUnit from '../../Unit/UnitList/actions/removeUnit';
-import { destroy, UnitList } from '../../Unit/UnitList/Model';
+import { UnitList } from '../../Unit/UnitList/Model';
 import { SceneEventFactory, EventFactory } from '../../utils';
 import * as Squad from '../Model';
 import removeCharaFromBoard from './actions/removeCharaFromBoard';
 import onDragEndFromUnitList from './events/onDragEndFromUnitList';
 import onDragFromUnitList from './events/onDragFromUnitList';
+import { onCloseModal } from './events/onCloseModal';
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 
-const componentEvents = {
+export const componentEvents = {
   ADD_UNIT_BUTTON_CLICKED: 'ADD_UNIT_BUTTON_CLICKED',
   ON_DRAG: 'ON_DRAG',
   ON_DRAG_END: 'ON_DRAG_END',
@@ -68,6 +69,18 @@ export default function (
 
   //if (addUnitEnabled)
   const listScene = createUnitList(scene, 30, 30, 5, units.toList());
+
+  listScene.charas.forEach((chara) => {
+    onEnableDrag(
+      chara,
+      () => {
+        console.log(`drag`);
+      },
+      () => () => {
+        console.log(`drag end`);
+      }
+    );
+  });
 
   const events: EditSquadModalEvents = createEvents(
     scene,
@@ -148,12 +161,7 @@ function createEvents(
       )
   );
   events.OnClose.on(() => {
-    destroy(listScene);
-    boardScene.destroy();
-
-    for (const k in componentEvents) scene.events.off(k);
-
-    onClose(boardScene.squad);
+    onCloseModal(listScene, boardScene, scene, onClose);
   });
 
   return events;
