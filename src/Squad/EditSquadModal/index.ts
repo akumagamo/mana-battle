@@ -1,22 +1,26 @@
-import createStaticBoard from '../Board/createBoard';
-import onBoardUnitClicked from '../Board/events/onBoardUnitClicked';
-import findTileByXY from '../Board/findTileByXY';
-import highlightTile from '../Board/highlightTile';
-import { StaticBoard } from '../Board/Model';
-import { Chara } from '../Chara/Model';
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../constants';
-import { Vector } from '../Map/Model';
-import { Container } from '../Models';
-import button from '../UI/button';
-import panel from '../UI/panel';
-import { Unit, UnitIndex } from '../Unit/Model';
-import SmallUnitDetailsBar from '../Unit/SmallUnitDetailsBar';
-import { createUnitList, reposition, scaleDown } from '../Unit/UnitList';
-import addUnit from '../Unit/UnitList/actions/addUnit';
-import removeUnitFromList from '../Unit/UnitList/actions/removeUnit';
-import { destroy, UnitList } from '../Unit/UnitList/Model';
-import { SceneEventFactory, EventFactory } from '../utils';
-import * as Squad from './Model';
+import createStaticBoard from '../../Board/createBoard';
+import onBoardUnitClicked from '../../Board/events/onBoardUnitClicked';
+import findTileByXY from '../../Board/findTileByXY';
+import highlightTile from '../../Board/highlightTile';
+import { StaticBoard } from '../../Board/Model';
+import onEnableDrag from '../../Chara/events/onEnableDrag';
+import { Chara } from '../../Chara/Model';
+import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../../constants';
+import { Vector } from '../../Map/Model';
+import { Container } from '../../Models';
+import button from '../../UI/button';
+import panel from '../../UI/panel';
+import { Unit, UnitIndex } from '../../Unit/Model';
+import SmallUnitDetailsBar from '../../Unit/SmallUnitDetailsBar';
+import { createUnitList, reposition, scaleDown } from '../../Unit/UnitList';
+import addUnit from '../../Unit/UnitList/actions/addUnit';
+import removeUnit from '../../Unit/UnitList/actions/removeUnit';
+import { destroy, UnitList } from '../../Unit/UnitList/Model';
+import { SceneEventFactory, EventFactory } from '../../utils';
+import * as Squad from '../Model';
+import removeCharaFromBoard from './actions/removeCharaFromBoard';
+import onDragEndFromUnitList from './events/onDragEndFromUnitList';
+import onDragFromUnitList from './events/onDragFromUnitList';
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 
@@ -57,18 +61,13 @@ export default function (
     false,
     {
       onDragStart: (u, x, y, chara) => {},
-      onDragEnd: (chara) => (x, y) => {},
+      onDragEnd: (chara) => (x, y) => {}, // todo: event to remove unit
       onSquadUpdated: onSquadUpdated,
     }
   );
 
   //if (addUnitEnabled)
-  const listScene = createUnitListOnModal(scene, units);
-
-  // const onDrag = (_unit: Unit, x: number, y: number) =>
-  //   scene.editSquadModalEvents.OnDragFromUnitList.emit({ x, y });
-  // const onDragEnd = (chara: Chara, x: number, y: number) =>
-  //   handleOnDragEndFromUnitList(x, y, boardScene, chara, onSquadUpdated);
+  const listScene = createUnitList(scene, 30, 30, 5, units.toList());
 
   const events: EditSquadModalEvents = createEvents(
     scene,
@@ -123,27 +122,7 @@ export default function (
 export const createUnitListOnModal = (
   scene: Phaser.Scene,
   units: UnitIndex
-) => {
-  return createUnitList(
-    scene,
-    30,
-    30,
-    5,
-    units.filter((u) => !u.squad).toList()
-  );
-};
-
-const handleOnDragFromUnitList = (
-  listScene: UnitList,
-  board: StaticBoard,
-  x: number,
-  y: number
-) => {
-  board.tiles.forEach((tile) => tile.sprite.clearTint());
-  const boardSprite = findTileByXY(board, x - board.x + 50, y - board.y + 250);
-
-  if (boardSprite) boardSprite.sprite.setTint(0x33ff88);
-};
+) => {};
 
 const handleOnDragEndFromUnitList = (
   x: number,
@@ -207,7 +186,7 @@ const handleOnDragEndFromUnitList = (
     }
 
     //Remove dragged unit from list
-    removeUnitFromList(unitList, unit);
+    removeUnit(unitList, unit);
 
     highlightTile(board, cell);
   } else {
@@ -240,11 +219,11 @@ function createEvents(
   };
 
   events.OnDragFromUnitList.on(({ x, y }: { x: number; y: number }) =>
-    handleOnDragFromUnitList(listScene, boardScene, x, y)
+    onDragFromUnitList(listScene, boardScene, x, y)
   );
   events.OnDragEndFromUnitList.on(
     ({ pos, chara }: { pos: Vector; unit: Unit; chara: Chara }) =>
-      handleOnDragEndFromUnitList(
+      onDragEndFromUnitList(
         pos.x,
         pos.y,
         listScene,
@@ -254,11 +233,4 @@ function createEvents(
       )
   );
   return events;
-}
-
-function removeCharaFromBoard(board: StaticBoard, charaToRemove: Chara) {
-  board.unitList = board.unitList.filter(
-    (c) => c.props.unit.id !== charaToRemove.props.unit.id
-  );
-  charaToRemove.charaWrapper.destroy();
 }

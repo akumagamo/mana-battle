@@ -22,6 +22,7 @@ export function createUnitList(
     page: 0,
     itemsPerPage,
     units,
+    charas: List(),
   };
 
   renderRows(unitList);

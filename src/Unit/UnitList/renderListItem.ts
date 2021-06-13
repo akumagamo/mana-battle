@@ -1,9 +1,6 @@
 import createChara from '../../Chara/createChara';
-import onEnableDrag from '../../Chara/events/onEnableDrag';
-import { Container } from '../../Models';
 import { Unit } from '../Model';
-import handleUnitDrag, { getRowPosition } from './actions/handleUnitDrag';
-import handleUnitDragEnd from './actions/handleUnitDragEnd';
+import { getRowPosition } from './actions/handleUnitDrag';
 import background from './background';
 import { rowOffsetX, rowOffsetY, rowWidth, rowHeight } from './constants';
 import { UnitList } from './Model';
@@ -13,7 +10,6 @@ export default (unitList: UnitList, unit: Unit, index: number) => {
 
   const { x, y } = getRowPosition(container.x, container.y, index);
 
-  console.log(x, y);
   const rowContainer = scene.add.container(x, y);
   rowContainer.setName('row_' + unit.id);
 
@@ -37,11 +33,7 @@ export default (unitList: UnitList, unit: Unit, index: number) => {
     scale: 0.5,
   });
 
-  // onEnableDrag(
-  //   chara,
-  //   (unit, x, y, chara) => handleUnitDrag(unitList, unit, x, y, chara),
-  //   (chara) => (x, y) => handleUnitDragEnd(unitList, chara, x, y)
-  // );
+  unitList.charas = unitList.charas.push(chara);
 
   const text = scene.add.text(40, 30, unit.name);
 

@@ -1,0 +1,81 @@
+import { Vector } from 'matter';
+import findTileByXY from '../../../Board/findTileByXY';
+import highlightTile from '../../../Board/highlightTile';
+import { StaticBoard } from '../../../Board/Model';
+import { Chara } from '../../../Chara/Model';
+import { GAME_SPEED } from '../../../env';
+import { Unit } from '../../../Unit/Model';
+import { reposition, scaleDown } from '../../../Unit/UnitList';
+import addUnit from '../../../Unit/UnitList/actions/addUnit';
+import removeUnit from '../../../Unit/UnitList/actions/removeUnit';
+import { UnitList } from '../../../Unit/UnitList/Model';
+import { addMember, getMemberByPosition, SquadRecord } from '../../Model';
+import removeCharaFromBoard from '../actions/removeCharaFromBoard';
+
+export default (
+  x: number,
+  y: number,
+  unitList: UnitList,
+  board: StaticBoard,
+  chara: Chara,
+  onSquadUpdated: (s: SquadRecord, added: string[], removed: string[]) => void
+) => {
+  const cell = findTileByXY(board, x, y);
+  const { unit } = chara.props;
+
+  if (cell) {
+    const { updatedSquad, added, removed } = addMember(
+      unit,
+      board.squad,
+      cell.boardX,
+      cell.boardY
+    );
+
+    onSquadUpdated(updatedSquad, added, removed);
+
+    const unitToReplace = getMemberByPosition({
+      x: cell.boardX,
+      y: cell.boardY,
+    })(board.squad);
+
+    board.squad = updatedSquad;
+
+    //create new chara on board, representing same unit
+    // board.placeUnit({
+    //   member: Squad.makeMember({ id: unit.id, x: cell.boardX, y: cell.boardY }),
+    //   fromOutside: true,
+    // });
+
+    //remove replaced unit
+    if (unitToReplace) {
+      const charaToRemove = board.unitList.find(
+        (chara) => chara.props.unit.id === unitToReplace.id
+      );
+
+      addUnit(unitList, charaToRemove.props.unit);
+
+      board.scene.tweens.add({
+        targets: charaToRemove.container,
+        y: charaToRemove.container.y - 200,
+        alpha: 0,
+        ease: 'Cubic',
+        duration: 8400 / GAME_SPEED,
+        repeat: 0,
+        paused: false,
+        yoyo: false,
+        onComplete: () => {
+          removeCharaFromBoard(board, charaToRemove);
+        },
+      });
+    }
+
+    //Remove dragged unit from list
+    removeUnit(unitList, unit);
+
+    highlightTile(board, cell);
+  } else {
+    reposition(unitList, chara);
+    scaleDown(unitList, chara);
+    board.tiles.forEach((tile) => tile.sprite.clearTint());
+  }
+};

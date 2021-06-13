@@ -11,10 +11,7 @@ export type UnitList = {
   y: number;
   itemsPerPage: number;
   units: List<Unit>;
-
-  // onUnitClick: (unit: Unit) => void;
-  // onDrag: (unit: Unit, x: number, y: number) => void;
-  // onDragEnd: (chara: Chara, x: number, y: number) => void;
+  charas: List<Chara>;
 };
 
 export const destroy = (unitList: UnitList) => {
