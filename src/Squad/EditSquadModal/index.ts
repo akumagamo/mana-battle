@@ -73,18 +73,9 @@ export default function (
     scene,
     boardScene,
     listScene,
+    onClose,
     onSquadUpdated
   );
-
-  const handleOnCloseEditSquadModal = () => {
-    destroy(listScene);
-    boardScene.destroy();
-
-    for (const k in componentEvents) scene.events.off(k);
-
-    onClose(boardScene.squad);
-  };
-  events.OnClose.on(handleOnCloseEditSquadModal);
 
   const panel_ = panel(
     -SCREEN_WIDTH / 2,
@@ -119,87 +110,11 @@ export default function (
   return events;
 }
 
-export const createUnitListOnModal = (
-  scene: Phaser.Scene,
-  units: UnitIndex
-) => {};
-
-const handleOnDragEndFromUnitList = (
-  x: number,
-  y: number,
-  unitList: UnitList,
-  board: StaticBoard,
-  chara: Chara,
-  onSquadUpdated: (
-    s: Squad.SquadRecord,
-    added: string[],
-    removed: string[]
-  ) => void
-) => {
-  const cell = findTileByXY(board, x, y);
-  const { unit } = chara.props;
-
-  if (cell) {
-    const { updatedSquad, added, removed } = Squad.addMember(
-      unit,
-      board.squad,
-      cell.boardX,
-      cell.boardY
-    );
-
-    onSquadUpdated(updatedSquad, added, removed);
-
-    const unitToReplace = Squad.getMemberByPosition({
-      x: cell.boardX,
-      y: cell.boardY,
-    })(board.squad);
-
-    board.squad = updatedSquad;
-
-    //create new chara on board, representing same unit
-    // board.placeUnit({
-    //   member: Squad.makeMember({ id: unit.id, x: cell.boardX, y: cell.boardY }),
-    //   fromOutside: true,
-    // });
-
-    //remove replaced unit
-    if (unitToReplace) {
-      const charaToRemove = board.unitList.find(
-        (chara) => chara.props.unit.id === unitToReplace.id
-      );
-
-      addUnit(unitList, charaToRemove.props.unit);
-
-      board.scene.tweens.add({
-        targets: charaToRemove.container,
-        y: charaToRemove.container.y - 200,
-        alpha: 0,
-        ease: 'Cubic',
-        duration: 8400 / GAME_SPEED,
-        repeat: 0,
-        paused: false,
-        yoyo: false,
-        onComplete: () => {
-          removeCharaFromBoard(board, charaToRemove);
-        },
-      });
-    }
-
-    //Remove dragged unit from list
-    removeUnit(unitList, unit);
-
-    highlightTile(board, cell);
-  } else {
-    reposition(unitList, chara);
-    scaleDown(unitList, chara);
-    board.tiles.forEach((tile) => tile.sprite.clearTint());
-  }
-};
-
 function createEvents(
   scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents },
   boardScene: StaticBoard,
   listScene: UnitList,
+  onClose: { (s: Squad.SquadRecord): void; (arg0: Squad.SquadRecord): void },
   onSquadUpdated: (
     s: Squad.SquadRecord,
     added: string[],
@@ -232,5 +147,14 @@ function createEvents(
         onSquadUpdated
       )
   );
+  events.OnClose.on(() => {
+    destroy(listScene);
+    boardScene.destroy();
+
+    for (const k in componentEvents) scene.events.off(k);
+
+    onClose(boardScene.squad);
+  });
+
   return events;
 }
