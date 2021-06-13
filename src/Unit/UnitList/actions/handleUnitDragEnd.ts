@@ -4,5 +4,6 @@ import { pageControls } from '../pageControls';
 
 export default (unitList: UnitList, chara: Chara, x: number, y: number) => {
   pageControls(unitList);
-  if (unitList.onDragEnd) unitList.onDragEnd(chara, x, y);
+  console.log(`todo: on drag end`);
+  //if (unitList.onDragEnd) unitList.onDragEnd(chara, x, y);
 };

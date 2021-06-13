@@ -37,11 +37,11 @@ export default (unitList: UnitList, unit: Unit, index: number) => {
     scale: 0.5,
   });
 
-  onEnableDrag(
-    chara,
-    (unit, x, y, chara) => handleUnitDrag(unitList, unit, x, y, chara),
-    (chara) => (x, y) => handleUnitDragEnd(unitList, chara, x, y)
-  );
+  // onEnableDrag(
+  //   chara,
+  //   (unit, x, y, chara) => handleUnitDrag(unitList, unit, x, y, chara),
+  //   (chara) => (x, y) => handleUnitDragEnd(unitList, chara, x, y)
+  // );
 
   const text = scene.add.text(40, 30, unit.name);
 

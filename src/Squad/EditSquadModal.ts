@@ -62,19 +62,13 @@ export default function (
     }
   );
 
-  const listScene = createUnitList(
-    scene,
-    110,
-    90,
-    5,
-    units.toList().filter((u) => !u.squad),
-    () => {},
-    () => {},
-    () => {}
-  );
+  //if (addUnitEnabled)
+  const listScene = createUnitListOnModal(scene, units);
 
-  if (addUnitEnabled)
-    createUnitListOnModal(scene, listScene, boardScene, onSquadUpdated);
+  // const onDrag = (_unit: Unit, x: number, y: number) =>
+  //   scene.editSquadModalEvents.OnDragFromUnitList.emit({ x, y });
+  // const onDragEnd = (chara: Chara, x: number, y: number) =>
+  //   handleOnDragEndFromUnitList(x, y, boardScene, chara, onSquadUpdated);
 
   const events: EditSquadModalEvents = createEvents(
     scene,
@@ -127,24 +121,26 @@ export default function (
 }
 
 export const createUnitListOnModal = (
-  scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents },
-  list: UnitList,
-  boardScene: StaticBoard,
-  onSquadUpdated: (
-    s: Squad.SquadRecord,
-    added: string[],
-    removed: string[]
-  ) => void
+  scene: Phaser.Scene,
+  units: UnitIndex
 ) => {
-  list.onDrag = (_unit, x, y) =>
-    scene.editSquadModalEvents.OnDragFromUnitList.emit({ x, y });
-  list.onDragEnd = (chara, x, y) =>
-    handleOnDragEndFromUnitList(x, y, list, boardScene, chara, onSquadUpdated);
+  return createUnitList(
+    scene,
+    30,
+    30,
+    5,
+    units.filter((u) => !u.squad).toList()
+  );
 };
 
-const handleOnDragFromUnitList = (board: StaticBoard, x: number, y: number) => {
+const handleOnDragFromUnitList = (
+  listScene: UnitList,
+  board: StaticBoard,
+  x: number,
+  y: number
+) => {
   board.tiles.forEach((tile) => tile.sprite.clearTint());
-  const boardSprite = findTileByXY(board, x, y);
+  const boardSprite = findTileByXY(board, x - board.x + 50, y - board.y + 250);
 
   if (boardSprite) boardSprite.sprite.setTint(0x33ff88);
 };
@@ -152,7 +148,7 @@ const handleOnDragFromUnitList = (board: StaticBoard, x: number, y: number) => {
 const handleOnDragEndFromUnitList = (
   x: number,
   y: number,
-  listScene: UnitList,
+  unitList: UnitList,
   board: StaticBoard,
   chara: Chara,
   onSquadUpdated: (
@@ -193,7 +189,7 @@ const handleOnDragEndFromUnitList = (
         (chara) => chara.props.unit.id === unitToReplace.id
       );
 
-      addUnit(listScene, charaToRemove.props.unit);
+      addUnit(unitList, charaToRemove.props.unit);
 
       board.scene.tweens.add({
         targets: charaToRemove.container,
@@ -211,12 +207,12 @@ const handleOnDragEndFromUnitList = (
     }
 
     //Remove dragged unit from list
-    removeUnitFromList(listScene, unit);
+    removeUnitFromList(unitList, unit);
 
     highlightTile(board, cell);
   } else {
-    reposition(listScene, chara);
-    scaleDown(listScene, chara);
+    reposition(unitList, chara);
+    scaleDown(unitList, chara);
     board.tiles.forEach((tile) => tile.sprite.clearTint());
   }
 };
@@ -244,7 +240,7 @@ function createEvents(
   };
 
   events.OnDragFromUnitList.on(({ x, y }: { x: number; y: number }) =>
-    handleOnDragFromUnitList(boardScene, x, y)
+    handleOnDragFromUnitList(listScene, boardScene, x, y)
   );
   events.OnDragEndFromUnitList.on(
     ({ pos, chara }: { pos: Vector; unit: Unit; chara: Chara }) =>

@@ -2,6 +2,7 @@ import { tileWidth, tileHeight } from '../constants';
 import { BoardTile, StaticBoard } from './Model';
 
 export default (board: StaticBoard, x: number, y: number) => {
+  console.log(x, y, board.tiles[0].x);
   return board.tiles.find(isPointerInTile({ x, y: y + 100 }));
 };
 function isPointerInTile(pointer: { x: number; y: number }) {

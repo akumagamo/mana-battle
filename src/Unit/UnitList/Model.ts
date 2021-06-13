@@ -12,9 +12,9 @@ export type UnitList = {
   itemsPerPage: number;
   units: List<Unit>;
 
-  onUnitClick: (unit: Unit) => void;
-  onDrag: (unit: Unit, x: number, y: number) => void;
-  onDragEnd: (chara: Chara, x: number, y: number) => void;
+  // onUnitClick: (unit: Unit) => void;
+  // onDrag: (unit: Unit, x: number, y: number) => void;
+  // onDragEnd: (chara: Chara, x: number, y: number) => void;
 };
 
 export const destroy = (unitList: UnitList) => {

@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 import { Unit } from '../Model';
 import { Chara } from '../../Chara/Model';
-import { Container } from '../../Models';
 import { List } from 'immutable';
 import renderListItem from './renderListItem';
 import { UnitList } from './Model';
@@ -11,12 +10,9 @@ export function createUnitList(
   x: number,
   y: number,
   itemsPerPage: number,
-  units: List<Unit>,
-  onUnitClick: ((unit: Unit) => void) | null = null,
-  onDrag: (unit: Unit, x: number, y: number) => void,
-  onDragEnd: (chara: Chara, x: number, y: number) => void
-) {
-  const container = scene.add.container();
+  units: List<Unit>
+): UnitList {
+  const container = scene.add.container(x, y);
 
   const unitList: UnitList = {
     scene,
@@ -26,9 +22,6 @@ export function createUnitList(
     page: 0,
     itemsPerPage,
     units,
-    onUnitClick,
-    onDrag,
-    onDragEnd,
   };
 
   renderRows(unitList);

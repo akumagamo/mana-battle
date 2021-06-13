@@ -8,10 +8,11 @@ export default (
   unit: Unit,
   x: number,
   y: number,
-  chara: Chara
+  chara: Chara,
+  onDrag: (chara: Unit, x: number, y: number) => void
 ) => {
   scaleUp(unitList.scene, chara);
-  return unitList.onDrag(unit, x, y);
+  onDrag(unit, x, y);
 };
 export function getRowPosition(x: number, y: number, index: number) {
   const lineHeight = 100;

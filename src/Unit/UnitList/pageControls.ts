@@ -4,17 +4,18 @@ import clearList from './actions/clearList';
 import { UnitList } from './Model';
 
 export function pageControls(unitList: UnitList) {
-
-  const baseY = 480;
+  const baseY = 280;
 
   const totalUnits = unitList.units.size;
 
   if (unitList.page !== 0) {
-    const prev = button(
-      unitList.x - 20,
-      unitList.y + baseY,
+    const container = unitList.scene.add.container();
+    unitList.container.add(container);
+    button(
+      200,
+      baseY,
       ' <= ',
-      unitList.scene.add.container(),
+      container,
       unitList.scene,
       () => prevPage(unitList),
       false,
@@ -27,11 +28,13 @@ export function pageControls(unitList: UnitList) {
     unitList.itemsPerPage * (unitList.page + 1) >= totalUnits;
 
   if (!isLastPage) {
-    const next = button(
-      unitList.x + 50,
-      unitList.y + baseY,
+    const container = unitList.scene.add.container();
+    unitList.container.add(container);
+    button(
+      250,
+      baseY,
       ' => ',
-      unitList.scene.add.container(),
+      container,
       unitList.scene,
       () => nextPage(unitList),
       false,
@@ -44,12 +47,12 @@ export function nextPage(unitList: UnitList) {
   unitList.page = unitList.page + 1;
   clearList(unitList);
   renderRows(unitList);
-  pageControls(unitList)
+  pageControls(unitList);
 }
 
 export function prevPage(unitList: UnitList) {
   unitList.page = unitList.page - 1;
   clearList(unitList);
   renderRows(unitList);
-  pageControls(unitList)
+  pageControls(unitList);
 }
