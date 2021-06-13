@@ -17,10 +17,11 @@ export default (board: StaticBoard) => {
 
   makeUnitsDragable(
     board,
-    (unit,x,y,chara)=>{
-
-	onUnitDrag(board)(unit,x,y)
-
+    (a, b, c) => {
+      console.log(a, b, c);
+    },
+    (unit, x, y, chara) => {
+      onUnitDrag(board)(unit, x, y);
     },
     () => () => {}
   );
