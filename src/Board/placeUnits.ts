@@ -1,9 +1,4 @@
-import onEnableDrag from '../Chara/events/onEnableDrag';
-import { Chara } from '../Chara/Model';
-import { Unit } from '../Unit/Model';
 import addUnitToBoard from './addUnitToBoard';
-import onUnitDrag from './events/onUnitDrag';
-import makeUnitsDragable from './makeUnitsDragable';
 import { StaticBoard } from './Model';
 import sortUnitsByDepth from './sortUnitsByDepth';
 
@@ -14,17 +9,5 @@ export default (board: StaticBoard) => {
 
     board.unitList = board.unitList.concat([chara]);
   });
-
-  makeUnitsDragable(
-    board,
-    (a, b, c) => {
-      console.log(a, b, c);
-    },
-    (unit, x, y, chara) => {
-      onUnitDrag(board)(unit, x, y);
-    },
-    () => () => {}
-  );
-
   sortUnitsByDepth(board);
 };

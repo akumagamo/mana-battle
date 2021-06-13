@@ -1,6 +1,7 @@
 import { Chara } from '../Chara/Model';
 import { SquadRecord } from '../Squad/Model';
 import { Unit, UnitIndex } from '../Unit/Model';
+import makeUnitsDragable from './makeUnitsDragable';
 import { StaticBoard } from './Model';
 import createTiles from './placeTiles';
 import placeUnits from './placeUnits';
@@ -14,11 +15,15 @@ export default (
   scale = 1,
   front = true,
   isSelected = false,
-  onSquadUpdated?: (
-    squad: SquadRecord,
-    added: string[],
-    removed: string[]
-  ) => void
+  interactive?: {
+    onSquadUpdated?: (
+      squad: SquadRecord,
+      added: string[],
+      removed: string[]
+    ) => void;
+    onDragStart?: (unit: Unit, x: number, y: number, chara: Chara) => void;
+    onDragEnd?: (chara: Chara) => (x: number, y: number) => void;
+  }
 ) => {
   const container = scene.add.container(x, y);
   const tiles = createTiles(scene, scale, {
@@ -43,6 +48,10 @@ export default (
 
   placeUnits(board);
 
+  if (interactive) {
+    const { onSquadUpdated, onDragStart, onDragEnd } = interactive;
+    makeUnitsDragable(board, onSquadUpdated, onDragStart, onDragEnd);
+  }
   // DEBUG DRAG CONTAINER
   //debugMakeOverlay(board);
 

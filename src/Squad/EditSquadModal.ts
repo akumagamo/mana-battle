@@ -1,7 +1,6 @@
 import createStaticBoard from '../Board/createStaticBoard';
 import findTileByXY from '../Board/findTileByXY';
 import highlightTile from '../Board/highlightTile';
-import BoardScene from '../Board/InteractiveBoardScene';
 import { StaticBoard } from '../Board/Model';
 import { Chara } from '../Chara/Model';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../constants';
@@ -43,27 +42,6 @@ export default function (
   ) => void,
   onClose: (s: Squad.SquadRecord) => void
 ) {
-  const boardScene = createStaticBoard(
-    scene,
-    squad,
-    units,
-    SCREEN_WIDTH / 2,
-    SCREEN_HEIGHT / 4,
-    1,
-    true,
-    false,
-    onSquadUpdated
-  );
-
-  //  new BoardScene(squad, onSquadUpdated, units, true);
-
-  const listScene = new UnitListScene(
-    110,
-    90,
-    5,
-    units.toList().filter((u) => !u.squad)
-  );
-
   const events: EditSquadModalEvents = {
     OnDrag: SceneEventFactory<Vector>(scene, componentEvents.ON_DRAG),
     OnDragEnd: SceneEventFactory<{ pos: Vector; unit: Unit }>(
@@ -73,6 +51,7 @@ export default function (
     OnClose: SceneEventFactory<null>(scene, componentEvents.ON_CLOSE),
   };
 
+  //  new BoardScene(squad, onSquadUpdated, units, true);
   events.OnDrag.on(({ x, y }: { x: number; y: number }) =>
     handleOnDragFromUnitList(boardScene, x, y)
   );
@@ -86,6 +65,28 @@ export default function (
         chara,
         onSquadUpdated
       )
+  );
+  const boardScene = createStaticBoard(
+    scene,
+    squad,
+    units,
+    SCREEN_WIDTH / 2,
+    SCREEN_HEIGHT / 4,
+    1,
+    true,
+    false,
+    {
+      onDragStart: (u, x, y, chara) => {},
+      onDragEnd: (chara) => (x, y) => {},
+      onSquadUpdated: onSquadUpdated,
+    }
+  );
+
+  const listScene = new UnitListScene(
+    110,
+    90,
+    5,
+    units.toList().filter((u) => !u.squad)
   );
 
   const handleOnCloseEditSquadModal = () => {
@@ -123,8 +124,8 @@ export default function (
   //   container.add(details);
   // });
   button(
-    1070,
-    SCREEN_HEIGHT - 150,
+    0,
+    SCREEN_HEIGHT - 350,
     'Confirm',
     boardScene.container,
     boardScene.scene,
