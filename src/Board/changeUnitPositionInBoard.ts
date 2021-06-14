@@ -22,7 +22,9 @@ export default (
   ) => void
 ) => {
   console.log(`board/changeunitpositioninboard`, x, y);
-  const tile = findTileByXY(board, x, y);
+
+  //todo: this same check is performed three times. we can pass the tile in a callback
+  const tile = findTileByXY(board, x, y + 100);
   if (!tile) {
     moveUnitToBoardTile(board, unit.id);
   } else {

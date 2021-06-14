@@ -58,6 +58,8 @@ export default function (
     true,
     false,
     {
+      onDragStart: () => {},
+      onDragEnd: () => () => {},
       onSquadUpdated: onSquadUpdated,
     }
   );

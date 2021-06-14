@@ -1,4 +1,3 @@
-import debugCreateOverlay from '../Board/debugCreateOverlay';
 import { Unit } from '../Unit/Model';
 import initial from './animations/initial';
 import stand from './animations/stand';
