@@ -65,7 +65,6 @@ export default function (
   );
 
   const refresher = (charas: List<Chara>) => {
-    console.log(charas);
     charas.forEach((chara) => {
       onEnableDrag(
         chara,

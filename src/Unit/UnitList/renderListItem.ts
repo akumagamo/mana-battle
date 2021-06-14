@@ -10,32 +10,25 @@ export default (unitList: UnitList, unit: Unit, index: number) => {
 
   const { x, y } = getRowPosition(container.x, container.y, index);
 
-  const rowContainer = scene.add.container(x, y);
+  const rowContainer = scene.add.container();
   rowContainer.setName('row_' + unit.id);
 
   container.add(rowContainer);
 
-  var rect = new Phaser.Geom.Rectangle(
-    rowOffsetX,
-    rowOffsetY,
-    rowWidth,
-    rowHeight
-  );
-
   const background_ = background(scene);
-  background_.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
+  background_.setPosition(x,y)
 
   const chara = createChara({
     parent: scene,
     unit,
-    x: 0,
-    y: 0,
+    x,
+    y,
     scale: 0.5,
   });
 
   unitList.charas = unitList.charas.push(chara);
 
-  const text = scene.add.text(40, 30, unit.name);
+  const text = scene.add.text(x + 40, y +30, unit.name);
 
   rowContainer.add([background_, text, chara.container]);
 

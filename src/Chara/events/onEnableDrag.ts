@@ -12,15 +12,9 @@ export default function onEnableDrag(
   chara.container.setInteractive();
   chara.scene.input.setDraggable(chara.container);
 
-  chara.container.name = chara.id;
-  chara.container.on(
-    'drag',
-    (_pointer: Pointer, x: number, y: number) => {
-      /** when triggered, this event iterates on all gameobjects contained
-       * in the scene. that's why we filter by the "name" */
-      onDrag(chara, x, y, dragStart);
-    }
-  );
+  chara.container.on('drag', (_pointer: Pointer, x: number, y: number) => {
+    onDrag(chara, x, y, dragStart);
+  });
 
   chara.container.on(
     'dragend',
