@@ -83,7 +83,6 @@ export default function (
             onSquadUpdated,
             refresher
           );
-          console.log(`drag end`);
         }
       );
     });

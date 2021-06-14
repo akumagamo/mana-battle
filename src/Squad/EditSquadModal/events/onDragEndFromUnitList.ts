@@ -2,7 +2,6 @@ import { List } from 'immutable';
 import addNewUnitToBoard from '../../../Board/actions/addNewUnitToBoard';
 import findTileByXY from '../../../Board/findTileByXY';
 import highlightTile from '../../../Board/highlightTile';
-import { isPointerInTile } from '../../../Board/isPointerInTile';
 import { Board } from '../../../Board/Model';
 import { Chara } from '../../../Chara/Model';
 import { GAME_SPEED } from '../../../env';
@@ -26,7 +25,6 @@ export default (
   const cell = findTileByXY(board, x - board.x, y - board.y + 100);
   const { unit } = chara.props;
 
-  console.log(cell);
   if (cell) {
     const { updatedSquad, added, removed } = addMember(
       unit,
@@ -60,7 +58,7 @@ export default (
         y: charaToRemove.container.y - 200,
         alpha: 0,
         ease: 'Cubic',
-        duration: 8400 / GAME_SPEED,
+        duration: 1000 / GAME_SPEED,
         repeat: 0,
         paused: false,
         yoyo: false,
@@ -79,4 +77,6 @@ export default (
     scaleDown(unitList, chara);
     board.tiles.forEach((tile) => tile.sprite.clearTint());
   }
+
+  onRefresh(List(unitList.charas));
 };
