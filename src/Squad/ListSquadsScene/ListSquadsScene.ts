@@ -4,7 +4,7 @@ import createStaticBoard from '../../Board/createBoard';
 import onBoardClicked from '../../Board/events/onBoardClicked';
 import onBoardDeselected from '../../Board/events/onBoardDeselected';
 import onBoardSelected from '../../Board/events/onBoardSelected';
-import { StaticBoard } from '../../Board/Model';
+import { Board } from '../../Board/Model';
 import { SCREEN_WIDTH, PLAYER_FORCE } from '../../constants';
 import { GAME_SPEED } from '../../env';
 import { Container, Pointer } from '../../Models';
@@ -42,7 +42,7 @@ export class ListSquadsScene extends Phaser.Scene {
     ConfirmButtonClicked: SceneEventFactory<null>(this, 'ConfirmButtonClicked'),
   };
 
-  boards: StaticBoard[] = [];
+  boards: Board[] = [];
   page: number = 0;
   itemsPerPage: number = 16;
   squads = Map() as Squad.Index;
@@ -247,7 +247,7 @@ export class ListSquadsScene extends Phaser.Scene {
     this.boards.push(board);
   }
 
-  getBoard(id: string, fn: (board: StaticBoard) => void) {
+  getBoard(id: string, fn: (board: Board) => void) {
     const board = this.boards.find((e) => e.squad.id === id);
 
     fn(board);

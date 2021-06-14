@@ -11,13 +11,6 @@ export default (
   chara: Chara,
   onDrag: (chara: Unit, x: number, y: number) => void
 ) => {
-  scaleUp(unitList.scene, chara);
+  if (chara.container.scale === 0.5) scaleUp(unitList.scene, chara);
   onDrag(unit, x, y);
 };
-export function getRowPosition(x: number, y: number, index: number) {
-  const lineHeight = 100;
-  return {
-    x,
-    y: y + lineHeight * index,
-  };
-}

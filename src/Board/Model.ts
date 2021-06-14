@@ -12,7 +12,7 @@ export type BoardTile = {
   boardY: number;
 };
 
-export type StaticBoard = {
+export type Board = {
   scene: Phaser.Scene;
   container: Container;
   x: number;

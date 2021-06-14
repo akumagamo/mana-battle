@@ -2,9 +2,9 @@ import tint from '../Chara/animations/tint';
 import createChara from '../Chara/createChara';
 import { Unit } from '../Unit/Model';
 import getUnitPositionOnScreen from './getUnitPositionOnScreen';
-import { StaticBoard } from './Model';
+import { Board } from './Model';
 
-export default (board: StaticBoard, unit: Unit) => {
+export default (board: Board, unit: Unit) => {
   const member = board.squad.members.get(unit.id);
 
   const { x, y } = getUnitPositionOnScreen(member);
@@ -20,7 +20,7 @@ export default (board: StaticBoard, unit: Unit) => {
     showHpBar: true,
   });
 
-  board.container.add(chara.charaWrapper);
+  board.container.add(chara.container);
 
   if (chara.props.unit.currentHp < 1) tint(chara, 222222);
 

@@ -6,7 +6,7 @@ export function displayExperience(chara: Chara, experience: number) {
     -50,
     -100,
     `${experience.toString()} xp`,
-    chara.charaWrapper,
+    chara.container,
     chara.props.parent
   );
   xp.setScale(1.5);

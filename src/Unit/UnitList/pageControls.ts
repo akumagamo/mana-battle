@@ -1,11 +1,16 @@
+import { List } from 'immutable';
 import { renderRows } from '.';
+import { Chara } from '../../Chara/Model';
 import { SCREEN_HEIGHT } from '../../constants';
 import button from '../../UI/button';
 import clearList from './actions/clearList';
 import refresh from './actions/refresh';
 import { UnitList } from './Model';
 
-export function pageControls(unitList: UnitList) {
+export function pageControls(
+  unitList: UnitList,
+  onRefresh: (cs: List<Chara>) => void
+) {
   const baseX = 30;
   const baseY = SCREEN_HEIGHT - 100;
 
@@ -20,7 +25,7 @@ export function pageControls(unitList: UnitList) {
       ' <= ',
       container,
       unitList.scene,
-      () => prevPage(unitList),
+      () => prevPage(unitList, onRefresh),
       false,
       50
     );
@@ -39,19 +44,25 @@ export function pageControls(unitList: UnitList) {
       ' => ',
       container,
       unitList.scene,
-      () => nextPage(unitList),
+      () => nextPage(unitList, onRefresh),
       false,
       50
     );
   }
 }
 
-export function nextPage(unitList: UnitList) {
+export function nextPage(
+  unitList: UnitList,
+  onRefresh: (cs: List<Chara>) => void
+) {
   unitList.page = unitList.page + 1;
-  refresh(unitList)
+  refresh(unitList, onRefresh);
 }
 
-export function prevPage(unitList: UnitList) {
+export function prevPage(
+  unitList: UnitList,
+  onRefresh: (cs: List<Chara>) => void
+) {
   unitList.page = unitList.page - 1;
-  refresh(unitList)
+  refresh(unitList, onRefresh);
 }

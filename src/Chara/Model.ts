@@ -1,5 +1,5 @@
 import { Unit } from '../Unit/Model';
-import { Container, Image } from '../Models';
+import { Container, Graphics, Image } from '../Models';
 
 export type CharaProps = {
   parent: Phaser.Scene;

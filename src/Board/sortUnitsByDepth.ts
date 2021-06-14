@@ -1,6 +1,6 @@
-import { StaticBoard } from './Model';
+import { Board } from './Model';
 
-export default (board: StaticBoard) => {
+export default (board: Board) => {
   board.unitList.forEach((chara) =>
     chara.container.setDepth(chara.container?.y)
   );

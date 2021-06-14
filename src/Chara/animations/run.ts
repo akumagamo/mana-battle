@@ -45,8 +45,8 @@ const front = (chara: Chara) => {
   });
 
   chara.scene.add.tween({
-    targets: chara.charaWrapper,
-    y: chara.charaWrapper.y - 20,
+    targets: chara.container,
+    y: chara.container.y - 20,
     yoyo: true,
     repeat: -1,
     duration: 100 / GAME_SPEED,
@@ -95,8 +95,8 @@ const back = (chara: Chara) => {
   });
 
   chara.scene.add.tween({
-    targets: chara.charaWrapper,
-    y: chara.charaWrapper.y - 20,
+    targets: chara.container,
+    y: chara.container.y - 20,
     yoyo: true,
     repeat: -1,
     duration: 100 / GAME_SPEED,

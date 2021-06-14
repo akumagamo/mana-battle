@@ -1,10 +1,9 @@
-import { Vector } from 'matter';
-import findTileByXY from '../../../Board/findTileByXY';
+import { List } from 'immutable';
 import highlightTile from '../../../Board/highlightTile';
-import { StaticBoard } from '../../../Board/Model';
+import { isPointerInTile } from '../../../Board/isPointerInTile';
+import { Board } from '../../../Board/Model';
 import { Chara } from '../../../Chara/Model';
 import { GAME_SPEED } from '../../../env';
-import { Unit } from '../../../Unit/Model';
 import { reposition, scaleDown } from '../../../Unit/UnitList';
 import addUnit from '../../../Unit/UnitList/actions/addUnit';
 import removeUnit from '../../../Unit/UnitList/actions/removeUnit';
@@ -16,11 +15,13 @@ export default (
   x: number,
   y: number,
   unitList: UnitList,
-  board: StaticBoard,
+  board: Board,
   chara: Chara,
-  onSquadUpdated: (s: SquadRecord, added: string[], removed: string[]) => void
+  onSquadUpdated: (s: SquadRecord, added: string[], removed: string[]) => void,
+  onRefresh: (cs: List<Chara>) => void
 ) => {
-  const cell = findTileByXY(board, x, y);
+  console.log(`dragend!!`);
+  const cell = board.tiles.find(isPointerInTile({ x, y: y - 50 }));
   const { unit } = chara.props;
 
   if (cell) {
@@ -70,7 +71,7 @@ export default (
     }
 
     //Remove dragged unit from list
-    removeUnit(unitList, unit);
+    removeUnit(unitList, unit, onRefresh);
 
     highlightTile(board, cell);
   } else {

@@ -1,7 +1,7 @@
 import { tileHeight, tileWidth } from '../constants';
-import { StaticBoard } from './Model';
+import { Board } from './Model';
 
-export default (board: StaticBoard) => {
+export default (board: Board) => {
   const width = board.tiles[0].sprite.width * board.scale * 3;
   const height = board.tiles[0].sprite.height * board.scale * 3;
   var rect = new Phaser.Geom.Rectangle(
@@ -17,4 +17,5 @@ export default (board: StaticBoard) => {
   graphics.alpha = 0.2;
 
   graphics.fillRectShape(rect);
+  return graphics;
 };

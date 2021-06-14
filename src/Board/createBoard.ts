@@ -2,7 +2,7 @@ import { Chara } from '../Chara/Model';
 import { SquadRecord } from '../Squad/Model';
 import { Unit, UnitIndex } from '../Unit/Model';
 import makeUnitsDragable from './makeUnitsDragable';
-import { StaticBoard } from './Model';
+import { Board } from './Model';
 import createTiles from './placeTiles';
 import placeUnits from './placeUnits';
 
@@ -31,7 +31,7 @@ export default (
     mapHeight: 3,
   });
   container.add(tiles.map((t) => t.sprite));
-  const board: StaticBoard = {
+  const board: Board = {
     scene,
     container,
     tiles,

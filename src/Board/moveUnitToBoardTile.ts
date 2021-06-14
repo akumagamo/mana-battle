@@ -1,9 +1,9 @@
 import { getMember } from '../Squad/Model';
 import getUnitPositionOnScreen from './getUnitPositionOnScreen';
-import { StaticBoard } from './Model';
+import { Board } from './Model';
 import sortUnitsByDepth from './sortUnitsByDepth';
 
-export default (board: StaticBoard, id: string) => {
+export default (board: Board, id: string) => {
   const chara = board.unitList.find((chara) => chara.id === id);
 
   const { unit } = chara.props;

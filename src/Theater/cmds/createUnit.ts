@@ -27,7 +27,7 @@ export const createUnit = (
     showWeapon,
   });
 
-  scene.container.add(chara.charaWrapper);
+  scene.container.add(chara.container);
 
   scene.charas = scene.charas.set(key, chara);
 };

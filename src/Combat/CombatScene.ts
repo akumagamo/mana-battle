@@ -25,7 +25,7 @@ import bowAttack from '../Chara/animations/bowAttack';
 import slash from '../Chara/animations/slash';
 import flinch from '../Chara/animations/flinch';
 import createChara from '../Chara/createChara';
-import { StaticBoard } from '../Board/Model';
+import { Board } from '../Board/Model';
 import createStaticBoard from '../Board/createBoard';
 
 const COMBAT_CHARA_SCALE = 1;
@@ -58,8 +58,8 @@ export default class CombatScene extends Phaser.Scene {
   squads: Squad.Index = Map();
   unitIndex: UnitIndex = Map();
   miniSquads: {
-    top: StaticBoard | null;
-    bottom: StaticBoard | null;
+    top: Board | null;
+    bottom: Board | null;
   } = {
     top: null,
     bottom: null,

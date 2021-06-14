@@ -32,7 +32,7 @@ export const speak = (
     headOnly: true,
   });
 
-  container.add(head.charaWrapper);
+  container.add(head.container);
 
   text(190, 20, chara.props.unit.name, container, scene);
   //const unitText = text(190, 60, text_, container, scene);

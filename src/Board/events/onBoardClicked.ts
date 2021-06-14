@@ -1,7 +1,7 @@
 import { SquadRecord } from '../../Squad/Model';
-import { StaticBoard } from '../Model';
+import { Board } from '../Model';
 
-export default (board: StaticBoard, fn: (sqd: SquadRecord) => void) => {
+export default (board: Board, fn: (sqd: SquadRecord) => void) => {
   const width = board.tiles[0].sprite.width * board.scale * 3;
   const height = board.tiles[0].sprite.height * board.scale * 3;
   var clickZone = board.scene.add.zone(

@@ -1,11 +1,11 @@
-import { StaticBoard } from '../../../Board/Model';
+import { Board } from '../../../Board/Model';
 import { destroy, UnitList } from '../../../Unit/UnitList/Model';
 import * as Squad from '../../Model';
 import { EditSquadModalEvents, componentEvents } from '../index';
 
 export function onCloseModal(
   listScene: UnitList,
-  boardScene: StaticBoard,
+  boardScene: Board,
   scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents },
   onClose: { (s: Squad.SquadRecord): void; (arg0: Squad.SquadRecord): void }
 ) {

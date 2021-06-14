@@ -4,10 +4,10 @@ import { SquadRecord } from '../Squad/Model';
 import { Unit } from '../Unit/Model';
 import changeUnitPositionInBoard from './changeUnitPositionInBoard';
 import onUnitDrag from './events/onUnitDrag';
-import { StaticBoard } from './Model';
+import { Board } from './Model';
 
 export default (
-  board: StaticBoard,
+  board: Board,
   onSquadUpdated: (
     squad: SquadRecord,
     added: string[],
@@ -20,18 +20,21 @@ export default (
     onEnableDrag(
       chara,
       (u, x, y, chara) => {
-        onUnitDrag(board)(u, x, y);
-
-        if (onDragStart) onDragStart(u, x, y, chara);
+        if (onDragStart) {
+          onDragStart(u, x, y, chara);
+          onUnitDrag(board)(u, x, y);
+        }
       },
       (c) => (x, y) => {
-        changeUnitPositionInBoard(
-          board,
-          { unit: c.props.unit, x, y },
-          onSquadUpdated
-        );
+        if (onDragEnd) {
+          changeUnitPositionInBoard(
+            board,
+            { unit: c.props.unit, x, y },
+            onSquadUpdated
+          );
 
-        if (onDragEnd) onDragEnd(c)(x, y);
+          onDragEnd(c)(x, y);
+        }
       }
     );
   });

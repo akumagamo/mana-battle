@@ -1,9 +1,9 @@
 import { Vector } from 'matter';
 import { invertBoardPosition } from '../Squad/Model';
 import { cartesianToIsometric } from '../utils/isometric';
-import { StaticBoard } from './Model';
+import { Board } from './Model';
 
-export default (board: StaticBoard, squadMember: Vector) => {
+export default (board: Board, squadMember: Vector) => {
   const x_ = board.front ? squadMember.x : invertBoardPosition(squadMember.x);
   const y_ = board.front ? squadMember.y : invertBoardPosition(squadMember.y);
 

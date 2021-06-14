@@ -6,7 +6,7 @@ export async function displayLevelUp(chara: Chara) {
     -100,
     -100,
     'Level up!',
-    chara.charaWrapper,
+    chara.container,
     chara.props.parent
   );
   lvlUp.setScale(1.5);

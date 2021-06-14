@@ -1,6 +1,6 @@
 import createChara from '../../Chara/createChara';
 import { Unit } from '../Model';
-import { getRowPosition } from './actions/handleUnitDrag';
+import { getRowPosition } from './actions/getRowPosition';
 import background from './background';
 import { rowOffsetX, rowOffsetY, rowWidth, rowHeight } from './constants';
 import { UnitList } from './Model';
@@ -37,7 +37,7 @@ export default (unitList: UnitList, unit: Unit, index: number) => {
 
   const text = scene.add.text(40, 30, unit.name);
 
-  rowContainer.add([background_, text, chara.charaWrapper]);
+  rowContainer.add([background_, text, chara.container]);
 
   return rowContainer;
 };

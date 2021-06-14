@@ -26,7 +26,6 @@ export const renderSquad = (scene: MapScene, mapSquad: MapSquad): void => {
     x,
     y,
     scale: CHARA_MAP_SCALE,
-    showWeapon: false,
   });
 
   const emblem = scene.add.image(

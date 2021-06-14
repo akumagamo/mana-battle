@@ -1,9 +1,8 @@
+import { List } from 'immutable';
 import { Chara } from '../../../Chara/Model';
 import { UnitList } from '../Model';
-import { pageControls } from '../pageControls';
+import refresh from './refresh';
 
-export default (unitList: UnitList, chara: Chara, x: number, y: number) => {
-  pageControls(unitList);
-  console.log(`todo: on drag end`);
-  //if (unitList.onDragEnd) unitList.onDragEnd(chara, x, y);
+export default (unitList: UnitList, onRefresh: (cs: List<Chara>) => void) => {
+  refresh(unitList, onRefresh);
 };

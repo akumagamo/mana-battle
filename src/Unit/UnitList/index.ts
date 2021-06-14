@@ -4,7 +4,6 @@ import { Chara } from '../../Chara/Model';
 import { List } from 'immutable';
 import renderListItem from './renderListItem';
 import { UnitList } from './Model';
-import { pageControls } from './pageControls';
 import refresh from './actions/refresh';
 
 export function createUnitList(
@@ -12,7 +11,8 @@ export function createUnitList(
   x: number,
   y: number,
   itemsPerPage: number,
-  units: List<Unit>
+  units: List<Unit>,
+  onRefresh: (c: List<Chara>) => void
 ): UnitList {
   const container = scene.add.container(x, y);
 
@@ -27,7 +27,7 @@ export function createUnitList(
     charas: List(),
   };
 
-  refresh(unitList);
+  refresh(unitList, onRefresh);
 
   scene.game.events.emit('UnitListSceneCreated', unitList);
   return unitList;
@@ -57,7 +57,7 @@ export function reposition(unitList: UnitList, chara: Chara) {
   });
 
   unitList.scene.tweens.add({
-    targets: chara.charaWrapper,
+    targets: chara.container,
     x: rowBackground.x,
     y: rowBackground.y,
     duration: 600,

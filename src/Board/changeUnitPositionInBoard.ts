@@ -1,11 +1,11 @@
 import { makeMember, SquadRecord, updateMember } from '../Squad/Model';
 import { Unit } from '../Unit/Model';
 import findTileByXY from './findTileByXY';
-import { StaticBoard } from './Model';
+import { Board } from './Model';
 import moveUnitToBoardTile from './moveUnitToBoardTile';
 
 export default (
-  board: StaticBoard,
+  board: Board,
   {
     unit,
     x,
@@ -21,6 +21,7 @@ export default (
     removed: string[]
   ) => void
 ) => {
+  console.log(`board/changeunitpositioninboard`, x, y);
   const tile = findTileByXY(board, x, y);
   if (!tile) {
     moveUnitToBoardTile(board, unit.id);

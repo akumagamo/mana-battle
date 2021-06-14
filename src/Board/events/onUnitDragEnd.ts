@@ -1,4 +1,4 @@
-import { BoardTile, StaticBoard } from '../Model';
+import { BoardTile, Board } from '../Model';
 import * as Squad from '../../Squad/Model';
 import { Chara } from '../../Chara/Model';
 import findTileByXY from '../findTileByXY';
@@ -6,7 +6,7 @@ import changeUnitPositionInBoard from '../changeUnitPositionInBoard';
 import highlightTile from '../highlightTile';
 import getUnitPositionOnScreen from '../getUnitPositionOnScreen';
 
-export default (board: StaticBoard) => (chara: Chara) => (
+export default (board: Board) => (chara: Chara) => (
   x: number,
   y: number,
   onSquadUpdated: (
@@ -20,6 +20,7 @@ export default (board: StaticBoard) => (chara: Chara) => (
   } = chara;
   const { squad } = board;
 
+  console.log(`board/events/onunitdragend`, x, y);
   const boardSprite = findTileByXY(board, x, y);
 
   const squadMember = Squad.getMember(unit.id, squad);
