@@ -56,7 +56,7 @@ const front = (chara: Chara) => {
 const back = (chara: Chara) => {
   const bounce = upAndDown(chara);
 
-  bounce(chara.charaWrapper, -12, 300);
+  bounce(chara.innerWrapper, -12, 300);
 
   chara.scene.add.tween({
     targets: chara.leftFoot,

@@ -18,12 +18,12 @@ export type Chara = {
   id: string;
   props: CharaProps;
   scene: Phaser.Scene;
-  /** Container around Chara, doesn't rotate (useful for adding UI elements)*/
-  charaWrapper: Container;
   container: Container;
 
-  //body parts
+  /** Container around Chara contents (useful for adding UI elements and bouncing while running)*/
+  innerWrapper: Container;
 
+  //body parts
   hair: Image | null;
   head: Image | null;
   trunk: Image | null;

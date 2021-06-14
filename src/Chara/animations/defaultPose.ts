@@ -38,8 +38,8 @@ export default (chara: Chara) => {
   chara.trunk.rotation = 0;
 
   if (chara.props.front) {
-    chara.charaWrapper.x = CHARA_WRAPPER_X;
-    chara.charaWrapper.y = CHARA_WRAPPER_Y;
+    chara.innerWrapper.x = CHARA_WRAPPER_X;
+    chara.innerWrapper.y = CHARA_WRAPPER_Y;
     chara.head.x = HEAD_FRONT_X;
     chara.head.y = HEAD_FRONT_Y;
     chara.leftFoot.x = LEFT_FOOT_FRONT_X;
@@ -61,8 +61,8 @@ export default (chara: Chara) => {
       chara.leftHand.setPosition(LEFT_HAND_FRONT_X + 5, LEFT_HAND_FRONT_Y + 10);
     }
   } else {
-    chara.charaWrapper.x = CHARA_WRAPPER_X;
-    chara.charaWrapper.y = CHARA_WRAPPER_Y;
+    chara.innerWrapper.x = CHARA_WRAPPER_X;
+    chara.innerWrapper.y = CHARA_WRAPPER_Y;
     chara.head.x = HEAD_BACK_X;
     chara.head.y = HEAD_BACK_Y;
     chara.leftFoot.x = LEFT_FOOT_BACK_X;

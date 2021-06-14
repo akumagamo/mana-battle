@@ -39,28 +39,6 @@ export default (props: {
   container.setSize(container_width, container_height);
   container.setScale(scale);
 
-  const sq = () => {
-    const width = 100;
-    const height = 100;
-    var rect = new Phaser.Geom.Rectangle(
-      -width / 2,
-      -height / 2,
-      width,
-      height
-    );
-    var graphics = parent.add.graphics({
-      fillStyle: { color: 0x0000ff },
-    });
-
-    graphics.alpha = 0.2;
-
-    graphics.fillRectShape(rect);
-    return graphics;
-  };
-
-  const re = sq();
-  container.add(re);
-
   const chara: Chara = {
     id: unit.id,
     props: {
@@ -76,7 +54,7 @@ export default (props: {
     },
     scene: parent,
     container,
-    charaWrapper,
+    innerWrapper: charaWrapper,
     hpBarContainer: parent.add.container(),
 
     hair: null,

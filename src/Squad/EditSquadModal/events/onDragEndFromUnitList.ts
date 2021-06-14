@@ -1,4 +1,6 @@
 import { List } from 'immutable';
+import addNewUnitToBoard from '../../../Board/actions/addNewUnitToBoard';
+import findTileByXY from '../../../Board/findTileByXY';
 import highlightTile from '../../../Board/highlightTile';
 import { isPointerInTile } from '../../../Board/isPointerInTile';
 import { Board } from '../../../Board/Model';
@@ -20,10 +22,11 @@ export default (
   onSquadUpdated: (s: SquadRecord, added: string[], removed: string[]) => void,
   onRefresh: (cs: List<Chara>) => void
 ) => {
-  console.log(`dragend!!`);
-  const cell = board.tiles.find(isPointerInTile({ x, y: y - 50 }));
+  // todo: the board should offer this api
+  const cell = findTileByXY(board, x - board.x, y - board.y + 100);
   const { unit } = chara.props;
 
+  console.log(cell);
   if (cell) {
     const { updatedSquad, added, removed } = addMember(
       unit,
@@ -42,10 +45,7 @@ export default (
     board.squad = updatedSquad;
 
     //create new chara on board, representing same unit
-    // board.placeUnit({
-    //   member: Squad.makeMember({ id: unit.id, x: cell.boardX, y: cell.boardY }),
-    //   fromOutside: true,
-    // });
+    addNewUnitToBoard(board)(unit, cell.boardX, cell.boardY);
 
     //remove replaced unit
     if (unitToReplace) {

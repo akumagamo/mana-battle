@@ -49,7 +49,10 @@ export default (
     detailsBar(chara.props.unit);
   });
 
-  highlightTile(boardScene, leader);
+  const tile = boardScene.tiles.find(
+    (t) => t.boardX === leader.x && t.boardY === leader.y
+  );
+  highlightTile(boardScene, tile);
 
   const defaultUnit = units.find((u) => u.id === leader.id);
 
