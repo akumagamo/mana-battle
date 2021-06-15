@@ -2,7 +2,7 @@ import { makeMember, SquadRecord, updateMember } from '../Squad/Model';
 import { Unit } from '../Unit/Model';
 import findTileByXY from './findTileByXY';
 import { Board } from './Model';
-import moveUnitToBoardTile from './moveUnitToBoardTile';
+import animateUnitToBoardTile from './animateUnitToBoardTile';
 
 export default (
   board: Board,
@@ -21,23 +21,35 @@ export default (
     removed: string[]
   ) => void
 ) => {
-  console.log(`board/changeunitpositioninboard`, x, y);
-
   //todo: this same check is performed three times. we can pass the tile in a callback
   const tile = findTileByXY(board, x, y + 100);
   if (!tile) {
-    moveUnitToBoardTile(board, unit.id);
+    animateUnitToBoardTile(board, unit.id);
   } else {
+    const previousPosition = board.squad.members.get(unit.id);
+    const existing = board.squad.members.find(
+      (m) => m.x === tile.boardX && m.y === tile.boardY
+    );
+
     const updatedSquad = updateMember(
       board.squad,
       makeMember({ id: unit.id, x: tile.boardX, y: tile.boardY })
-    );
+    ).update('members', (members) => {
+      if (existing)
+        return members.update(existing.id, (member) =>
+          member.set('x', previousPosition.x).set('y', previousPosition.y)
+        );
+      else return members;
+    });
 
     board.squad = updatedSquad;
+
+    console.log(updatedSquad);
+
     onSquadUpdated(updatedSquad, [], []);
 
     updatedSquad.members.forEach((updatedUnit) => {
-      moveUnitToBoardTile(board, updatedUnit.id);
+      animateUnitToBoardTile(board, updatedUnit.id);
     });
   }
 };

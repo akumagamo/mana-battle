@@ -20,7 +20,7 @@ export default (board: Board, id: string) => {
     paused: false,
     yoyo: false,
   });
-  // TODO: optimize, fire only once if multiple units were move at the same time
+
   tween.on('complete', () => {
     sortUnitsByDepth(board);
   });
