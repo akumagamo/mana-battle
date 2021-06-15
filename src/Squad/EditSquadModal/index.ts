@@ -4,7 +4,6 @@ import { Board } from '../../Board/Model';
 import onEnableDrag from '../../Chara/events/onEnableDrag';
 import { Chara } from '../../Chara/Model';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../../constants';
-import { Vector } from '../../Map/Model';
 import { Container } from '../../Models';
 import button from '../../UI/button';
 import panel from '../../UI/panel';
@@ -30,25 +29,30 @@ export const componentEvents = {
 };
 
 export type EditSquadModalEvents = {
-  //OnDragFromUnitList: EventFactory<Vector>;
-  //OnDragEndFromUnitList: EventFactory<{ pos: Vector; unit: Unit }>;
   OnClose: EventFactory<null>;
 };
 
-export default function (
+export default function ({
+  scene,
+  squad,
+  units,
+  addUnitEnabled,
+  onSquadUpdated,
+  onClose,
+}: {
   /** Any scene that wants to use this component needs to register events locally */
-  scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents },
-  squad: Squad.SquadRecord,
-  units: UnitIndex,
-  addUnitEnabled: boolean,
+  scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents };
+  squad: Squad.SquadRecord;
+  units: UnitIndex;
+  addUnitEnabled: boolean;
   onSquadUpdated: (
     s: Squad.SquadRecord,
     added: string[],
     removed: string[]
-  ) => void,
-  onClose: (s: Squad.SquadRecord) => void
-) {
-  const boardScene = createBoard(
+  ) => void;
+  onClose: (s: Squad.SquadRecord) => void;
+}) {
+  const board = createBoard(
     scene,
     squad,
     units,
@@ -64,13 +68,13 @@ export default function (
     }
   );
 
-  const refresher = (charas: List<Chara>) => {
+  const onListUpdated = (charas: List<Chara>) => {
     charas.forEach((chara) => {
       onEnableDrag(
         chara,
         (unit, x, y, chara) => {
           handleUnitDrag(listScene, unit, x, y, chara, () => {
-            onDragFromUnitList(listScene, boardScene, x, y);
+            onDragFromUnitList(listScene, board, x, y);
           });
         },
         (chara) => (x, y) => {
@@ -78,26 +82,33 @@ export default function (
             x,
             y,
             listScene,
-            boardScene,
+            board,
             chara,
             onSquadUpdated,
-            refresher
+            onListUpdated
           );
         }
       );
     });
   };
 
-  const listScene = createUnitList(scene, 30, 30, 5, units.toList(), refresher);
+  const listScene = createUnitList(
+    scene,
+    30,
+    30,
+    5,
+    units.toList(),
+    onListUpdated
+  );
   //if (addUnitEnabled)
 
   const events: EditSquadModalEvents = createEvents(
     scene,
-    boardScene,
+    board,
     listScene,
     onClose,
     onSquadUpdated,
-    refresher
+    onListUpdated
   );
 
   const panel_ = panel(
@@ -105,29 +116,24 @@ export default function (
     -SCREEN_HEIGHT / 4,
     SCREEN_WIDTH,
     SCREEN_HEIGHT,
-    boardScene.container,
-    boardScene.scene
+    board.container,
+    board.scene
   );
-  boardScene.container.sendToBack(panel_);
+  board.container.sendToBack(panel_);
   let details: Container | null = null;
 
-  onBoardUnitClicked(boardScene, (c) => {
+  onBoardUnitClicked(board, (c) => {
     details?.destroy();
     details = SmallUnitDetailsBar(
       330,
       SCREEN_HEIGHT - 160,
-      boardScene.scene,
+      board.scene,
       units.find((u) => u.id === c.props.unit.id)
     );
-    boardScene.container.add(details);
+    board.container.add(details);
   });
-  button(
-    0,
-    SCREEN_HEIGHT - 350,
-    'Confirm',
-    boardScene.container,
-    boardScene.scene,
-    () => events.OnClose.emit(null)
+  button(0, SCREEN_HEIGHT - 350, 'Confirm', board.container, board.scene, () =>
+    events.OnClose.emit(null)
   );
 
   return events;

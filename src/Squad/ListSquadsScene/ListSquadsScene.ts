@@ -92,6 +92,7 @@ export class ListSquadsScene extends Phaser.Scene {
       );
   }
   renderSquadList() {
+    console.log(`rendering squad list...`);
     const rows = this.formatList(this.squads.toList(), List());
 
     rows.forEach((row, y) =>
@@ -154,12 +155,12 @@ export class ListSquadsScene extends Phaser.Scene {
 
     this.uiContainer = this.add.container();
 
-    this.editSquadModalEvents = EditSquadModal(
-      this,
+    this.editSquadModalEvents = EditSquadModal({
+      scene: this,
       squad,
-      this.units,
-      !this.dispatched.has(squad.id),
-      (sqd, added, removed) => {
+      units: this.units,
+      addUnitEnabled: !this.dispatched.has(squad.id),
+      onSquadUpdated: (sqd, added, removed) => {
         this.squads = this.squads.set(sqd.id, sqd);
         added.forEach((id) => {
           this.units = this.units.update(id, (unit) => ({
@@ -174,30 +175,37 @@ export class ListSquadsScene extends Phaser.Scene {
           }));
         });
       },
-      (sqd) => {
+      onClose: (sqd) => {
+        console.log(`closed squad`, sqd);
         this.squads = this.squads.set(sqd.id, sqd);
+        sqd.members.forEach((m) => {
+          this.units = this.units.update(m.id, (u) => ({
+            ...u,
+            squad: sqd.id,
+          }));
+        });
         this.inputEnabled = true;
         this.refreshBoards();
         this.handleSquadClicked(sqd);
         this.editSquadModalEvents = null;
-      }
-    );
+      },
+    });
   }
   handleCreateSquadClicked() {
     this.inputEnabled = false;
     this.uiContainer = this.add.container();
 
-    this.editSquadModalEvents = EditSquadModal(
-      this,
-      Squad.createSquad({
+    this.editSquadModalEvents = EditSquadModal({
+      scene: this,
+      squad: Squad.createSquad({
         id: 'squad+' + new Date().getTime(),
         members: Map(),
         force: PLAYER_FORCE,
         leader: '',
       }),
-      this.units.filter((u) => !u.squad),
-      true,
-      (sqd, added, removed) => {
+      units: this.units.filter((u) => !u.squad),
+      addUnitEnabled: true,
+      onSquadUpdated: (sqd, added, removed) => {
         this.squads = this.squads.set(sqd.id, sqd);
         added.forEach((id) => {
           this.units = this.units.update(id, (unit) => ({
@@ -212,7 +220,7 @@ export class ListSquadsScene extends Phaser.Scene {
           }));
         });
       },
-      (sqd) => {
+      onClose: (sqd) => {
         if (sqd.members.size > 0) {
           this.squads = this.squads.set(sqd.id, sqd);
         }
@@ -223,8 +231,8 @@ export class ListSquadsScene extends Phaser.Scene {
           this.handleSquadClicked(sqd);
         }
         this.editSquadModalEvents = null;
-      }
-    );
+      },
+    });
   }
 
   renderBoard(squad: Squad.SquadRecord, x: number, y: number) {

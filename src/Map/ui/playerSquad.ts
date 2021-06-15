@@ -24,32 +24,28 @@ export default (
         mapScene.disableMapInput();
 
         EditSquadModal(
-          mapScene,
-          mapSquad.squad,
-          mapScene.state.units,
-          false,
-          (updatedSquad) => {
-            mapScene.signal('changed unit position on board, updating', [
-              {
-                type: 'UPDATE_STATE',
-                target: {
-                  ...mapScene.state,
-                  squads: mapScene.state.squads.set(mapSquad.id, {
-                    ...mapScene.state.squads.get(mapSquad.id),
-                    squad: updatedSquad,
-                  }),
+          {
+            scene: mapScene, squad: mapSquad.squad, units: mapScene.state.units, addUnitEnabled: false, onSquadUpdated: (updatedSquad) => {
+              mapScene.signal('changed unit position on board, updating', [
+                {
+                  type: 'UPDATE_STATE',
+                  target: {
+                    ...mapScene.state,
+                    squads: mapScene.state.squads.set(mapSquad.id, {
+                      ...mapScene.state.squads.get(mapSquad.id),
+                      squad: updatedSquad,
+                    }),
+                  },
                 },
-              },
-            ]);
-          },
-          () => {
-            mapScene.enableInput();
-            mapScene.changeMode({
-              type: 'SQUAD_SELECTED',
-              id: mapSquad.squad.id,
-            });
-          }
-        );
+              ]);
+            }, onClose: () => {
+              mapScene.enableInput();
+              mapScene.changeMode({
+                type: 'SQUAD_SELECTED',
+                id: mapSquad.squad.id,
+              });
+            }
+          }        );
       }
     );
     button(baseX + 200, baseY, 'Move', mapScene.uiContainer, mapScene, () =>
