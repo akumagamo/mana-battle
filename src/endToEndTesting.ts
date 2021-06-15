@@ -6,7 +6,7 @@ import { MapScene } from './Map/MapScene';
 import { PLAYER_FORCE } from './constants';
 import { Unit } from './Unit/Model';
 import { ListSquadsScene } from './Squad/ListSquadsScene/ListSquadsScene';
-import UnitList from './Unit/UnitList';
+import UnitList from './Unit/UnitList/createUnitList';
 import BoardScene from './Board/InteractiveBoardScene';
 import { handleDispatchSquad } from './Map/dispatchWindow';
 import { MapSquad } from './Map/Model';

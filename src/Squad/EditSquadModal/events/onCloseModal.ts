@@ -1,7 +1,7 @@
 import { Board } from '../../../Board/Model';
 import { destroy, UnitList } from '../../../Unit/UnitList/Model';
 import * as Squad from '../../Model';
-import { EditSquadModalEvents, componentEvents } from '../index';
+import { EditSquadModalEvents, componentEvents } from '../createEditSquadModal';
 
 export function onCloseModal(
   listScene: UnitList,

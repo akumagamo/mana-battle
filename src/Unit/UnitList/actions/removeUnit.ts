@@ -1,5 +1,5 @@
 import { List } from 'immutable';
-import { renderRows } from '..';
+import { renderRows } from '../createUnitList';
 import { Chara } from '../../../Chara/Model';
 import { Unit } from '../../Model';
 import { UnitList } from '../Model';

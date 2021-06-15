@@ -13,7 +13,9 @@ import panel from '../../UI/panel';
 import text from '../../UI/text';
 import { UnitIndex } from '../../Unit/Model';
 import { SceneEventFactory } from '../../utils';
-import EditSquadModal, { EditSquadModalEvents } from '../EditSquadModal';
+import EditSquadModal, {
+  EditSquadModalEvents,
+} from '../EditSquadModal/createEditSquadModal';
 import * as Squad from '../Model';
 
 type CreateParams = {
@@ -92,7 +94,6 @@ export class ListSquadsScene extends Phaser.Scene {
       );
   }
   renderSquadList() {
-    console.log(`rendering squad list...`);
     const rows = this.formatList(this.squads.toList(), List());
 
     rows.forEach((row, y) =>
@@ -116,7 +117,8 @@ export class ListSquadsScene extends Phaser.Scene {
     }
   }
 
-  renderSelectSquadInfo(squad: Squad.SquadRecord) {
+  renderSelectSquadInfo(squadId: string) {
+    const squad = this.squads.get(squadId);
     const baseY = 650;
     const panel_ = panel(0, baseY, SCREEN_WIDTH, 100, this.uiContainer, this);
 
@@ -129,7 +131,7 @@ export class ListSquadsScene extends Phaser.Scene {
 
     text(20, baseY + 40, leader, this.uiContainer, this);
 
-    const dispatched = this.dispatched.has(squad.id);
+    const dispatched = this.dispatched.has(squadId);
 
     button(300, baseY + 20, 'Edit', this.uiContainer, this, () =>
       this.evs.SquadEditClicked.emit(squad)
@@ -142,7 +144,7 @@ export class ListSquadsScene extends Phaser.Scene {
       this.uiContainer,
       this,
       () => {
-        this.onDisbandSquad(squad.id);
+        this.onDisbandSquad(squadId);
         this.refreshBoards();
         this.refreshUI(this.getSquads().first());
       },
@@ -154,6 +156,7 @@ export class ListSquadsScene extends Phaser.Scene {
     this.inputEnabled = false;
 
     this.uiContainer = this.add.container();
+
 
     this.editSquadModalEvents = EditSquadModal({
       scene: this,
@@ -176,7 +179,6 @@ export class ListSquadsScene extends Phaser.Scene {
         });
       },
       onClose: (sqd) => {
-        console.log(`closed squad`, sqd);
         this.squads = this.squads.set(sqd.id, sqd);
         sqd.members.forEach((m) => {
           this.units = this.units.update(m.id, (u) => ({
@@ -343,7 +345,7 @@ export class ListSquadsScene extends Phaser.Scene {
 
     this.renderControls();
 
-    this.renderSelectSquadInfo(sqd);
+    this.renderSelectSquadInfo(sqd.id);
   }
 
   refreshBoards() {

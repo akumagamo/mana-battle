@@ -5,7 +5,7 @@ import highlightTile from '../../../Board/highlightTile';
 import { Board } from '../../../Board/Model';
 import { Chara } from '../../../Chara/Model';
 import { GAME_SPEED } from '../../../env';
-import { reposition, scaleDown } from '../../../Unit/UnitList';
+import { reposition, scaleDown } from '../../../Unit/UnitList/createUnitList';
 import addUnit from '../../../Unit/UnitList/actions/addUnit';
 import removeUnit from '../../../Unit/UnitList/actions/removeUnit';
 import { UnitList } from '../../../Unit/UnitList/Model';

@@ -40,7 +40,7 @@ import { screenToCellPosition, cellToScreenPosition } from './board/position';
 import * as CombatScene from '../Combat/CombatScene';
 import { handleMovePlayerSquadButtonClicked } from './ui/playerSquad';
 import { organizeButtonClicked } from './ui/organizeButtonClicked';
-import { EditSquadModalEvents } from '../Squad/EditSquadModal';
+import { EditSquadModalEvents } from '../Squad/EditSquadModal/createEditSquadModal';
 import dispatchWindow from './dispatchWindow';
 import returnButtonClicked from '../Squad/ListSquadsScene/events/returnButtonClicked';
 import run from '../Chara/animations/run';

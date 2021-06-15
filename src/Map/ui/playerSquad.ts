@@ -1,7 +1,7 @@
 import { MapSquad } from '../Model';
 import button from '../../UI/button';
 import { MapScene } from '../MapScene';
-import EditSquadModal from '../../Squad/EditSquadModal';
+import EditSquadModal from '../../Squad/EditSquadModal/createEditSquadModal';
 
 export default (
   mapScene: MapScene,

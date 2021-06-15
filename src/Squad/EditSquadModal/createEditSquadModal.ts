@@ -9,7 +9,7 @@ import button from '../../UI/button';
 import panel from '../../UI/panel';
 import { Unit, UnitIndex } from '../../Unit/Model';
 import SmallUnitDetailsBar from '../../Unit/SmallUnitDetailsBar';
-import { createUnitList } from '../../Unit/UnitList';
+import createUnitList from '../../Unit/UnitList/createUnitList';
 import { UnitList } from '../../Unit/UnitList/Model';
 import { SceneEventFactory, EventFactory } from '../../utils';
 import * as Squad from '../Model';
@@ -18,8 +18,6 @@ import onDragFromUnitList from './events/onDragFromUnitList';
 import { onCloseModal } from './events/onCloseModal';
 import { List } from 'immutable';
 import handleUnitDrag from '../../Unit/UnitList/actions/handleUnitDrag';
-
-const GAME_SPEED = parseInt(process.env.SPEED);
 
 export const componentEvents = {
   ADD_UNIT_BUTTON_CLICKED: 'ADD_UNIT_BUTTON_CLICKED',
@@ -97,10 +95,9 @@ export default function ({
     30,
     30,
     5,
-    units.toList(),
+    units.toList().filter((u) => !u.squad),
     onListUpdated
   );
-  //if (addUnitEnabled)
 
   const events: EditSquadModalEvents = createEvents(
     scene,
@@ -152,32 +149,9 @@ function createEvents(
   refresher: { (charas: List<Chara>): void; (cs: List<Chara>): void }
 ) {
   const events: EditSquadModalEvents = {
-    // OnDragFromUnitList: SceneEventFactory<Vector>(
-    //   scene,
-    //   componentEvents.ON_DRAG
-    // ),
-    // OnDragEndFromUnitList: SceneEventFactory<{ pos: Vector; unit: Unit }>(
-    //   scene,
-    //   componentEvents.ON_DRAG_END
-    // ),
     OnClose: SceneEventFactory<null>(scene, componentEvents.ON_CLOSE),
   };
 
-  // events.OnDragFromUnitList.on(({ x, y }: { x: number; y: number }) =>
-  //   onDragFromUnitList(listScene, boardScene, x, y)
-  // );
-  // events.OnDragEndFromUnitList.on(
-  //   ({ pos, chara }: { pos: Vector; unit: Unit; chara: Chara }) =>
-  //     onDragEndFromUnitList(
-  //       pos.x,
-  //       pos.y,
-  //       listScene,
-  //       boardScene,
-  //       chara,
-  //       onSquadUpdated,
-  //       refresher
-  //     )
-  // );
   events.OnClose.on(() => {
     onCloseModal(listScene, boardScene, scene, onClose);
   });

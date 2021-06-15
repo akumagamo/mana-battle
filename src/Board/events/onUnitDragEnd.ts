@@ -20,10 +20,8 @@ export default (board: Board) => (chara: Chara) => (
   } = chara;
   const { squad } = board;
 
-  console.log(`board/events/onunitdragend`, x, y);
   const boardSprite = findTileByXY(board, x, y + 100);
 
-  console.log(boardSprite.boardX, boardSprite.boardY);
   const squadMember = Squad.getMember(unit.id, squad);
 
   const isMoved = (boardSprite: BoardTile) =>

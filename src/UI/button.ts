@@ -97,7 +97,6 @@ export default (
 };
 
 export const setActive = (btn: Phaser.GameObjects.Graphics) => {
-  console.log(`setting active`);
   btn.fillStyle(activeFill);
   btn.fill();
 };

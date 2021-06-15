@@ -6,7 +6,7 @@ import renderListItem from './renderListItem';
 import { UnitList } from './Model';
 import refresh from './actions/refresh';
 
-export function createUnitList(
+export default function (
   scene: Phaser.Scene,
   x: number,
   y: number,

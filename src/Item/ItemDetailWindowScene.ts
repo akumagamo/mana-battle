@@ -172,7 +172,6 @@ export class ItemDetailWindowScene extends Phaser.Scene {
     this.itemStats(item, x + 370, y + 130, this.selectecItemDetailsContainer);
 
     this.btn(x + 400, y + 250, "Equip", () => {
-      console.log(item);
       // api.equipItem(item.id, unitId);
       // this.clearChildren();
       // onItemSelect();

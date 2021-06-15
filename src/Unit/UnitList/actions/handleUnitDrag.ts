@@ -1,4 +1,4 @@
-import { scaleUp } from '..';
+import { scaleUp } from '../createUnitList';
 import { Chara } from '../../../Chara/Model';
 import { Unit } from '../../Model';
 import { UnitList } from '../Model';

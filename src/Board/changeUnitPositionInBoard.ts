@@ -44,8 +44,6 @@ export default (
 
     board.squad = updatedSquad;
 
-    console.log(updatedSquad);
-
     onSquadUpdated(updatedSquad, [], []);
 
     updatedSquad.members.forEach((updatedUnit) => {
