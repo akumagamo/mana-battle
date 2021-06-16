@@ -240,7 +240,7 @@ export class ListSquadsScene extends Phaser.Scene {
   renderBoard(squad: Squad.SquadRecord, x: number, y: number) {
     const BOARD_X = 170 + x * 350;
     const BOARD_Y = 110 + y * 250;
-    const board = createStaticBoard(
+    const { board } = createStaticBoard(
       this,
       squad,
       this.units.filter((u) => u.squad === squad.id),

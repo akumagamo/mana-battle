@@ -7,7 +7,7 @@ import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../../constants';
 import { Container } from '../../Models';
 import button from '../../UI/button';
 import panel from '../../UI/panel';
-import { Unit, UnitIndex } from '../../Unit/Model';
+import { UnitIndex } from '../../Unit/Model';
 import SmallUnitDetailsBar from '../../Unit/SmallUnitDetailsBar';
 import createUnitList from '../../Unit/UnitList/createUnitList';
 import { UnitList } from '../../Unit/UnitList/Model';
@@ -18,6 +18,7 @@ import onDragFromUnitList from './events/onDragFromUnitList';
 import { onCloseModal } from './events/onCloseModal';
 import { List } from 'immutable';
 import handleUnitDrag from '../../Unit/UnitList/actions/handleUnitDrag';
+import { makeUnitDragable } from '../../Board/makeUnitsDragable';
 
 export const componentEvents = {
   ADD_UNIT_BUTTON_CLICKED: 'ADD_UNIT_BUTTON_CLICKED',
@@ -50,7 +51,7 @@ export default function ({
   ) => void;
   onClose: (s: Squad.SquadRecord) => void;
 }) {
-  const board = createBoard(
+  const { board, interactions } = createBoard(
     scene,
     squad,
     units,
@@ -83,7 +84,8 @@ export default function ({
             board,
             chara,
             onSquadUpdated,
-            onListUpdated
+            onListUpdated,
+            interactions
           );
         }
       );

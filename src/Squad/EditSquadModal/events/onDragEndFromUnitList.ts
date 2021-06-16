@@ -2,7 +2,7 @@ import { List } from 'immutable';
 import addNewUnitToBoard from '../../../Board/actions/addNewUnitToBoard';
 import findTileByXY from '../../../Board/findTileByXY';
 import highlightTile from '../../../Board/highlightTile';
-import { Board } from '../../../Board/Model';
+import { Board, BoardInteractiveEvents } from '../../../Board/Model';
 import { Chara } from '../../../Chara/Model';
 import { GAME_SPEED } from '../../../env';
 import { reposition, scaleDown } from '../../../Unit/UnitList/createUnitList';
@@ -11,6 +11,7 @@ import removeUnit from '../../../Unit/UnitList/actions/removeUnit';
 import { UnitList } from '../../../Unit/UnitList/Model';
 import { addMember, getMemberByPosition, SquadRecord } from '../../Model';
 import removeCharaFromBoard from '../actions/removeCharaFromBoard';
+import { makeUnitDragable } from '../../../Board/makeUnitsDragable';
 
 export default (
   x: number,
@@ -19,7 +20,8 @@ export default (
   board: Board,
   chara: Chara,
   onSquadUpdated: (s: SquadRecord, added: string[], removed: string[]) => void,
-  onRefresh: (cs: List<Chara>) => void
+  onRefresh: (cs: List<Chara>) => void,
+  interactions: BoardInteractiveEvents
 ) => {
   // todo: the board should offer this api
   const cell = findTileByXY(board, x - board.x, y - board.y + 100);
@@ -43,8 +45,15 @@ export default (
     board.squad = updatedSquad;
 
     //create new chara on board, representing same unit
-    addNewUnitToBoard(board)(unit, cell.boardX, cell.boardY);
+    const newChara = addNewUnitToBoard(board)(unit, cell.boardX, cell.boardY);
 
+    makeUnitDragable(
+      newChara,
+      board,
+      interactions.onDragStart,
+      interactions.onDragEnd,
+      interactions.onSquadUpdated
+    );
     //remove replaced unit
     if (unitToReplace) {
       const charaToRemove = board.unitList.find(

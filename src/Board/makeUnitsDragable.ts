@@ -17,25 +17,38 @@ export default (
   onDragEnd?: (chara: Chara) => (x: number, y: number) => void
 ) => {
   board.unitList.forEach((chara) => {
-    onEnableDrag(
-      chara,
-      (u, x, y, chara) => {
-        if (onDragStart) {
-          onDragStart(u, x, y, chara);
-          onUnitDrag(board)(u, x, y);
-        }
-      },
-      (c) => (x, y) => {
-        if (onDragEnd) {
-          changeUnitPositionInBoard(
-            board,
-            { unit: c.props.unit, x, y },
-            onSquadUpdated
-          );
-
-          onDragEnd(c)(x, y);
-        }
-      }
-    );
+    makeUnitDragable(chara, board, onDragStart, onDragEnd, onSquadUpdated);
   });
 };
+export function makeUnitDragable(
+  chara: Chara,
+  board: Board,
+  onDragStart: (unit: Unit, x: number, y: number, chara: Chara) => void,
+  onDragEnd: (chara: Chara) => (x: number, y: number) => void,
+  onSquadUpdated: (
+    squad: SquadRecord,
+    added: string[],
+    removed: string[]
+  ) => void
+) {
+  onEnableDrag(
+    chara,
+    (u, x, y, chara) => {
+      if (onDragStart) {
+        onDragStart(u, x, y, chara);
+        onUnitDrag(board)(u, x, y);
+      }
+    },
+    (c) => (x, y) => {
+      if (onDragEnd) {
+        changeUnitPositionInBoard(
+          board,
+          { unit: c.props.unit, x, y },
+          onSquadUpdated
+        );
+
+        onDragEnd(c)(x, y);
+      }
+    }
+  );
+}

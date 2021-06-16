@@ -199,8 +199,8 @@ export default class CombatScene extends Phaser.Scene {
         pos[squadId].top
       );
 
-    this.miniSquads.top = render(top);
-    this.miniSquads.bottom = render(bottom);
+    this.miniSquads.top = render(top).board;
+    this.miniSquads.bottom = render(bottom).board;
 
     const push = (c: Chara) => this.miniSquadCharas.push(c);
 

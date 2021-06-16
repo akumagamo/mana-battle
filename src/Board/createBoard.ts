@@ -55,5 +55,11 @@ export default (
   // DEBUG DRAG CONTAINER
   //debugMakeOverlay(board);
 
-  return board;
+  return {
+    board,
+    /** Interaction parameters that were used when creating the board are returned to allow other
+     * functions refreshing new elements as they are added to the board
+     */
+    interactions: { ...interactive },
+  };
 };

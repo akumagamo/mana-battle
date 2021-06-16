@@ -6,4 +6,6 @@ export default (board: Board) => (id: string) => {
   const chara = addUnitToBoard(board, unit);
 
   board.unitList = board.unitList.concat([chara]);
+
+  return chara;
 };

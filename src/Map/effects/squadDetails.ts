@@ -32,7 +32,7 @@ export default (
 
   const detailsBar = renderUnitDetailsBar(scene, details, container);
 
-  const boardScene = createStaticBoard(
+  const { board } = createStaticBoard(
     scene,
     mapSquad.squad,
     units,
@@ -41,18 +41,18 @@ export default (
     0.7
   );
 
-  container.add(boardScene.container);
+  container.add(board.container);
 
-  onBoardUnitClicked(boardScene, (chara) => {
+  onBoardUnitClicked(board, (chara) => {
     charaStats.removeAll();
 
     detailsBar(chara.props.unit);
   });
 
-  const tile = boardScene.tiles.find(
+  const tile = board.tiles.find(
     (t) => t.boardX === leader.x && t.boardY === leader.y
   );
-  highlightTile(boardScene, tile);
+  highlightTile(board, tile);
 
   const defaultUnit = units.find((u) => u.id === leader.id);
 

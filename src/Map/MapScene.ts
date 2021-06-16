@@ -978,7 +978,7 @@ export class MapScene extends Phaser.Scene {
 
     const enemyUnits = this.getSquadUnits(squadB.id);
 
-    const enemy = createStaticBoard(
+    const { board: enemy } = createStaticBoard(
       this,
       squadB.squad,
       enemyUnits,
@@ -990,7 +990,7 @@ export class MapScene extends Phaser.Scene {
 
     const alliedUnits = this.state.units.filter((u) => u.squad === squadA.id);
 
-    const ally = createStaticBoard(
+    const { board: ally } = createStaticBoard(
       this,
       squadA.squad,
       alliedUnits,
