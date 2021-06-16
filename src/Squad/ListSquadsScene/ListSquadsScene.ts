@@ -282,7 +282,7 @@ export class ListSquadsScene extends Phaser.Scene {
 
   renderControls() {
     button(
-      SCREEN_WIDTH - 150,
+      SCREEN_WIDTH - 200,
       600,
       'Confirm',
       this.uiContainer,
@@ -292,7 +292,7 @@ export class ListSquadsScene extends Phaser.Scene {
     );
 
     button(
-      SCREEN_WIDTH - 370,
+      SCREEN_WIDTH - 400,
       600,
       'Create Squad',
       this.uiContainer,
