@@ -155,8 +155,8 @@ export class ListSquadsScene extends Phaser.Scene {
   handleSquadEditClicked(squad: Squad.SquadRecord) {
     this.inputEnabled = false;
 
+    this.uiContainer.destroy();
     this.uiContainer = this.add.container();
-
 
     this.editSquadModalEvents = EditSquadModal({
       scene: this,
