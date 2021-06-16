@@ -122,15 +122,20 @@ export default function ({
   onBoardUnitClicked(board, (c) => {
     details?.destroy();
     details = SmallUnitDetailsBar(
-      330,
-      SCREEN_HEIGHT - 160,
+      -330,
+      350,
       board.scene,
       units.find((u) => u.id === c.props.unit.id)
     );
     board.container.add(details);
   });
-  button(0, SCREEN_HEIGHT - 350, 'Confirm', board.container, board.scene, () =>
-    events.OnClose.emit(null)
+  button(
+    380,
+    SCREEN_HEIGHT - 320,
+    'Confirm',
+    board.container,
+    board.scene,
+    () => events.OnClose.emit(null)
   );
 
   return events;
