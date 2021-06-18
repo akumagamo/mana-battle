@@ -13,9 +13,7 @@ import panel from '../../UI/panel';
 import text from '../../UI/text';
 import { Unit, UnitIndex } from '../../Unit/Model';
 import { SceneEventFactory } from '../../utils';
-import EditSquadModal, {
-  EditSquadModalEvents,
-} from '../EditSquadModal/createEditSquadModal';
+import EditSquadModal from '../EditSquadModal/createEditSquadModal';
 import * as Squad from '../Model';
 
 type CreateParams = {
@@ -54,7 +52,6 @@ export class ListSquadsScene extends Phaser.Scene {
   dispatched: Set<string> = Set();
   inputEnabled = true;
   uiContainer: Container | null = null;
-  editSquadModalEvents: EditSquadModalEvents;
 
   constructor() {
     super(key);
@@ -159,7 +156,7 @@ export class ListSquadsScene extends Phaser.Scene {
     this.uiContainer.destroy();
     this.uiContainer = this.add.container();
 
-    this.editSquadModalEvents = EditSquadModal({
+    EditSquadModal({
       scene: this,
       squad,
       units: this.units,
@@ -190,7 +187,6 @@ export class ListSquadsScene extends Phaser.Scene {
         this.inputEnabled = true;
         this.refreshBoards();
         this.handleSquadClicked(sqd);
-        this.editSquadModalEvents = null;
       },
     });
   }
@@ -198,7 +194,7 @@ export class ListSquadsScene extends Phaser.Scene {
     this.inputEnabled = false;
     this.uiContainer = this.add.container();
 
-    this.editSquadModalEvents = EditSquadModal({
+    EditSquadModal({
       scene: this,
       squad: Squad.createSquad({
         id: 'squad+' + new Date().getTime(),
@@ -233,7 +229,6 @@ export class ListSquadsScene extends Phaser.Scene {
         if (sqd.members.size > 0) {
           this.handleSquadClicked(sqd);
         }
-        this.editSquadModalEvents = null;
       },
     });
   }

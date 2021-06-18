@@ -26,17 +26,6 @@ export const componentEvents = {
   ON_CLOSE: 'ON_CLOSE',
 };
 
-export type EditSquadModalEvents = {
-  onClose: EventFactory<null>;
-  onDragFromUnitListEvent: (
-    unit: Unit,
-    x: number,
-    y: number,
-    chara: Chara
-  ) => void;
-  onDragEndFromUnitListEvent: (chara: Chara) => (x: number, y: number) => void;
-};
-
 export default function ({
   scene,
   squad,
@@ -46,7 +35,7 @@ export default function ({
   onClose,
 }: {
   /** Any scene that wants to use this component needs to register events locally */
-  scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents };
+  scene: Phaser.Scene ;
   squad: Squad.SquadRecord;
   units: UnitIndex;
   addUnitEnabled: boolean;
@@ -155,16 +144,10 @@ export default function ({
   );
 
   board.scene.events.emit('EditSquadModalOpened', { board, unitList });
-
-  return {
-    onClose: onCloseEvent,
-    onDragFromUnitListEvent,
-    onDragEndFromUnitListEvent,
-  };
 }
 
 function createOnCloseEvent(
-  scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents },
+  scene: Phaser.Scene ,
   boardScene: Board,
   listScene: UnitList,
   onClose: { (s: Squad.SquadRecord): void; (arg0: Squad.SquadRecord): void },
