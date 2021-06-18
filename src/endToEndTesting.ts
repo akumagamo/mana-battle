@@ -1,8 +1,8 @@
-import TitleScene from './Scenes/TitleScene';
 import CharaCreationScene from './CharaCreation/CharaCreationScene';
 import { MapScene } from './Map/MapScene';
 import { PLAYER_FORCE } from './constants';
 import { Unit } from './Unit/Model';
+import TitleScene from './Scenes/Title/TitleScene';
 
 const assert = (condition: string, a: any, b: any) => {
   if (a !== b)
@@ -14,7 +14,7 @@ const assert = (condition: string, a: any, b: any) => {
 
 export function endToEndTesting(game: Phaser.Game) {
   game.events.once('TitleSceneCreated', (scn: TitleScene) => {
-    scn.sceneEvents.NewGameButtonClicked();
+    scn.events.emit('newGameButtonClicked');
   });
   game.events.once(
     'CharaCreationSceneCreated',

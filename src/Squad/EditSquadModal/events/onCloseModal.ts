@@ -7,7 +7,7 @@ export function onCloseModal(
   listScene: UnitList,
   boardScene: Board,
   scene: Phaser.Scene,
-  onClose: { (s: Squad.SquadRecord): void; (arg0: Squad.SquadRecord): void }
+  onClose: (s: Squad.SquadRecord) => void
 ) {
   destroy(listScene);
   boardScene.destroy();

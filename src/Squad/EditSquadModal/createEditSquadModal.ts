@@ -35,7 +35,7 @@ export default function ({
   onClose,
 }: {
   /** Any scene that wants to use this component needs to register events locally */
-  scene: Phaser.Scene ;
+  scene: Phaser.Scene;
   squad: Squad.SquadRecord;
   units: UnitIndex;
   addUnitEnabled: boolean;
@@ -69,7 +69,7 @@ export default function ({
     chara: Chara
   ) => {
     handleUnitDrag(unitList, unit, x, y, chara, () => {
-      onDragFromUnitList(unitList, board, x, y);
+      onDragFromUnitList(board, x, y);
     });
   };
 
@@ -147,7 +147,7 @@ export default function ({
 }
 
 function createOnCloseEvent(
-  scene: Phaser.Scene ,
+  scene: Phaser.Scene,
   boardScene: Board,
   listScene: UnitList,
   onClose: { (s: Squad.SquadRecord): void; (arg0: Squad.SquadRecord): void },
