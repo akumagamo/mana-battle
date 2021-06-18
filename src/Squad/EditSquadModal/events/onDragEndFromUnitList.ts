@@ -81,11 +81,11 @@ export default (
     removeUnit(unitList, unit, onRefresh);
 
     highlightTile(board, cell);
+
+    onRefresh(List(unitList.charas));
   } else {
     reposition(unitList, chara);
     scaleDown(unitList, chara);
     board.tiles.forEach((tile) => tile.sprite.clearTint());
   }
-
-  onRefresh(List(unitList.charas));
 };

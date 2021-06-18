@@ -73,7 +73,9 @@ export default (props: {
     rightHandEquip: null,
     leftHandEquip: null,
     hat: null,
-    destroy: () => container.destroy(), //todo: make this an external function. check other destroy fns
+    destroy: () => {
+      container.destroy();
+    }, //todo: make this an external function. check other destroy fns
   };
 
   initial(chara, headOnly);

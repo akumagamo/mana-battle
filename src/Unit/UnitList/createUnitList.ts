@@ -5,6 +5,8 @@ import { List } from 'immutable';
 import renderListItem from './renderListItem';
 import { UnitList } from './Model';
 import refresh from './actions/refresh';
+import { getRowPosition } from './actions/getRowPosition';
+import { GAME_SPEED } from '../../env';
 
 export default function (
   scene: Phaser.Scene,
@@ -33,34 +35,20 @@ export default function (
   return unitList;
 }
 
-export function getUnitIndex(unitList: UnitList, unit: Unit) {
-  const itemsToRender = getUnitsToRender(unitList);
-  return itemsToRender.findIndex((u) => u.id === unit.id);
-}
-export function removeUnitRow(unitList: UnitList, id: string) {
-  const row = unitList.container.getByName('row_' + id);
-  row.destroy();
-}
-
 export function reposition(unitList: UnitList, chara: Chara) {
-  const rowBackground: any = unitList.container.getByName('row_' + chara.id);
+  const unitsToRender = getUnitsToRender(unitList);
+
+  const pos = getRowPosition(
+    unitList.container.x,
+    unitList.container.y,
+    unitsToRender.findIndex((u) => u.id === chara.id)
+  );
 
   unitList.scene.tweens.add({
     targets: chara.container,
-    x: rowBackground.x,
-    y: rowBackground.y,
-    duration: 600,
-    ease: 'Cubic',
-    repeat: 0,
-    paused: false,
-    yoyo: false,
-  });
-
-  unitList.scene.tweens.add({
-    targets: chara.container,
-    x: rowBackground.x,
-    y: rowBackground.y,
-    duration: 600,
+    x: pos.x,
+    y: pos.y,
+    duration: 600 / GAME_SPEED,
     ease: 'Cubic',
     repeat: 0,
     paused: false,
