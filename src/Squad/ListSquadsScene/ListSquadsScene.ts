@@ -17,7 +17,6 @@ import EditSquadModal, {
   EditSquadModalEvents,
 } from '../EditSquadModal/createEditSquadModal';
 import * as Squad from '../Model';
-import { Chara } from '/Users/leonardofarroco/dev/mana-phaser/src/Chara/Model';
 
 type CreateParams = {
   squads: Squad.Index;
@@ -45,13 +44,14 @@ export class ListSquadsScene extends Phaser.Scene {
     ConfirmButtonClicked: SceneEventFactory<null>(this, 'ConfirmButtonClicked'),
   };
 
+  onReturnClick: (scene: ListSquadsScene) => void | null = null;
+
   boards: Board[] = [];
   page: number = 0;
   itemsPerPage: number = 16;
   squads = Map() as Squad.Index;
   units = Map() as UnitIndex;
   dispatched: Set<string> = Set();
-  onReturnClick: (scene: ListSquadsScene) => void | null = null;
   inputEnabled = true;
   uiContainer: Container | null = null;
   editSquadModalEvents: EditSquadModalEvents;
@@ -132,12 +132,12 @@ export class ListSquadsScene extends Phaser.Scene {
 
     text(20, baseY + 40, leader, this.uiContainer, this);
 
-    const dispatched = this.dispatched.has(squadId);
-
     button(300, baseY + 20, 'Edit', this.uiContainer, this, () =>
       this.evs.SquadEditClicked.emit(squad)
     );
 
+    const dispatched = this.dispatched.has(squadId);
+    const isLastSquad = this.squads.size === 1;
     button(
       1000,
       baseY + 20,
@@ -149,7 +149,7 @@ export class ListSquadsScene extends Phaser.Scene {
         this.refreshBoards();
         this.refreshUI(this.getSquads().first());
       },
-      dispatched
+      dispatched || isLastSquad
     );
   }
 

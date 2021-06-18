@@ -18,7 +18,6 @@ import onDragFromUnitList from './events/onDragFromUnitList';
 import { onCloseModal } from './events/onCloseModal';
 import { List } from 'immutable';
 import handleUnitDrag from '../../Unit/UnitList/actions/handleUnitDrag';
-import { makeUnitDragable } from '../../Board/makeUnitsDragable';
 
 export const componentEvents = {
   ADD_UNIT_BUTTON_CLICKED: 'ADD_UNIT_BUTTON_CLICKED',
