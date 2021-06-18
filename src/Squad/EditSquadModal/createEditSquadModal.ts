@@ -7,7 +7,7 @@ import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../../constants';
 import { Container } from '../../Models';
 import button from '../../UI/button';
 import panel from '../../UI/panel';
-import { UnitIndex } from '../../Unit/Model';
+import { Unit, UnitIndex } from '../../Unit/Model';
 import SmallUnitDetailsBar from '../../Unit/SmallUnitDetailsBar';
 import createUnitList from '../../Unit/UnitList/createUnitList';
 import { UnitList } from '../../Unit/UnitList/Model';
@@ -28,7 +28,14 @@ export const componentEvents = {
 };
 
 export type EditSquadModalEvents = {
-  OnClose: EventFactory<null>;
+  onClose: EventFactory<null>;
+  onDragFromUnitListEvent: (
+    unit: Unit,
+    x: number,
+    y: number,
+    chara: Chara
+  ) => void;
+  onDragEndFromUnitListEvent: (chara: Chara) => (x: number, y: number) => void;
 };
 
 export default function ({
@@ -67,32 +74,40 @@ export default function ({
     }
   );
 
-  const onListUpdated = (charas: List<Chara>) => {
-    charas.forEach((chara) => {
-      onEnableDrag(
-        chara,
-        (unit, x, y, chara) => {
-          handleUnitDrag(listScene, unit, x, y, chara, () => {
-            onDragFromUnitList(listScene, board, x, y);
-          });
-        },
-        (chara) => (x, y) => {
-          onDragEndFromUnitList(
-            x,
-            y,
-            listScene,
-            board,
-            chara,
-            onSquadUpdated,
-            onListUpdated,
-            interactions
-          );
-        }
-      );
+  const onDragFromUnitListEvent = (
+    unit: Unit,
+    x: number,
+    y: number,
+    chara: Chara
+  ) => {
+    handleUnitDrag(unitList, unit, x, y, chara, () => {
+      onDragFromUnitList(unitList, board, x, y);
     });
   };
 
-  const listScene = createUnitList(
+  const onDragEndFromUnitListEvent = (chara: Chara) => (
+    x: number,
+    y: number
+  ) => {
+    onDragEndFromUnitList(
+      x,
+      y,
+      unitList,
+      board,
+      chara,
+      onSquadUpdated,
+      onListUpdated,
+      interactions
+    );
+  };
+
+  const onListUpdated = (charas: List<Chara>) => {
+    charas.forEach((chara) => {
+      onEnableDrag(chara, onDragFromUnitListEvent, onDragEndFromUnitListEvent);
+    });
+  };
+
+  const unitList = createUnitList(
     scene,
     30,
     30,
@@ -101,10 +116,10 @@ export default function ({
     onListUpdated
   );
 
-  const events: EditSquadModalEvents = createEvents(
+  const onCloseEvent = createOnCloseEvent(
     scene,
     board,
-    listScene,
+    unitList,
     onClose,
     onSquadUpdated,
     onListUpdated
@@ -137,13 +152,19 @@ export default function ({
     'Confirm',
     board.container,
     board.scene,
-    () => events.OnClose.emit(null)
+    () => onCloseEvent.emit(null)
   );
 
-  return events;
+  board.scene.events.emit('EditSquadModalOpened', { board, unitList });
+
+  return {
+    onClose: onCloseEvent,
+    onDragFromUnitListEvent,
+    onDragEndFromUnitListEvent,
+  };
 }
 
-function createEvents(
+function createOnCloseEvent(
   scene: Phaser.Scene & { editSquadModalEvents: EditSquadModalEvents },
   boardScene: Board,
   listScene: UnitList,
@@ -155,13 +176,11 @@ function createEvents(
   ) => void,
   refresher: { (charas: List<Chara>): void; (cs: List<Chara>): void }
 ) {
-  const events: EditSquadModalEvents = {
-    OnClose: SceneEventFactory<null>(scene, componentEvents.ON_CLOSE),
-  };
+  const onClose_ = SceneEventFactory<null>(scene, componentEvents.ON_CLOSE);
 
-  events.OnClose.on(() => {
+  onClose_.on(() => {
     onCloseModal(listScene, boardScene, scene, onClose);
   });
 
-  return events;
+  return onClose_;
 }

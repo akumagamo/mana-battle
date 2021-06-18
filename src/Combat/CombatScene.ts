@@ -178,12 +178,12 @@ export default class CombatScene extends Phaser.Scene {
 
   renderMiniSquads(top: string, bottom: string) {
     const pos = {
-      [top]: { x: SCREEN_WIDTH - 430, y: -20, top: true },
-      [bottom]: { x: -80, y: SCREEN_HEIGHT - 230, top: false },
+      [top]: { x: SCREEN_WIDTH - 170, y: 60, top: true },
+      [bottom]: { x: 160, y: SCREEN_HEIGHT - 150, top: false },
     };
 
     const panel_ = (id: string) =>
-      panel(pos[id].x + 80, pos[id].y, 360, 230, this.container, this);
+      panel(pos[id].x - 180, pos[id].y - 70, 360, 230, this.container, this);
 
     panel_(top).setAlpha(0.3);
     panel_(bottom).setAlpha(0.3);

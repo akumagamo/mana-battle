@@ -11,12 +11,13 @@ import { Container, Pointer } from '../../Models';
 import button from '../../UI/button';
 import panel from '../../UI/panel';
 import text from '../../UI/text';
-import { UnitIndex } from '../../Unit/Model';
+import { Unit, UnitIndex } from '../../Unit/Model';
 import { SceneEventFactory } from '../../utils';
 import EditSquadModal, {
   EditSquadModalEvents,
 } from '../EditSquadModal/createEditSquadModal';
 import * as Squad from '../Model';
+import { Chara } from '/Users/leonardofarroco/dev/mana-phaser/src/Chara/Model';
 
 type CreateParams = {
   squads: Squad.Index;
@@ -52,8 +53,8 @@ export class ListSquadsScene extends Phaser.Scene {
   dispatched: Set<string> = Set();
   onReturnClick: (scene: ListSquadsScene) => void | null = null;
   inputEnabled = true;
-  editSquadModalEvents: EditSquadModalEvents;
   uiContainer: Container | null = null;
+  editSquadModalEvents: EditSquadModalEvents;
 
   constructor() {
     super(key);

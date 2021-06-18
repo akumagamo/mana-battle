@@ -960,8 +960,8 @@ export class MapScene extends Phaser.Scene {
 
   // TODO: handle scenario where none of the engaging squads belongs to the player
   async startCombat(squadA: MapSquad, squadB: MapSquad, direction: string) {
-    const baseX = 200;
-    const baseY = 200;
+    const baseX = 500;
+    const baseY = 300;
     const scale = 0.5;
 
     const playerSquad = [squadA, squadB].find(
