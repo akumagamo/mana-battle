@@ -2,7 +2,7 @@ import { makeUnit } from '../Unit/makeUnit';
 import stand from './animations/stand';
 import createChara from './createChara';
 import hpBar from './ui/hpBar';
-import { getMockCalls, sceneMock } from '../test/sceneMock';
+import { getMockCalls, sceneMock } from '../test/mocks';
 
 jest.mock('./ui/hpBar');
 jest.mock('./animations/stand');
