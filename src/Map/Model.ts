@@ -34,6 +34,8 @@ export type MapState = {
   cities: City[];
   squads: Map<string, MapSquad>;
   units: UnitIndex;
+  timeOfDay: number;
+  tick: number;
   ai: Map<string, AICommand>;
   /** Contains the ids from all dispatched squads (from all forces). Should this move to the force? */
   dispatchedSquads: Set<string>;
@@ -81,7 +83,13 @@ export type MapSquad = {
   id: string;
   squad: SquadRecord;
   pos: Vector;
-  status: "alive" | "defeated" | "retreated" | "hidden";
+  status:
+    | "standing"
+    | "moving"
+    | "defeated"
+    | "retreated"
+    | "sleeping"
+    | "guarding_fort";
 };
 
 export function createMapSquad(squad: SquadRecord): MapSquad {
@@ -89,7 +97,7 @@ export function createMapSquad(squad: SquadRecord): MapSquad {
     id: squad.id,
     squad,
     pos: { x: 1, y: 1 },
-    status: "alive",
+    status: "standing",
   };
 }
 
@@ -220,6 +228,9 @@ export function getCity(state: MapState, id: string): City {
 }
 export function getForceUnits(state: MapState, force: string) {
   return state.units.filter((u) => u.force === force);
+}
+export function getSquadUnits(state: MapState, squadId: string) {
+  return state.units.filter((u) => u.squad === squadId);
 }
 export function getForceSquads(state: MapState, force: string) {
   return state.squads.filter((u) => u.squad.force === force);

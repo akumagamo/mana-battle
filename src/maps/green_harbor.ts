@@ -33,6 +33,8 @@ const map: () => MapState = () => {
     author: 'Leonardo Farroco',
     description: 'The first map',
     dispatchedSquads: Set(),
+    timeOfDay: 0,
+    tick: 0,
     cells: tiles,
     squads: List([
       toMapSquad(
@@ -118,50 +120,42 @@ const map: () => MapState = () => {
     ],
     units: Map({
       enemy1: {
-        ...makeUnit({ job: 'fighter', id: 0, lvl: 10 }),
-        id: 'enemy1',
+        ...makeUnit({ id: 'enemy1' }),
         squad: 'squad1',
         force: CPU_FORCE,
       },
       enemy2: {
-        ...makeUnit({ job: 'fighter', id: 0, lvl: 10 }),
-        id: 'enemy2',
+        ...makeUnit({ id: 'enemy2' }),
         squad: 'squad1',
         force: CPU_FORCE,
       },
       enemy3: {
-        ...makeUnit({ job: 'fighter', id: 0, lvl: 10 }),
-        id: 'enemy3',
+        ...makeUnit({ id: 'enemy3' }),
         squad: 'squad1',
         force: CPU_FORCE,
       },
       enemy4: {
-        ...makeUnit({ job: 'fighter', id: 0, lvl: 10 }),
-        id: 'enemy4',
+        ...makeUnit({ id: 'enemy4' }),
         squad: 'squad1',
         force: CPU_FORCE,
       },
       enemy5: {
-        ...makeUnit({ job: 'fighter', id: 0, lvl: 10 }),
-        id: 'enemy5',
+        ...makeUnit({ id: 'enemy5' }),
         squad: 'squad2',
         force: CPU_FORCE,
       },
       enemy6: {
-        ...makeUnit({ job: 'fighter', id: 0, lvl: 10 }),
-        id: 'enemy6',
+        ...makeUnit({ id: 'enemy6' }),
         squad: 'squad2',
         force: CPU_FORCE,
       },
       enemy7: {
-        ...makeUnit({ job: 'fighter', id: 0, lvl: 10 }),
-        id: 'enemy7',
+        ...makeUnit({ id: 'enemy7' }),
         squad: 'squad2',
         force: CPU_FORCE,
       },
       enemy8: {
-        ...makeUnit({ job: 'fighter', id: 0, lvl: 10 }),
-        id: 'enemy8',
+        ...makeUnit({ id: 'enemy8' }),
         squad: 'squad2',
         force: CPU_FORCE,
       },

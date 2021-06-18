@@ -72,7 +72,7 @@ export const handleDispatchSquad = async (
 ) => {
   container.destroy();
 
-  scene.dispatchSquad(mapSquad.squad);
+  scene.dispatchSquad(mapSquad.squad, scene.state.timeOfDay);
   scene.enableInput();
   scene.isPaused = false;
   scene.changeMode({ type: "SQUAD_SELECTED", id: mapSquad.squad.id });

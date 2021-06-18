@@ -18,15 +18,7 @@ import TitleScene from './Scenes/Title/TitleScene';
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,
     },
-    scene: [
-      TitleScene,
-      ListSquadsScene,
-      ListUnitsScene,
-      MapListScene,
-      CombatScene,
-      OptionsScene,
-      WorldScene,
-    ],
+    scene: [TitleScene, ListSquadsScene, CombatScene, OptionsScene],
     dom: {
       createContainer: true,
     },

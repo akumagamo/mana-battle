@@ -3,6 +3,7 @@ import { PLAYER_FORCE } from '../../constants';
 import button from '../../UI/button';
 import text from '../../UI/text';
 import { MapScene } from '../MapScene';
+import {getSquadUnits} from '../Model';
 import playerSquad from './playerSquad';
 
 export async function squadInfo(
@@ -31,7 +32,7 @@ export async function squadInfo(
   const { board } = createStaticBoard(
     scene,
     mapSquad.squad,
-    scene.getSquadUnits(id),
+    getSquadUnits(scene.state,id),
     170,
     600,
     0.4

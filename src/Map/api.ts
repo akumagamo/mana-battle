@@ -1,7 +1,6 @@
 import * as PF from "pathfinding";
 import { Vector } from "./Model";
 
-
 export const getDistance = (vec1: Vector) => (vec2: Vector) =>
   Math.abs(vec1.x - vec2.x) + Math.abs(vec1.y - vec2.y);
 
