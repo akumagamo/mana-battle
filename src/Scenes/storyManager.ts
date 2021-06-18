@@ -10,13 +10,11 @@ import { toMapSquad } from '../Unit/Model';
 import { makeUnit } from '../Unit/makeUnit';
 import { startTheaterScene } from '../Theater/TheaterScene';
 import chapter_1_intro from '../Theater/Chapters/chapter_1_intro';
-import TitleScene, { TitleSceneState, turnOff } from './Title/TitleScene';
+import { turnOff } from './Title/turnOff';
+import { TitleSceneState } from './Title/Model';
 
 const GAME_SPEED = parseInt(process.env.SPEED);
-export const storyManager = async (
-  parent: TitleScene,
-  state: TitleSceneState
-) => {
+export default async (parent: Phaser.Scene, state: TitleSceneState) => {
   if (process.env.SOUND_ENABLED) {
     parent.tweens.add({
       targets: state.music,
@@ -49,32 +47,32 @@ export const storyManager = async (
 
   const alliedUnits = Map({
     [unit.id]: { ...unit, squad: '1' },
-    m1: { ...makeUnit('fighter', 'm1', 1), squad: '1' },
-    m2: { ...makeUnit('fighter', 'm2', 1), squad: '1' },
-    m3: { ...makeUnit('archer', 'm3', 1), squad: '1' },
-    m4: { ...makeUnit('mage', 'm4', 1), squad: '1' },
+    m1: { ...makeUnit({ job: 'fighter', id: 'm1', lvl: 1 }), squad: '1' },
+    m2: { ...makeUnit({ job: 'fighter', id: 'm2', lvl: 1 }), squad: '1' },
+    m3: { ...makeUnit({ job: 'archer', id: 'm3', lvl: 1 }), squad: '1' },
+    m4: { ...makeUnit({ job: 'mage', id: 'm4', lvl: 1 }), squad: '1' },
 
-    c1: { ...makeUnit('fighter', 'c1', 1), squad: 'c' },
-    c2: { ...makeUnit('fighter', 'c2', 1), squad: 'c' },
-    c3: { ...makeUnit('fighter', 'c3', 1), squad: 'c' },
-    c4: { ...makeUnit('fighter', 'c4', 1), squad: 'c' },
-    c5: { ...makeUnit('fighter', 'c5', 1), squad: 'c' },
-    d1: { ...makeUnit('fighter', 'd1', 1), squad: 'd' },
-    d2: { ...makeUnit('fighter', 'd2', 1), squad: 'd' },
-    d3: { ...makeUnit('fighter', 'd3', 1), squad: 'd' },
-    d4: { ...makeUnit('fighter', 'd4', 1), squad: 'd' },
-    d5: { ...makeUnit('fighter', 'd5', 1), squad: 'd' },
+    c1: { ...makeUnit({ job: 'fighter', id: 'c1', lvl: 1 }), squad: 'c' },
+    c2: { ...makeUnit({ job: 'fighter', id: 'c2', lvl: 1 }), squad: 'c' },
+    c3: { ...makeUnit({ job: 'fighter', id: 'c3', lvl: 1 }), squad: 'c' },
+    c4: { ...makeUnit({ job: 'fighter', id: 'c4', lvl: 1 }), squad: 'c' },
+    c5: { ...makeUnit({ job: 'fighter', id: 'c5', lvl: 1 }), squad: 'c' },
+    d1: { ...makeUnit({ job: 'fighter', id: 'd1', lvl: 1 }), squad: 'd' },
+    d2: { ...makeUnit({ job: 'fighter', id: 'd2', lvl: 1 }), squad: 'd' },
+    d3: { ...makeUnit({ job: 'fighter', id: 'd3', lvl: 1 }), squad: 'd' },
+    d4: { ...makeUnit({ job: 'fighter', id: 'd4', lvl: 1 }), squad: 'd' },
+    d5: { ...makeUnit({ job: 'fighter', id: 'd5', lvl: 1 }), squad: 'd' },
 
     // units without squad
-    e5: { ...makeUnit('fighter', 'e5', 1) },
-    e6: { ...makeUnit('fighter', 'e6', 1) },
-    e7: { ...makeUnit('fighter', 'e7', 1) },
-    e8: { ...makeUnit('fighter', 'e8', 1) },
-    e9: { ...makeUnit('fighter', 'e9', 1) },
-    e10: { ...makeUnit('fighter', 'e10', 1) },
-    e11: { ...makeUnit('fighter', 'e11', 1) },
-    e12: { ...makeUnit('fighter', 'e12', 1) },
-    e13: { ...makeUnit('fighter', 'e13', 1) },
+    e5: { ...makeUnit({ job: 'fighter', id: 'e5', lvl: 1 }) },
+    e6: { ...makeUnit({ job: 'fighter', id: 'e6', lvl: 1 }) },
+    e7: { ...makeUnit({ job: 'fighter', id: 'e7', lvl: 1 }) },
+    e8: { ...makeUnit({ job: 'fighter', id: 'e8', lvl: 1 }) },
+    e9: { ...makeUnit({ job: 'fighter', id: 'e9', lvl: 1 }) },
+    e10: { ...makeUnit({ job: 'fighter', id: 'e10', lvl: 1 }) },
+    e11: { ...makeUnit({ job: 'fighter', id: 'e11', lvl: 1 }) },
+    e12: { ...makeUnit({ job: 'fighter', id: 'e12', lvl: 1 }) },
+    e13: { ...makeUnit({ job: 'fighter', id: 'e13', lvl: 1 }) },
   });
 
   const sqd = firstSquad.mergeDeep(

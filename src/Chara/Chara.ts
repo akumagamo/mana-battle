@@ -1,6 +1,5 @@
 import { Unit } from '../Unit/Model';
-import { Container, Pointer, Image } from '../Models';
-import createChara from './createChara';
+import { Container, Image } from '../Models';
 
 interface CharaProps {
   key: string;

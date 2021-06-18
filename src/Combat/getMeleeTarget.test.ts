@@ -1,14 +1,14 @@
-import { Map } from "immutable";
-import { createSquad, makeMember, squadBuilder } from "../Squad/Model";
-import { printSquad } from "../Squad/Model.test";
-import { equals } from "../test/utils";
-import { makeUnit } from "../Unit/makeUnit";
-import { getMeleeTarget } from "./getMeleeTarget";
+import { Map } from 'immutable';
+import { createSquad, makeMember, squadBuilder } from '../Squad/Model';
+import { printSquad } from '../Squad/Model.test';
+import { equals } from '../test/utils';
+import { makeUnit } from '../Unit/makeUnit';
+import { getMeleeTarget } from './getMeleeTarget';
 
-jest.mock("../utils");
-jest.mock("../Unit/mods");
+jest.mock('../utils');
+jest.mock('../Unit/mods');
 
-test("Should get correct melee targets", () => {
+test('Should get correct melee targets', () => {
   // Team 1 facing right =>
   //  [ 0, _, 1],
   //  [ _, _, 2],
@@ -31,54 +31,54 @@ test("Should get correct melee targets", () => {
   // 4 -> 6
 
   const squadIndex = Map({
-    "1": createSquad({
-      id: "1",
-      force: "player",
-      leader: "0",
+    '1': createSquad({
+      id: '1',
+      force: 'player',
+      leader: '0',
       members: Map({
-        "0": makeMember({ id: "0", x: 1, y: 1 }),
-        "1": makeMember({ id: "1", x: 3, y: 1 }),
-        "2": makeMember({ id: "2", x: 3, y: 2 }),
-        "3": makeMember({ id: "3", x: 3, y: 3 }),
-        "4": makeMember({ id: "4", x: 1, y: 3 }),
+        '0': makeMember({ id: '0', x: 1, y: 1 }),
+        '1': makeMember({ id: '1', x: 3, y: 1 }),
+        '2': makeMember({ id: '2', x: 3, y: 2 }),
+        '3': makeMember({ id: '3', x: 3, y: 3 }),
+        '4': makeMember({ id: '4', x: 1, y: 3 }),
       }),
     }),
-    "2": createSquad({
-      id: "2",
-      force: "cpu",
-      leader: "5",
+    '2': createSquad({
+      id: '2',
+      force: 'cpu',
+      leader: '5',
       members: Map({
-        "5": makeMember({ id: "5", x: 2, y: 2 }),
-        "6": makeMember({ id: "6", x: 3, y: 1 }),
-        "7": makeMember({ id: "7", x: 3, y: 2 }),
-        "8": makeMember({ id: "8", x: 3, y: 3 }),
+        '5': makeMember({ id: '5', x: 2, y: 2 }),
+        '6': makeMember({ id: '6', x: 3, y: 1 }),
+        '7': makeMember({ id: '7', x: 3, y: 2 }),
+        '8': makeMember({ id: '8', x: 3, y: 3 }),
       }),
     }),
   });
 
   const unitIndex = Map({
-    "0": { ...makeUnit("fighter", 0, 1), squad: "1" },
-    "1": { ...makeUnit("fighter", 1, 1), squad: "1" },
-    "2": { ...makeUnit("fighter", 2, 1), squad: "1" },
-    "3": { ...makeUnit("fighter", 3, 1), squad: "1" },
-    "4": { ...makeUnit("fighter", 4, 1), squad: "1" },
-    "5": { ...makeUnit("fighter", 5, 1), squad: "2" },
-    "6": { ...makeUnit("fighter", 6, 1), squad: "2" },
-    "7": { ...makeUnit("fighter", 7, 1), squad: "2" },
-    "8": { ...makeUnit("fighter", 8, 1), squad: "2" },
+    '0': { ...makeUnit({ job: 'fighter', id: 0, lvl: 1 }), squad: '1' },
+    '1': { ...makeUnit({ job: 'fighter', id: 1, lvl: 1 }), squad: '1' },
+    '2': { ...makeUnit({ job: 'fighter', id: 2, lvl: 1 }), squad: '1' },
+    '3': { ...makeUnit({ job: 'fighter', id: 3, lvl: 1 }), squad: '1' },
+    '4': { ...makeUnit({ job: 'fighter', id: 4, lvl: 1 }), squad: '1' },
+    '5': { ...makeUnit({ job: 'fighter', id: 5, lvl: 1 }), squad: '2' },
+    '6': { ...makeUnit({ job: 'fighter', id: 6, lvl: 1 }), squad: '2' },
+    '7': { ...makeUnit({ job: 'fighter', id: 7, lvl: 1 }), squad: '2' },
+    '8': { ...makeUnit({ job: 'fighter', id: 8, lvl: 1 }), squad: '2' },
   });
 
   const targetOf = (id: string) =>
     getMeleeTarget(unitIndex.get(id), unitIndex, squadIndex).id;
 
-  equals(targetOf("0"), "8");
-  equals(targetOf("1"), "8");
-  equals(targetOf("2"), "7");
-  equals(targetOf("3"), "6");
-  equals(targetOf("4"), "6");
+  equals(targetOf('0'), '8');
+  equals(targetOf('1'), '8');
+  equals(targetOf('2'), '7');
+  equals(targetOf('3'), '6');
+  equals(targetOf('4'), '6');
 });
 
-test("Should choose closer enemy on diagonal", () => {
+test('Should choose closer enemy on diagonal', () => {
   // Team 1 facing right =>
   //  [ _, _, 0],
   //  [ _, _, _],
@@ -97,33 +97,33 @@ test("Should choose closer enemy on diagonal", () => {
   // 1 -> 3
 
   const squadIndex = Map({
-    "1": squadBuilder({
-      id: "1",
-      force: "player",
-      leader: "0",
-      members: [["0", 3, 1]],
+    '1': squadBuilder({
+      id: '1',
+      force: 'player',
+      leader: '0',
+      members: [['0', 3, 1]],
     }),
-    "2": squadBuilder({
-      id: "2",
-      force: "cpu",
-      leader: "1",
+    '2': squadBuilder({
+      id: '2',
+      force: 'cpu',
+      leader: '1',
       members: [
-        ["1", 2, 2],
-        ["2", 1, 3],
-        ["3", 3, 2],
+        ['1', 2, 2],
+        ['2', 1, 3],
+        ['3', 3, 2],
       ],
     }),
   });
 
   const unitIndex = Map({
-    "0": { ...makeUnit("fighter", 0, 1), squad: "1" },
-    "1": { ...makeUnit("fighter", 1, 1), squad: "2" },
-    "2": { ...makeUnit("fighter", 2, 1), squad: "2" },
-    "3": { ...makeUnit("fighter", 3, 1), squad: "2" },
+    '0': { ...makeUnit({ job: 'fighter', id: 0, lvl: 1 }), squad: '1' },
+    '1': { ...makeUnit({ job: 'fighter', id: 1, lvl: 1 }), squad: '2' },
+    '2': { ...makeUnit({ job: 'fighter', id: 2, lvl: 1 }), squad: '2' },
+    '3': { ...makeUnit({ job: 'fighter', id: 3, lvl: 1 }), squad: '2' },
   });
 
   const targetOf = (id: string) =>
     getMeleeTarget(unitIndex.get(id), unitIndex, squadIndex).id;
 
-  equals(targetOf("0"), "3");
+  equals(targetOf('0'), '3');
 });

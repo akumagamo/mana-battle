@@ -18,11 +18,10 @@ it('Should be rendered at the passed position', () => {
   const chara = createChara({
     parent: scene,
     x: 100,
-    y: 100,
-    unit: makeUnit('fighter', '1', 1),
+    y: 99,
+    unit: makeUnit({ id: '1' }),
   });
-  expect(chara.container.x).toEqual(100);
-  expect(chara.container.y).toEqual(100);
+  expect(chara.container).toMatchObject({ x: 100, y: 99, name: '1' });
 });
 
 it('Should not render a hp bar by default', () => {
@@ -32,7 +31,7 @@ it('Should not render a hp bar by default', () => {
     parent: scene,
     x: 100,
     y: 100,
-    unit: makeUnit('fighter', '1', 1),
+    unit: makeUnit({ id: '1' }),
   });
   expect(getMockCalls(chara.hpBarContainer.add)).toEqual([]);
 });
@@ -44,7 +43,7 @@ it('Should render a hp bar if argument is present', () => {
     parent: scene,
     x: 100,
     y: 100,
-    unit: makeUnit('fighter', 'id1', 1),
+    unit: makeUnit({ id: 'id1' }),
     showHpBar: true,
   });
 
@@ -59,7 +58,7 @@ it('Should be animated by default', () => {
     parent: scene,
     x: 100,
     y: 100,
-    unit: makeUnit('fighter', '1', 1),
+    unit: makeUnit({ id: '1' }),
   });
 
   expect(toHaveBeenCalledWithFirstParameter(stand).id).toEqual('1');
@@ -71,7 +70,7 @@ it('Should not be animated if defined by a prop', () => {
     parent: scene,
     x: 100,
     y: 100,
-    unit: makeUnit('fighter', '1', 1),
+    unit: makeUnit({ id: '1' }),
     animated: false,
   });
 
@@ -84,7 +83,7 @@ it('Should be animated if defined by a prop', () => {
     parent: scene,
     x: 100,
     y: 100,
-    unit: makeUnit('fighter', '1', 1),
+    unit: makeUnit({ id: '1' }),
     animated: true,
   });
 

@@ -30,6 +30,8 @@ export default (props: {
   } = props;
   //the unit has two wrappers to allow multiple tweens at once
   const container = parent.add.container(x, y);
+  container.name = unit.id;
+
   const charaWrapper = parent.add.container();
   container.add(charaWrapper);
 

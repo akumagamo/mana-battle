@@ -177,7 +177,7 @@ export default class CharaCreationScene extends Phaser.Scene {
   }
 
   private initialState() {
-    const unit = makeUnit('fighter', 'new_chara', 1);
+    const unit = makeUnit({ job: 'fighter', id: 'new_chara', lvl: 1 });
     this.unit = {
       ...unit,
       style: {

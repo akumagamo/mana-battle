@@ -11,14 +11,19 @@ import {
 } from './Model';
 import { getUnitAttacks } from './Skills';
 import { baseEquips } from './Jobs';
-import {PLAYER_FORCE} from '../constants';
+import { PLAYER_FORCE } from '../constants';
 
-export function makeUnit(
-  job: UnitJob,
-  id: number | string,
-  lvl: number,
-  overrides: Object = {}
-): Unit {
+export function makeUnit({
+  job = 'fighter',
+  id,
+  lvl = 1,
+  overrides = {},
+}: {
+  id: number | string;
+  job?: UnitJob;
+  lvl?: number;
+  overrides?: Object;
+}): Unit {
   const baseStats: {
     [job in UnitJob]: { hp: number; str: number; dex: number; int: number };
   } = {
