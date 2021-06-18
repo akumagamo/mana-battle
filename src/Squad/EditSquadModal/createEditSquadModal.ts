@@ -104,14 +104,9 @@ export default function ({
     onListUpdated
   );
 
-  const onCloseEvent = createOnCloseEvent(
-    scene,
-    board,
-    unitList,
-    onClose,
-    onSquadUpdated,
-    onListUpdated
-  );
+  if (!addUnitEnabled) unitList.container.destroy();
+
+  const onCloseEvent = createOnCloseEvent(scene, board, unitList, onClose);
 
   const panel_ = panel(
     -SCREEN_WIDTH / 2,
@@ -150,13 +145,7 @@ function createOnCloseEvent(
   scene: Phaser.Scene,
   boardScene: Board,
   listScene: UnitList,
-  onClose: { (s: Squad.SquadRecord): void; (arg0: Squad.SquadRecord): void },
-  onSquadUpdated: (
-    s: Squad.SquadRecord,
-    added: string[],
-    removed: string[]
-  ) => void,
-  refresher: { (charas: List<Chara>): void; (cs: List<Chara>): void }
+  onClose: { (s: Squad.SquadRecord): void; (arg0: Squad.SquadRecord): void }
 ) {
   const onClose_ = SceneEventFactory<null>(scene, componentEvents.ON_CLOSE);
 
