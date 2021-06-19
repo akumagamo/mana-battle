@@ -11,7 +11,7 @@ import { Unit, UnitIndex } from "../../Unit/Model";
 import SmallUnitDetailsBar from "../../Unit/SmallUnitDetailsBar";
 import createUnitList from "../../Unit/UnitList/createUnitList";
 import { UnitList } from "../../Unit/UnitList/Model";
-import { SceneEventFactory } from "../../utils";
+import { createEvent } from "../../utils";
 import * as Squad from "../Model";
 import onDragEndFromUnitList from "./events/onDragEndFromUnitList";
 import onDragFromUnitList from "./events/onDragFromUnitList";
@@ -162,7 +162,7 @@ function createOnCloseEvent(
   listScene: UnitList,
   onClose: { (s: Squad.SquadRecord): void; (arg0: Squad.SquadRecord): void }
 ) {
-  const onClose_ = SceneEventFactory<null>(scene, componentEvents.ON_CLOSE);
+  const onClose_ = createEvent<null>(scene, componentEvents.ON_CLOSE);
 
   onClose_.on(() => {
     onCloseModal(container, listScene, boardScene, scene, onClose);

@@ -12,7 +12,7 @@ import button from '../../UI/button';
 import panel from '../../UI/panel';
 import text from '../../UI/text';
 import { Unit, UnitIndex } from '../../Unit/Model';
-import { SceneEventFactory } from '../../utils';
+import { createEvent } from '../../utils';
 import EditSquadModal from '../EditSquadModal/createEditSquadModal';
 import * as Squad from '../Model';
 
@@ -34,12 +34,12 @@ export const run = (
 
 export class ListSquadsScene extends Phaser.Scene {
   evs = {
-    SquadEditClicked: SceneEventFactory<Squad.SquadRecord>(
+    SquadEditClicked: createEvent<Squad.SquadRecord>(
       this,
       'SquadEditClicked'
     ),
-    CreateSquadClicked: SceneEventFactory<null>(this, 'CreateSquadClicked'),
-    ConfirmButtonClicked: SceneEventFactory<null>(this, 'ConfirmButtonClicked'),
+    CreateSquadClicked: createEvent<null>(this, 'CreateSquadClicked'),
+    ConfirmButtonClicked: createEvent<null>(this, 'ConfirmButtonClicked'),
   };
 
   onReturnClick: (scene: ListSquadsScene) => void | null = null;

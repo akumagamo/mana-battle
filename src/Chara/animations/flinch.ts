@@ -1,10 +1,9 @@
 import { Chara } from '../Model';
 import die from './die';
-import { displayDamage } from './displayDamage';
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 
-export default (chara: Chara, damage: number, isKilled: boolean) => {
+export default (chara: Chara, isKilled: boolean) => {
   const FLINCH_DURATION = 200 / GAME_SPEED;
   const FLINCH_ROTATION = -0.2;
 
@@ -30,6 +29,4 @@ export default (chara: Chara, damage: number, isKilled: boolean) => {
     duration: 20 / GAME_SPEED,
   });
 
-  // TODO: this should move to the parent scene
-  displayDamage(chara, damage);
 };

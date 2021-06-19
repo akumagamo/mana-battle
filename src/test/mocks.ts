@@ -5,7 +5,7 @@ export const sceneMock = () => {
     emit: jest.fn(),
   });
   const gameObjectMock = () => ({
-    ...eventsMock(), 
+    ...eventsMock(),
     setDepth: jest.fn(),
     setSize: jest.fn(),
     setScale: jest.fn(),
@@ -42,7 +42,7 @@ export const sceneMock = () => {
     add: jest.fn(),
     killAll: jest.fn(),
   };
-  return {
+  return ({
     add: {
       container: containerMock,
       image: imageMock,
@@ -56,11 +56,10 @@ export const sceneMock = () => {
       once: jest.fn(),
       emit: jest.fn(),
     },
-    game:{
-
-      events:{...eventsMock()}
-    }
-  };
+    game: {
+      events: { ...eventsMock() },
+    },
+  } as unknown) as Phaser.Scene;
 };
 
 export const getMockCalls = (a: any) => {

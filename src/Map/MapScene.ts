@@ -35,7 +35,7 @@ import { delay, tween } from "../Scenes/utils";
 import { fadeIn, fadeOut } from "../UI/Transition";
 import { MapCommands } from "./MapCommands";
 import { Mode, DEFAULT_MODE } from "./Mode";
-import { getDistance, SceneEventFactory } from "../utils";
+import { getDistance, createEvent } from "../utils";
 import { cellSize, CHARA_MAP_SCALE } from "./config";
 import { screenToCellPosition, cellToScreenPosition } from "./board/position";
 import * as CombatScene from "../Combat/CombatScene";
@@ -77,35 +77,35 @@ export const startMapScene = async (
 
 export class MapScene extends Phaser.Scene {
   evs = {
-    CellClicked: SceneEventFactory<{ tile: Vector; pointer: Vector }>(
+    CellClicked: createEvent<{ tile: Vector; pointer: Vector }>(
       this,
       "CellClicked"
     ),
-    MovePlayerSquadButonClicked: SceneEventFactory<{
+    MovePlayerSquadButonClicked: createEvent<{
       mapScene: MapScene;
       mapSquad: MapSquad;
     }>(this, "MovePlayerSquadButonClicked"),
-    SquadArrivedInfoMessageCompleted: SceneEventFactory<Chara>(
+    SquadArrivedInfoMessageCompleted: createEvent<Chara>(
       this,
       "SquadArrivedInfoMessageCompleted"
     ),
-    SquadClicked: SceneEventFactory<MapSquad>(this, "SquadClicked"),
-    CloseSquadArrivedInfoMessage: SceneEventFactory<Chara>(
+    SquadClicked: createEvent<MapSquad>(this, "SquadClicked"),
+    CloseSquadArrivedInfoMessage: createEvent<Chara>(
       this,
       "CloseSquadArrivedInfoMessage"
     ),
-    OrganizeButtonClicked: SceneEventFactory<MapScene>(
+    OrganizeButtonClicked: createEvent<MapScene>(
       this,
       "OrganizeButtonClicked"
     ),
-    CombatInitiated: SceneEventFactory<null>(this, "CombatInitiated"),
-    ReturnedFromCombat: SceneEventFactory<null>(this, "ReturnedFromCombat"),
-    DispatchWindowRendered: SceneEventFactory<{
+    CombatInitiated: createEvent<null>(this, "CombatInitiated"),
+    ReturnedFromCombat: createEvent<null>(this, "ReturnedFromCombat"),
+    DispatchWindowRendered: createEvent<{
       container: Container;
       scene: MapScene;
       squads: Map<string, MapSquad>;
     }>(this, "DispatchWindowRendered"),
-    SquadDispatched: SceneEventFactory<string>(this, "SquadDispatched"),
+    SquadDispatched: createEvent<string>(this, "SquadDispatched"),
   };
 
   isPaused = false;

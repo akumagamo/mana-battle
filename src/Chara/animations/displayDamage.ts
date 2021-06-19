@@ -1,26 +1,28 @@
-import text from '../../UI/text';
-import { Chara } from '../Model';
+import text from "../../UI/text";
+import { Chara } from "../Model";
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 export function displayDamage(chara: Chara, damage: number) {
-  const dmg = text(
-    chara.container.x - 20,
-    chara.container.y - 100,
-    damage.toString(),
-    chara.container,
-    chara.props.parent
+  const container = chara.scene.add.container(
+    chara.container.x,
+    chara.container.y
   );
+  const dmg = text(-20, -100, damage.toString(), container, chara.scene);
   dmg.setScale(2);
-  //dmg.setShadow(2, 2, '#000');
-  dmg.setStroke('#000000', 4);
-  dmg.setAlign('center');
+  // Phaser bug: stroke and shadow make tween not completeable
+  // dmg.setShadow(2, 2, "#000");
+  // dmg.setStroke("#000000", 4);
+  dmg.setAlign("center");
 
-  chara.props.parent.tweens.add({
+  chara.scene.tweens.add({
     targets: dmg,
-    y: chara.container.y - 120,
+    y: -40,
     alpha: 0,
-    duration: 3000 / GAME_SPEED,
-    ease: 'Expo',
-    onComplete: () => dmg.destroy(),
+    duration: 1000 / GAME_SPEED,
+    ease: "Expo",
+    onComplete: () => {
+      container.destroy();
+      dmg.destroy();
+    },
   });
 }

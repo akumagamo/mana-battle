@@ -19,14 +19,14 @@ export type EventFactory<ARGS> = {
   emit: (args: ARGS) => void;
 };
 
-export const SceneEventFactory = <ARGS>(
+export const createEvent = <ARGS>(
   scene: Phaser.Scene,
   key: string
 ): EventFactory<ARGS> => ({
-  on: (callback: (args_: ARGS) => void) => {
+  on: (callback: (args: ARGS) => void) => {
     scene.events.on(key, callback);
   },
-  once: (callback: (args_: ARGS) => void) => {
+  once: (callback: (args: ARGS) => void) => {
     scene.events.once(key, callback);
   },
   emit: (args: ARGS) => {

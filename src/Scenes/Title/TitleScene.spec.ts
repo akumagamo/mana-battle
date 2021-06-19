@@ -1,18 +1,39 @@
-import { sceneMock } from '../../test/mocks';
-import storyManager from '../storyManager';
-import { create } from './create';
-import { initialState } from './Model';
-import TitleScene from './TitleScene';
+import { getMockCalls, sceneMock } from "../../test/mocks";
+import storyManager from "../storyManager";
+import { create } from "./create";
+import * as newGameButtonClicked from "./events/newGameButtonClicked";
+import * as optionsButtonClicked from "./events/optionsButtonClicked";
+import { initialState } from "./Model";
 
-jest.mock('../storyManager', () => jest.fn());
+jest.mock("../storyManager", () => jest.fn());
 
 beforeEach(() => {
   (storyManager as jest.Mock).mockClear();
 });
 
-it("Should have a 'New Game' option", () => {
-  const scene = (sceneMock() as unknown) as TitleScene;
+it("Should have run without breaking", () => {
+  const scene = sceneMock();
   create(scene, initialState);
 });
 
-it.todo("Should start the game when choosing 'New Game'");
+it("Should subscribe to the action that creates a new game", () => {
+  const scene = sceneMock();
+  create(scene, initialState);
+
+  hasSubscribed(scene, newGameButtonClicked.key);
+});
+
+it("Should subscribe to the action that opens an option screen", () => {
+  const scene = sceneMock();
+  create(scene, initialState);
+
+  hasSubscribed(scene, optionsButtonClicked.key);
+});
+
+function hasSubscribed(scene: Phaser.Scene, eventName: string) {
+  const subscribed = getMockCalls(scene.events.once).some(
+    ([key]: string[]) => key === eventName
+  );
+
+  expect(subscribed).toBe(true);
+}
