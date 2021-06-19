@@ -14,17 +14,7 @@ import { turnOff } from './Title/turnOff';
 import { TitleSceneState } from './Title/Model';
 
 const GAME_SPEED = parseInt(process.env.SPEED);
-export default async (parent: Phaser.Scene, state: TitleSceneState) => {
-  if (process.env.SOUND_ENABLED) {
-    parent.tweens.add({
-      targets: state.music,
-      volume: 0,
-      duration: 1000,
-    });
-  }
-
-  await fadeOut(parent, 1000 / GAME_SPEED);
-  turnOff(parent, state);
+export default async (parent: Phaser.Scene) => {
 
   const scene = await startCharaCreationScene(parent);
 
