@@ -1,7 +1,9 @@
-import { MapScene } from '../MapScene';
-import { makeVector } from '../makeVector';
-import { PLAYER_FORCE } from '../../constants';
-import { Vector } from '../Model';
+import { MapScene } from "../MapScene";
+import { makeVector } from "../makeVector";
+import { PLAYER_FORCE } from "../../constants";
+import { Vector } from "../Model";
+import { screenToCellPosition } from "./position";
+import { getDistance } from "../../utils";
 
 export default async (scene: MapScene, cell: Vector) => {
   const { x, y } = cell;
@@ -10,7 +12,7 @@ export default async (scene: MapScene, cell: Vector) => {
 
   const select = () => {
     if (mapSquad) {
-      scene.changeMode({ type: 'SQUAD_SELECTED', id: mapSquad.squad.id });
+      scene.changeMode({ type: "SQUAD_SELECTED", id: mapSquad.squad.id });
       scene.evs.SquadClicked.emit(mapSquad);
       return;
     }
@@ -19,17 +21,17 @@ export default async (scene: MapScene, cell: Vector) => {
 
     if (city) {
       const selectCity = () => {
-        scene.signal('there was just a squad in the cell, select it', [
-          { type: 'SELECT_CITY', id: city.id },
+        scene.signal("there was just a squad in the cell, select it", [
+          { type: "SELECT_CITY", id: city.id },
         ]);
-        scene.changeMode({ type: 'CITY_SELECTED', id: city.id });
+        scene.changeMode({ type: "CITY_SELECTED", id: city.id });
       };
       switch (scene.mode.type) {
-        case 'NOTHING_SELECTED':
+        case "NOTHING_SELECTED":
           return selectCity();
-        case 'CITY_SELECTED':
+        case "CITY_SELECTED":
           return selectCity();
-        case 'SQUAD_SELECTED':
+        case "SQUAD_SELECTED":
           return selectCity();
         default:
           return;
@@ -38,10 +40,10 @@ export default async (scene: MapScene, cell: Vector) => {
   };
 
   switch (scene.mode.type) {
-    case 'MOVING_SQUAD':
+    case "MOVING_SQUAD":
       await handleMovingSquad(scene, x, y, scene.mode.id);
       break;
-    case 'SELECT_SQUAD_MOVE_TARGET':
+    case "SELECT_SQUAD_MOVE_TARGET":
       await handleSelectSquadMoveTarget(scene, x, y, scene.mode.id);
       break;
     default:
@@ -62,8 +64,8 @@ async function handleMovingSquad(
 
     if (isWalkable) {
       await scene.moveSquadTo(selectedSquad.squad.id, { x, y });
-      scene.signal('squad moved, updating position', [
-        { type: 'UPDATE_SQUAD_POS', id, pos: { x, y } },
+      scene.signal("squad moved, updating position", [
+        { type: "UPDATE_SQUAD_POS", id, pos: { x, y } },
       ]);
       scene.refreshUI();
     }
@@ -78,11 +80,21 @@ async function handleSelectSquadMoveTarget(
 ) {
   const selectedSquad = scene.getMapSquad(id);
   if (selectedSquad && selectedSquad.squad.force === PLAYER_FORCE) {
-    await scene.moveSquadTo(selectedSquad.squad.id, { x, y });
     scene.isPaused = false;
-    scene.state.squads = scene.state.squads.update(id, sqd=>({...sqd, status: 'moving'})) 
-    scene.signal('squad moved, updating position', [
-      { type: 'UPDATE_SQUAD_POS', id, pos: { x, y } },
-    ]);
+
+    const cell = screenToCellPosition(selectedSquad.pos)
+
+    if (cell.x !== x || cell.y !== y) {
+      await scene.moveSquadTo(selectedSquad.squad.id, { x, y });
+      scene.state.squads = scene.state.squads.update(id, (sqd) => ({
+        ...sqd,
+        status: "moving",
+      }));
+      scene.signal("squad moved, updating position", [
+        { type: "UPDATE_SQUAD_POS", id, pos: { x, y } },
+      ]);
+    } else {
+      scene.changeMode({type: "SQUAD_SELECTED", id})
+    }
   }
 }

@@ -1,23 +1,23 @@
-import button from '../../UI/button';
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../../constants';
-import { makeUnit } from '../../Unit/makeUnit';
-import createChara from '../../Chara/createChara';
-import { TitleSceneState } from './Model';
-import * as newGameButtonClicked from './events/handleNewGameClick';
-import { turnOff } from './turnOff';
-import { changeMusic } from './changeMusic';
-import { requestFullscreen } from '../../Browser/requestFullscreen';
-import { optionsButtonClicked } from './events/optionsButtonClicked';
+import button from "../../UI/button";
+import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../../constants";
+import { makeUnit } from "../../Unit/makeUnit";
+import createChara from "../../Chara/createChara";
+import { TitleSceneState } from "./Model";
+import * as newGameButtonClicked from "./events/handleNewGameClick";
+import { turnOff } from "./turnOff";
+import { changeMusic } from "./changeMusic";
+import { requestFullscreen } from "../../Browser/requestFullscreen";
+import { optionsButtonClicked } from "./events/optionsButtonClicked";
 
 export function create(scene: Phaser.Scene, state: TitleSceneState) {
-  scene.events.once('shutdown', () => turnOff(scene, state));
+  scene.events.once("shutdown", () => turnOff(scene, state));
 
-  newGameButtonClicked.listen(scene, state);
+  newGameButtonClicked.once(scene, state);
 
-  scene.events.on('optionsButtonClicked', () => optionsButtonClicked(scene));
+  scene.events.on("optionsButtonClicked", () => optionsButtonClicked(scene));
 
   state.container = scene.add.container(0, 0);
-  const bg = scene.add.image(0, 0, 'backgrounds/sunset');
+  const bg = scene.add.image(0, 0, "backgrounds/sunset");
   bg.setOrigin(0, 0);
   bg.displayWidth = SCREEN_WIDTH;
   bg.displayHeight = SCREEN_HEIGHT;
@@ -26,7 +26,7 @@ export function create(scene: Phaser.Scene, state: TitleSceneState) {
   state.charas = [
     createChara({
       parent: scene,
-      unit: makeUnit({ job: 'fighter', id: 3, lvl: 1 }),
+      unit: makeUnit({ job: "fighter", id: 3, lvl: 1 }),
       x: 250,
       y: 500,
       scale: 1.3,
@@ -35,7 +35,7 @@ export function create(scene: Phaser.Scene, state: TitleSceneState) {
     }),
     createChara({
       parent: scene,
-      unit: makeUnit({ job: 'mage', id: 1, lvl: 1 }),
+      unit: makeUnit({ job: "mage", id: 1, lvl: 1 }),
       x: 350,
       y: 520,
       scale: 1.5,
@@ -44,7 +44,7 @@ export function create(scene: Phaser.Scene, state: TitleSceneState) {
     }),
     createChara({
       parent: scene,
-      unit: makeUnit({ job: 'archer', id: 2, lvl: 1 }),
+      unit: makeUnit({ job: "archer", id: 2, lvl: 1 }),
       x: 450,
       y: 550,
       scale: 1.6,
@@ -58,19 +58,24 @@ export function create(scene: Phaser.Scene, state: TitleSceneState) {
   });
   state.charas.forEach((c) => state.container.add(c.container));
 
-  changeMusic(scene, state, 'title');
+  changeMusic(scene, state, "title");
 
-  button(20, 650, 'Go Fullscreen', state.container, scene, () => {
+  button(20, 650, "Go Fullscreen", state.container, scene, () => {
     requestFullscreen();
   });
 
-  button(SCREEN_WIDTH / 2, 550, 'New Game', state.container, scene, () =>
-    scene.events.emit(newGameButtonClicked.key)
+  button(
+    SCREEN_WIDTH / 2,
+    550,
+    "New Game",
+    state.container,
+    scene,
+    newGameButtonClicked.emit(scene)
   );
 
-  button(SCREEN_WIDTH / 2, 620, 'Options', state.container, scene, () => {
-    scene.events.emit('optionsButtonClicked');
+  button(SCREEN_WIDTH / 2, 620, "Options", state.container, scene, () => {
+    scene.events.emit("optionsButtonClicked");
   });
 
-  scene.game.events.emit('TitleSceneCreated', scene);
+  scene.game.events.emit("TitleSceneCreated", scene);
 }

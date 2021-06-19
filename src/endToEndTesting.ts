@@ -1,64 +1,72 @@
-import CharaCreationScene from './CharaCreation/CharaCreationScene';
-import { MapScene } from './Map/MapScene';
-import { PLAYER_FORCE } from './constants';
-import { Unit } from './Unit/Model';
-import TitleScene from './Scenes/Title/TitleScene';
-import * as newGameButtonClicked from './Scenes/Title/events/handleNewGameClick';
+import CharaCreationScene from "./CharaCreation/CharaCreationScene";
+import { MapScene } from "./Map/MapScene";
+import { PLAYER_FORCE } from "./constants";
+import { Unit } from "./Unit/Model";
+import * as newGameButtonClicked from "./Scenes/Title/events/handleNewGameClick";
+import TitleScene from "./Scenes/Title/TitleScene";
 
-const assert = (condition: string, a: any, b: any) => {
+const assert = <A>(condition: string, a: A, b: A) => {
   if (a !== b)
     throw new Error(
       `❌ ${condition} - ${a.toString()} should equals ${b.toString()}`
     );
-  else console.log('✅', condition);
+  else console.log("✅", condition);
 };
 
-export function endToEndTesting(game: Phaser.Game) {
-  game.events.once('TitleSceneCreated', (scn: TitleScene) => {
-    scn.events.emit(newGameButtonClicked.key);
+const event = (eventEmitter: Phaser.Events.EventEmitter) => (event: string) =>
+  new Promise((resolve) => {
+    eventEmitter.once(event, (...args: any[]) => {
+      //@ts-ignore
+      resolve(...args);
+    });
   });
-  game.events.once(
-    'CharaCreationSceneCreated',
-    (
-      scn: CharaCreationScene,
-      onHeroCreated: (value: Unit | PromiseLike<Unit>) => void
-    ) => {
-      (document.getElementById('new-chara-name') as HTMLInputElement).value =
-        'TestHero';
-      scn.sceneEvents.ConfirmationButtonClicked(onHeroCreated);
-    }
+
+export async function endToEndTesting(game: Phaser.Game) {
+  const scn = (await event(game.events)("TitleSceneCreated")) as TitleScene;
+
+  scn.events.emit(newGameButtonClicked.key);
+
+  const charaCreationScene = (await event(game.events)(
+    "CharaCreationSceneCreated"
+  )) as { scene: CharaCreationScene; onHeroCreated: (u: Unit) => void };
+  (document.getElementById("new-chara-name") as HTMLInputElement).value =
+    "TestHero";
+
+  charaCreationScene.scene.sceneEvents.ConfirmationButtonClicked(
+    charaCreationScene.onHeroCreated
   );
-  game.events.once('MapSceneCreated', (scn: MapScene) => {
-    const squad = scn.state.squads.find(
-      (sqd) => sqd.squad.force === PLAYER_FORCE
+
+  const mapScene = (await event(game.events)("MapSceneCreated")) as MapScene;
+
+  const squad = mapScene.state.squads.find(
+    (sqd) => sqd.squad.force === PLAYER_FORCE
+  );
+  clickCell(mapScene, 3, 5);
+  mapScene.evs.MovePlayerSquadButonClicked.emit({
+    mapScene: mapScene,
+    mapSquad: squad,
+  });
+  assert("MapScene is paused after clicking 'Move'", mapScene.isPaused, true);
+
+  clickCell(mapScene, 7, 5);
+
+  mapScene.evs.SquadDispatched.once((_id) => {
+    assert(
+      "MapScene is no longer paused selecting move destination",
+      mapScene.isPaused,
+      false
     );
-    clickCell(scn, 3, 5);
-    scn.evs.MovePlayerSquadButonClicked.emit({
-      mapScene: scn,
+  });
+
+  mapScene.evs.SquadArrivedInfoMessageCompleted.once((chara) => {
+    mapScene.evs.CloseSquadArrivedInfoMessage.emit(chara);
+
+    mapScene.evs.MovePlayerSquadButonClicked.emit({
+      mapScene: mapScene,
       mapSquad: squad,
     });
-    assert("MapScene is paused after clicking 'Move'", scn.isPaused, true);
 
-    clickCell(scn, 7, 5);
-
-    scn.evs.SquadDispatched.once((_id) => {
-      assert(
-        'MapScene is no longer paused selecting move destination',
-        scn.isPaused,
-        false
-      );
-    });
-
-    scn.evs.SquadArrivedInfoMessageCompleted.once((chara) => {
-      scn.evs.CloseSquadArrivedInfoMessage.emit(chara);
-
-      scn.evs.MovePlayerSquadButonClicked.emit({
-        mapScene: scn,
-        mapSquad: squad,
-      });
-
-      scn.evs.OrganizeButtonClicked.emit(scn);
-    });
+    mapScene.evs.OrganizeButtonClicked.emit(mapScene);
   });
 }
 

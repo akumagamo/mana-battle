@@ -30,7 +30,9 @@ export default (
     mapWidth: 3,
     mapHeight: 3,
   });
-  container.add(tiles.map((t) => t.sprite));
+  const tileContainer = scene.add.container().setName('tileContainer')
+  tileContainer .add(tiles.map((t) => t.sprite));
+  container.add(tileContainer)
   const board: Board = {
     scene,
     container,

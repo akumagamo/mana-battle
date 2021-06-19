@@ -12,6 +12,7 @@ import { UnitList } from '../../../Unit/UnitList/Model';
 import { addMember, getMemberByPosition, SquadRecord } from '../../Model';
 import removeCharaFromBoard from '../actions/removeCharaFromBoard';
 import { makeUnitDragable } from '../../../Board/makeUnitsDragable';
+import sortUnitsByDepth from '../../../Board/sortUnitsByDepth';
 
 export default (
   x: number,
@@ -81,6 +82,8 @@ export default (
     removeUnit(unitList, unit, onRefresh);
 
     highlightTile(board, cell);
+
+    sortUnitsByDepth(board)
 
     onRefresh(List(unitList.charas));
   } else {

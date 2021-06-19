@@ -116,7 +116,7 @@ export default class CharaCreationScene extends Phaser.Scene {
 
       this.confirmButton(onHeroCreated);
 
-      this.game.events.emit('CharaCreationSceneCreated', this, onHeroCreated);
+      this.game.events.emit('CharaCreationSceneCreated', {scene: this, onHeroCreated});
     });
   }
   private confirmButton(

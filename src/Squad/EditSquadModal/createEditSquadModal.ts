@@ -1,29 +1,29 @@
-import createBoard from '../../Board/createBoard';
-import onBoardUnitClicked from '../../Board/events/onBoardUnitClicked';
-import { Board } from '../../Board/Model';
-import onEnableDrag from '../../Chara/events/onEnableDrag';
-import { Chara } from '../../Chara/Model';
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../../constants';
-import { Container } from '../../Models';
-import button from '../../UI/button';
-import panel from '../../UI/panel';
-import { Unit, UnitIndex } from '../../Unit/Model';
-import SmallUnitDetailsBar from '../../Unit/SmallUnitDetailsBar';
-import createUnitList from '../../Unit/UnitList/createUnitList';
-import { UnitList } from '../../Unit/UnitList/Model';
-import { SceneEventFactory, EventFactory } from '../../utils';
-import * as Squad from '../Model';
-import onDragEndFromUnitList from './events/onDragEndFromUnitList';
-import onDragFromUnitList from './events/onDragFromUnitList';
-import { onCloseModal } from './events/onCloseModal';
-import { List } from 'immutable';
-import handleUnitDrag from '../../Unit/UnitList/actions/handleUnitDrag';
+import createBoard from "../../Board/createBoard";
+import onBoardUnitClicked from "../../Board/events/onBoardUnitClicked";
+import { Board } from "../../Board/Model";
+import onEnableDrag from "../../Chara/events/onEnableDrag";
+import { Chara } from "../../Chara/Model";
+import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../../constants";
+import { Container } from "../../Models";
+import button from "../../UI/button";
+import panel from "../../UI/panel";
+import { Unit, UnitIndex } from "../../Unit/Model";
+import SmallUnitDetailsBar from "../../Unit/SmallUnitDetailsBar";
+import createUnitList from "../../Unit/UnitList/createUnitList";
+import { UnitList } from "../../Unit/UnitList/Model";
+import { SceneEventFactory } from "../../utils";
+import * as Squad from "../Model";
+import onDragEndFromUnitList from "./events/onDragEndFromUnitList";
+import onDragFromUnitList from "./events/onDragFromUnitList";
+import { onCloseModal } from "./events/onCloseModal";
+import { List } from "immutable";
+import handleUnitDrag from "../../Unit/UnitList/actions/handleUnitDrag";
 
 export const componentEvents = {
-  ADD_UNIT_BUTTON_CLICKED: 'ADD_UNIT_BUTTON_CLICKED',
-  ON_DRAG: 'ON_DRAG',
-  ON_DRAG_END: 'ON_DRAG_END',
-  ON_CLOSE: 'ON_CLOSE',
+  ADD_UNIT_BUTTON_CLICKED: "ADD_UNIT_BUTTON_CLICKED",
+  ON_DRAG: "ON_DRAG",
+  ON_DRAG_END: "ON_DRAG_END",
+  ON_CLOSE: "ON_CLOSE",
 };
 
 export default function ({
@@ -46,6 +46,8 @@ export default function ({
   ) => void;
   onClose: (s: Squad.SquadRecord) => void;
 }) {
+  const container = scene.add.container();
+
   const { board, interactions } = createBoard(
     scene,
     squad,
@@ -61,6 +63,8 @@ export default function ({
       onSquadUpdated: onSquadUpdated,
     }
   );
+
+  container.add(board.container);
 
   const onDragFromUnitListEvent = (
     unit: Unit,
@@ -104,44 +108,55 @@ export default function ({
     onListUpdated
   );
 
+  container.add(unitList.container);
+
   if (!addUnitEnabled) unitList.container.destroy();
 
-  const onCloseEvent = createOnCloseEvent(scene, board, unitList, onClose);
+  const onCloseEvent = createOnCloseEvent(
+    container,
+    scene,
+    board,
+    unitList,
+    onClose
+  );
 
   const panel_ = panel(
-    -SCREEN_WIDTH / 2,
-    -SCREEN_HEIGHT / 4,
+    0,
+    0,
     SCREEN_WIDTH,
     SCREEN_HEIGHT,
-    board.container,
+    container,
     board.scene
   );
-  board.container.sendToBack(panel_);
-  let details: Container | null = null;
+  container.sendToBack(panel_);
 
   onBoardUnitClicked(board, (c) => {
+    let details = container.getByName("details");
+
     details?.destroy();
+
     details = SmallUnitDetailsBar(
-      -330,
-      350,
+      300,
+      SCREEN_HEIGHT - 200,
       board.scene,
       units.find((u) => u.id === c.props.unit.id)
     );
-    board.container.add(details);
+    container.add(details);
   });
   button(
-    380,
-    SCREEN_HEIGHT - 320,
-    'Confirm',
-    board.container,
+    SCREEN_WIDTH - 200,
+    SCREEN_HEIGHT - 200,
+    "Confirm",
+    container,
     board.scene,
     () => onCloseEvent.emit(null)
   );
 
-  board.scene.events.emit('EditSquadModalOpened', { board, unitList });
+  board.scene.events.emit("EditSquadModalOpened", { board, unitList });
 }
 
 function createOnCloseEvent(
+  container: Container,
   scene: Phaser.Scene,
   boardScene: Board,
   listScene: UnitList,
@@ -150,7 +165,7 @@ function createOnCloseEvent(
   const onClose_ = SceneEventFactory<null>(scene, componentEvents.ON_CLOSE);
 
   onClose_.on(() => {
-    onCloseModal(listScene, boardScene, scene, onClose);
+    onCloseModal(container, listScene, boardScene, scene, onClose);
   });
 
   return onClose_;

@@ -1,7 +1,7 @@
-import { MapSquad } from '../Model';
-import button from '../../UI/button';
-import { MapScene } from '../MapScene';
-import EditSquadModal from '../../Squad/EditSquadModal/createEditSquadModal';
+import { MapSquad } from "../Model";
+import button from "../../UI/button";
+import { MapScene } from "../MapScene";
+import EditSquadModal from "../../Squad/EditSquadModal/createEditSquadModal";
 
 export default (
   mapScene: MapScene,
@@ -12,43 +12,47 @@ export default (
   const baseX = 300;
   const mode = mapScene.mode.type;
 
-  if (mode === 'SQUAD_SELECTED') {
+  if (mode === "SQUAD_SELECTED") {
     button(
       baseX + 400,
       baseY,
-      'Formation',
+      "Formation",
       mapScene.uiContainer,
       mapScene,
       () => {
-        mapScene.changeMode({ type: 'CHANGING_SQUAD_FORMATION' });
+        mapScene.changeMode({ type: "CHANGING_SQUAD_FORMATION" });
         mapScene.disableMapInput();
 
-        EditSquadModal(
-          {
-            scene: mapScene, squad: mapSquad.squad, units: mapScene.state.units, addUnitEnabled: false, onSquadUpdated: (updatedSquad) => {
-              mapScene.signal('changed unit position on board, updating', [
-                {
-                  type: 'UPDATE_STATE',
-                  target: {
-                    ...mapScene.state,
-                    squads: mapScene.state.squads.set(mapSquad.id, {
-                      ...mapScene.state.squads.get(mapSquad.id),
-                      squad: updatedSquad,
-                    }),
-                  },
+        EditSquadModal({
+          scene: mapScene,
+          squad: mapSquad.squad,
+          units: mapScene.state.units,
+          addUnitEnabled: false,
+          onSquadUpdated: (updatedSquad) => {
+            mapScene.signal("changed unit position on board, updating", [
+              {
+                type: "UPDATE_STATE",
+                target: {
+                  ...mapScene.state,
+                  squads: mapScene.state.squads.set(mapSquad.id, {
+                    ...mapScene.state.squads.get(mapSquad.id),
+                    squad: updatedSquad,
+                  }),
                 },
-              ]);
-            }, onClose: () => {
-              mapScene.enableInput();
-              mapScene.changeMode({
-                type: 'SQUAD_SELECTED',
-                id: mapSquad.squad.id,
-              });
-            }
-          }        );
+              },
+            ]);
+          },
+          onClose: () => {
+            mapScene.enableInput();
+            mapScene.changeMode({
+              type: "SQUAD_SELECTED",
+              id: mapSquad.squad.id,
+            });
+          },
+        });
       }
     );
-    button(baseX + 200, baseY, 'Move', mapScene.uiContainer, mapScene, () =>
+    button(baseX + 200, baseY, "Move", mapScene.uiContainer, mapScene, () =>
       mapScene.evs.MovePlayerSquadButonClicked.emit({ mapScene, mapSquad })
     );
   }
@@ -62,7 +66,7 @@ export function handleMovePlayerSquadButtonClicked({
   mapSquad: MapSquad;
 }) {
   mapScene.changeMode({
-    type: 'SELECT_SQUAD_MOVE_TARGET',
+    type: "SELECT_SQUAD_MOVE_TARGET",
     id: mapSquad.id,
     start: mapSquad.pos,
   });

@@ -1,9 +1,6 @@
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from './constants';
 import OptionsScene from './Scenes/OptionsScene';
-import WorldScene from './Scenes/World';
 import { ListSquadsScene } from './Squad/ListSquadsScene/ListSquadsScene';
-import { ListUnitsScene } from './Unit/ListUnits';
-import MapListScene from './Map/MapListScene';
 import CombatScene from './Combat/CombatScene';
 import { endToEndTesting } from './endToEndTesting';
 import TitleScene from './Scenes/Title/TitleScene';

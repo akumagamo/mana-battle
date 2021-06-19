@@ -223,6 +223,7 @@ export class MapScene extends Phaser.Scene {
   update() {
     if (!this.isPaused) {
       this.moveSquads();
+
       this.state.timeOfDay += 1;
       this.state.tick += 1;
 
@@ -1074,10 +1075,6 @@ export class MapScene extends Phaser.Scene {
       path,
       squad,
     });
-
-    const chara = await this.getChara(id);
-
-    run(chara);
 
     this.changeMode({ type: "SQUAD_SELECTED", id });
   }

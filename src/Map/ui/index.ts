@@ -55,7 +55,7 @@ export default (scene: MapScene, uiContainer: Container): Promise<void> => {
         panel(SCREEN_WIDTH / 2, 15, 220, 50, uiContainer, scene);
         text(
           SCREEN_WIDTH / 2 + 10,
-          14,
+          24,
           'Select Destination',
           uiContainer,
           scene
