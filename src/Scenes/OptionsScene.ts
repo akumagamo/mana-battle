@@ -2,7 +2,6 @@ import Phaser from 'phaser';
 import {preload} from '../preload';
 import button from '../UI/button';
 import panel from '../UI/panel';
-import text from '../UI/text';
 
 export default class OptionsScene extends Phaser.Scene {
   constructor() {

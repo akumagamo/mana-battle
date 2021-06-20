@@ -20,16 +20,16 @@ export type EventFactory<ARGS> = {
 };
 
 export const createEvent = <ARGS>(
-  scene: Phaser.Scene,
+  emitter: Phaser.Events.EventEmitter | Phaser.GameObjects.GameObject,
   key: string
 ): EventFactory<ARGS> => ({
   on: (callback: (args: ARGS) => void) => {
-    scene.events.on(key, callback);
+    emitter.on(key, callback);
   },
   once: (callback: (args: ARGS) => void) => {
-    scene.events.once(key, callback);
+    emitter.once(key, callback);
   },
   emit: (args: ARGS) => {
-    scene.events.emit(key, args);
+    emitter.emit(key, args);
   },
 });

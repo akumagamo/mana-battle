@@ -43,7 +43,6 @@ import { handleMovePlayerSquadButtonClicked } from "./ui/playerSquad";
 import { organizeButtonClicked } from "./ui/organizeButtonClicked";
 import dispatchWindow from "./dispatchWindow";
 import returnButtonClicked from "../Squad/ListSquadsScene/events/returnButtonClicked";
-import run from "../Chara/animations/run";
 import stand from "../Chara/animations/stand";
 import fadeOutChara from "../Chara/animations/fadeOutChara";
 import createStaticBoard from "../Board/createBoard";
@@ -57,8 +56,6 @@ const MOVE_SPEED = 2 * GAME_SPEED;
 
 const CHARA_VERTICAL_OFFSET = -10;
 
-const CITY_HEAL_PERCENT = 20;
-
 export type MapTile = {
   x: number;
   y: number;
@@ -70,44 +67,11 @@ export const startMapScene = async (
   parent: Phaser.Scene,
   cmds: MapCommands[]
 ) => {
-  const scene = new MapScene();
-
-  parent.scene.add("MapScene", scene, true, cmds);
+  parent.scene.manager.run("MapScene", cmds);
 };
 
 export class MapScene extends Phaser.Scene {
-  evs = {
-    CellClicked: createEvent<{ tile: Vector; pointer: Vector }>(
-      this,
-      "CellClicked"
-    ),
-    MovePlayerSquadButonClicked: createEvent<{
-      mapScene: MapScene;
-      mapSquad: MapSquad;
-    }>(this, "MovePlayerSquadButonClicked"),
-    SquadArrivedInfoMessageCompleted: createEvent<Chara>(
-      this,
-      "SquadArrivedInfoMessageCompleted"
-    ),
-    SquadClicked: createEvent<MapSquad>(this, "SquadClicked"),
-    CloseSquadArrivedInfoMessage: createEvent<Chara>(
-      this,
-      "CloseSquadArrivedInfoMessage"
-    ),
-    OrganizeButtonClicked: createEvent<MapScene>(
-      this,
-      "OrganizeButtonClicked"
-    ),
-    CombatInitiated: createEvent<null>(this, "CombatInitiated"),
-    ReturnedFromCombat: createEvent<null>(this, "ReturnedFromCombat"),
-    DispatchWindowRendered: createEvent<{
-      container: Container;
-      scene: MapScene;
-      squads: Map<string, MapSquad>;
-    }>(this, "DispatchWindowRendered"),
-    SquadDispatched: createEvent<string>(this, "SquadDispatched"),
-  };
-
+  evs: any = {}; // temp
   isPaused = false;
   squadsInMovement: Map<string, { path: Vector[]; squad: MapSquad }> = Map();
 
@@ -202,6 +166,37 @@ export class MapScene extends Phaser.Scene {
   }
 
   init() {
+    this.evs = {
+      CellClicked: createEvent<{ tile: Vector; pointer: Vector }>(
+        this.events,
+        "CellClicked"
+      ),
+      MovePlayerSquadButonClicked: createEvent<{
+        mapScene: MapScene;
+        mapSquad: MapSquad;
+      }>(this.events, "MovePlayerSquadButonClicked"),
+      SquadArrivedInfoMessageCompleted: createEvent<Chara>(
+        this.events,
+        "SquadArrivedInfoMessageCompleted"
+      ),
+      SquadClicked: createEvent<MapSquad>(this.events, "SquadClicked"),
+      CloseSquadArrivedInfoMessage: createEvent<Chara>(
+        this.events,
+        "CloseSquadArrivedInfoMessage"
+      ),
+      OrganizeButtonClicked: createEvent<MapScene>(
+        this.events,
+        "OrganizeButtonClicked"
+      ),
+      CombatInitiated: createEvent<null>(this.events, "CombatInitiated"),
+      ReturnedFromCombat: createEvent<null>(this.events, "ReturnedFromCombat"),
+      DispatchWindowRendered: createEvent<{
+        container: Container;
+        scene: MapScene;
+        squads: Map<string, MapSquad>;
+      }>(this.events, "DispatchWindowRendered"),
+      SquadDispatched: createEvent<string>(this.events, "SquadDispatched"),
+    };
     this.evs.CellClicked.on(this.handleCellClick.bind(this));
     this.evs.MovePlayerSquadButonClicked.on(handleMovePlayerSquadButtonClicked);
     this.evs.SquadClicked.on(this.clickSquad.bind(this));
@@ -920,32 +915,6 @@ export class MapScene extends Phaser.Scene {
 
   enableCellClick() {
     this.cellClickDisabled = false;
-  }
-
-  healUnits(force: Force) {
-    this.getAliveSquadsFromForce(force.id).forEach((s) => {
-      if (this.state.cities.find((c) => c.x === s.pos.x && c.y === s.pos.y)) {
-        this.healSquad(s);
-      }
-    });
-  }
-
-  healSquad(squad: MapSquad) {
-    Object.keys(squad.squad.members).forEach((unitId) => {
-      const unit = this.state.units.get(unitId);
-
-      if (unit && unit.currentHp > 0 && unit.currentHp < unit.hp) {
-        const healAmount = Math.floor((unit.hp / 100) * CITY_HEAL_PERCENT);
-
-        const newHp = unit.currentHp + healAmount;
-
-        if (newHp < unit.hp)
-          this.state.units = this.state.units.set(unitId, {
-            ...unit,
-            currentHp: newHp,
-          });
-      }
-    });
   }
 
   getAliveSquadsFromForce(forceId: string) {

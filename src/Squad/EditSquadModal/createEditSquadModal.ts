@@ -162,7 +162,7 @@ function createOnCloseEvent(
   listScene: UnitList,
   onClose: { (s: Squad.SquadRecord): void; (arg0: Squad.SquadRecord): void }
 ) {
-  const onClose_ = createEvent<null>(scene, componentEvents.ON_CLOSE);
+  const onClose_ = createEvent<null>(scene.events, componentEvents.ON_CLOSE);
 
   onClose_.on(() => {
     onCloseModal(container, listScene, boardScene, scene, onClose);

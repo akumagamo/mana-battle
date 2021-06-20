@@ -35,11 +35,11 @@ export const run = (
 export class ListSquadsScene extends Phaser.Scene {
   evs = {
     SquadEditClicked: createEvent<Squad.SquadRecord>(
-      this,
+      this.events,
       'SquadEditClicked'
     ),
-    CreateSquadClicked: createEvent<null>(this, 'CreateSquadClicked'),
-    ConfirmButtonClicked: createEvent<null>(this, 'ConfirmButtonClicked'),
+    CreateSquadClicked: createEvent<null>(this.events, 'CreateSquadClicked'),
+    ConfirmButtonClicked: createEvent<null>(this.events, 'ConfirmButtonClicked'),
   };
 
   onReturnClick: (scene: ListSquadsScene) => void | null = null;

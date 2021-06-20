@@ -1,15 +1,11 @@
 import { getMockCalls, sceneMock } from "../../test/mocks";
-import storyManager from "../storyManager";
 import { create } from "./create";
 import * as newGameButtonClicked from "./events/newGameButtonClicked";
 import * as optionsButtonClicked from "./events/optionsButtonClicked";
 import { initialState } from "./Model";
 
 jest.mock("../storyManager", () => jest.fn());
-
-beforeEach(() => {
-  (storyManager as jest.Mock).mockClear();
-});
+jest.mock("../../CharaCreation/CharaCreationScene", () => jest.fn());
 
 it("Should have run without breaking", () => {
   const scene = sceneMock();
@@ -29,6 +25,7 @@ it("Should subscribe to the action that opens an option screen", () => {
 
   hasSubscribed(scene, optionsButtonClicked.key);
 });
+
 
 function hasSubscribed(scene: Phaser.Scene, eventName: string) {
   const subscribed = getMockCalls(scene.events.once).some(
