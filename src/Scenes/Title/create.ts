@@ -13,13 +13,12 @@ import {
 import {
   handleOptionButtonClicked,
   OptionsButtonClicked,
-} from "./events/OptionsButtonClicked";
+} from "./events/optionsButtonClicked";
 
 export function create(scene: Phaser.Scene, state: TitleSceneState) {
   scene.events.once("shutdown", () => turnOff(scene, state));
 
   NewGameButtonClicked(scene).once(handleNewGameButtonClicked);
-
   OptionsButtonClicked(scene).once(handleOptionButtonClicked);
 
   state.container = scene.add.container(0, 0);
