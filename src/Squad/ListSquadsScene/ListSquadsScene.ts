@@ -1,20 +1,22 @@
-import { List, Map, Set } from 'immutable';
-import menu from '../../Backgrounds/menu';
-import createStaticBoard from '../../Board/createBoard';
-import onBoardClicked from '../../Board/events/onBoardClicked';
-import onBoardDeselected from '../../Board/events/onBoardDeselected';
-import onBoardSelected from '../../Board/events/onBoardSelected';
-import { Board } from '../../Board/Model';
-import { SCREEN_WIDTH, PLAYER_FORCE } from '../../constants';
-import { GAME_SPEED } from '../../env';
-import { Container, Pointer } from '../../Models';
-import button from '../../UI/button';
-import panel from '../../UI/panel';
-import text from '../../UI/text';
-import { Unit, UnitIndex } from '../../Unit/Model';
-import { createEvent } from '../../utils';
-import EditSquadModal from '../EditSquadModal/createEditSquadModal';
-import * as Squad from '../Model';
+import { List, Map, Set } from "immutable";
+import menu from "../../Backgrounds/menu";
+import createStaticBoard from "../../Board/createBoard";
+import onBoardClicked from "../../Board/events/onBoardClicked";
+import onBoardDeselected from "../../Board/events/onBoardDeselected";
+import onBoardSelected from "../../Board/events/onBoardSelected";
+import { Board } from "../../Board/Model";
+import { SCREEN_WIDTH, PLAYER_FORCE } from "../../constants";
+import { GAME_SPEED } from "../../env";
+import { Container, Pointer } from "../../Models";
+import button from "../../UI/button";
+import panel from "../../UI/panel";
+import text from "../../UI/text";
+import { UnitIndex } from "../../Unit/Model";
+import EditSquadModal from "../EditSquadModal/createEditSquadModal";
+import * as Squad from "../Model";
+import confirmButtonClicked from "./events/confirmButtonClicked";
+import createSquadButtonClicked from "./events/createSquadButtonClicked";
+import editSquadButtonClicked from "./events/editSquadButtonClicked";
 
 type CreateParams = {
   squads: Squad.Index;
@@ -23,7 +25,7 @@ type CreateParams = {
   dispatched: Set<string>;
 };
 
-export const key = 'ListSquadsScene';
+export const key = "ListSquadsScene";
 
 export const run = (
   params: CreateParams,
@@ -33,15 +35,6 @@ export const run = (
 };
 
 export class ListSquadsScene extends Phaser.Scene {
-  evs = {
-    SquadEditClicked: createEvent<Squad.SquadRecord>(
-      this.events,
-      'SquadEditClicked'
-    ),
-    CreateSquadClicked: createEvent<null>(this.events, 'CreateSquadClicked'),
-    ConfirmButtonClicked: createEvent<null>(this.events, 'ConfirmButtonClicked'),
-  };
-
   onReturnClick: (scene: ListSquadsScene) => void | null = null;
 
   boards: Board[] = [];
@@ -57,15 +50,10 @@ export class ListSquadsScene extends Phaser.Scene {
     super(key);
   }
 
-  init() {
-    this.evs.SquadEditClicked.on(this.handleSquadEditClicked.bind(this));
-    this.evs.CreateSquadClicked.on(this.handleCreateSquadClicked.bind(this));
-    this.evs.ConfirmButtonClicked.on(
-      this.handleOnConfirmButtonClicked.bind(this)
-    );
-  }
-
   create({ squads, units, dispatched, onReturnClick }: CreateParams) {
+    editSquadButtonClicked(this).on(this.handleSquadEditClicked.bind(this));
+    createSquadButtonClicked(this).on(this.handleCreateSquadClicked.bind(this));
+    confirmButtonClicked(this).on(this.handleOnConfirmButtonClicked.bind(this));
     this.cameras.main.fadeIn(1000 / GAME_SPEED);
 
     this.squads = squads;
@@ -80,7 +68,7 @@ export class ListSquadsScene extends Phaser.Scene {
     this.renderControls();
     this.handleSquadClicked(squads.toList().get(0));
 
-    this.game.events.emit('ListSquadsSceneCreated', this);
+    this.game.events.emit("ListSquadsSceneCreated", this);
   }
 
   getSquads() {
@@ -129,8 +117,8 @@ export class ListSquadsScene extends Phaser.Scene {
 
     text(20, baseY + 40, leader, this.uiContainer, this);
 
-    button(300, baseY + 20, 'Edit', this.uiContainer, this, () =>
-      this.evs.SquadEditClicked.emit(squad)
+    button(300, baseY + 20, "Edit", this.uiContainer, this, () =>
+      editSquadButtonClicked(this).emit(squad)
     );
 
     const dispatched = this.dispatched.has(squadId);
@@ -138,7 +126,7 @@ export class ListSquadsScene extends Phaser.Scene {
     button(
       1000,
       baseY + 20,
-      'Disband Squad',
+      "Disband Squad",
       this.uiContainer,
       this,
       () => {
@@ -197,10 +185,10 @@ export class ListSquadsScene extends Phaser.Scene {
     EditSquadModal({
       scene: this,
       squad: Squad.createSquad({
-        id: 'squad+' + new Date().getTime(),
+        id: "squad+" + new Date().getTime(),
         members: Map(),
         force: PLAYER_FORCE,
-        leader: '',
+        leader: "",
       }),
       units: this.units.filter((u) => !u.squad),
       addUnitEnabled: true,
@@ -280,7 +268,7 @@ export class ListSquadsScene extends Phaser.Scene {
     button(
       SCREEN_WIDTH - 200,
       600,
-      'Confirm',
+      "Confirm",
       this.uiContainer,
       this,
       this.handleOnConfirmButtonClicked.bind(this),
@@ -290,11 +278,11 @@ export class ListSquadsScene extends Phaser.Scene {
     button(
       SCREEN_WIDTH - 400,
       600,
-      'Create Squad',
+      "Create Squad",
       this.uiContainer,
       this,
       () => {
-        this.evs.CreateSquadClicked.emit(null);
+        createSquadButtonClicked(this).emit(null);
       },
       !this.inputEnabled || this.units.every((u) => !!u.squad)
     );
@@ -310,10 +298,10 @@ export class ListSquadsScene extends Phaser.Scene {
     const totalSquads = Object.keys(squads).length;
 
     if (this.page !== 0) {
-      const prev = this.add.image(NAV_X, NAV_Y, 'arrow_right');
+      const prev = this.add.image(NAV_X, NAV_Y, "arrow_right");
       prev.setScale(-1, 1);
       prev.setInteractive();
-      prev.on('pointerdown', (_pointer: Pointer) => {
+      prev.on("pointerdown", (_pointer: Pointer) => {
         if (this.inputEnabled) this.prevPage();
       });
 
@@ -325,9 +313,9 @@ export class ListSquadsScene extends Phaser.Scene {
       this.itemsPerPage * (this.page + 1) >= totalSquads;
 
     if (!isLastPage) {
-      const next = this.add.image(NAV_X + 100, NAV_Y, 'arrow_right');
+      const next = this.add.image(NAV_X + 100, NAV_Y, "arrow_right");
       next.setInteractive();
-      next.on('pointerdown', () => {
+      next.on("pointerdown", () => {
         if (this.inputEnabled) this.nextPage();
       });
 
@@ -374,8 +362,6 @@ export class ListSquadsScene extends Phaser.Scene {
     this.units = Map();
     this.uiContainer.destroy();
     this.scene.stop(key);
-
-    for (const ev in this.evs) this.events.off(ev);
   }
 
   onDisbandSquad: (id: string) => void = (id: string) => {
