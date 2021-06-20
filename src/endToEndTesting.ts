@@ -7,6 +7,7 @@ import { initialState } from "./Scenes/Title/Model";
 import { NewGameButtonClicked } from "./Scenes/Title/events/NewGameButtonClicked";
 import ConfirmButtonClicked from "./CharaCreation/events/ConfirmButtonClicked";
 import { CharaCreationState } from "./CharaCreation/Model";
+import { CellClicked } from "./Map/events/CellClicked";
 
 const assert = <A>(condition: string, a: A, b: A) => {
   if (a !== b)
@@ -25,9 +26,11 @@ const event = (eventEmitter: Phaser.Events.EventEmitter) => (event: string) =>
   });
 
 export async function endToEndTesting(game: Phaser.Game) {
-  await startGame(game);
+  const titleScene = await getTitleScene(game);
+  await startGame(titleScene);
 
-  await createCharacter(game);
+  const charaCreationScene = await getCharaCreationScene(game);
+  await createCharacter(charaCreationScene);
 
   return;
   // const charaCreationScene = (await event(game.events)(
@@ -72,25 +75,36 @@ export async function endToEndTesting(game: Phaser.Game) {
   // });
 }
 
-async function createCharacter(game: Phaser.Game) {
-  const charaCreationScene = (await event(game.events)(
-    "CharaCreationSceneCreated"
-  )) as {scene: CharaCreationScene; state: CharaCreationState;};
+async function getCharaCreationScene(game: Phaser.Game) {
+  return (await event(game.events)("CharaCreationSceneCreated")) as {
+    scene: CharaCreationScene;
+    state: CharaCreationState;
+  };
+}
 
+async function getTitleScene(game: Phaser.Game) {
+  return (await event(game.events)("TitleSceneCreated")) as TitleScene;
+}
+
+async function createCharacter({
+  scene,
+  state,
+}: {
+  scene: Phaser.Scene;
+  state: CharaCreationState;
+}) {
   (document.getElementById("new-chara-name") as HTMLInputElement).value =
     "TestHero";
 
-  ConfirmButtonClicked(charaCreationScene.scene, charaCreationScene.state);
+  ConfirmButtonClicked(scene, state);
 }
 
-async function startGame(game: Phaser.Game) {
-  const scn = (await event(game.events)("TitleSceneCreated")) as TitleScene;
-
+async function startGame(scn: Phaser.Scene) {
   NewGameButtonClicked(scn).emit({ scene: scn, state: initialState });
 }
 
 function clickCell(scn: MapScene, x: number, y: number) {
-  scn.evs.CellClicked.emit({
+  CellClicked(scn).emit({
     tile: { x, y },
     pointer: { x: 200, y: 400 },
   });

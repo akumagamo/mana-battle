@@ -47,6 +47,7 @@ import stand from "../Chara/animations/stand";
 import fadeOutChara from "../Chara/animations/fadeOutChara";
 import createStaticBoard from "../Board/createBoard";
 import { healSquads } from "./events/healSquadsTick";
+import { CellClicked } from "./events/CellClicked";
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 
@@ -167,10 +168,6 @@ export class MapScene extends Phaser.Scene {
 
   init() {
     this.evs = {
-      CellClicked: createEvent<{ tile: Vector; pointer: Vector }>(
-        this.events,
-        "CellClicked"
-      ),
       MovePlayerSquadButonClicked: createEvent<{
         mapScene: MapScene;
         mapSquad: MapSquad;
@@ -197,7 +194,9 @@ export class MapScene extends Phaser.Scene {
       }>(this.events, "DispatchWindowRendered"),
       SquadDispatched: createEvent<string>(this.events, "SquadDispatched"),
     };
-    this.evs.CellClicked.on(this.handleCellClick.bind(this));
+
+    CellClicked(this).on(this.handleCellClick.bind(this));
+
     this.evs.MovePlayerSquadButonClicked.on(handleMovePlayerSquadButtonClicked);
     this.evs.SquadClicked.on(this.clickSquad.bind(this));
     this.evs.CloseSquadArrivedInfoMessage.on(
@@ -690,7 +689,7 @@ export class MapScene extends Phaser.Scene {
   }
   makeInteractive(cell: MapTile) {
     cell.tile.on("pointerup", (pointer: Pointer) =>
-      this.evs.CellClicked.emit({
+      CellClicked(this).emit({
         tile: cell,
         pointer: { x: pointer.upX, y: pointer.upY },
       })
