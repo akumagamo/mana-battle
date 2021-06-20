@@ -1,5 +1,4 @@
 import { Container } from '../../Models';
-import text from '../../UI/text';
 import tint from '../animations/tint';
 import { CHARA_INACTIVE_COLOR } from '../colors';
 import { Chara } from '../Model';
@@ -35,14 +34,6 @@ const createHpBar = (
   var fillSize = Math.floor(width * (hpAmount / maxHp));
 
   hpBar.fillRect(borderWidth, borderWidth, fillSize, height);
-
-  const hp = text(30, -50, hpAmount, container, scene);
-  hp.setStyle({ fontStyle: 'bold', align: 'center' });
-  container.add(hp);
-
-  hp.setColor('#ffffff');
-  hp.setStroke('#000000', 6);
-  hp.setFontSize(50);
 
   return container;
 };

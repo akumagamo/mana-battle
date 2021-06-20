@@ -175,7 +175,6 @@ export class MapScene extends Phaser.Scene {
   init() {
     CellClicked(this).on(this.handleCellClick.bind(this));
     MovePlayerSquadButtonClicked(this).on(handleMovePlayerSquadButtonClicked);
-    SquadClicked(this).on(this.clickSquad.bind(this));
     SquadArrivedInfoMessageClosed(this).on(
       this.handleCloseSquadArrivedInfoMessage.bind(this)
     );
@@ -711,28 +710,11 @@ export class MapScene extends Phaser.Scene {
     return { ...pos, y: pos.y + CHARA_VERTICAL_OFFSET };
   }
 
-  async clickSquad(squad: MapSquad) {
-    await this.moveCameraTo(squad.pos, 100 / GAME_SPEED);
-
-    if (squad.squad.force === PLAYER_FORCE) {
-      this.handleClickOnOwnUnit();
-    } else {
-      this.handleClickOnEnemyUnit(squad);
-    }
-  }
-
   async getChara(squadId: string) {
     const leader = this.getSquadLeader(squadId);
     return this.charas.find((c) => c.id === leader.id);
   }
 
-  handleClickOnOwnUnit() {
-    this.refreshUI();
-  }
-
-  async handleClickOnEnemyUnit(enemyUnit: MapSquad) {
-    this.changeMode({ type: "SQUAD_SELECTED", id: enemyUnit.id });
-  }
 
   attack = async (starter: MapSquad, target: MapSquad, direction: string) => {
     await fadeOut(this, 1000 / GAME_SPEED);
