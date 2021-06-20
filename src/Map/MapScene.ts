@@ -48,6 +48,13 @@ import fadeOutChara from "../Chara/animations/fadeOutChara";
 import createStaticBoard from "../Board/createBoard";
 import { healSquads } from "./events/healSquadsTick";
 import { CellClicked } from "./events/CellClicked";
+import MovePlayerSquadButtonClicked from "./events/MovePlayerSquadButtonClicked";
+import ReturnedFromCombat from "./events/ReturnedFromCombat";
+import SquadArrivedInfoMessageCompleted from "./events/SquadArrivedInfoMessageCompleted";
+import SquadClicked from "./events/SquadClicked";
+import CombatInitiated from "./events/CombatInitiated";
+import SquadArrivedInfoMessageClosed from "./events/SquadArrivedInfoMessageClosed";
+import OrganizeButtonClicked from "./events/OrganizeButtonClicked";
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 
@@ -72,7 +79,6 @@ export const startMapScene = async (
 };
 
 export class MapScene extends Phaser.Scene {
-  evs: any = {}; // temp
   isPaused = false;
   squadsInMovement: Map<string, { path: Vector[]; squad: MapSquad }> = Map();
 
@@ -167,42 +173,13 @@ export class MapScene extends Phaser.Scene {
   }
 
   init() {
-    this.evs = {
-      MovePlayerSquadButonClicked: createEvent<{
-        mapScene: MapScene;
-        mapSquad: MapSquad;
-      }>(this.events, "MovePlayerSquadButonClicked"),
-      SquadArrivedInfoMessageCompleted: createEvent<Chara>(
-        this.events,
-        "SquadArrivedInfoMessageCompleted"
-      ),
-      SquadClicked: createEvent<MapSquad>(this.events, "SquadClicked"),
-      CloseSquadArrivedInfoMessage: createEvent<Chara>(
-        this.events,
-        "CloseSquadArrivedInfoMessage"
-      ),
-      OrganizeButtonClicked: createEvent<MapScene>(
-        this.events,
-        "OrganizeButtonClicked"
-      ),
-      CombatInitiated: createEvent<null>(this.events, "CombatInitiated"),
-      ReturnedFromCombat: createEvent<null>(this.events, "ReturnedFromCombat"),
-      DispatchWindowRendered: createEvent<{
-        container: Container;
-        scene: MapScene;
-        squads: Map<string, MapSquad>;
-      }>(this.events, "DispatchWindowRendered"),
-      SquadDispatched: createEvent<string>(this.events, "SquadDispatched"),
-    };
-
     CellClicked(this).on(this.handleCellClick.bind(this));
-
-    this.evs.MovePlayerSquadButonClicked.on(handleMovePlayerSquadButtonClicked);
-    this.evs.SquadClicked.on(this.clickSquad.bind(this));
-    this.evs.CloseSquadArrivedInfoMessage.on(
+    MovePlayerSquadButtonClicked(this).on(handleMovePlayerSquadButtonClicked);
+    SquadClicked(this).on(this.clickSquad.bind(this));
+    SquadArrivedInfoMessageClosed(this).on(
       this.handleCloseSquadArrivedInfoMessage.bind(this)
     );
-    this.evs.OrganizeButtonClicked.on(() =>
+    OrganizeButtonClicked(this).on(() =>
       organizeButtonClicked(
         {
           turnOff: this.turnOff.bind(this),
@@ -307,7 +284,8 @@ export class MapScene extends Phaser.Scene {
       const chara = await this.getChara(squad.id);
       stand(chara);
       const portrait = await this.speak(squad);
-      this.evs.SquadArrivedInfoMessageCompleted.emit(portrait);
+
+      SquadArrivedInfoMessageCompleted(this).emit(portrait);
     }
   }
 
@@ -356,7 +334,7 @@ export class MapScene extends Phaser.Scene {
     );
 
     button(950, 180, "Ok", this.uiContainer, this, () =>
-      this.evs.CloseSquadArrivedInfoMessage.emit(res.portrait)
+      SquadArrivedInfoMessageClosed(this).emit(res.portrait)
     );
 
     this.uiContainer.add(res.portrait.container);
@@ -799,7 +777,7 @@ export class MapScene extends Phaser.Scene {
       // TODO: use safe start
       this.scene.start("MapScene", units.concat(commands));
 
-      this.evs.ReturnedFromCombat.emit(null);
+      ReturnedFromCombat(this).emit(null);
     };
 
     // URGENT TODO: type this scene integration
@@ -822,7 +800,7 @@ export class MapScene extends Phaser.Scene {
       onCombatFinish: combatCallback,
     });
 
-    this.evs.CombatInitiated.emit(null);
+    CombatInitiated(this).emit(null);
   };
 
   turnOff() {
@@ -837,8 +815,6 @@ export class MapScene extends Phaser.Scene {
     this.tileIndex = [[]];
 
     this.mode = DEFAULT_MODE;
-
-    for (const ev in this.evs) this.events.off(ev);
 
     this.scene.manager.stop("MapScene");
   }

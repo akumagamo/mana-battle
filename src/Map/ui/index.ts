@@ -3,6 +3,7 @@ import { Container } from '../../Models';
 import button from '../../UI/button';
 import panel from '../../UI/panel';
 import text from '../../UI/text';
+import OrganizeButtonClicked from '../events/OrganizeButtonClicked';
 import { MapScene } from '../MapScene';
 import city from './city';
 import { squadInfo } from './squadInfo';
@@ -19,7 +20,7 @@ export default (scene: MapScene, uiContainer: Container): Promise<void> => {
 
   if (scene.mode.type !== 'SELECT_SQUAD_MOVE_TARGET') {
     button(50, 40, 'Organize', uiContainer, scene, () =>
-      scene.evs.OrganizeButtonClicked.emit(scene)
+      OrganizeButtonClicked(this).emit(scene)
     );
     button(250, 40, 'Dispatch', uiContainer, scene, () =>
       scene.handleDispatchClick()

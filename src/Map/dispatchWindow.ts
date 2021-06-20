@@ -3,6 +3,9 @@ import { delay } from "../Scenes/utils";
 import button from "../UI/button";
 import panel from "../UI/panel";
 import text from "../UI/text";
+import DispatchWindowRendered from "./events/DispatchWindowRendered";
+import SquadClicked from "./events/SquadClicked";
+import SquadDispatched from "./events/SquadDispatched";
 import { MapScene } from "./MapScene";
 import { MapSquad } from "./Model";
 
@@ -58,7 +61,7 @@ export default (scene: MapScene) => {
     );
   });
 
-  scene.evs.DispatchWindowRendered.emit({
+  DispatchWindowRendered(scene).emit({
     container,
     scene,
     squads: squadsToRender,
@@ -78,7 +81,7 @@ export const handleDispatchSquad = async (
   scene.changeMode({ type: "SQUAD_SELECTED", id: mapSquad.squad.id });
 
   let squad = scene.getMapSquad(mapSquad.squad.id);
-  scene.evs.SquadClicked.emit(squad);
+  SquadClicked(scene).emit(squad);
   scene.signal("clicked dispatch squad button", [
     {
       type: "MOVE_CAMERA_TO",
@@ -88,5 +91,5 @@ export const handleDispatchSquad = async (
     },
   ]);
 
-  scene.evs.SquadDispatched.emit(mapSquad.id);
+  SquadDispatched(scene).emit(mapSquad.id);
 };

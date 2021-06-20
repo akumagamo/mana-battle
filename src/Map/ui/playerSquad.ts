@@ -2,6 +2,7 @@ import { MapSquad } from "../Model";
 import button from "../../UI/button";
 import { MapScene } from "../MapScene";
 import EditSquadModal from "../../Squad/EditSquadModal/createEditSquadModal";
+import MovePlayerSquadButtonClicked from "../events/MovePlayerSquadButtonClicked";
 
 export default (
   mapScene: MapScene,
@@ -53,7 +54,7 @@ export default (
       }
     );
     button(baseX + 200, baseY, "Move", mapScene.uiContainer, mapScene, () =>
-      mapScene.evs.MovePlayerSquadButonClicked.emit({ mapScene, mapSquad })
+      MovePlayerSquadButtonClicked(mapScene).emit({ mapScene, mapSquad })
     );
   }
 };

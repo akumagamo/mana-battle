@@ -4,6 +4,7 @@ import { PLAYER_FORCE } from "../../constants";
 import { Vector } from "../Model";
 import { screenToCellPosition } from "./position";
 import { getDistance } from "../../utils";
+import SquadClicked from "../events/SquadClicked";
 
 export default async (scene: MapScene, cell: Vector) => {
   const { x, y } = cell;
@@ -13,7 +14,7 @@ export default async (scene: MapScene, cell: Vector) => {
   const select = () => {
     if (mapSquad) {
       scene.changeMode({ type: "SQUAD_SELECTED", id: mapSquad.squad.id });
-      scene.evs.SquadClicked.emit(mapSquad);
+      SquadClicked(scene).emit(mapSquad);
       return;
     }
 
@@ -82,7 +83,7 @@ async function handleSelectSquadMoveTarget(
   if (selectedSquad && selectedSquad.squad.force === PLAYER_FORCE) {
     scene.isPaused = false;
 
-    const cell = screenToCellPosition(selectedSquad.pos)
+    const cell = screenToCellPosition(selectedSquad.pos);
 
     if (cell.x !== x || cell.y !== y) {
       await scene.moveSquadTo(selectedSquad.squad.id, { x, y });
@@ -94,7 +95,7 @@ async function handleSelectSquadMoveTarget(
         { type: "UPDATE_SQUAD_POS", id, pos: { x, y } },
       ]);
     } else {
-      scene.changeMode({type: "SQUAD_SELECTED", id})
+      scene.changeMode({ type: "SQUAD_SELECTED", id });
     }
   }
 }
