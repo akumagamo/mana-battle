@@ -47,13 +47,14 @@ import stand from "../Chara/animations/stand";
 import fadeOutChara from "../Chara/animations/fadeOutChara";
 import createStaticBoard from "../Board/createBoard";
 import { healSquads } from "./events/healSquadsTick";
-import { CellClicked } from "./events/CellClicked";
+import CellClicked from "./events/CellClicked";
 import MovePlayerSquadButtonClicked from "./events/MovePlayerSquadButtonClicked";
 import ReturnedFromCombat from "./events/ReturnedFromCombat";
 import SquadArrivedInfoMessageCompleted from "./events/SquadArrivedInfoMessageCompleted";
 import CombatInitiated from "./events/CombatInitiated";
 import SquadArrivedInfoMessageClosed from "./events/SquadArrivedInfoMessageClosed";
 import OrganizeButtonClicked from "./events/OrganizeButtonClicked";
+import events, { unSubscribe } from "./events";
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 
@@ -169,24 +170,6 @@ export class MapScene extends Phaser.Scene {
     castles.forEach((id: string) => {
       this.load.image(id, `${PUBLIC_URL}/art/castles/${id}.jpg`);
     });
-  }
-
-  init() {
-    CellClicked(this).on(this.handleCellClick.bind(this));
-    MovePlayerSquadButtonClicked(this).on(handleMovePlayerSquadButtonClicked);
-    SquadArrivedInfoMessageClosed(this).on(
-      this.handleCloseSquadArrivedInfoMessage.bind(this)
-    );
-    OrganizeButtonClicked(this).on(() =>
-      organizeButtonClicked(
-        {
-          turnOff: this.turnOff.bind(this),
-          state: this.state,
-          scene: this.scene,
-        },
-        (listScene) => returnButtonClicked(this)(listScene)
-      )
-    );
   }
 
   update() {
@@ -423,6 +406,24 @@ export class MapScene extends Phaser.Scene {
   }
 
   async create(data: MapCommands[]) {
+    events.CellClicked(this).on(this.handleCellClick.bind(this));
+    events
+      .MovePlayerSquadButonClicked(this)
+      .on(handleMovePlayerSquadButtonClicked);
+    events
+      .SquadArrivedInfoMessageCompleted(this)
+      .on(this.handleCloseSquadArrivedInfoMessage.bind(this));
+    events.OrganizeButtonClicked(this).on(() =>
+      organizeButtonClicked(
+        {
+          turnOff: this.turnOff.bind(this),
+          state: this.state,
+          scene: this.scene,
+        },
+        (listScene) => returnButtonClicked(this)(listScene)
+      )
+    );
+
     this.mode = DEFAULT_MODE;
 
     if (process.env.SOUND_ENABLED) {
@@ -714,7 +715,6 @@ export class MapScene extends Phaser.Scene {
     return this.charas.find((c) => c.id === leader.id);
   }
 
-
   attack = async (starter: MapSquad, target: MapSquad, direction: string) => {
     await fadeOut(this, 1000 / GAME_SPEED);
 
@@ -798,6 +798,8 @@ export class MapScene extends Phaser.Scene {
     this.mode = DEFAULT_MODE;
 
     this.scene.manager.stop("MapScene");
+
+    unSubscribe(this);
   }
 
   tintClickableCells(cell: MapTile) {

@@ -1,4 +1,5 @@
 import { createEvent } from "../../utils";
 
-export default (scene: Phaser.Scene) =>
-  createEvent<null>(scene.events, "CombatInitiated");
+export const key = "CombatInitiated";
+
+export default (scene: Phaser.Scene) => createEvent<null>(scene.events, key);

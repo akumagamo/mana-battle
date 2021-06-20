@@ -1,6 +1,6 @@
 import { getMockCalls, sceneMock } from "../../test/mocks";
 import { create } from "./create";
-import * as newGameButtonClicked from "./events/NewGameButtonClicked";
+import * as newGameButtonClicked from "./events/newGameButtonClicked";
 import * as optionsButtonClicked from "./events/optionsButtonClicked";
 import { initialState } from "./Model";
 
@@ -25,7 +25,6 @@ it("Should subscribe to the action that opens an option screen", () => {
 
   hasSubscribed(scene, optionsButtonClicked.key);
 });
-
 
 function hasSubscribed(scene: Phaser.Scene, eventName: string) {
   const subscribed = getMockCalls(scene.events.once).some(

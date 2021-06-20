@@ -25,7 +25,7 @@ export async function handleNewGameButtonClicked({
   await fadeOut(scene, 1000 / GAME_SPEED);
 
   turnOff(scene, state);
-  startCharaCreationScene(scene)
+  startCharaCreationScene(scene);
 }
 
 export const NewGameButtonClicked = (scene: Phaser.Scene) =>
