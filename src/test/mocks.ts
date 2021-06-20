@@ -4,6 +4,7 @@ export const eventsMock = () => ({
   on: jest.fn(),
   once: jest.fn(),
   emit: jest.fn(),
+  off: jest.fn(),
 });
 export const gameObjectMock = () => ({
   ...eventsMock(),
@@ -55,11 +56,7 @@ export const sceneMock = () => {
       zone: containerMock,
     },
     tweens: tweensMock,
-    events: {
-      on: jest.fn(),
-      once: jest.fn(),
-      emit: jest.fn(),
-    },
+    events: eventsMock(),
     cameras: {
       main: {
         fadeIn: jest.fn().mockResolvedValue(null),

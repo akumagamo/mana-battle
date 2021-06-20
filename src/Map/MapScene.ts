@@ -51,7 +51,6 @@ import { CellClicked } from "./events/CellClicked";
 import MovePlayerSquadButtonClicked from "./events/MovePlayerSquadButtonClicked";
 import ReturnedFromCombat from "./events/ReturnedFromCombat";
 import SquadArrivedInfoMessageCompleted from "./events/SquadArrivedInfoMessageCompleted";
-import SquadClicked from "./events/SquadClicked";
 import CombatInitiated from "./events/CombatInitiated";
 import SquadArrivedInfoMessageClosed from "./events/SquadArrivedInfoMessageClosed";
 import OrganizeButtonClicked from "./events/OrganizeButtonClicked";
