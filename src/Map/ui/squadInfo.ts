@@ -6,28 +6,33 @@ import { MapScene } from '../MapScene';
 import {getSquadUnits} from '../Model';
 import playerSquad from './playerSquad';
 
+/**
+ * Rendering text is *very* slow.
+ * Removing text we can reduce rendering time from 15ms to 1ms.
+ * */
 export async function squadInfo(
   scene: MapScene,
   uiContainer: Phaser.GameObjects.Container,
   baseY: number,
   id: string
 ): Promise<void> {
-  console.time('squadInfo')
+
+
   const mapSquad = scene.getMapSquad(id);
 
-  // const leader = scene.getSquadLeader(id);
+  const leader = scene.getSquadLeader(id);
 
-  // text(320, baseY, leader.name, uiContainer, scene);
+  text(320, baseY, leader.name, uiContainer, scene);
 
   if (mapSquad.squad.force !== PLAYER_FORCE) {
-    // button(430, baseY, 'Squad Details', scene.uiContainer, scene, () => {
-    //   scene.viewSquadDetails(id);
-    // });
+    button(430, baseY, 'Squad Details', scene.uiContainer, scene, () => {
+      scene.viewSquadDetails(id);
+    });
   }
 
-  // if (mapSquad.squad.force === PLAYER_FORCE) {
-  //   playerSquad(scene, baseY, mapSquad, uiContainer);
-  // }
+  if (mapSquad.squad.force === PLAYER_FORCE) {
+    playerSquad(scene, baseY, mapSquad, uiContainer);
+  }
 
   const { board } = createStaticBoard(
     scene,
@@ -39,5 +44,4 @@ export async function squadInfo(
   );
 
   uiContainer.add(board.container);
-  console.timeEnd('squadInfo')
 }

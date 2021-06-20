@@ -30,6 +30,7 @@ export const imageMock = jest.fn(() => ({
 export const textMock = jest.fn(() => ({
   setShadow: jest.fn(),
   setColor: jest.fn(),
+  getTextMetrics: jest.fn(),
   ...gameObjectMock(),
 }));
 export const graphicsMock = jest.fn(() => ({
