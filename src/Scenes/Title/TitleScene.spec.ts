@@ -1,7 +1,7 @@
 import { getMockCalls, sceneMock } from "../../test/mocks";
 import { create } from "./create";
-import * as newGameButtonClicked from "./events/newGameButtonClicked";
-import * as optionsButtonClicked from "./events/optionsButtonClicked";
+import * as newGameButtonClicked from "./events/NewGameButtonClicked";
+import * as optionsButtonClicked from "./events/OptionsButtonClicked";
 import { initialState } from "./Model";
 
 jest.mock("../storyManager", () => jest.fn());
