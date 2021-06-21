@@ -1,6 +1,6 @@
 import { containerMock, getMockCalls, sceneMock } from "../../../test/mocks";
 import { initialState } from "../Model";
-import * as newGameButtonClicked from "./newgamebtn";
+import * as newGameButtonClicked from "./newGameButtonClicked";
 import * as start from "../../../CharaCreation/start";
 
 jest.mock("../../../UI/Transition");

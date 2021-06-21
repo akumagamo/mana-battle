@@ -1,6 +1,6 @@
 import { getMockCalls, sceneMock } from "../../test/mocks";
 import { create } from "./create";
-import * as newGameButtonClicked from "./events/newgamebtn";
+import * as newGameButtonClicked from "./events/newGameButtonClicked";
 import * as optionsButtonClicked from "./events/optionsButtonClicked";
 import { initialState } from "./Model";
 

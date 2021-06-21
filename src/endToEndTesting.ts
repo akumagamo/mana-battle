@@ -2,7 +2,7 @@ import CharaCreationScene from "./CharaCreation/CharaCreationScene";
 import { MapScene } from "./Map/MapScene";
 import TitleScene from "./Scenes/Title/TitleScene";
 import { initialState } from "./Scenes/Title/Model";
-import * as newgamebtn from "./Scenes/Title/events/newgamebtn";
+import * as newgamebtn from "./Scenes/Title/events/newGameButtonClicked";
 import ConfirmButtonClicked from "./CharaCreation/events/ConfirmButtonClicked";
 import { CharaCreationState } from "./CharaCreation/Model";
 import mapEvents from "./Map/events";

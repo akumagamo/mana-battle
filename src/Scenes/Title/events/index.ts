@@ -1,5 +1,5 @@
 import * as optionsButtonClicked from "./optionsButtonClicked";
-import * as newgamebtn from "./newgamebtn";
+import * as newgamebtn from "./newGameButtonClicked";
 
 export const events = [newgamebtn.key, optionsButtonClicked.key];
 
