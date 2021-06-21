@@ -6,7 +6,7 @@ import { TitleSceneState } from "./Model";
 import { turnOff } from "./turnOff";
 import { changeMusic } from "./changeMusic";
 import { requestFullscreen } from "../../Browser/requestFullscreen";
-import { handleNewGameButtonClicked } from "./events/NewGameButtonClicked";
+import { handleNewGameButtonClicked } from "./events/NewGameButtonClicked_";
 import { handleOptionButtonClicked } from "./events/optionsButtonClicked";
 import events from "./events";
 

@@ -1,4 +1,4 @@
-import * as newGameButtonClicked from "./newGameButtonClicked";
+import * as newGameButtonClicked from "./newGameButtonClicked_";
 import * as optionsButtonClicked from "./optionsButtonClicked";
 
 const events = {
