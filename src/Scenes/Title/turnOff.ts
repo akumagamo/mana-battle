@@ -1,8 +1,9 @@
-import unsubscribe from "./events/unsubscribe";
+import events from "./events";
 import { initialState, TitleSceneState } from "./Model";
 
 export function turnOff(scene: Phaser.Scene, state: TitleSceneState) {
   state.container.destroy();
   state = initialState;
-  unsubscribe(scene);
+
+  events.forEach((k) => scene.events.off(k));
 }

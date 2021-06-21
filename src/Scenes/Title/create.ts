@@ -6,20 +6,14 @@ import { TitleSceneState } from "./Model";
 import { turnOff } from "./turnOff";
 import { changeMusic } from "./changeMusic";
 import { requestFullscreen } from "../../Browser/requestFullscreen";
-import {
-  handleNewGameButtonClicked,
-  NewGameButtonClicked_,
-} from "./events/newgamebtn";
-import {
-  handleOptionButtonClicked,
-  OptionsButtonClicked,
-} from "./events/optionsButtonClicked";
+import { NewGameButtonClicked_ } from "./events/newgamebtn";
+import { OptionsButtonClicked } from "./events/optionsButtonClicked";
+import { subscribe } from "./events";
 
 export function create(scene: Phaser.Scene, state: TitleSceneState) {
   scene.events.once("shutdown", () => turnOff(scene, state));
 
-  NewGameButtonClicked_(scene).once(handleNewGameButtonClicked);
-  OptionsButtonClicked(scene).once(handleOptionButtonClicked);
+  subscribe(scene);
 
   state.container = scene.add.container(0, 0);
   const bg = scene.add.image(0, 0, "backgrounds/sunset");

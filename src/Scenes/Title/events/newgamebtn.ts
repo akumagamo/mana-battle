@@ -33,3 +33,6 @@ export const NewGameButtonClicked_ = (scene: Phaser.Scene) =>
     scene.events,
     key
   );
+
+export const subscribe = (scene: Phaser.Scene) =>
+  NewGameButtonClicked_(scene).once(handleNewGameButtonClicked);
