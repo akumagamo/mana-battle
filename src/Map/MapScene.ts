@@ -1,6 +1,5 @@
 import { Chara } from "../Chara/Model";
 import { INVALID_STATE } from "../errors";
-import button from "../UI/button";
 import { Container, Image, Pointer } from "../Models";
 import panel from "../UI/panel";
 import { getPathTo } from "./api";
@@ -8,18 +7,12 @@ import {
   Vector,
   MapSquad,
   MapState,
-  Force,
   getCity,
   getForce,
   getForceSquads,
   getSquadUnits,
 } from "./Model";
-import {
-  SCREEN_WIDTH,
-  SCREEN_HEIGHT,
-  PLAYER_FORCE,
-  PUBLIC_URL,
-} from "../constants";
+import { SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_FORCE } from "../constants";
 import { toMapSquad, Unit } from "../Unit/Model";
 import { Map, Set, List } from "immutable";
 import speech from "../UI/speech";
@@ -35,34 +28,24 @@ import { delay, tween } from "../Scenes/utils";
 import { fadeIn, fadeOut } from "../UI/Transition";
 import { MapCommands } from "./MapCommands";
 import { Mode, DEFAULT_MODE } from "./Mode";
-import { getDistance, createEvent } from "../utils";
-import { cellSize, CHARA_MAP_SCALE } from "./config";
+import { getDistance } from "../utils";
+import { cellSize, CHARA_VERTICAL_OFFSET, WALKABLE_CELL_TINT } from "./config";
 import { screenToCellPosition, cellToScreenPosition } from "./board/position";
 import * as CombatScene from "../Combat/CombatScene";
 import { handleMovePlayerSquadButtonClicked } from "./ui/playerSquad";
 import { organizeButtonClicked } from "./ui/organizeButtonClicked";
 import dispatchWindow from "./dispatchWindow";
 import returnButtonClicked from "../Squad/ListSquadsScene/events/returnButtonClicked";
-import stand from "../Chara/animations/stand";
-import fadeOutChara from "../Chara/animations/fadeOutChara";
 import createStaticBoard from "../Board/createBoard";
 import { healSquads } from "./events/healSquadsTick";
 import CellClicked from "./events/CellClicked";
-import MovePlayerSquadButtonClicked from "./events/MovePlayerSquadButtonClicked";
 import ReturnedFromCombat from "./events/ReturnedFromCombat";
-import SquadArrivedInfoMessageCompleted from "./events/SquadArrivedInfoMessageCompleted";
 import CombatInitiated from "./events/CombatInitiated";
-import SquadArrivedInfoMessageClosed from "./events/SquadArrivedInfoMessageClosed";
-import OrganizeButtonClicked from "./events/OrganizeButtonClicked";
-import events, { unSubscribe } from "./events";
-
-const GAME_SPEED = parseInt(process.env.SPEED);
-
-const WALKABLE_CELL_TINT = 0x88aa88;
-
-const MOVE_SPEED = 2 * GAME_SPEED;
-
-const CHARA_VERTICAL_OFFSET = -10;
+import events from "./events";
+import preload from "./preload";
+import moveSquads from "./update/moveSquads";
+import { GAME_SPEED } from "../env";
+import destroySquad from "./events/destroySquad";
 
 export type MapTile = {
   x: number;
@@ -124,57 +107,11 @@ export class MapScene extends Phaser.Scene {
     super("MapScene");
   }
 
-  preload() {
-    if (process.env.SOUND_ENABLED) {
-      const mp3s = ["map1"];
-      mp3s.forEach((id: string) => {
-        this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
-      });
-    }
-    const tiles = [
-      "tiles/grass",
-      "tiles/woods",
-      "tiles/mountain",
-      "tiles/castle",
-      "tiles/water",
-      "tiles/beach-r",
-      "tiles/beach-l",
-      "tiles/beach-t",
-      "tiles/beach-b",
-      "tiles/beach-tr",
-      "tiles/beach-tl",
-      "tiles/beach-br",
-      "tiles/beach-bl",
-
-      "tiles/beach-b-and-r",
-      "tiles/beach-t-and-r",
-      "tiles/beach-b-and-l",
-      "tiles/beach-t-and-l",
-    ];
-    tiles.forEach((id: string) => {
-      this.load.image(id, `${PUBLIC_URL}/${id}.svg`);
-    });
-
-    const structures = ["tiles/town"];
-    structures.forEach((id: string) => {
-      this.load.image(id, `${PUBLIC_URL}/${id}.svg`);
-    });
-    const mapElems = ["ally_emblem", "enemy_emblem"];
-    mapElems.forEach((id: string) => {
-      this.load.image(id, `${PUBLIC_URL}/map/${id}.svg`);
-    });
-
-    // merano - Alois_Kirnig_-_Forst_Castle_on_the_Adige_near_Merano
-
-    const castles = ["merano"];
-    castles.forEach((id: string) => {
-      this.load.image(id, `${PUBLIC_URL}/art/castles/${id}.jpg`);
-    });
-  }
+  preload = preload 
 
   update() {
     if (!this.isPaused) {
-      this.moveSquads();
+      moveSquads(this);
 
       this.state.timeOfDay += 1;
       this.state.tick += 1;
@@ -186,142 +123,6 @@ export class MapScene extends Phaser.Scene {
     }
   }
 
-  private moveSquads() {
-    const movedSquads = this.squadsInMovement.keySeq();
-
-    let direction = "";
-
-    this.squadsInMovement.forEach(async (value, squadId) => {
-      const { path, squad } = value;
-
-      const [head] = path;
-
-      const next = cellToScreenPosition(head);
-
-      const dist = getDistance(squad.pos, next);
-
-      const chara = await this.getChara(squadId);
-
-      if (dist >= MOVE_SPEED) {
-        direction = this.stepChara(next, squad, direction, chara);
-      } else {
-        await this.finishMovement(path, squad);
-      }
-
-      return squadId;
-    });
-
-    // check collision
-    // TODO: divide by each squad, store lists of enemies then compare
-    movedSquads.forEach(async (sqd) => {
-      const current = await this.getChara(sqd);
-
-      // TODO: only enemies
-      // how: have indexes per team
-      this.charas
-        .filter((c) => {
-          const a = this.getMapSquad(c.props.unit.squad).squad.force;
-          const b = this.getMapSquad(sqd).squad.force;
-
-          return a !== b;
-        })
-        .forEach((c) => {
-          const distance = getDistance(c.container, current.container);
-
-          if (distance < cellSize * 0.8) {
-            this.isPaused = true;
-            this.startCombat(
-              this.getMapSquad(sqd),
-              this.getMapSquad(c.props.unit.squad),
-              direction
-            );
-          }
-        });
-    });
-  }
-
-  private async finishMovement(path: Vector[], squad: MapSquad) {
-    const [, ...remaining] = path;
-
-    if (remaining.length > 0) {
-      this.squadsInMovement = this.squadsInMovement.set(squad.id, {
-        path: remaining,
-        squad,
-      });
-    } else {
-      this.squadsInMovement = this.squadsInMovement.delete(squad.id);
-
-      const isCity = this.state.cities.some((city) => {
-        const { x, y } = screenToCellPosition(squad.pos);
-
-        return city.x === x && city.y === y;
-      });
-
-      this.state.squads = this.state.squads.update(squad.id, (sqd) => ({
-        ...sqd,
-        status: isCity ? "guarding_fort" : "standing",
-      }));
-
-      const chara = await this.getChara(squad.id);
-      stand(chara);
-      const portrait = await this.speak(squad);
-
-      SquadArrivedInfoMessageCompleted(this).emit(portrait);
-    }
-  }
-
-  private stepChara(
-    next: { x: number; y: number },
-    squad: MapSquad,
-    direction: string,
-    chara: Chara
-  ) {
-    if (next.x > squad.pos.x) {
-      squad.pos.x += 1 * MOVE_SPEED;
-      direction = "right";
-      chara.container.scaleX = CHARA_MAP_SCALE;
-    } else if (next.x < squad.pos.x) {
-      squad.pos.x -= 1 * MOVE_SPEED;
-      direction = "left";
-      chara.container.scaleX = CHARA_MAP_SCALE * -1;
-    } else if (next.y > squad.pos.y) {
-      squad.pos.y += 1 * MOVE_SPEED;
-      direction = "bottom";
-    } else if (next.y < squad.pos.y) {
-      squad.pos.y -= 1 * MOVE_SPEED;
-      direction = "top";
-    }
-    chara.container.setPosition(squad.pos.x, squad.pos.y);
-    // TODO: update squad + add single source of "squad truth"
-    this.updateState({
-      ...this.state,
-      squads: this.state.squads.setIn([squad.id, "pos"], squad.pos),
-    });
-    return direction;
-  }
-
-  async speak(squad: MapSquad) {
-    this.isPaused = true;
-
-    const leader = this.getSquadLeader(squad.id);
-    const res = await speech(
-      leader,
-      450,
-      70,
-      "We arrived at the target destination.",
-      this.uiContainer,
-      this,
-      GAME_SPEED
-    );
-
-    button(950, 180, "Ok", this.uiContainer, this, () =>
-      SquadArrivedInfoMessageClosed(this).emit(res.portrait)
-    );
-
-    this.uiContainer.add(res.portrait.container);
-
-    return res.portrait;
-  }
   handleCloseSquadArrivedInfoMessage(chara: Chara) {
     chara.destroy();
     this.refreshUI();
@@ -384,13 +185,6 @@ export class MapScene extends Phaser.Scene {
   private markSquadForRemoval(id: string) {
     this.squadsToRemove = this.squadsToRemove.add(id);
   }
-  private async destroySquad(id: string) {
-    const chara = await this.getChara(id);
-
-    await fadeOutChara(chara);
-
-    await this.removeSquadFromState(id);
-  }
 
   async selectCity(id: string) {
     this.refreshUI();
@@ -452,7 +246,7 @@ export class MapScene extends Phaser.Scene {
     this.makeWorldDraggable();
     this.setWorldBounds();
 
-    await Promise.all(this.squadsToRemove.map((id) => this.destroySquad(id)));
+    await Promise.all(this.squadsToRemove.map((id) => destroySquad(this, id)));
     this.squadsToRemove = Set();
 
     // if (!this.hasShownVictoryCondition) {
@@ -799,7 +593,7 @@ export class MapScene extends Phaser.Scene {
 
     this.scene.manager.stop("MapScene");
 
-    unSubscribe(this);
+    Object.keys(events).forEach((k) => this.events.off(k));
   }
 
   tintClickableCells(cell: MapTile) {

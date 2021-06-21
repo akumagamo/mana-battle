@@ -1,4 +1,5 @@
 import { createEvent } from "../../../utils";
 
-export default (scene: Phaser.Scene) =>
-  createEvent<null>(scene.events, "ConfirmButtonClicked");
+export const key = "ConfirmButtonClicked";
+
+export default (scene: Phaser.Scene) => createEvent<null>(scene.events, key);

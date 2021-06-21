@@ -23,7 +23,5 @@ const events = {
   [SquadDispatched.key]: SquadDispatched.default,
 };
 
-export const unSubscribe = (scene: Phaser.Scene) =>
-  Object.keys(events).forEach((k) => scene.events.off(k));
 
 export default events;

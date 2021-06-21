@@ -55,7 +55,7 @@ export function preload(this: Phaser.Scene) {
 
   this.load.html("nameform", "assets/chara-creation/input.html");
 
-  preloadCharaAssets(this)
+  preloadCharaAssets(this);
 
   progressBar(this);
 }

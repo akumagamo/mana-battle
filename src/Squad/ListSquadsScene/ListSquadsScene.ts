@@ -14,6 +14,7 @@ import text from "../../UI/text";
 import { UnitIndex } from "../../Unit/Model";
 import EditSquadModal from "../EditSquadModal/createEditSquadModal";
 import * as Squad from "../Model";
+import { events } from "./events";
 import confirmButtonClicked from "./events/confirmButtonClicked";
 import createSquadButtonClicked from "./events/createSquadButtonClicked";
 import editSquadButtonClicked from "./events/editSquadButtonClicked";
@@ -362,6 +363,7 @@ export class ListSquadsScene extends Phaser.Scene {
     this.units = Map();
     this.uiContainer.destroy();
     this.scene.stop(key);
+    events.forEach((k) => this.events.off(k));
   }
 
   onDisbandSquad: (id: string) => void = (id: string) => {
