@@ -28,7 +28,7 @@ export async function handleNewGameButtonClicked({
   startCharaCreationScene(scene);
 }
 
-export const NewGameButtonClicked = (scene: Phaser.Scene) =>
+export const NewGameButtonClicked_ = (scene: Phaser.Scene) =>
   createEvent<{ scene: Phaser.Scene; state: TitleSceneState }>(
     scene.events,
     key

@@ -2,7 +2,7 @@ import CharaCreationScene from "./CharaCreation/CharaCreationScene";
 import { MapScene } from "./Map/MapScene";
 import TitleScene from "./Scenes/Title/TitleScene";
 import { initialState } from "./Scenes/Title/Model";
-import { NewGameButtonClicked } from "./Scenes/Title/events/NewGameButtonClicked";
+import * as newgamebtn from "./Scenes/Title/events/newgamebtn";
 import ConfirmButtonClicked from "./CharaCreation/events/ConfirmButtonClicked";
 import { CharaCreationState } from "./CharaCreation/Model";
 import mapEvents from "./Map/events";
@@ -98,7 +98,9 @@ async function createCharacter({
 }
 
 async function startGame(scn: Phaser.Scene) {
-  NewGameButtonClicked(scn).emit({ scene: scn, state: initialState });
+  newgamebtn
+    .NewGameButtonClicked_(scn)
+    .emit({ scene: scn, state: initialState });
 }
 
 function clickCell(scn: MapScene, x: number, y: number) {

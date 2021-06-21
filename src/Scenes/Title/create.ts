@@ -6,15 +6,20 @@ import { TitleSceneState } from "./Model";
 import { turnOff } from "./turnOff";
 import { changeMusic } from "./changeMusic";
 import { requestFullscreen } from "../../Browser/requestFullscreen";
-import { handleNewGameButtonClicked } from "./events/NewGameButtonClicked_";
-import { handleOptionButtonClicked } from "./events/optionsButtonClicked";
-import events from "./events";
+import {
+  handleNewGameButtonClicked,
+  NewGameButtonClicked_,
+} from "./events/newgamebtn";
+import {
+  handleOptionButtonClicked,
+  OptionsButtonClicked,
+} from "./events/optionsButtonClicked";
 
 export function create(scene: Phaser.Scene, state: TitleSceneState) {
   scene.events.once("shutdown", () => turnOff(scene, state));
 
-  events.NewGameButtonClicked(scene).once(handleNewGameButtonClicked);
-  events.OptionsButtonClicked(scene).once(handleOptionButtonClicked);
+  NewGameButtonClicked_(scene).once(handleNewGameButtonClicked);
+  OptionsButtonClicked(scene).once(handleOptionButtonClicked);
 
   state.container = scene.add.container(0, 0);
   const bg = scene.add.image(0, 0, "backgrounds/sunset");
@@ -65,11 +70,11 @@ export function create(scene: Phaser.Scene, state: TitleSceneState) {
   });
 
   button(SCREEN_WIDTH / 2, 550, "New Game", state.container, scene, () =>
-    events.NewGameButtonClicked(scene).emit({ scene, state })
+    NewGameButtonClicked_(scene).emit({ scene, state })
   );
 
   button(SCREEN_WIDTH / 2, 620, "Options", state.container, scene, () => {
-    events.OptionsButtonClicked(scene).emit(scene);
+    OptionsButtonClicked(scene).emit(scene);
   });
 
   scene.game.events.emit("TitleSceneCreated", scene);
