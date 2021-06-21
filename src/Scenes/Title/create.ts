@@ -6,14 +6,14 @@ import { TitleSceneState } from "./Model";
 import { turnOff } from "./turnOff";
 import { changeMusic } from "./changeMusic";
 import { requestFullscreen } from "../../Browser/requestFullscreen";
-import { NewGameButtonClicked_ } from "./events/newgamebtn";
-import { OptionsButtonClicked } from "./events/optionsButtonClicked";
-import { subscribe } from "./events";
+import { emitter, subscribeToEvents } from "./events";
 
 export function create(scene: Phaser.Scene, state: TitleSceneState) {
   scene.events.once("shutdown", () => turnOff(scene, state));
 
-  subscribe(scene);
+  const emit = emitter(scene);
+
+  subscribeToEvents(scene);
 
   state.container = scene.add.container(0, 0);
   const bg = scene.add.image(0, 0, "backgrounds/sunset");
@@ -64,11 +64,11 @@ export function create(scene: Phaser.Scene, state: TitleSceneState) {
   });
 
   button(SCREEN_WIDTH / 2, 550, "New Game", state.container, scene, () =>
-    NewGameButtonClicked_(scene).emit({ scene, state })
+    emit.NewGameButtonClicked({ scene, state })
   );
 
   button(SCREEN_WIDTH / 2, 620, "Options", state.container, scene, () => {
-    OptionsButtonClicked(scene).emit(scene);
+    emit.OptionsButtonClicked(scene);
   });
 
   scene.game.events.emit("TitleSceneCreated", scene);
