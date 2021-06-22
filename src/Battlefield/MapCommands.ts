@@ -13,8 +13,6 @@ export type MapCommands =
       cell: Vector;
     }
   | { type: "MOVE_CAMERA_TO"; x: number; y: number; duration: number }
-  | { type: "CLEAR_TILES_EVENTS" }
-  | { type: "CLEAR_TILES_TINTING" }
   | { type: "RESET_SQUAD_POSITION"; unit: MapSquad }
   | { type: "SELECT_CITY"; id: string }
   | { type: "SET_SELECTED_UNIT"; id: string }

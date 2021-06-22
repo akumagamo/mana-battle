@@ -1,6 +1,7 @@
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../constants";
 import { Image, Pointer } from "../Models";
 import { delay } from "../Scenes/utils";
+import {disableCellClick, enableCellClick} from "./board/input";
 import { cellSize } from "./config";
 import { MapScene } from "./MapScene";
 
@@ -62,14 +63,15 @@ export function makeWorldDraggable(scene: MapScene) {
     scene.mapY = scene.mapContainer.y;
     // Avoid firing "click_cell" event on dragend
 
+    // todo: there's a "distance" property in the Phaser event
     if (
       scene.isDragging &&
       timeDelta > minTimeDelta &&
       posDelta > minPosDelta
     ) {
-      scene.disableCellClick();
+      disableCellClick(scene);
       await delay(scene, 20);
-      scene.enableCellClick();
+      enableCellClick(scene);
     }
     scene.isDragging = false;
   });

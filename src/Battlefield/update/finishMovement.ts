@@ -3,7 +3,7 @@ import stand from "../../Chara/animations/stand";
 import { screenToCellPosition } from "../board/position";
 import SquadArrivedInfoMessageCompleted from "../events/SquadArrivedInfoMessageCompleted";
 import { MapScene } from "../MapScene";
-import { MapSquad } from "../Model";
+import { getChara, MapSquad } from "../Model";
 import speak from "../rendering/speak";
 
 export default async function (
@@ -32,7 +32,7 @@ export default async function (
       status: isCity ? "guarding_fort" : "standing",
     }));
 
-    const chara = await scene.getChara(squad.id);
+    const chara = getChara(scene, squad.id);
     stand(chara);
     const portrait = await speak(scene, squad);
 

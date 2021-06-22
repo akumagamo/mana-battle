@@ -5,6 +5,7 @@ import EditSquadModal from "../../Squad/EditSquadModal/createEditSquadModal";
 import MovePlayerSquadButtonClicked from "../events/MovePlayerSquadButtonClicked";
 import { disableMapInput, enableInput } from "../board/input";
 import signal from "../signal";
+import { changeMode } from "../Mode";
 
 export default (mapScene: MapScene, baseY: number, mapSquad: MapSquad) => {
   const baseX = 300;
@@ -18,7 +19,7 @@ export default (mapScene: MapScene, baseY: number, mapSquad: MapSquad) => {
       mapScene.uiContainer,
       mapScene,
       () => {
-        mapScene.changeMode({ type: "CHANGING_SQUAD_FORMATION" });
+        changeMode(mapScene, { type: "CHANGING_SQUAD_FORMATION" });
         disableMapInput(mapScene);
 
         EditSquadModal({
@@ -42,7 +43,7 @@ export default (mapScene: MapScene, baseY: number, mapSquad: MapSquad) => {
           },
           onClose: () => {
             enableInput(mapScene);
-            mapScene.changeMode({
+            changeMode(mapScene, {
               type: "SQUAD_SELECTED",
               id: mapSquad.squad.id,
             });
@@ -63,7 +64,7 @@ export function handleMovePlayerSquadButtonClicked({
   mapScene: MapScene;
   mapSquad: MapSquad;
 }) {
-  mapScene.changeMode({
+  changeMode(mapScene, {
     type: "SELECT_SQUAD_MOVE_TARGET",
     id: mapSquad.id,
     start: mapSquad.pos,

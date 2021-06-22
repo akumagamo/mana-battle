@@ -3,12 +3,12 @@ import button from "../../UI/button";
 import speech from "../../UI/speech";
 import SquadArrivedInfoMessageClosed from "../events/SquadArrivedInfoMessageClosed";
 import { MapScene } from "../MapScene";
-import { MapSquad } from "../Model";
+import { getSquadLeader, MapSquad } from "../Model";
 
 export default async function (scene: MapScene, squad: MapSquad) {
   scene.isPaused = true;
 
-  const leader = scene.getSquadLeader(squad.id);
+  const leader = getSquadLeader(scene.state, squad.id);
   const res = await speech(
     leader,
     450,

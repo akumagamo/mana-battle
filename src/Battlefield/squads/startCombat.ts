@@ -6,7 +6,8 @@ import panel from "../../UI/panel";
 import speech from "../../UI/speech";
 import { disableMapInput } from "../board/input";
 import { MapScene } from "../MapScene";
-import { MapSquad, getSquadUnits } from "../Model";
+import { MapSquad, getSquadUnits, getSquadLeader } from "../Model";
+import { destroyUI } from "../ui";
 import attack from "./attack";
 
 export default async function (
@@ -24,12 +25,12 @@ export default async function (
   );
 
   disableMapInput(scene);
-  scene.destroyUI();
+  destroyUI(scene);
 
   const bg = panel(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, scene.uiContainer, scene);
   bg.setAlpha(0.4);
 
-  const leader = scene.getSquadLeader(playerSquad.id);
+  const leader = getSquadLeader(scene.state, playerSquad.id);
 
   const enemyUnits = getSquadUnits(scene.state, squadB.id);
 

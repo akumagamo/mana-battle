@@ -1,7 +1,7 @@
 import { GAME_SPEED } from "../../env";
 import { cellSize } from "../config";
 import { MapScene } from "../MapScene";
-import { getMapSquad, updateState } from "../Model";
+import { getChara, getMapSquad, updateState } from "../Model";
 
 export default async function (scene: MapScene) {
   if (scene.squadToPush) {
@@ -16,7 +16,7 @@ export default async function (scene: MapScene) {
     if (direction === "top") yPush = dist * -1;
     if (direction === "bottom") yPush = dist;
 
-    const chara = await scene.getChara(loser.id);
+    const chara = getChara(scene, loser.id);
 
     const newPos = {
       x: chara.container.x + xPush,

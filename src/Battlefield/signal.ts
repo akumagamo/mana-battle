@@ -6,6 +6,8 @@ import { MapScene } from "./MapScene";
 import { updateState } from "./Model";
 import moveCameraTo from "./rendering/moveCameraTo";
 import markSquadForRemoval from "./squads/markSquadForRemoval";
+import { refreshUI } from "./ui";
+import { viewSquadDetails } from "./ui/squadInfo";
 
 export default async function (
   scene: MapScene,
@@ -33,14 +35,10 @@ export default async function (
         clickCell(scene, cmd.cell);
       } else if (cmd.type === "MOVE_CAMERA_TO") {
         moveCameraTo(scene, { x: cmd.x, y: cmd.y }, cmd.duration);
-      } else if (cmd.type === "CLEAR_TILES_EVENTS") {
-        scene.clearAllTileEvents();
-      } else if (cmd.type === "CLEAR_TILES_TINTING") {
-        scene.clearAllTileTint();
       } else if (cmd.type === "VIEW_SQUAD_DETAILS") {
-        scene.viewSquadDetails(cmd.id);
+        viewSquadDetails(scene, cmd.id);
       } else if (cmd.type === "REFRESH_UI") {
-        scene.refreshUI();
+        refreshUI(scene);
       } else if (cmd.type === "CITY_CLICK") {
         selectCity(scene, cmd.id);
       } else if (cmd.type === "CAPTURE_CITY") {

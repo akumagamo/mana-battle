@@ -9,7 +9,9 @@ import * as SquadArrivedInfoMessageCompleted from "./SquadArrivedInfoMessageComp
 import * as SquadClicked from "./SquadClicked";
 import * as SquadDispatched from "./SquadDispatched";
 
-const events = {
+/** This is a function to avoid accessing the `default` property before initialization -
+ * which can lead to a webpack error*/
+const events = () => ({
   [cellClicked.key]: cellClicked.default,
   [combatInitiated.key]: combatInitiated.default,
   [dispatchWindowRendered.key]: dispatchWindowRendered.default,
@@ -21,7 +23,6 @@ const events = {
     SquadArrivedInfoMessageCompleted.default,
   [SquadClicked.key]: SquadClicked.default,
   [SquadDispatched.key]: SquadDispatched.default,
-};
-
+});
 
 export default events;

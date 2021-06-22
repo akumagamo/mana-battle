@@ -1,17 +1,51 @@
+import { Pointer } from "../../Models";
+import CellClicked from "../events/CellClicked";
 import { MapScene } from "../MapScene";
+import { MapTile } from "../Model";
+import { refreshUI } from "../ui";
 
 export function disableMapInput(scene: MapScene) {
-  scene.clearAllTileEvents();
-  this.disableCellClick();
+  clearAllTileEvents(scene);
+  disableCellClick(scene);
   scene.dragDisabled = true;
 }
 
 export function enableInput(scene: MapScene) {
   scene.dragDisabled = false;
-  scene.enableCellClick();
+  enableCellClick(scene);
 
-  scene.clearAllTileEvents();
-  scene.tiles.forEach((tile) => scene.makeInteractive(tile));
+  clearAllTileEvents(scene);
+  scene.tiles.forEach((tile) => makeInteractive(scene, tile));
 
-  scene.refreshUI();
+  refreshUI(scene);
+}
+export function disableCellClick(scene: MapScene) {
+  scene.cellClickDisabled = true;
+}
+
+export function enableCellClick(scene: MapScene) {
+  scene.cellClickDisabled = false;
+}
+export function makeInteractive(scene: MapScene, cell: MapTile) {
+  cell.tile.on("pointerup", (pointer: Pointer) =>
+    CellClicked(scene).emit({
+      scene: scene,
+      tile: cell,
+      pointer: { x: pointer.upX, y: pointer.upY },
+    })
+  );
+}
+
+export function clearAllTileEvents(scene: MapScene) {
+  scene.tiles.forEach((tile) => {
+    tile.tile.removeAllListeners();
+  });
+}
+
+export function clearAllTileTint(scene: MapScene) {
+  scene.tiles.forEach((tile) => {
+    tile.tile.clearTint();
+    scene.tweens.killTweensOf(tile.tile);
+    tile.tile.alpha = 1;
+  });
 }

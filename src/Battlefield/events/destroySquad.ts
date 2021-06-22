@@ -1,8 +1,9 @@
 import fadeOutChara from "../../Chara/animations/fadeOutChara";
 import { MapScene } from "../MapScene";
+import { getChara } from "../Model";
 
 export default async function (scene: MapScene, id: string) {
-  const chara = await scene.getChara(id);
+  const chara = getChara(scene, id);
 
   await fadeOutChara(chara);
 
@@ -22,7 +23,7 @@ async function removeSquadFromState(scene: MapScene, id: string) {
   scene.state.squads = scene.state.squads.filter((s) => s.id !== id);
   scene.state.units = scene.state.units.filter((u) => u.squad !== squadId);
 
-  const chara = await scene.getChara(id);
+  const chara = getChara(scene, id);
   chara.destroy();
 
   scene.charas = scene.charas.filter((c) => c.props.unit.squad !== id);

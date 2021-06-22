@@ -251,6 +251,15 @@ export function getForceSquads(state: MapState, force: string) {
 export function getForce(state: MapState, id: string) {
   return state.forces.find((f) => f.id === id);
 }
+export function getSquadLeader(state: MapState, squadId: string) {
+  let squad = getMapSquad(state, squadId);
+
+  return state.units.get(squad.squad.leader);
+}
+export function getChara(scene: MapScene, squadId: string) {
+  const leader = getSquadLeader(scene.state, squadId);
+  return scene.charas.find((c) => c.id === leader.id);
+}
 
 export function updateState(scene: MapScene, state: MapState) {
   scene.state = { ...scene.state, ...state };

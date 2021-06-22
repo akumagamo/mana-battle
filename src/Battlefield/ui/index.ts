@@ -16,8 +16,8 @@ const BOTTOM_PANEL_HEIGHT = 80;
 const BOTTOM_PANEL_X = 0;
 export const BOTTOM_PANEL_Y = SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT;
 
-export default (scene: MapScene, uiContainer: Container): Promise<void> => {
-  // TODO: remove this (currently we fail to select enemy squad without this)
+export default function ui (scene: MapScene, uiContainer: Container): Promise<void> {
+  // TODO: remove scene (currently we fail to select enemy squad without scene)
   // the parent is already removing (refreshUI)
   const baseY = BOTTOM_PANEL_Y + 25;
 
@@ -71,3 +71,18 @@ export default (scene: MapScene, uiContainer: Container): Promise<void> => {
       return;
   }
 };
+
+export async function destroyUI(scene:MapScene) {
+    const { uiContainer } = scene;
+    uiContainer.removeAll(true);
+  }
+
+  export async function refreshUI(scene:MapScene) {
+    destroyUI(scene);
+
+    if (scene.mode.type === "CHANGING_SQUAD_FORMATION") return;
+
+    const { uiContainer } = scene;
+
+    ui(scene, uiContainer);
+  }

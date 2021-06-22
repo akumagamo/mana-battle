@@ -5,7 +5,7 @@ import { cellSize, MOVE_SPEED } from "../config";
 import { MapScene } from "../MapScene";
 import finishMovement from "./finishMovement";
 import stepChara from "./stepChara";
-import { getMapSquad } from "../Model";
+import { getChara, getMapSquad } from "../Model";
 
 export default function (scene: MapScene) {
   const movedSquads = scene.squadsInMovement.keySeq();
@@ -21,7 +21,7 @@ export default function (scene: MapScene) {
 
     const dist = getDistance(squad.pos, next);
 
-    const chara = await scene.getChara(squadId);
+    const chara = getChara(scene, squadId);
 
     if (dist >= MOVE_SPEED) {
       direction = stepChara(scene, next, squad, direction, chara);
@@ -35,7 +35,7 @@ export default function (scene: MapScene) {
   // check collision
   // TODO: divide by each squad, store lists of enemies then compare
   movedSquads.forEach(async (sqd) => {
-    const current = await scene.getChara(sqd);
+    const current = getChara(scene, sqd);
 
     // TODO: only enemies
     // how: have indexes per team

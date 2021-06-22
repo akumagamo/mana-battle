@@ -104,9 +104,11 @@ async function startGame(scn: Phaser.Scene) {
 }
 
 function clickCell(scn: MapScene, x: number, y: number) {
-  mapEvents.CellClicked(scn).emit({
-    scene: scn,
-    tile: { x, y },
-    pointer: { x: 200, y: 400 },
-  });
+  mapEvents()
+    .CellClicked(scn)
+    .emit({
+      scene: scn,
+      tile: { x, y },
+      pointer: { x: 200, y: 400 },
+    });
 }

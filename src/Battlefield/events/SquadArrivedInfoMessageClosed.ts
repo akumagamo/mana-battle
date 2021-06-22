@@ -1,13 +1,14 @@
 import { Chara } from "../../Chara/Model";
 import { createEvent } from "../../utils";
 import { MapScene } from "../MapScene";
+import { refreshUI } from "../ui";
 
 export function handleCloseSquadArrivedInfoMessage(
   scene: MapScene,
   chara: Chara
 ) {
   chara.destroy();
-  scene.refreshUI();
+  refreshUI(scene);
   scene.isPaused = false;
 }
 

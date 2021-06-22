@@ -1,11 +1,11 @@
 import {List, Map, Set} from "immutable";
 import {PLAYER_FORCE} from "../constants";
 import {MapCommands} from "../Battlefield/MapCommands";
-import {startMapScene} from "../Battlefield/MapScene";
 import maps from "../maps";
 import {createSquad, makeMember, squadBuilder} from "../Squad/Model";
 import {makeUnit} from "../Unit/makeUnit";
 import {toMapSquad, Unit} from "../Unit/Model";
+import startBattlefieldScene from "../Battlefield/startBattlefieldScene";
 
 export default async (scene:Phaser.Scene, unit:Unit) => {
 
@@ -113,5 +113,5 @@ export default async (scene:Phaser.Scene, unit:Unit) => {
     },
   ];
 
-  startMapScene(scene, commands);
+  startBattlefieldScene(scene, commands);
 }

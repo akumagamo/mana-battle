@@ -2,6 +2,7 @@ import { Vector } from "matter";
 import { getPathTo } from "../api";
 import { screenToCellPosition } from "../board/position";
 import { MapScene } from "../MapScene";
+import {changeMode} from "../Mode";
 import { getMapSquad } from "../Model";
 
 export default async function (scene: MapScene, id: string, target: Vector) {
@@ -20,7 +21,7 @@ export default async function (scene: MapScene, id: string, target: Vector) {
     squad,
   });
 
-  scene.changeMode({ type: "SQUAD_SELECTED", id });
+  changeMode(scene, { type: "SQUAD_SELECTED", id });
 }
 
 function makeWalkableGrid(scene: MapScene): number[][] {

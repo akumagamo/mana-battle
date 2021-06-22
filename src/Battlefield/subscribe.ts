@@ -8,14 +8,15 @@ import returnButtonClicked from "../Squad/ListSquadsScene/events/returnButtonCli
 import { handleCellClick } from "./events/CellClicked";
 
 export default function (scene: MapScene) {
-  events.CellClicked(scene).on((c) => handleCellClick(c));
-  events
+  const events_ = events();
+  events_.CellClicked(scene).on((c) => handleCellClick(c));
+  events_
     .MovePlayerSquadButonClicked(scene)
     .on((c) => handleMovePlayerSquadButtonClicked(c));
-  events
+  events_
     .SquadArrivedInfoMessageCompleted(scene)
     .on((chara) => handleCloseSquadArrivedInfoMessage(scene, chara));
-  events.OrganizeButtonClicked(scene).on(() =>
+  events_.OrganizeButtonClicked(scene).on(() =>
     organizeButtonClicked(
       {
         turnOff: () => turnOff(scene),

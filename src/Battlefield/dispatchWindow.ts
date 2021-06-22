@@ -1,13 +1,24 @@
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
+import { PLAYER_FORCE, SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
+import { SquadRecord } from "../Squad/Model";
 import button from "../UI/button";
 import panel from "../UI/panel";
 import text from "../UI/text";
+import { toMapSquad } from "../Unit/Model";
 import { enableInput } from "./board/input";
+import { renderSquad } from "./board/renderSquads";
 import DispatchWindowRendered from "./events/DispatchWindowRendered";
 import SquadClicked from "./events/SquadClicked";
 import SquadDispatched from "./events/SquadDispatched";
 import { MapScene } from "./MapScene";
-import { getMapSquad, MapSquad } from "./Model";
+import { changeMode } from "./Mode";
+import {
+  getCity,
+  getForce,
+  getForceSquads,
+  getMapSquad,
+  getSquadLeader,
+  MapSquad,
+} from "./Model";
 import signal from "./signal";
 
 export default (scene: MapScene) => {
@@ -43,13 +54,14 @@ export default (scene: MapScene) => {
     enableInput(scene);
   });
 
-  // TODO: avoid listing defeated squads
-  let squadsToRender = scene
-    .getPlayerSquads()
-    .filter((mapSquad) => !scene.state.dispatchedSquads.has(mapSquad.squad.id));
+  let squadsToRender = getForceSquads(scene.state, PLAYER_FORCE).filter(
+    (mapSquad) =>
+      mapSquad.status !== "defeated" &&
+      !scene.state.dispatchedSquads.has(mapSquad.squad.id)
+  );
 
   squadsToRender.toList().forEach((mapSquad, i) => {
-    const leader = scene.getSquadLeader(mapSquad.id);
+    const leader = getSquadLeader(scene.state, mapSquad.id);
     button(
       x + padding,
       y + 60 + 70 * i,
@@ -76,10 +88,10 @@ export const handleDispatchSquad = async (
 ) => {
   container.destroy();
 
-  scene.dispatchSquad(mapSquad.squad, scene.state.timeOfDay);
+  dispatchSquad(scene, mapSquad.squad, scene.state.timeOfDay);
   enableInput(scene);
   scene.isPaused = false;
-  scene.changeMode({ type: "SQUAD_SELECTED", id: mapSquad.squad.id });
+  changeMode(scene, { type: "SQUAD_SELECTED", id: mapSquad.squad.id });
 
   let squad = getMapSquad(scene.state, mapSquad.squad.id);
   SquadClicked(scene).emit(squad);
@@ -94,3 +106,22 @@ export const handleDispatchSquad = async (
 
   SquadDispatched(scene).emit(mapSquad.id);
 };
+
+function dispatchSquad(
+  scene: MapScene,
+  squad: SquadRecord,
+  dispatchTime: number
+) {
+  const force = getForce(scene.state, PLAYER_FORCE);
+  let mapSquad = toMapSquad(
+    squad,
+    getCity(this.state, force.initialPosition),
+    dispatchTime
+  );
+
+  this.state.dispatchedSquads = this.state.dispatchedSquads.add(squad.id);
+
+  force.squads.push(squad.id);
+
+  renderSquad(this, mapSquad);
+}

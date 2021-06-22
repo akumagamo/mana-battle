@@ -2,19 +2,22 @@ import { MapScene } from "../MapScene";
 import { makeVector } from "../makeVector";
 import { PLAYER_FORCE } from "../../constants";
 import { getMapSquad, Vector } from "../Model";
-import { screenToCellPosition } from "./position";
+import { cellToScreenPosition, screenToCellPosition } from "./position";
 import SquadClicked from "../events/SquadClicked";
 import moveSquadTo from "../squads/moveSquadTo";
 import signal from "../signal";
+import { refreshUI } from "../ui";
+import { getDistance } from "../../utils";
+import {changeMode} from "../Mode";
 
 export default async (scene: MapScene, cell: Vector) => {
   const { x, y } = cell;
 
-  const mapSquad = scene.squadAt(x, y);
+  const mapSquad = squadAt(scene, x, y);
 
   const select = () => {
     if (mapSquad) {
-      scene.changeMode({ type: "SQUAD_SELECTED", id: mapSquad.squad.id });
+      changeMode(scene, { type: "SQUAD_SELECTED", id: mapSquad.squad.id });
       SquadClicked(scene).emit(mapSquad);
       return;
     }
@@ -26,7 +29,7 @@ export default async (scene: MapScene, cell: Vector) => {
         signal(scene, "there was just a squad in the cell, select it", [
           { type: "SELECT_CITY", id: city.id },
         ]);
-        scene.changeMode({ type: "CITY_SELECTED", id: city.id });
+        changeMode(scene, { type: "CITY_SELECTED", id: city.id });
       };
       switch (scene.mode.type) {
         case "NOTHING_SELECTED":
@@ -69,7 +72,7 @@ async function handleMovingSquad(
       signal(scene, "squad moved, updating position", [
         { type: "UPDATE_SQUAD_POS", id, pos: { x, y } },
       ]);
-      scene.refreshUI();
+      refreshUI(scene);
     }
   }
 }
@@ -96,7 +99,13 @@ async function handleSelectSquadMoveTarget(
         { type: "UPDATE_SQUAD_POS", id, pos: { x, y } },
       ]);
     } else {
-      scene.changeMode({ type: "SQUAD_SELECTED", id });
+      changeMode (scene, { type: "SQUAD_SELECTED", id });
     }
   }
+}
+
+function squadAt(scene: MapScene, x: number, y: number) {
+  return scene.state.dispatchedSquads
+    .map((id) => getMapSquad(scene.state, id))
+    .find((s) => getDistance(cellToScreenPosition({ x, y }), s.pos) < 50);
 }

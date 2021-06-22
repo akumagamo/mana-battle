@@ -2,8 +2,10 @@ import createStaticBoard from "../../Board/createBoard";
 import { PLAYER_FORCE } from "../../constants";
 import button from "../../UI/button";
 import text from "../../UI/text";
+import { disableMapInput, enableInput } from "../board/input";
+import squadDetails from "../effects/squadDetails";
 import { MapScene } from "../MapScene";
-import { getMapSquad, getSquadUnits } from "../Model";
+import { getMapSquad, getSquadLeader, getSquadUnits } from "../Model";
 import playerSquad from "./playerSquad";
 
 /**
@@ -18,13 +20,13 @@ export async function squadInfo(
 ): Promise<void> {
   const mapSquad = getMapSquad(scene.state, id);
 
-  const leader = scene.getSquadLeader(id);
+  const leader = getSquadLeader(scene.state, id);
 
   text(320, baseY, leader.name, uiContainer, scene);
 
   if (mapSquad.squad.force !== PLAYER_FORCE) {
     button(430, baseY, "Squad Details", scene.uiContainer, scene, () => {
-      scene.viewSquadDetails(id);
+      viewSquadDetails(scene, id);
     });
   }
 
@@ -42,4 +44,15 @@ export async function squadInfo(
   );
 
   uiContainer.add(board.container);
+}
+
+export function viewSquadDetails(scene: MapScene, id: string): void {
+  const mapSquad = getMapSquad(scene.state, id);
+  disableMapInput(scene);
+  squadDetails(
+    scene,
+    mapSquad,
+    scene.state.units.filter((u) => mapSquad.squad.members.has(u.id)),
+    () => enableInput(scene)
+  );
 }
