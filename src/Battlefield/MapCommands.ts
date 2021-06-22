@@ -1,6 +1,5 @@
-import { Vector, MapSquad, MapState } from "./Model";
+import { Vector, MapSquad, MapState, MapTile } from "./Model";
 import { Unit } from "../Unit/Model";
-import { MapTile } from "./MapScene";
 export type MapCommands =
   | { type: "UPDATE_STATE"; target: MapState }
   | { type: "UPDATE_SQUAD_POS"; id: string; pos: Vector }
@@ -13,7 +12,6 @@ export type MapCommands =
       type: "CLICK_CELL";
       cell: Vector;
     }
-  | { type: "CLEAR_TILES" }
   | { type: "MOVE_CAMERA_TO"; x: number; y: number; duration: number }
   | { type: "CLEAR_TILES_EVENTS" }
   | { type: "CLEAR_TILES_TINTING" }

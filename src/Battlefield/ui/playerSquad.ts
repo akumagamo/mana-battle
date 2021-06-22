@@ -3,13 +3,10 @@ import button from "../../UI/button";
 import { MapScene } from "../MapScene";
 import EditSquadModal from "../../Squad/EditSquadModal/createEditSquadModal";
 import MovePlayerSquadButtonClicked from "../events/MovePlayerSquadButtonClicked";
+import { disableMapInput, enableInput } from "../board/input";
+import signal from "../signal";
 
-export default (
-  mapScene: MapScene,
-  baseY: number,
-  mapSquad: MapSquad,
-  uiContainer: Phaser.GameObjects.Container
-) => {
+export default (mapScene: MapScene, baseY: number, mapSquad: MapSquad) => {
   const baseX = 300;
   const mode = mapScene.mode.type;
 
@@ -22,7 +19,7 @@ export default (
       mapScene,
       () => {
         mapScene.changeMode({ type: "CHANGING_SQUAD_FORMATION" });
-        mapScene.disableMapInput();
+        disableMapInput(mapScene);
 
         EditSquadModal({
           scene: mapScene,
@@ -30,7 +27,7 @@ export default (
           units: mapScene.state.units,
           addUnitEnabled: false,
           onSquadUpdated: (updatedSquad) => {
-            mapScene.signal("changed unit position on board, updating", [
+            signal(mapScene, "changed unit position on board, updating", [
               {
                 type: "UPDATE_STATE",
                 target: {
@@ -44,7 +41,7 @@ export default (
             ]);
           },
           onClose: () => {
-            mapScene.enableInput();
+            enableInput(mapScene);
             mapScene.changeMode({
               type: "SQUAD_SELECTED",
               id: mapSquad.squad.id,

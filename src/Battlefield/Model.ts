@@ -1,6 +1,8 @@
 import { Map, Set } from "immutable";
+import { Image } from "../Models";
 import { SquadRecord } from "../Squad/Model";
 import { UnitIndex } from "../Unit/Model";
+import { MapScene } from "./MapScene";
 export type UnitId = string;
 export type ForceId = string;
 export type CityId = string;
@@ -22,6 +24,13 @@ export type CellNumber =
   | 13
   | 14
   | 15;
+
+export type MapTile = {
+  x: number;
+  y: number;
+  type: number;
+  tile: Image;
+};
 
 export type AICommand = "DEFEND" | "ATTACK";
 export type MapState = {
@@ -223,6 +232,10 @@ export type BattleFieldMap = {
   [x: string]: MapState;
 };
 
+export function getMapSquad(state: MapState, squadId: string) {
+  return state.squads.get(squadId);
+}
+
 export function getCity(state: MapState, id: string): City {
   return state.cities.find((c) => c.id === id);
 }
@@ -237,4 +250,8 @@ export function getForceSquads(state: MapState, force: string) {
 }
 export function getForce(state: MapState, id: string) {
   return state.forces.find((f) => f.id === id);
+}
+
+export function updateState(scene: MapScene, state: MapState) {
+  scene.state = { ...scene.state, ...state };
 }

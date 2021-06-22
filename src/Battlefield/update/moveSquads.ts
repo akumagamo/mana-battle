@@ -1,9 +1,11 @@
 import { getDistance } from "../../utils";
 import { cellToScreenPosition } from "../board/position";
+import startCombat from "../squads/startCombat";
 import { cellSize, MOVE_SPEED } from "../config";
 import { MapScene } from "../MapScene";
 import finishMovement from "./finishMovement";
 import stepChara from "./stepChara";
+import { getMapSquad } from "../Model";
 
 export default function (scene: MapScene) {
   const movedSquads = scene.squadsInMovement.keySeq();
@@ -39,8 +41,8 @@ export default function (scene: MapScene) {
     // how: have indexes per team
     scene.charas
       .filter((c) => {
-        const a = scene.getMapSquad(c.props.unit.squad).squad.force;
-        const b = scene.getMapSquad(sqd).squad.force;
+        const a = getMapSquad(scene.state, c.props.unit.squad).squad.force;
+        const b = getMapSquad(scene.state, sqd).squad.force;
 
         return a !== b;
       })
@@ -49,9 +51,10 @@ export default function (scene: MapScene) {
 
         if (distance < cellSize * 0.8) {
           scene.isPaused = true;
-          scene.startCombat(
-            scene.getMapSquad(sqd),
-            scene.getMapSquad(c.props.unit.squad),
+          startCombat(
+            scene,
+            getMapSquad(scene.state, sqd),
+            getMapSquad(scene.state, c.props.unit.squad),
             direction
           );
         }

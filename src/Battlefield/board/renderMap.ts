@@ -1,10 +1,10 @@
-import { tileMap, translateTiles } from '../Model';
-import { MapScene } from '../MapScene';
-import { cellToScreenPosition } from './position';
-import { cellSize } from '../config';
+import { tileMap, translateTiles } from "../Model";
+import { MapScene } from "../MapScene";
+import { cellToScreenPosition } from "./position";
+import { cellSize } from "../config";
 
 export default (scene: MapScene) => {
-  const { container } = scene.getContainers();
+  const { mapContainer } = scene;
   translateTiles(scene.state.cells).forEach((arr, col) =>
     arr.forEach((n, row) => {
       const { x, y } = cellToScreenPosition({ x: row, y: col });
@@ -13,7 +13,7 @@ export default (scene: MapScene) => {
 
       tile.setInteractive();
 
-      container.add(tile);
+      mapContainer.add(tile);
 
       scene.input.setDraggable(tile);
 

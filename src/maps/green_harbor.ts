@@ -1,5 +1,5 @@
 import { List, Map, Set } from 'immutable';
-import { CellNumber, City, MapState } from '../Map/Model';
+import { CellNumber, City, MapState } from '../Battlefield/Model';
 import { makeUnit } from '../Unit/makeUnit';
 import { toMapSquad } from '../Unit/Model';
 import { CPU_FORCE, PLAYER_FORCE } from '../constants';

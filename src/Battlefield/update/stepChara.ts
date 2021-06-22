@@ -1,7 +1,7 @@
 import { Chara } from "../../Chara/Model";
 import { MOVE_SPEED, CHARA_MAP_SCALE } from "../config";
 import { MapScene } from "../MapScene";
-import { MapSquad } from "../Model";
+import { MapSquad, updateState } from "../Model";
 
 export default function (
   scene: MapScene,
@@ -27,7 +27,7 @@ export default function (
   }
   chara.container.setPosition(squad.pos.x, squad.pos.y);
   // TODO: update squad + add single source of "squad truth"
-  scene.updateState({
+  updateState(scene, {
     ...scene.state,
     squads: scene.state.squads.setIn([squad.id, "pos"], squad.pos),
   });

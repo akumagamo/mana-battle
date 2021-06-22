@@ -4,7 +4,7 @@ import { ListSquadsScene } from "./Squad/ListSquadsScene/ListSquadsScene";
 import CombatScene from "./Combat/CombatScene";
 import { endToEndTesting } from "./endToEndTesting";
 import TitleScene from "./Scenes/Title/TitleScene";
-import { MapScene } from "./Map/MapScene";
+import { MapScene } from "./Battlefield/MapScene";
 import CharaCreationScene from "./CharaCreation/CharaCreationScene";
 
 (() => {

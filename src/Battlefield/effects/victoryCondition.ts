@@ -2,9 +2,10 @@ import { CPU_FORCE, SCREEN_HEIGHT, SCREEN_WIDTH } from "../../constants";
 import { MapScene } from "../MapScene";
 import { delay, tween } from "../../Scenes/utils";
 import moveCameraTo from "../rendering/moveCameraTo";
+import label from "../rendering/label";
 
 export default async (scene: MapScene) => {
-  const title = scene.label(SCREEN_WIDTH / 2, 60, "Victory Condition");
+  const title = label(scene, SCREEN_WIDTH / 2, 60, "Victory Condition");
   title.setAlpha(0);
 
   const castle = scene.state.cities.find(
@@ -21,7 +22,8 @@ export default async (scene: MapScene) => {
   });
   await delay_(500);
   moveCameraTo(scene, castle, 1000);
-  const conquer = scene.label(
+  const conquer = label(
+    scene,
     SCREEN_WIDTH / 2,
     160,
     "Conquer enemy headquarters"
@@ -36,7 +38,7 @@ export default async (scene: MapScene) => {
   const pic = scene.add.sprite(SCREEN_WIDTH / 2, 350, "merano");
   pic.setOrigin(0.5);
   pic.setDisplaySize(250, 250);
-  const name = scene.label(SCREEN_WIDTH / 2, 520, "Merano Castle");
+  const name = label(scene, SCREEN_WIDTH / 2, 520, "Merano Castle");
 
   pic.setAlpha(0);
   name.setAlpha(0);
@@ -57,7 +59,8 @@ export default async (scene: MapScene) => {
 
   scene.missionContainer.destroy();
   scene.missionContainer = scene.add.container();
-  const start = scene.label(
+  const start = label(
+    scene,
     SCREEN_WIDTH / 2,
     SCREEN_HEIGHT / 2,
     "Mission Start"
@@ -75,3 +78,12 @@ export default async (scene: MapScene) => {
     duration: 1000,
   });
 };
+
+export function showCityInfo(scene: MapScene, id: string) {
+  scene.state.cities.find((c) => c.id === id);
+
+  const pic = scene.add.sprite(SCREEN_WIDTH / 2, 350, "merano");
+  pic.setOrigin(0.5);
+  pic.setDisplaySize(250, 250);
+  label(scene, SCREEN_WIDTH / 2, 520, "Merano Castle");
+}

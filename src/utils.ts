@@ -1,5 +1,5 @@
 import { Map } from "immutable";
-import { Vector } from "./Map/Model";
+import { Vector } from "./Battlefield/Model";
 
 export const indexById = (xs: Map<string, { id: string }>, x: { id: string }) =>
   xs.set(x.id, x);

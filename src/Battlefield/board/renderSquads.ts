@@ -1,13 +1,12 @@
-import { MapSquad } from '../Model';
-import { Chara } from '../../Chara/Model';
-import { INVALID_STATE } from '../../errors';
-import { MapScene } from '../MapScene';
-import { PLAYER_FORCE } from '../../constants';
-import { CHARA_MAP_SCALE } from '../config';
-import createChara from '../../Chara/createChara';
+import { getMapSquad, MapSquad } from "../Model";
+import { INVALID_STATE } from "../../errors";
+import { MapScene } from "../MapScene";
+import { PLAYER_FORCE } from "../../constants";
+import { CHARA_MAP_SCALE } from "../config";
+import createChara from "../../Chara/createChara";
 
 export const renderSquad = (scene: MapScene, mapSquad: MapSquad): void => {
-  const { container } = scene.getContainers();
+  const { mapContainer } = scene;
   const squadLeader = mapSquad.squad.members.find(
     (mem) => mem.id === mapSquad.squad.leader
   );
@@ -31,23 +30,23 @@ export const renderSquad = (scene: MapScene, mapSquad: MapSquad): void => {
   const emblem = scene.add.image(
     100,
     -20,
-    mapSquad.squad.force === PLAYER_FORCE ? 'ally_emblem' : 'enemy_emblem'
+    mapSquad.squad.force === PLAYER_FORCE ? "ally_emblem" : "enemy_emblem"
   );
 
   chara.container.add(emblem);
 
-  container.add(chara.container);
+  mapContainer.add(chara.container);
 
   scene.charas.push(chara);
 };
 
 export default (scene: MapScene): void => {
   scene.state.dispatchedSquads.forEach((id) =>
-    renderSquad(scene, scene.getMapSquad(id))
+    renderSquad(scene, getMapSquad(scene.state, id))
   );
 
   scene.squadsInMovement.forEach(async ({ path }, id) => {
-    const squad = scene.getMapSquad(id);
+    const squad = getMapSquad(scene.state, id);
 
     // Update reference
     // We need a ref for quick updates in the main loop

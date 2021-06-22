@@ -1,7 +1,7 @@
 import {List, Map, Set} from "immutable";
 import {PLAYER_FORCE} from "../constants";
-import {MapCommands} from "../Map/MapCommands";
-import {startMapScene} from "../Map/MapScene";
+import {MapCommands} from "../Battlefield/MapCommands";
+import {startMapScene} from "../Battlefield/MapScene";
 import maps from "../maps";
 import {createSquad, makeMember, squadBuilder} from "../Squad/Model";
 import {makeUnit} from "../Unit/makeUnit";

@@ -8,7 +8,6 @@ import { Container } from "../Models";
 import fireball from "../Chara/animations/spells/fireball";
 import castSpell from "../Chara/animations/castSpell";
 import * as Squad from "../Squad/Model";
-import { Vector } from "../Map/Model";
 import { List, Map } from "immutable";
 import announcement from "../UI/announcement";
 import { fadeIn, fadeOut } from "../UI/Transition";
@@ -28,6 +27,7 @@ import createChara from "../Chara/createChara";
 import { Board } from "../Board/Model";
 import createStaticBoard from "../Board/createBoard";
 import { displayDamage } from "../Chara/animations/displayDamage";
+import { Vector } from "../Battlefield/Model";
 
 const COMBAT_CHARA_SCALE = 1;
 const WALK_DURATION = 500;
@@ -207,10 +207,6 @@ export default class CombatScene extends Phaser.Scene {
 
     this.miniSquads.top.unitList.forEach(push);
     this.miniSquads.bottom.unitList.forEach(push);
-  }
-
-  private miniSquadId(id: string): string {
-    return `minisquad_${id}`;
   }
 
   turnOff() {

@@ -1,11 +1,11 @@
 import CharaCreationScene from "./CharaCreation/CharaCreationScene";
-import { MapScene } from "./Map/MapScene";
+import { MapScene } from "./Battlefield/MapScene";
 import TitleScene from "./Scenes/Title/TitleScene";
 import { initialState } from "./Scenes/Title/Model";
 import * as newgamebtn from "./Scenes/Title/events/newGameButtonClicked";
 import ConfirmButtonClicked from "./CharaCreation/events/ConfirmButtonClicked";
 import { CharaCreationState } from "./CharaCreation/Model";
-import mapEvents from "./Map/events";
+import mapEvents from "./Battlefield/events";
 
 const assert = <A>(condition: string, a: A, b: A) => {
   if (a !== b)
@@ -105,6 +105,7 @@ async function startGame(scn: Phaser.Scene) {
 
 function clickCell(scn: MapScene, x: number, y: number) {
   mapEvents.CellClicked(scn).emit({
+    scene: scn,
     tile: { x, y },
     pointer: { x: 200, y: 400 },
   });

@@ -1,13 +1,14 @@
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
-import { delay } from "../Scenes/utils";
 import button from "../UI/button";
 import panel from "../UI/panel";
 import text from "../UI/text";
+import { enableInput } from "./board/input";
 import DispatchWindowRendered from "./events/DispatchWindowRendered";
 import SquadClicked from "./events/SquadClicked";
 import SquadDispatched from "./events/SquadDispatched";
 import { MapScene } from "./MapScene";
-import { MapSquad } from "./Model";
+import { getMapSquad, MapSquad } from "./Model";
+import signal from "./signal";
 
 export default (scene: MapScene) => {
   let container = scene.add.container();
@@ -39,7 +40,7 @@ export default (scene: MapScene) => {
   close.setInteractive();
   close.on("pointerup", () => {
     container.destroy();
-    scene.enableInput();
+    enableInput(scene);
   });
 
   // TODO: avoid listing defeated squads
@@ -76,13 +77,13 @@ export const handleDispatchSquad = async (
   container.destroy();
 
   scene.dispatchSquad(mapSquad.squad, scene.state.timeOfDay);
-  scene.enableInput();
+  enableInput(scene);
   scene.isPaused = false;
   scene.changeMode({ type: "SQUAD_SELECTED", id: mapSquad.squad.id });
 
-  let squad = scene.getMapSquad(mapSquad.squad.id);
+  let squad = getMapSquad(scene.state, mapSquad.squad.id);
   SquadClicked(scene).emit(squad);
-  scene.signal("clicked dispatch squad button", [
+  signal(scene, "clicked dispatch squad button", [
     {
       type: "MOVE_CAMERA_TO",
       x: squad.pos.x,

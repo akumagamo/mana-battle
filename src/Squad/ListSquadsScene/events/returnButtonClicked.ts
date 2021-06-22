@@ -1,9 +1,9 @@
 import { PLAYER_FORCE } from "../../../constants";
-import { MapScene } from "../../../Map/MapScene";
-import { getCity, getForceSquads } from "../../../Map/Model";
+import { MapScene } from "../../../Battlefield/MapScene";
+import { getCity, getForceSquads } from "../../../Battlefield/Model";
 import { toMapSquad } from "../../../Unit/Model";
 import { ListSquadsScene } from "../../ListSquadsScene/ListSquadsScene";
-import {SquadRecord} from "../../Model";
+import { SquadRecord } from "../../Model";
 
 const returnButtonClicked = (mapScene: MapScene) => (
   listSquadScene: ListSquadsScene
@@ -24,8 +24,7 @@ const returnButtonClicked = (mapScene: MapScene) => (
   mapScene.scene.manager.start("MapScene", []);
 };
 
-
-function addNewSquad(mapScene: MapScene, squad:SquadRecord) {
+function addNewSquad(mapScene: MapScene, squad: SquadRecord) {
   const force = mapScene.state.forces.find((force) => force.id === squad.force);
 
   // TODO: create 'addSquadToMapScene' method
@@ -35,7 +34,7 @@ function addNewSquad(mapScene: MapScene, squad:SquadRecord) {
   mapScene.state.squads = mapScene.state.squads.set(squad.id, mapSquad);
 }
 
-function updateExistingSquad(mapScene: MapScene, squad:SquadRecord) {
+function updateExistingSquad(mapScene: MapScene, squad: SquadRecord) {
   mapScene.state.squads = mapScene.state.squads.update(squad.id, (sqd) => ({
     ...sqd,
     squad: squad,

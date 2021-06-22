@@ -3,8 +3,11 @@ import { Container } from "../../Models";
 import button from "../../UI/button";
 import panel from "../../UI/panel";
 import text from "../../UI/text";
+import { disableMapInput } from "../board/input";
+import dispatchWindow from "../dispatchWindow";
 import OrganizeButtonClicked from "../events/OrganizeButtonClicked";
 import { MapScene } from "../MapScene";
+import turnOff from "../turnOff";
 import city from "./city";
 import { squadInfo } from "./squadInfo";
 
@@ -22,12 +25,14 @@ export default (scene: MapScene, uiContainer: Container): Promise<void> => {
     button(50, 40, "Organize", uiContainer, scene, () =>
       OrganizeButtonClicked(scene).emit(scene)
     );
-    button(250, 40, "Dispatch", uiContainer, scene, () =>
-      scene.handleDispatchClick()
-    );
+    button(250, 40, "Dispatch", uiContainer, scene, () => {
+      disableMapInput(scene);
+      scene.isPaused = true;
+      dispatchWindow(scene);
+    });
 
     button(1100, 50, "Return to Title", uiContainer, scene, () => {
-      scene.turnOff();
+      turnOff(scene);
       scene.scene.start("TitleScene");
     });
   }
