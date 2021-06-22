@@ -26,10 +26,10 @@ export default (scene: MapScene) => {
         type: n,
         tile: tile,
       };
-      scene.tiles.push(mapTile);
+      scene.state.tiles.push(mapTile);
 
-      if (!scene.tileIndex[col]) scene.tileIndex[col] = [];
-      scene.tileIndex[col][row] = mapTile;
+      if (!scene.state.tileIndex[col]) scene.state.tileIndex[col] = [];
+      scene.state.tileIndex[col][row] = mapTile;
     })
   );
 };

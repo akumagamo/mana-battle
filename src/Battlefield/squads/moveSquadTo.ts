@@ -1,9 +1,9 @@
-import { Vector } from "matter";
-import { getPathTo } from "../api";
-import { screenToCellPosition } from "../board/position";
-import { MapScene } from "../MapScene";
-import {changeMode} from "../Mode";
-import { getMapSquad } from "../Model";
+import { Vector } from 'matter';
+import { getPathTo } from '../api';
+import { screenToCellPosition } from '../board/position';
+import { MapScene } from '../MapScene';
+import { changeMode } from '../Mode';
+import { getMapSquad } from '../Model';
 
 export default async function (scene: MapScene, id: string, target: Vector) {
   const squad = getMapSquad(scene.state, id);
@@ -16,12 +16,12 @@ export default async function (scene: MapScene, id: string, target: Vector) {
     y,
   }));
 
-  scene.squadsInMovement = scene.squadsInMovement.set(id, {
+  scene.state.squadsInMovement = scene.state.squadsInMovement.set(id, {
     path,
     squad,
   });
 
-  changeMode(scene, { type: "SQUAD_SELECTED", id });
+  changeMode(scene, { type: 'SQUAD_SELECTED', id });
 }
 
 function makeWalkableGrid(scene: MapScene): number[][] {

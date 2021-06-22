@@ -1,6 +1,6 @@
-import { Vector } from "matter";
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../../constants";
-import { MapScene } from "../MapScene";
+import { Vector } from 'matter';
+import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../../constants';
+import { MapScene } from '../MapScene';
 
 export default function moveCameraTo(
   scene: MapScene,
@@ -12,13 +12,13 @@ export default function moveCameraTo(
   y = y * -1 + SCREEN_HEIGHT / 2;
 
   const tx = () => {
-    if (x < scene.bounds.x.min) return scene.bounds.x.min;
-    else if (x > scene.bounds.x.max) return scene.bounds.x.max;
+    if (x < scene.state.bounds.x.min) return scene.state.bounds.x.min;
+    else if (x > scene.state.bounds.x.max) return scene.state.bounds.x.max;
     else return x;
   };
   const ty = () => {
-    if (y < scene.bounds.y.min) return scene.bounds.y.min;
-    else if (y > scene.bounds.y.max) return scene.bounds.y.max;
+    if (y < scene.state.bounds.y.min) return scene.state.bounds.y.min;
+    else if (y > scene.state.bounds.y.max) return scene.state.bounds.y.max;
     else return y;
   };
 
@@ -28,7 +28,7 @@ export default function moveCameraTo(
       x: tx(),
       y: ty(),
       duration: duration,
-      ease: "cubic.out",
+      ease: 'cubic.out',
       onComplete: () => {
         resolve();
       },
@@ -39,7 +39,7 @@ export default function moveCameraTo(
       mapX: tx(),
       mapY: ty(),
       duration: duration,
-      ease: "cubic.out",
+      ease: 'cubic.out',
     });
   });
 }

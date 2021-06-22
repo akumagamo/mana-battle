@@ -1,10 +1,16 @@
 import { List, Map, Set } from 'immutable';
-import { CellNumber, City, MapState } from '../Battlefield/Model';
+import {
+  CellNumber,
+  City,
+  initialBattlefieldState,
+  MapState,
+} from '../Battlefield/Model';
 import { makeUnit } from '../Unit/makeUnit';
 import { toMapSquad } from '../Unit/Model';
 import { CPU_FORCE, PLAYER_FORCE } from '../constants';
 import { createSquad, makeMember } from '../Squad/Model';
 import { Container } from '../Models';
+import { DEFAULT_MODE } from '../Battlefield/Mode';
 
 const enemyCastle: City = {
   id: 'castle2',
@@ -29,18 +35,12 @@ const tiles: CellNumber[][] = [
 ];
 const map: () => MapState = () => {
   return {
+    ...initialBattlefieldState,
     id: 'greenHarbor',
     name: 'Green Harbor',
     author: 'Leonardo Farroco',
     description: 'The first map',
-    dispatchedSquads: Set(),
-    timeOfDay: 0,
-    tick: 0,
     cells: tiles,
-    charas: [],
-    mapContainer: {} as Container,
-    missionContainer: {} as Container,
-    uiContainer: {} as Container,
     squads: List([
       toMapSquad(
         createSquad({

@@ -1,11 +1,11 @@
-import { Vector } from "matter";
-import { GAME_SPEED } from "../../env";
-import { tween } from "../../Scenes/utils";
-import { createEvent } from "../../utils";
-import { MapScene } from "../MapScene";
-import signal from "../signal";
+import { Vector } from 'matter';
+import { GAME_SPEED } from '../../env';
+import { tween } from '../../Scenes/utils';
+import { createEvent } from '../../utils';
+import { MapScene } from '../MapScene';
+import signal from '../signal';
 
-export const key = "CellClicked";
+export const key = 'CellClicked';
 
 export async function handleCellClick({
   scene,
@@ -16,8 +16,8 @@ export async function handleCellClick({
   tile: Vector;
   pointer: Vector;
 }) {
-  if (!scene.cellClickDisabled)
-    signal(scene, "regular click cell", [{ type: "CLICK_CELL", cell: tile }]);
+  if (!scene.state.cellClickDisabled)
+    signal(scene, 'regular click cell', [{ type: 'CLICK_CELL', cell: tile }]);
 
   var ping = scene.add.circle(pointer.x, pointer.y, 20, 0xffff66);
 

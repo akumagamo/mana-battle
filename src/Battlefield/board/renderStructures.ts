@@ -1,5 +1,5 @@
-import { MapScene } from "../MapScene";
-import { cellToScreenPosition } from "./position";
+import { MapScene } from '../MapScene';
+import { cellToScreenPosition } from './position';
 
 const CITY_SCALE = 0.5;
 
@@ -11,7 +11,7 @@ export default (scene: MapScene) => {
 
     city_.setScale(CITY_SCALE);
 
-    if (city.force === "PLAYER_FORCE") {
+    if (city.force === 'PLAYER_FORCE') {
       //city_.setTint(ALLIED_CITY_TINT);
     } else {
       //city_.setTint(ENEMY_CITY_TINT);
@@ -22,6 +22,6 @@ export default (scene: MapScene) => {
     // });
     scene.state.mapContainer.add(city_);
     city_.name = city.id;
-    scene.citySprites.push(city_);
+    scene.state.citySprites.push(city_);
   });
 };

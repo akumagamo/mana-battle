@@ -1,5 +1,5 @@
-import { MapScene } from "../MapScene";
+import { MapScene } from '../MapScene';
 
 export default function (scene: MapScene, id: string) {
-  scene.squadsToRemove = scene.squadsToRemove.add(id);
+  scene.state.squadsToRemove = scene.state.squadsToRemove.add(id);
 }

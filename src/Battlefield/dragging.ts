@@ -8,7 +8,7 @@ import { MapScene } from './MapScene';
 export function setWorldBounds(scene: MapScene) {
   const rows = scene.state.cells[0].length;
   const cols = scene.state.cells.length;
-  scene.bounds = {
+  scene.state.bounds = {
     x: { min: -1 * (rows * cellSize - SCREEN_WIDTH), max: 0 },
     y: { min: -1 * (cols * cellSize - SCREEN_HEIGHT), max: 0 },
   };
@@ -27,24 +27,29 @@ export function makeWorldDraggable(scene: MapScene) {
   scene.input.on(
     'drag',
     (_: Pointer, gameObject: Image, dragX: number, dragY: number) => {
-      if (scene.dragDisabled) return;
+      if (scene.state.dragDisabled) return;
 
-      if (!scene.isDragging) scene.isDragging = true;
+      if (!scene.state.isDragging) scene.state.isDragging = true;
 
       const dx = gameObject.x - dragX;
       const dy = gameObject.y - dragY;
 
-      const mx = scene.mapX - dx;
-      const my = scene.mapY - dy;
+      const mx = scene.state.mapX - dx;
+      const my = scene.state.mapY - dy;
 
-      const { x, y } = scene.bounds;
+      const { x, y } = scene.state.bounds;
 
       if (mx < x.max && mx > x.min && my < y.max && my > y.min)
-        scene.state.mapContainer.setPosition(scene.mapX - dx, scene.mapY - dy);
+        scene.state.mapContainer.setPosition(
+          scene.state.mapX - dx,
+          scene.state.mapY - dy
+        );
       else {
         // Movement bound to one or two corners
-        const gx = mx > x.max ? x.max : mx < x.min ? x.min : scene.mapX - dx;
-        const gy = my > y.max ? y.max : my < y.min ? y.min : scene.mapY - dy;
+        const gx =
+          mx > x.max ? x.max : mx < x.min ? x.min : scene.state.mapX - dx;
+        const gy =
+          my > y.max ? y.max : my < y.min ? y.min : scene.state.mapY - dy;
 
         scene.state.mapContainer.setPosition(gx, gy);
       }
@@ -59,13 +64,13 @@ export function makeWorldDraggable(scene: MapScene) {
     const minTimeDelta = 300;
     const minPosDelta = 30;
 
-    scene.mapX = scene.state.mapContainer.x;
-    scene.mapY = scene.state.mapContainer.y;
+    scene.state.mapX = scene.state.mapContainer.x;
+    scene.state.mapY = scene.state.mapContainer.y;
     // Avoid firing "click_cell" event on dragend
 
     // todo: there's a "distance" property in the Phaser event
     if (
-      scene.isDragging &&
+      scene.state.isDragging &&
       timeDelta > minTimeDelta &&
       posDelta > minPosDelta
     ) {
@@ -73,6 +78,6 @@ export function makeWorldDraggable(scene: MapScene) {
       await delay(scene, 20);
       enableCellClick(scene);
     }
-    scene.isDragging = false;
+    scene.state.isDragging = false;
   });
 }

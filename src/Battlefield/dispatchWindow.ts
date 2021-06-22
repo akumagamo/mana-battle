@@ -1,16 +1,16 @@
-import { PLAYER_FORCE, SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
-import { SquadRecord } from "../Squad/Model";
-import button from "../UI/button";
-import panel from "../UI/panel";
-import text from "../UI/text";
-import { toMapSquad } from "../Unit/Model";
-import { enableInput } from "./board/input";
-import { renderSquad } from "./board/renderSquads";
-import DispatchWindowRendered from "./events/DispatchWindowRendered";
-import SquadClicked from "./events/SquadClicked";
-import SquadDispatched from "./events/SquadDispatched";
-import { MapScene } from "./MapScene";
-import { changeMode } from "./Mode";
+import { PLAYER_FORCE, SCREEN_HEIGHT, SCREEN_WIDTH } from '../constants';
+import { SquadRecord } from '../Squad/Model';
+import button from '../UI/button';
+import panel from '../UI/panel';
+import text from '../UI/text';
+import { toMapSquad } from '../Unit/Model';
+import { enableInput } from './board/input';
+import { renderSquad } from './board/renderSquads';
+import DispatchWindowRendered from './events/DispatchWindowRendered';
+import SquadClicked from './events/SquadClicked';
+import SquadDispatched from './events/SquadDispatched';
+import { MapScene } from './MapScene';
+import { changeMode } from './Mode';
 import {
   getCity,
   getForce,
@@ -18,8 +18,8 @@ import {
   getMapSquad,
   getSquadLeader,
   MapSquad,
-} from "./Model";
-import signal from "./signal";
+} from './Model';
+import signal from './signal';
 
 export default (scene: MapScene) => {
   let container = scene.add.container();
@@ -37,26 +37,26 @@ export default (scene: MapScene) => {
   const title = text(
     SCREEN_WIDTH / 2,
     y + 20,
-    "Select squad to dispatch",
+    'Select squad to dispatch',
     container,
     scene
   );
   title.setOrigin(0.5);
   title.setFontSize(24);
 
-  const close = scene.add.image(x + width, y, "close_btn");
+  const close = scene.add.image(x + width, y, 'close_btn');
   container.add(close);
   close.setOrigin(0.5);
   close.setScale(0.7);
   close.setInteractive();
-  close.on("pointerup", () => {
+  close.on('pointerup', () => {
     container.destroy();
     enableInput(scene);
   });
 
   let squadsToRender = getForceSquads(scene.state, PLAYER_FORCE).filter(
     (mapSquad) =>
-      mapSquad.status !== "defeated" &&
+      mapSquad.status !== 'defeated' &&
       !scene.state.dispatchedSquads.has(mapSquad.squad.id)
   );
 
@@ -90,14 +90,14 @@ export const handleDispatchSquad = async (
 
   dispatchSquad(scene, mapSquad.squad, scene.state.timeOfDay);
   enableInput(scene);
-  scene.isPaused = false;
-  changeMode(scene, { type: "SQUAD_SELECTED", id: mapSquad.squad.id });
+  scene.state.isPaused = false;
+  changeMode(scene, { type: 'SQUAD_SELECTED', id: mapSquad.squad.id });
 
   let squad = getMapSquad(scene.state, mapSquad.squad.id);
   SquadClicked(scene).emit(squad);
-  signal(scene, "clicked dispatch squad button", [
+  signal(scene, 'clicked dispatch squad button', [
     {
-      type: "MOVE_CAMERA_TO",
+      type: 'MOVE_CAMERA_TO',
       x: squad.pos.x,
       y: squad.pos.y,
       duration: 500,

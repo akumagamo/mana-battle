@@ -1,9 +1,11 @@
-import { Map, Set } from "immutable";
-import { Chara } from "../Chara/Model";
-import { Container, Image } from "../Models";
-import { SquadRecord } from "../Squad/Model";
-import { UnitIndex } from "../Unit/Model";
-import { MapScene } from "./MapScene";
+import { Map, Set } from 'immutable';
+import { Chara } from '../Chara/Model';
+import { Container, Image } from '../Models';
+import { SquadRecord } from '../Squad/Model';
+import { UnitIndex } from '../Unit/Model';
+import { VectorRec } from './makeVector';
+import { MapScene } from './MapScene';
+import { DEFAULT_MODE, Mode } from './Mode';
 export type UnitId = string;
 export type ForceId = string;
 export type CityId = string;
@@ -33,7 +35,7 @@ export type MapTile = {
   tile: Image;
 };
 
-export type AICommand = "DEFEND" | "ATTACK";
+export type AICommand = 'DEFEND' | 'ATTACK';
 export type MapState = {
   id: string;
   name: string;
@@ -53,12 +55,39 @@ export type MapState = {
   ai: Map<string, AICommand>;
   /** Contains the ids from all dispatched squads (from all forces). Should this move to the force? */
   dispatchedSquads: Set<string>;
+  isPaused: boolean;
+  squadsInMovement: Map<string, { path: Vector[]; squad: MapSquad }>;
+  tiles: MapTile[];
+  moveableCells: Set<VectorRec>;
+  walkableGrid: number[][];
+  tileIndex: MapTile[][];
+  citySprites: Image[];
+  mode: Mode;
+  dragState: null | Vector;
+  mapX: number;
+  mapY: number;
+  isDragging: boolean;
+  bounds: {
+    x: { min: number; max: number };
+    y: { min: number; max: number };
+  };
+
+  hasShownVictoryCondition: boolean;
+  dragDisabled: boolean;
+  cellClickDisabled: boolean;
+
+  squadsToRemove: Set<string>;
+  squadToPush: {
+    winner: string;
+    loser: string;
+    direction: string;
+  } | null;
 };
 export type Force = {
   id: ForceId;
   name: string;
   squads: string[];
-  relations: { [id: string]: "hostile" | "neutral" | "ally" };
+  relations: { [id: string]: 'hostile' | 'neutral' | 'ally' };
   initialPosition: string;
 };
 
@@ -77,16 +106,16 @@ export type City = {
   x: number;
   y: number;
   force: ForceId | null;
-  type: "town" | "castle" | "shop";
+  type: 'town' | 'castle' | 'shop';
 };
 export function createCity(id: string, x: number, y: number): City {
   return {
     id,
-    name: "",
+    name: '',
     x,
     y,
     force: null,
-    type: "town",
+    type: 'town',
   };
 }
 
@@ -98,12 +127,12 @@ export type MapSquad = {
   squad: SquadRecord;
   pos: Vector;
   status:
-    | "standing"
-    | "moving"
-    | "defeated"
-    | "retreated"
-    | "sleeping"
-    | "guarding_fort";
+    | 'standing'
+    | 'moving'
+    | 'defeated'
+    | 'retreated'
+    | 'sleeping'
+    | 'guarding_fort';
 };
 
 export function createMapSquad(squad: SquadRecord): MapSquad {
@@ -111,7 +140,7 @@ export function createMapSquad(squad: SquadRecord): MapSquad {
     id: squad.id,
     squad,
     pos: { x: 1, y: 1 },
-    status: "standing",
+    status: 'standing',
   };
 }
 
@@ -126,25 +155,25 @@ export type TurnManager = {
 export type Step = { target: Vector; steps: Vector[] };
 
 export const tileMap: { [x in CellNumber]: string } = {
-  0: "grass",
-  1: "woods",
-  2: "mountain",
-  3: "water",
+  0: 'grass',
+  1: 'woods',
+  2: 'mountain',
+  3: 'water',
 
-  4: "beach-r",
-  5: "beach-l",
-  6: "beach-t",
-  7: "beach-b",
+  4: 'beach-r',
+  5: 'beach-l',
+  6: 'beach-t',
+  7: 'beach-b',
 
-  8: "beach-tr",
-  9: "beach-tl",
-  10: "beach-br",
-  11: "beach-bl",
+  8: 'beach-tr',
+  9: 'beach-tl',
+  10: 'beach-br',
+  11: 'beach-bl',
 
-  12: "beach-b-and-r",
-  13: "beach-t-and-r",
-  14: "beach-b-and-l",
-  15: "beach-t-and-l", //br
+  12: 'beach-b-and-r',
+  13: 'beach-t-and-r',
+  14: 'beach-b-and-l',
+  15: 'beach-t-and-l', //br
 };
 
 export const translateTiles = (tiles: CellNumber[][]) => {
@@ -269,3 +298,45 @@ export function getChara(state: MapState, squadId: string) {
 export function updateState(scene: MapScene, state: MapState) {
   scene.state = { ...scene.state, ...state };
 }
+
+export const initialBattlefieldState = {
+  id: '',
+  name: '',
+  author: '',
+  description: '',
+  cells: [[]],
+  charas: [],
+  forces: [],
+  cities: [],
+  mapContainer: {} as Container,
+  missionContainer: {} as Container,
+  uiContainer: {} as Container,
+  squads: Map(),
+  units: Map(),
+  timeOfDay: 0,
+  tick: 0,
+  ai: Map(),
+  /** Contains the ids from all dispatched squads (from all forces). Should this move to the force? */
+  dispatchedSquads: Set(),
+  isPaused: false,
+  squadsInMovement: Map(),
+  tiles: [],
+  moveableCells: Set(),
+  walkableGrid: [[]],
+  tileIndex: [[]],
+  citySprites: [],
+  mode: DEFAULT_MODE,
+  dragState: null,
+  mapX: 0,
+  mapY: 0,
+  isDragging : false,
+  bounds: {
+    x: { min: 0, max: 0 },
+    y: { min: 0, max: 0 },
+  },
+  hasShownVictoryCondition: false,
+  dragDisabled: false,
+  cellClickDisabled: false,
+  squadsToRemove: Set(),
+  squadToPush: null,
+} as MapState;

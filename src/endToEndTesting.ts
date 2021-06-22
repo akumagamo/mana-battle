@@ -1,18 +1,18 @@
-import CharaCreationScene from "./CharaCreation/CharaCreationScene";
-import { MapScene } from "./Battlefield/MapScene";
-import TitleScene from "./Scenes/Title/TitleScene";
-import { initialState } from "./Scenes/Title/Model";
-import * as newgamebtn from "./Scenes/Title/events/newGameButtonClicked";
-import ConfirmButtonClicked from "./CharaCreation/events/ConfirmButtonClicked";
-import { CharaCreationState } from "./CharaCreation/Model";
-import mapEvents from "./Battlefield/events";
+import CharaCreationScene from './CharaCreation/CharaCreationScene';
+import { MapScene } from './Battlefield/MapScene';
+import TitleScene from './Scenes/Title/TitleScene';
+import { initialState } from './Scenes/Title/Model';
+import * as newgamebtn from './Scenes/Title/events/newGameButtonClicked';
+import ConfirmButtonClicked from './CharaCreation/events/ConfirmButtonClicked';
+import { CharaCreationState } from './CharaCreation/Model';
+import mapEvents from './Battlefield/events';
 
 const assert = <A>(condition: string, a: A, b: A) => {
   if (a !== b)
     throw new Error(
       `❌ ${condition} - ${a.toString()} should equals ${b.toString()}`
     );
-  else console.log("✅", condition);
+  else console.log('✅', condition);
 };
 
 const event = (eventEmitter: Phaser.Events.EventEmitter) => (event: string) =>
@@ -49,14 +49,14 @@ export async function endToEndTesting(game: Phaser.Game) {
   //   mapScene: mapScene,
   //   mapSquad: squad,
   // });
-  // assert("MapScene is paused after clicking 'Move'", mapScene.isPaused, true);
+  // assert("MapScene is paused after clicking 'Move'", mapscene.state.isPaused, true);
 
   // clickCell(mapScene, 7, 5);
 
   // mapScene.evs.SquadDispatched.once((_id) => {
   //   assert(
   //     "MapScene is no longer paused selecting move destination",
-  //     mapScene.isPaused,
+  //     mapscene.state.isPaused,
   //     false
   //   );
   // });
@@ -74,14 +74,14 @@ export async function endToEndTesting(game: Phaser.Game) {
 }
 
 async function getCharaCreationScene(game: Phaser.Game) {
-  return (await event(game.events)("CharaCreationSceneCreated")) as {
+  return (await event(game.events)('CharaCreationSceneCreated')) as {
     scene: CharaCreationScene;
     state: CharaCreationState;
   };
 }
 
 async function getTitleScene(game: Phaser.Game) {
-  return (await event(game.events)("TitleSceneCreated")) as TitleScene;
+  return (await event(game.events)('TitleSceneCreated')) as TitleScene;
 }
 
 async function createCharacter({
@@ -91,8 +91,8 @@ async function createCharacter({
   scene: Phaser.Scene;
   state: CharaCreationState;
 }) {
-  (document.getElementById("new-chara-name") as HTMLInputElement).value =
-    "TestHero";
+  (document.getElementById('new-chara-name') as HTMLInputElement).value =
+    'TestHero';
 
   ConfirmButtonClicked(scene, state);
 }

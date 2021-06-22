@@ -9,7 +9,7 @@ import { changeMode } from '../Mode';
 
 export default (mapScene: MapScene, baseY: number, mapSquad: MapSquad) => {
   const baseX = 300;
-  const mode = mapScene.mode.type;
+  const mode = mapScene.state.mode.type;
 
   if (mode === 'SQUAD_SELECTED') {
     button(
@@ -74,5 +74,5 @@ export function handleMovePlayerSquadButtonClicked({
     id: mapSquad.id,
     start: mapSquad.pos,
   });
-  mapScene.isPaused = true;
+  mapScene.state.isPaused = true;
 }

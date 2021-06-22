@@ -19,7 +19,7 @@ import { refreshUI } from './ui';
 export default async (scene: MapScene, data: MapCommands[]) => {
   subscribe(scene);
 
-  scene.mode = DEFAULT_MODE;
+  scene.state.mode = DEFAULT_MODE;
 
   if (process.env.SOUND_ENABLED) {
     scene.sound.stopAll();
@@ -32,7 +32,10 @@ export default async (scene: MapScene, data: MapCommands[]) => {
 
   signal(scene, 'startup', data);
 
-  scene.state.mapContainer = scene.add.container(scene.mapX, scene.mapY);
+  scene.state.mapContainer = scene.add.container(
+    scene.state.mapX,
+    scene.state.mapY
+  );
   scene.state.uiContainer = scene.add.container();
   scene.state.missionContainer = scene.add.container();
 
@@ -47,8 +50,10 @@ export default async (scene: MapScene, data: MapCommands[]) => {
   makeWorldDraggable(scene);
   setWorldBounds(scene);
 
-  await Promise.all(scene.squadsToRemove.map((id) => destroySquad(scene, id)));
-  scene.squadsToRemove = Set();
+  await Promise.all(
+    scene.state.squadsToRemove.map((id) => destroySquad(scene, id))
+  );
+  scene.state.squadsToRemove = Set();
 
   // if (!scene.hasShownVictoryCondition) {
   //   victoryCondition(scene);
@@ -58,7 +63,7 @@ export default async (scene: MapScene, data: MapCommands[]) => {
   await pushSquad(scene);
 
   enableInput(scene);
-  scene.isPaused = false;
+  scene.state.isPaused = false;
 
   refreshUI(scene);
   scene.game.events.emit('MapSceneCreated', scene);

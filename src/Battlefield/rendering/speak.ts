@@ -6,7 +6,7 @@ import { MapScene } from '../MapScene';
 import { getSquadLeader, MapSquad } from '../Model';
 
 export default async function (scene: MapScene, squad: MapSquad) {
-  scene.isPaused = true;
+  scene.state.isPaused = true;
 
   const leader = getSquadLeader(scene.state, squad.id);
   const res = await speech(

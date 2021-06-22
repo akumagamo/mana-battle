@@ -1,18 +1,18 @@
-import { getDistance } from "../../utils";
-import { cellToScreenPosition } from "../board/position";
-import startCombat from "../squads/startCombat";
-import { cellSize, MOVE_SPEED } from "../config";
-import { MapScene } from "../MapScene";
-import finishMovement from "./finishMovement";
-import stepChara from "./stepChara";
-import { getChara, getMapSquad } from "../Model";
+import { getDistance } from '../../utils';
+import { cellToScreenPosition } from '../board/position';
+import startCombat from '../squads/startCombat';
+import { cellSize, MOVE_SPEED } from '../config';
+import { MapScene } from '../MapScene';
+import finishMovement from './finishMovement';
+import stepChara from './stepChara';
+import { getChara, getMapSquad } from '../Model';
 
 export default function (scene: MapScene) {
-  const movedSquads = scene.squadsInMovement.keySeq();
+  const movedSquads = scene.state.squadsInMovement.keySeq();
 
-  let direction = "";
+  let direction = '';
 
-  scene.squadsInMovement.forEach(async (value, squadId) => {
+  scene.state.squadsInMovement.forEach(async (value, squadId) => {
     const { path, squad } = value;
 
     const [head] = path;
@@ -50,7 +50,7 @@ export default function (scene: MapScene) {
         const distance = getDistance(c.container, current.container);
 
         if (distance < cellSize * 0.8) {
-          scene.isPaused = true;
+          scene.state.isPaused = true;
           startCombat(
             scene,
             getMapSquad(scene.state, sqd),

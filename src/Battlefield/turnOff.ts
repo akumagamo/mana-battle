@@ -7,13 +7,13 @@ export default function (scene: MapScene) {
   scene.state.uiContainer.destroy();
   scene.state.charas.forEach((chara) => chara.destroy());
   scene.state.charas = [];
-  scene.tiles.forEach((tile) => {
+  scene.state.tiles.forEach((tile) => {
     tile.tile.destroy();
   });
-  scene.tiles = [];
-  scene.tileIndex = [[]];
+  scene.state.tiles = [];
+  scene.state.tileIndex = [[]];
 
-  scene.mode = DEFAULT_MODE;
+  scene.state.mode = DEFAULT_MODE;
 
   scene.scene.manager.stop('MapScene');
 

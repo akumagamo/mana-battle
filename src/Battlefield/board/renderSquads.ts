@@ -45,12 +45,12 @@ export default (scene: MapScene): void => {
     renderSquad(scene, getMapSquad(scene.state, id))
   );
 
-  scene.squadsInMovement.forEach(async ({ path }, id) => {
+  scene.state.squadsInMovement.forEach(async ({ path }, id) => {
     const squad = getMapSquad(scene.state, id);
 
     // Update reference
     // We need a ref for quick updates in the main loop
-    scene.squadsInMovement = scene.squadsInMovement.set(id, {
+    scene.state.squadsInMovement = scene.state.squadsInMovement.set(id, {
       path,
       squad,
     });

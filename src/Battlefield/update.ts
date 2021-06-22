@@ -1,9 +1,9 @@
-import { healSquads } from "./events/healSquadsTick";
-import { MapScene } from "./MapScene";
-import moveSquads from "./update/moveSquads";
+import { healSquads } from './events/healSquadsTick';
+import { MapScene } from './MapScene';
+import moveSquads from './update/moveSquads';
 
 export default function (scene: MapScene) {
-  if (!scene.isPaused) {
+  if (!scene.state.isPaused) {
     moveSquads(scene);
 
     scene.state.timeOfDay += 1;
