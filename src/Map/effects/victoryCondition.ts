@@ -1,6 +1,7 @@
 import { CPU_FORCE, SCREEN_HEIGHT, SCREEN_WIDTH } from "../../constants";
 import { MapScene } from "../MapScene";
 import { delay, tween } from "../../Scenes/utils";
+import moveCameraTo from "../rendering/moveCameraTo";
 
 export default async (scene: MapScene) => {
   const title = scene.label(SCREEN_WIDTH / 2, 60, "Victory Condition");
@@ -19,7 +20,7 @@ export default async (scene: MapScene) => {
     duration: 1000,
   });
   await delay_(500);
-  scene.moveCameraTo(castle, 1000);
+  moveCameraTo(scene, castle, 1000);
   const conquer = scene.label(
     SCREEN_WIDTH / 2,
     160,

@@ -46,6 +46,7 @@ import preload from "./preload";
 import moveSquads from "./update/moveSquads";
 import { GAME_SPEED } from "../env";
 import destroySquad from "./events/destroySquad";
+import moveCameraTo from "./rendering/moveCameraTo";
 
 export type MapTile = {
   x: number;
@@ -107,7 +108,7 @@ export class MapScene extends Phaser.Scene {
     super("MapScene");
   }
 
-  preload = preload 
+  preload = preload;
 
   update() {
     if (!this.isPaused) {
@@ -150,7 +151,7 @@ export class MapScene extends Phaser.Scene {
 
           clickCell(this, cmd.cell);
         } else if (cmd.type === "MOVE_CAMERA_TO") {
-          this.moveCameraTo({ x: cmd.x, y: cmd.y }, cmd.duration);
+          moveCameraTo(this, { x: cmd.x, y: cmd.y }, cmd.duration);
         } else if (cmd.type === "CLEAR_TILES") {
           this.clearTiles();
         } else if (cmd.type === "CLEAR_TILES_EVENTS") {
@@ -261,67 +262,6 @@ export class MapScene extends Phaser.Scene {
 
     this.refreshUI();
     this.game.events.emit("MapSceneCreated", this);
-  }
-
-  async removeSquadFromState(id: string) {
-    this.state.forces = this.state.forces.map((force) => ({
-      ...force,
-      squads: force.squads.filter((s) => s !== id),
-    }));
-
-    const squadId = this.state.squads.find((s) => s.id === id).id;
-
-    this.state.dispatchedSquads = this.state.dispatchedSquads.remove(id);
-
-    this.state.squads = this.state.squads.filter((s) => s.id !== id);
-    this.state.units = this.state.units.filter((u) => u.squad !== squadId);
-
-    const chara = await this.getChara(id);
-    chara.destroy();
-
-    this.charas = this.charas.filter((c) => c.props.unit.squad !== id);
-  }
-
-  /**
-   * Moves camera position to a vector in the board.
-   * If the position is out of bounds, moves until the limit.
-   */
-  moveCameraTo({ x, y }: Vector, duration: number) {
-    x = x * -1 + SCREEN_WIDTH / 2;
-
-    y = y * -1 + SCREEN_HEIGHT / 2;
-
-    const tx = () => {
-      if (x < this.bounds.x.min) return this.bounds.x.min;
-      else if (x > this.bounds.x.max) return this.bounds.x.max;
-      else return x;
-    };
-    const ty = () => {
-      if (y < this.bounds.y.min) return this.bounds.y.min;
-      else if (y > this.bounds.y.max) return this.bounds.y.max;
-      else return y;
-    };
-
-    return new Promise<void>((resolve) => {
-      this.tweens.add({
-        targets: this.mapContainer,
-        x: tx(),
-        y: ty(),
-        duration: duration,
-        ease: "cubic.out",
-        onComplete: () => {
-          resolve();
-        },
-      });
-
-      this.tweens.add({
-        targets: this,
-        mapX: tx(),
-        mapY: ty(),
-        duration: duration,
-        ease: "cubic.out",
-      });
-    });
   }
 
   setWorldBounds() {
