@@ -1,30 +1,13 @@
 import { Chara } from "../Chara/Model";
 import { Container, Image } from "../Models";
-import {
-  Vector,
-  MapSquad,
-  MapState,
-  MapTile,
-} from "./Model";
+import { Vector, MapSquad, MapState, MapTile } from "./Model";
 import { Map, Set } from "immutable";
-import renderMap from "./board/renderMap";
-import renderSquads from "./board/renderSquads";
-import renderStructures from "./board/renderStructures";
 import { VectorRec } from "./makeVector";
-import { delay } from "../Scenes/utils";
-import { fadeIn } from "../UI/Transition";
 import { MapCommands } from "./MapCommands";
 import { Mode, DEFAULT_MODE } from "./Mode";
 import preload from "./preload";
-import { GAME_SPEED } from "../env";
-import destroySquad from "./events/destroySquad";
-import { makeWorldDraggable, setWorldBounds } from "./dragging";
-import { enableInput } from "./board/input";
-import pushSquad from "./squads/pushSquad";
 import update from "./update";
-import subscribe from "./subscribe";
-import signal from "./signal";
-import { refreshUI } from "./ui";
+import create from "./create";
 
 export class MapScene extends Phaser.Scene {
   isPaused = false;
@@ -78,52 +61,7 @@ export class MapScene extends Phaser.Scene {
     update(this);
   }
 
-  async create(data: MapCommands[]) {
-    subscribe(this);
-
-    this.mode = DEFAULT_MODE;
-
-    if (process.env.SOUND_ENABLED) {
-      this.sound.stopAll();
-      const music = this.sound.add("map1");
-
-      //@ts-ignore
-      music.setVolume(0.3);
-      music.play();
-    }
-
-    this.mapContainer = this.add.container(this.mapX, this.mapY);
-    this.uiContainer = this.add.container();
-    this.missionContainer = this.add.container();
-
-    signal(this, "startup", data);
-
-    await delay(this, 100);
-
-    renderMap(this);
-    renderStructures(this);
-    renderSquads(this);
-
-    await fadeIn(this, 1000 / GAME_SPEED);
-
-    makeWorldDraggable(this);
-    setWorldBounds(this);
-
-    await Promise.all(this.squadsToRemove.map((id) => destroySquad(this, id)));
-    this.squadsToRemove = Set();
-
-    // if (!this.hasShownVictoryCondition) {
-    //   victoryCondition(this);
-    //   this.hasShownVictoryCondition = true;
-    // }
-
-    await pushSquad(this);
-
-    enableInput(this);
-    this.isPaused = false;
-
-    refreshUI(this);
-    this.game.events.emit("MapSceneCreated", this);
+  create(data: MapCommands[]) {
+    create(this, data);
   }
-
 }
