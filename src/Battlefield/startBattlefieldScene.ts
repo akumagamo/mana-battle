@@ -1,5 +1,5 @@
-import { MapCommands } from "./MapCommands";
+import { MapState } from "./Model";
 
-export default async (parent: Phaser.Scene, cmds: MapCommands[]) => {
-  parent.scene.manager.run("MapScene", cmds);
+export default async (parent: Phaser.Scene, state: MapState) => {
+  parent.scene.manager.run("MapScene", state);
 };

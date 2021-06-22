@@ -5,14 +5,14 @@ import { cellSize, MOVE_SPEED } from '../config';
 import { MapScene } from '../MapScene';
 import finishMovement from './finishMovement';
 import stepChara from './stepChara';
-import { getChara, getMapSquad } from '../Model';
+import { getChara, getMapSquad, MapState } from '../Model';
 
-export default function (scene: MapScene) {
-  const movedSquads = scene.state.squadsInMovement.keySeq();
+export default function (scene: MapScene, state: MapState) {
+  const movedSquads = state.squadsInMovement.keySeq();
 
   let direction = '';
 
-  scene.state.squadsInMovement.forEach(async (value, squadId) => {
+  state.squadsInMovement.forEach(async (value, squadId) => {
     const { path, squad } = value;
 
     const [head] = path;
@@ -21,12 +21,12 @@ export default function (scene: MapScene) {
 
     const dist = getDistance(squad.pos, next);
 
-    const chara = getChara(scene.state, squadId);
+    const chara = getChara(state, squadId);
 
     if (dist >= MOVE_SPEED) {
-      direction = stepChara(scene, next, squad, direction, chara);
+      direction = stepChara(scene, state, next, squad, direction, chara);
     } else {
-      await finishMovement(scene, path, squad);
+      await finishMovement(scene, state, path, squad);
     }
 
     return squadId;
@@ -35,14 +35,14 @@ export default function (scene: MapScene) {
   // check collision
   // TODO: divide by each squad, store lists of enemies then compare
   movedSquads.forEach(async (sqd) => {
-    const current = getChara(scene.state, sqd);
+    const current = getChara(state, sqd);
 
     // TODO: only enemies
     // how: have indexes per team
-    scene.state.charas
+    state.charas
       .filter((c) => {
-        const a = getMapSquad(scene.state, c.props.unit.squad).squad.force;
-        const b = getMapSquad(scene.state, sqd).squad.force;
+        const a = getMapSquad(state, c.props.unit.squad).squad.force;
+        const b = getMapSquad(state, sqd).squad.force;
 
         return a !== b;
       })
@@ -50,11 +50,12 @@ export default function (scene: MapScene) {
         const distance = getDistance(c.container, current.container);
 
         if (distance < cellSize * 0.8) {
-          scene.state.isPaused = true;
+          state.isPaused = true;
           startCombat(
             scene,
-            getMapSquad(scene.state, sqd),
-            getMapSquad(scene.state, c.props.unit.squad),
+            state,
+            getMapSquad(state, sqd),
+            getMapSquad(state, c.props.unit.squad),
             direction
           );
         }

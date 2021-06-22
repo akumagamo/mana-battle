@@ -1,49 +1,54 @@
 import { Pointer } from '../../Models';
 import CellClicked from '../events/CellClicked';
 import { MapScene } from '../MapScene';
-import { MapTile } from '../Model';
+import { MapState, MapTile } from '../Model';
 import { refreshUI } from '../ui';
 
-export function disableMapInput(scene: MapScene) {
-  clearAllTileEvents(scene);
-  disableCellClick(scene);
-  scene.state.dragDisabled = true;
+export function disableMapInput(state: MapState) {
+  clearAllTileEvents(state);
+  disableCellClick(state);
+  state.dragDisabled = true;
 }
 
-export function enableInput(scene: MapScene) {
-  scene.state.dragDisabled = false;
-  enableCellClick(scene);
+export function enableInput(scene: MapScene, state: MapState) {
+  state.dragDisabled = false;
+  enableCellClick(state);
 
-  clearAllTileEvents(scene);
-  scene.state.tiles.forEach((tile) => makeInteractive(scene, tile));
+  clearAllTileEvents(state);
+  state.tiles.forEach((tile) => makeInteractive(scene, state, tile));
 
-  refreshUI(scene);
+  refreshUI(scene, state);
 }
-export function disableCellClick(scene: MapScene) {
-  scene.state.cellClickDisabled = true;
+export function disableCellClick(state: MapState) {
+  state.cellClickDisabled = true;
 }
 
-export function enableCellClick(scene: MapScene) {
-  scene.state.cellClickDisabled = false;
+export function enableCellClick(state: MapState) {
+  state.cellClickDisabled = false;
 }
-export function makeInteractive(scene: MapScene, cell: MapTile) {
+export function makeInteractive(
+  scene: MapScene,
+  state: MapState,
+  cell: MapTile
+) {
   cell.tile.on('pointerup', (pointer: Pointer) =>
     CellClicked(scene).emit({
-      scene: scene,
+      scene,
+      state,
       tile: cell,
       pointer: { x: pointer.upX, y: pointer.upY },
     })
   );
 }
 
-export function clearAllTileEvents(scene: MapScene) {
-  scene.state.tiles.forEach((tile) => {
+export function clearAllTileEvents(state: MapState) {
+  state.tiles.forEach((tile) => {
     tile.tile.removeAllListeners();
   });
 }
 
-export function clearAllTileTint(scene: MapScene) {
-  scene.state.tiles.forEach((tile) => {
+export function clearAllTileTint(scene: MapScene, state: MapState) {
+  state.tiles.forEach((tile) => {
     tile.tile.clearTint();
     scene.tweens.killTweensOf(tile.tile);
     tile.tile.alpha = 1;

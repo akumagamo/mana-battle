@@ -1,13 +1,13 @@
-import {MapScene} from "../MapScene";
-import {getCity} from "../Model";
-import signal from "../signal";
-import {refreshUI} from "../ui";
+import { MapScene } from '../MapScene';
+import { getCity, MapState } from '../Model';
+import signal from '../signal';
+import { refreshUI } from '../ui';
 
-export default  async function(scene: MapScene, id: string) {
-    refreshUI(scene);
-    const { x, y } = getCity(scene.state, id);
+export default async function (scene: MapScene, state: MapState, id: string) {
+  refreshUI(scene, state);
+  const { x, y } = getCity(state, id);
 
-    signal(scene, "selectCity", [
-      { type: "MOVE_CAMERA_TO", x, y, duration: 500 },
-    ]);
-  }
+  signal(scene, state, 'selectCity', [
+    { type: 'MOVE_CAMERA_TO', x, y, duration: 500 },
+  ]);
+}

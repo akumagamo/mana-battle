@@ -1,10 +1,11 @@
 import { MapScene } from '../MapScene';
+import { MapState } from '../Model';
 import { cellToScreenPosition } from './position';
 
 const CITY_SCALE = 0.5;
 
-export default (scene: MapScene) => {
-  scene.state.cities.forEach((city) => {
+export default (scene: MapScene, state: MapState) => {
+  state.cities.forEach((city) => {
     const { x, y } = cellToScreenPosition({ x: city.x, y: city.y });
 
     const city_ = scene.add.image(x, y, `tiles/${city.type}`);
@@ -20,8 +21,8 @@ export default (scene: MapScene) => {
     // city_.on('pointerup', () => {
     //     this.signal([{type: 'CITY_CLICK', id: city.id}]);
     // });
-    scene.state.mapContainer.add(city_);
+    state.mapContainer.add(city_);
     city_.name = city.id;
-    scene.state.citySprites.push(city_);
+    state.citySprites.push(city_);
   });
 };

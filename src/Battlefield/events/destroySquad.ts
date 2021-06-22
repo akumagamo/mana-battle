@@ -1,32 +1,29 @@
-import fadeOutChara from "../../Chara/animations/fadeOutChara";
-import { MapScene } from "../MapScene";
-import { getChara } from "../Model";
+import fadeOutChara from '../../Chara/animations/fadeOutChara';
+import { getChara, MapState } from '../Model';
 
-export default async function (scene: MapScene, id: string) {
-  const chara = getChara(scene.state, id);
+export default async function (state: MapState, id: string) {
+  const chara = getChara(state, id);
 
   await fadeOutChara(chara);
 
-  await removeSquadFromState(scene, id);
+  await removeSquadFromState(state, id);
 }
 
-async function removeSquadFromState(scene: MapScene, id: string) {
-  scene.state.forces = scene.state.forces.map((force) => ({
+async function removeSquadFromState(state: MapState, id: string) {
+  state.forces = state.forces.map((force) => ({
     ...force,
     squads: force.squads.filter((s) => s !== id),
   }));
 
-  const squadId = scene.state.squads.find((s) => s.id === id).id;
+  const squadId = state.squads.find((s) => s.id === id).id;
 
-  scene.state.dispatchedSquads = scene.state.dispatchedSquads.remove(id);
+  state.dispatchedSquads = state.dispatchedSquads.remove(id);
 
-  scene.state.squads = scene.state.squads.filter((s) => s.id !== id);
-  scene.state.units = scene.state.units.filter((u) => u.squad !== squadId);
+  state.squads = state.squads.filter((s) => s.id !== id);
+  state.units = state.units.filter((u) => u.squad !== squadId);
 
-  const chara = getChara(scene.state, id);
+  const chara = getChara(state, id);
   chara.destroy();
 
-  scene.state.charas = scene.state.charas.filter(
-    (c) => c.props.unit.squad !== id
-  );
+  state.charas = state.charas.filter((c) => c.props.unit.squad !== id);
 }

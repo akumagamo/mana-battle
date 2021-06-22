@@ -6,12 +6,13 @@ import panel from '../../UI/panel';
 import speech from '../../UI/speech';
 import { disableMapInput } from '../board/input';
 import { MapScene } from '../MapScene';
-import { MapSquad, getSquadUnits, getSquadLeader } from '../Model';
+import { MapSquad, getSquadUnits, getSquadLeader, MapState } from '../Model';
 import { destroyUI } from '../ui';
 import attack from './attack';
 
 export default async function (
   scene: MapScene,
+  state: MapState,
   squadA: MapSquad,
   squadB: MapSquad,
   direction: string
@@ -24,22 +25,15 @@ export default async function (
     (sqd) => sqd.squad.force === PLAYER_FORCE
   );
 
-  disableMapInput(scene);
-  destroyUI(scene);
+  disableMapInput(state);
+  destroyUI(state);
 
-  const bg = panel(
-    0,
-    0,
-    SCREEN_WIDTH,
-    SCREEN_HEIGHT,
-    scene.state.uiContainer,
-    scene
-  );
+  const bg = panel(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, state.uiContainer, scene);
   bg.setAlpha(0.4);
 
-  const leader = getSquadLeader(scene.state, playerSquad.id);
+  const leader = getSquadLeader(state, playerSquad.id);
 
-  const enemyUnits = getSquadUnits(scene.state, squadB.id);
+  const enemyUnits = getSquadUnits(state, squadB.id);
 
   const { board: enemy } = createBoard(
     scene,
@@ -51,7 +45,7 @@ export default async function (
     true
   );
 
-  const alliedUnits = scene.state.units.filter((u) => u.squad === squadA.id);
+  const alliedUnits = state.units.filter((u) => u.squad === squadA.id);
 
   const { board: ally } = createBoard(
     scene,
@@ -68,7 +62,7 @@ export default async function (
     450,
     70,
     'Ready for Combat',
-    scene.state.uiContainer,
+    state.uiContainer,
     scene,
     GAME_SPEED
   );
@@ -80,5 +74,5 @@ export default async function (
   ally.destroy();
   enemy.destroy();
 
-  attack(scene, squadA, squadB, direction);
+  attack(scene, state, squadA, squadB, direction);
 }

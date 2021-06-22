@@ -1,9 +1,11 @@
 import { Vector } from 'matter';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../../constants';
 import { MapScene } from '../MapScene';
+import { MapState } from '../Model';
 
 export default function moveCameraTo(
   scene: MapScene,
+  state: MapState,
   { x, y }: Vector,
   duration: number
 ) {
@@ -12,19 +14,19 @@ export default function moveCameraTo(
   y = y * -1 + SCREEN_HEIGHT / 2;
 
   const tx = () => {
-    if (x < scene.state.bounds.x.min) return scene.state.bounds.x.min;
-    else if (x > scene.state.bounds.x.max) return scene.state.bounds.x.max;
+    if (x < state.bounds.x.min) return state.bounds.x.min;
+    else if (x > state.bounds.x.max) return state.bounds.x.max;
     else return x;
   };
   const ty = () => {
-    if (y < scene.state.bounds.y.min) return scene.state.bounds.y.min;
-    else if (y > scene.state.bounds.y.max) return scene.state.bounds.y.max;
+    if (y < state.bounds.y.min) return state.bounds.y.min;
+    else if (y > state.bounds.y.max) return state.bounds.y.max;
     else return y;
   };
 
   return new Promise<void>((resolve) => {
     scene.tweens.add({
-      targets: scene.state.mapContainer,
+      targets: state.mapContainer,
       x: tx(),
       y: ty(),
       duration: duration,

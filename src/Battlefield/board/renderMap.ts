@@ -1,11 +1,11 @@
-import { tileMap, translateTiles } from '../Model';
+import { MapState, tileMap, translateTiles } from '../Model';
 import { MapScene } from '../MapScene';
 import { cellToScreenPosition } from './position';
 import { cellSize } from '../config';
 
-export default (scene: MapScene) => {
-  const { mapContainer } = scene.state;
-  translateTiles(scene.state.cells).forEach((arr, col) =>
+export default (scene: MapScene, state: MapState) => {
+  const { mapContainer } = state;
+  translateTiles(state.cells).forEach((arr, col) =>
     arr.forEach((n, row) => {
       const { x, y } = cellToScreenPosition({ x: row, y: col });
 
@@ -26,10 +26,10 @@ export default (scene: MapScene) => {
         type: n,
         tile: tile,
       };
-      scene.state.tiles.push(mapTile);
+      state.tiles.push(mapTile);
 
-      if (!scene.state.tileIndex[col]) scene.state.tileIndex[col] = [];
-      scene.state.tileIndex[col][row] = mapTile;
+      if (!state.tileIndex[col]) state.tileIndex[col] = [];
+      state.tileIndex[col][row] = mapTile;
     })
   );
 };

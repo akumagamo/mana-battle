@@ -18,10 +18,11 @@ import {
   getMapSquad,
   getSquadLeader,
   MapSquad,
+  MapState,
 } from './Model';
 import signal from './signal';
 
-export default (scene: MapScene) => {
+export default (scene: MapScene, state: MapState) => {
   let container = scene.add.container();
 
   const x = SCREEN_WIDTH / 4;
@@ -51,24 +52,24 @@ export default (scene: MapScene) => {
   close.setInteractive();
   close.on('pointerup', () => {
     container.destroy();
-    enableInput(scene);
+    enableInput(scene, state);
   });
 
-  let squadsToRender = getForceSquads(scene.state, PLAYER_FORCE).filter(
+  let squadsToRender = getForceSquads(state, PLAYER_FORCE).filter(
     (mapSquad) =>
       mapSquad.status !== 'defeated' &&
-      !scene.state.dispatchedSquads.has(mapSquad.squad.id)
+      !state.dispatchedSquads.has(mapSquad.squad.id)
   );
 
   squadsToRender.toList().forEach((mapSquad, i) => {
-    const leader = getSquadLeader(scene.state, mapSquad.id);
+    const leader = getSquadLeader(state, mapSquad.id);
     button(
       x + padding,
       y + 60 + 70 * i,
       leader.name,
       container,
       scene,
-      () => handleDispatchSquad(container, scene, mapSquad),
+      () => handleDispatchSquad(container, scene, state, mapSquad),
       false,
       width - padding * 2
     );
@@ -84,18 +85,19 @@ export default (scene: MapScene) => {
 export const handleDispatchSquad = async (
   container: Phaser.GameObjects.Container,
   scene: MapScene,
+  state: MapState,
   mapSquad: MapSquad
 ) => {
   container.destroy();
 
-  dispatchSquad(scene, mapSquad.squad, scene.state.timeOfDay);
-  enableInput(scene);
-  scene.state.isPaused = false;
-  changeMode(scene, { type: 'SQUAD_SELECTED', id: mapSquad.squad.id });
+  dispatchSquad(state, mapSquad.squad);
+  enableInput(scene, state);
+  state.isPaused = false;
+  changeMode(scene, state, { type: 'SQUAD_SELECTED', id: mapSquad.squad.id });
 
-  let squad = getMapSquad(scene.state, mapSquad.squad.id);
+  let squad = getMapSquad(state, mapSquad.squad.id);
   SquadClicked(scene).emit(squad);
-  signal(scene, 'clicked dispatch squad button', [
+  signal(scene, state, 'clicked dispatch squad button', [
     {
       type: 'MOVE_CAMERA_TO',
       x: squad.pos.x,
@@ -107,21 +109,17 @@ export const handleDispatchSquad = async (
   SquadDispatched(scene).emit(mapSquad.id);
 };
 
-function dispatchSquad(
-  scene: MapScene,
-  squad: SquadRecord,
-  dispatchTime: number
-) {
-  const force = getForce(scene.state, PLAYER_FORCE);
+function dispatchSquad(state: MapState, squad: SquadRecord) {
+  const force = getForce(state, PLAYER_FORCE);
   let mapSquad = toMapSquad(
     squad,
     getCity(this.state, force.initialPosition),
-    dispatchTime
+    state.timeOfDay
   );
 
   this.state.dispatchedSquads = this.state.dispatchedSquads.add(squad.id);
 
   force.squads.push(squad.id);
 
-  renderSquad(this, mapSquad);
+  renderSquad(this, state, mapSquad);
 }

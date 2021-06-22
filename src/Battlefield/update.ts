@@ -1,17 +1,18 @@
 import { healSquads } from './events/healSquadsTick';
 import { MapScene } from './MapScene';
+import { MapState } from './Model';
 import moveSquads from './update/moveSquads';
 
-export default function (scene: MapScene) {
-  if (!scene.state.isPaused) {
-    moveSquads(scene);
+export default function (scene: MapScene, state: MapState) {
+  if (!state.isPaused) {
+    moveSquads(scene, state);
 
-    scene.state.timeOfDay += 1;
-    scene.state.tick += 1;
+    state.timeOfDay += 1;
+    state.tick += 1;
 
-    if (scene.state.tick === 100) {
-      healSquads(scene.state);
-      scene.state.tick = 0;
+    if (state.tick === 100) {
+      healSquads(state);
+      state.tick = 0;
     }
   }
 }

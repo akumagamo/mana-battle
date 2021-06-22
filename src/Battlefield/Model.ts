@@ -295,10 +295,6 @@ export function getChara(state: MapState, squadId: string) {
   return state.charas.find((c) => c.id === leader.id);
 }
 
-export function updateState(scene: MapScene, state: MapState) {
-  scene.state = { ...scene.state, ...state };
-}
-
 export const initialBattlefieldState = {
   id: '',
   name: '',
@@ -329,7 +325,7 @@ export const initialBattlefieldState = {
   dragState: null,
   mapX: 0,
   mapY: 0,
-  isDragging : false,
+  isDragging: false,
   bounds: {
     x: { min: 0, max: 0 },
     y: { min: 0, max: 0 },

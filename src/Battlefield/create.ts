@@ -11,15 +11,15 @@ import destroySquad from './events/destroySquad';
 import { MapCommands } from './MapCommands';
 import { MapScene } from './MapScene';
 import { DEFAULT_MODE } from './Mode';
+import { MapState } from './Model';
 import signal from './signal';
 import pushSquad from './squads/pushSquad';
 import subscribe from './subscribe';
 import { refreshUI } from './ui';
+import update from './update';
 
-export default async (scene: MapScene, data: MapCommands[]) => {
-  subscribe(scene);
-
-  scene.state.mode = DEFAULT_MODE;
+export default async (scene: MapScene, state: MapState) => {
+  subscribe(scene, state);
 
   if (process.env.SOUND_ENABLED) {
     scene.sound.stopAll();
@@ -30,41 +30,40 @@ export default async (scene: MapScene, data: MapCommands[]) => {
     music.play();
   }
 
-  signal(scene, 'startup', data);
-
-  scene.state.mapContainer = scene.add.container(
-    scene.state.mapX,
-    scene.state.mapY
-  );
-  scene.state.uiContainer = scene.add.container();
-  scene.state.missionContainer = scene.add.container();
+  state.mapContainer = scene.add.container(state.mapX, state.mapY);
+  state.uiContainer = scene.add.container();
+  state.missionContainer = scene.add.container();
 
   await delay(scene, 100);
 
-  renderMap(scene);
-  renderStructures(scene);
-  renderSquads(scene);
+  renderMap(scene, state);
+  renderStructures(scene, state);
+  renderSquads(scene, state);
 
   await fadeIn(scene, 1000 / GAME_SPEED);
 
-  makeWorldDraggable(scene);
-  setWorldBounds(scene);
+  console.log(state);
+  makeWorldDraggable(scene, state);
+  setWorldBounds(state);
 
-  await Promise.all(
-    scene.state.squadsToRemove.map((id) => destroySquad(scene, id))
-  );
-  scene.state.squadsToRemove = Set();
+  await Promise.all(state.squadsToRemove.map((id) => destroySquad(state, id)));
+  state.squadsToRemove = Set();
 
   // if (!scene.hasShownVictoryCondition) {
   //   victoryCondition(scene);
   //   scene.hasShownVictoryCondition = true;
   // }
 
-  await pushSquad(scene);
+  await pushSquad(scene, state);
 
-  enableInput(scene);
-  scene.state.isPaused = false;
+  enableInput(scene, state);
+  state.isPaused = false;
 
-  refreshUI(scene);
-  scene.game.events.emit('MapSceneCreated', scene);
+  refreshUI(scene, state);
+
+  console.log(state);
+  scene.game.events.emit('MapSceneCreated', { scene, state });
+  scene.events.on('update', () => {
+    update(scene, state);
+  });
 };

@@ -1,11 +1,18 @@
-import panel from "../../UI/panel";
-import { MapScene } from "../MapScene";
+import panel from '../../UI/panel';
+import { MapScene } from '../MapScene';
+import { MapState } from '../Model';
 
-export default function (scene: MapScene, x: number, y: number, text: string) {
+export default function (
+  scene: MapScene,
+  state: MapState,
+  x: number,
+  y: number,
+  text: string
+) {
   const container = scene.add.container();
   const text_ = scene.add.text(x, y, text, {
-    fontSize: "36px",
-    color: "#fff",
+    fontSize: '36px',
+    color: '#fff',
   });
   text_.setOrigin(0.5);
   panel(
@@ -19,7 +26,7 @@ export default function (scene: MapScene, x: number, y: number, text: string) {
 
   container.add(text_);
 
-  scene.state.missionContainer.add(container);
+  state.missionContainer.add(container);
 
   return container;
 }

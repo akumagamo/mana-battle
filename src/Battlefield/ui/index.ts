@@ -7,6 +7,7 @@ import { disableMapInput } from '../board/input';
 import dispatchWindow from '../dispatchWindow';
 import OrganizeButtonClicked from '../events/OrganizeButtonClicked';
 import { MapScene } from '../MapScene';
+import { MapState } from '../Model';
 import turnOff from '../turnOff';
 import city from './city';
 import { squadInfo } from './squadInfo';
@@ -18,31 +19,32 @@ export const BOTTOM_PANEL_Y = SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT;
 
 export default function ui(
   scene: MapScene,
+  state: MapState,
   uiContainer: Container
 ): Promise<void> {
   // TODO: remove scene (currently we fail to select enemy squad without scene)
   // the parent is already removing (refreshUI)
   const baseY = BOTTOM_PANEL_Y + 25;
 
-  if (scene.state.mode.type !== 'SELECT_SQUAD_MOVE_TARGET') {
+  if (state.mode.type !== 'SELECT_SQUAD_MOVE_TARGET') {
     button(50, 40, 'Organize', uiContainer, scene, () =>
       OrganizeButtonClicked(scene).emit(scene)
     );
     button(250, 40, 'Dispatch', uiContainer, scene, () => {
-      disableMapInput(scene);
-      scene.state.isPaused = true;
-      dispatchWindow(scene);
+      disableMapInput(state);
+      state.isPaused = true;
+      dispatchWindow(scene, state);
     });
 
     button(1100, 50, 'Return to Title', uiContainer, scene, () => {
-      turnOff(scene);
+      turnOff(scene, state);
       scene.scene.start('TitleScene');
     });
   }
 
-  if (scene.state.mode.type === 'NOTHING_SELECTED') return;
+  if (state.mode.type === 'NOTHING_SELECTED') return;
 
-  if (scene.state.mode.type !== 'SELECT_SQUAD_MOVE_TARGET')
+  if (state.mode.type !== 'SELECT_SQUAD_MOVE_TARGET')
     panel(
       BOTTOM_PANEL_X,
       BOTTOM_PANEL_Y,
@@ -52,13 +54,13 @@ export default function ui(
       scene
     );
 
-  switch (scene.state.mode.type) {
+  switch (state.mode.type) {
     case 'SQUAD_SELECTED':
-      return squadInfo(scene, uiContainer, baseY, scene.state.mode.id);
+      return squadInfo(scene, state, uiContainer, baseY, state.mode.id);
     case 'MOVING_SQUAD':
-      return squadInfo(scene, uiContainer, baseY, scene.state.mode.id);
+      return squadInfo(scene, state, uiContainer, baseY, state.mode.id);
     case 'CITY_SELECTED':
-      return city(scene, uiContainer, baseY, scene.state.mode.id);
+      return city(scene, state, uiContainer, baseY, state.mode.id);
     case 'SELECT_SQUAD_MOVE_TARGET':
       return new Promise(() => {
         panel(SCREEN_WIDTH / 2, 15, 220, 50, uiContainer, scene);
@@ -75,17 +77,17 @@ export default function ui(
   }
 }
 
-export async function destroyUI(scene: MapScene) {
-  const { uiContainer } = scene.state;
+export async function destroyUI(state: MapState) {
+  const { uiContainer } = state;
   uiContainer.removeAll(true);
 }
 
-export async function refreshUI(scene: MapScene) {
-  destroyUI(scene);
+export async function refreshUI(scene: MapScene, state: MapState) {
+  destroyUI(state);
 
-  if (scene.state.mode.type === 'CHANGING_SQUAD_FORMATION') return;
+  if (state.mode.type === 'CHANGING_SQUAD_FORMATION') return;
 
-  const { uiContainer } = scene.state;
+  const { uiContainer } = state;
 
-  ui(scene, uiContainer);
+  ui(scene, state, uiContainer);
 }

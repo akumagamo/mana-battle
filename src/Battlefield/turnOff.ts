@@ -1,19 +1,20 @@
 import { MapScene } from './MapScene';
 import { DEFAULT_MODE } from './Mode';
 import events from './events';
+import { MapState } from './Model';
 
-export default function (scene: MapScene) {
-  scene.state.mapContainer.destroy();
-  scene.state.uiContainer.destroy();
-  scene.state.charas.forEach((chara) => chara.destroy());
-  scene.state.charas = [];
-  scene.state.tiles.forEach((tile) => {
+export default function (scene: MapScene, state: MapState) {
+  state.mapContainer.destroy();
+  state.uiContainer.destroy();
+  state.charas.forEach((chara) => chara.destroy());
+  state.charas = [];
+  state.tiles.forEach((tile) => {
     tile.tile.destroy();
   });
-  scene.state.tiles = [];
-  scene.state.tileIndex = [[]];
+  state.tiles = [];
+  state.tileIndex = [[]];
 
-  scene.state.mode = DEFAULT_MODE;
+  state.mode = DEFAULT_MODE;
 
   scene.scene.manager.stop('MapScene');
 

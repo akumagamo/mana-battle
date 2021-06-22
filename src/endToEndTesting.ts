@@ -6,6 +6,7 @@ import * as newgamebtn from './Scenes/Title/events/newGameButtonClicked';
 import ConfirmButtonClicked from './CharaCreation/events/ConfirmButtonClicked';
 import { CharaCreationState } from './CharaCreation/Model';
 import mapEvents from './Battlefield/events';
+import { initialBattlefieldState } from './Battlefield/Model';
 
 const assert = <A>(condition: string, a: A, b: A) => {
   if (a !== b)
@@ -107,7 +108,9 @@ function clickCell(scn: MapScene, x: number, y: number) {
   mapEvents()
     .CellClicked(scn)
     .emit({
+      // TODO: have props curried
       scene: scn,
+      state: initialBattlefieldState,
       tile: { x, y },
       pointer: { x: 200, y: 400 },
     });

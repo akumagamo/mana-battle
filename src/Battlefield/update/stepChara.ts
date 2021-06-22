@@ -1,10 +1,11 @@
-import { Chara } from "../../Chara/Model";
-import { MOVE_SPEED, CHARA_MAP_SCALE } from "../config";
-import { MapScene } from "../MapScene";
-import { MapSquad, updateState } from "../Model";
+import { Chara } from '../../Chara/Model';
+import { MOVE_SPEED, CHARA_MAP_SCALE } from '../config';
+import { MapScene } from '../MapScene';
+import { MapSquad, MapState } from '../Model';
 
 export default function (
   scene: MapScene,
+  state: MapState,
   next: { x: number; y: number },
   squad: MapSquad,
   direction: string,
@@ -12,24 +13,21 @@ export default function (
 ) {
   if (next.x > squad.pos.x) {
     squad.pos.x += 1 * MOVE_SPEED;
-    direction = "right";
+    direction = 'right';
     chara.container.scaleX = CHARA_MAP_SCALE;
   } else if (next.x < squad.pos.x) {
     squad.pos.x -= 1 * MOVE_SPEED;
-    direction = "left";
+    direction = 'left';
     chara.container.scaleX = CHARA_MAP_SCALE * -1;
   } else if (next.y > squad.pos.y) {
     squad.pos.y += 1 * MOVE_SPEED;
-    direction = "bottom";
+    direction = 'bottom';
   } else if (next.y < squad.pos.y) {
     squad.pos.y -= 1 * MOVE_SPEED;
-    direction = "top";
+    direction = 'top';
   }
   chara.container.setPosition(squad.pos.x, squad.pos.y);
   // TODO: update squad + add single source of "squad truth"
-  updateState(scene, {
-    ...scene.state,
-    squads: scene.state.squads.setIn([squad.id, "pos"], squad.pos),
-  });
+  state.squads = state.squads.setIn([squad.id, 'pos'], squad.pos);
   return direction;
 }

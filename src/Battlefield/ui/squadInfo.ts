@@ -5,39 +5,36 @@ import text from '../../UI/text';
 import { disableMapInput, enableInput } from '../board/input';
 import squadDetails from '../effects/squadDetails';
 import { MapScene } from '../MapScene';
-import { getMapSquad, getSquadLeader, getSquadUnits } from '../Model';
+import { getMapSquad, getSquadLeader, getSquadUnits, MapState } from '../Model';
 import playerSquad from './playerSquad';
 
-/**
- * Rendering text is *very* slow.
- * Removing text we can reduce rendering time from 15ms to 1ms.
- * */
 export async function squadInfo(
   scene: MapScene,
+  state: MapState,
   uiContainer: Phaser.GameObjects.Container,
   baseY: number,
   id: string
 ): Promise<void> {
-  const mapSquad = getMapSquad(scene.state, id);
+  const mapSquad = getMapSquad(state, id);
 
-  const leader = getSquadLeader(scene.state, id);
+  const leader = getSquadLeader(state, id);
 
   text(320, baseY, leader.name, uiContainer, scene);
 
   if (mapSquad.squad.force !== PLAYER_FORCE) {
-    button(430, baseY, 'Squad Details', scene.state.uiContainer, scene, () => {
-      viewSquadDetails(scene, id);
+    button(430, baseY, 'Squad Details', state.uiContainer, scene, () => {
+      viewSquadDetails(scene, state, id);
     });
   }
 
   if (mapSquad.squad.force === PLAYER_FORCE) {
-    playerSquad(scene, baseY, mapSquad);
+    playerSquad(scene, state, baseY, mapSquad);
   }
 
   const { board } = createStaticBoard(
     scene,
     mapSquad.squad,
-    getSquadUnits(scene.state, id),
+    getSquadUnits(state, id),
     170,
     600,
     0.4
@@ -46,13 +43,17 @@ export async function squadInfo(
   uiContainer.add(board.container);
 }
 
-export function viewSquadDetails(scene: MapScene, id: string): void {
-  const mapSquad = getMapSquad(scene.state, id);
-  disableMapInput(scene);
+export function viewSquadDetails(
+  scene: MapScene,
+  state: MapState,
+  id: string
+): void {
+  const mapSquad = getMapSquad(state, id);
+  disableMapInput(state);
   squadDetails(
     scene,
     mapSquad,
-    scene.state.units.filter((u) => mapSquad.squad.members.has(u.id)),
-    () => enableInput(scene)
+    state.units.filter((u) => mapSquad.squad.members.has(u.id)),
+    () => enableInput(scene, state)
   );
 }

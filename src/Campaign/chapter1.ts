@@ -91,27 +91,21 @@ export default async (scene: Phaser.Scene, unit: Unit) => {
 
   // todo: use scene from battlefield
   const map = maps[0]();
-  let commands: MapCommands[] = [
-    {
-      type: 'UPDATE_STATE',
-      target: {
-        ...map,
-        dispatchedSquads: Set(List(['1']).concat(map.squads.keySeq())),
-        squads: map.squads.merge(
-          Map(
-            squads.map((s) => [
-              s.id,
-              toMapSquad(
-                s,
-                map.cities.find((c) => c.id === 'castle1')
-              ),
-            ])
-          )
-        ),
-        units: map.units.merge(alliedUnits),
-      },
-    },
-  ];
-
-  startBattlefieldScene(scene, commands);
+  const state = {
+    ...map,
+    dispatchedSquads: Set(List(['1']).concat(map.squads.keySeq())),
+    squads: map.squads.merge(
+      Map(
+        squads.map((s) => [
+          s.id,
+          toMapSquad(
+            s,
+            map.cities.find((c) => c.id === 'castle1')
+          ),
+        ])
+      )
+    ),
+    units: map.units.merge(alliedUnits),
+  };
+  startBattlefieldScene(scene, state);
 };
