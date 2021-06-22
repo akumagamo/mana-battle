@@ -24,7 +24,7 @@ export default function moveCameraTo(
 
   return new Promise<void>((resolve) => {
     scene.tweens.add({
-      targets: scene.mapContainer,
+      targets: scene.state.mapContainer,
       x: tx(),
       y: ty(),
       duration: duration,

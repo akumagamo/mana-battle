@@ -32,7 +32,7 @@ export default async function (
       status: isCity ? "guarding_fort" : "standing",
     }));
 
-    const chara = getChara(scene, squad.id);
+    const chara = getChara(scene.state, squad.id);
     stand(chara);
     const portrait = await speak(scene, squad);
 

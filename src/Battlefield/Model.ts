@@ -1,5 +1,6 @@
 import { Map, Set } from "immutable";
-import { Image } from "../Models";
+import { Chara } from "../Chara/Model";
+import { Container, Image } from "../Models";
 import { SquadRecord } from "../Squad/Model";
 import { UnitIndex } from "../Unit/Model";
 import { MapScene } from "./MapScene";
@@ -38,7 +39,11 @@ export type MapState = {
   name: string;
   author: string;
   description: string;
+  mapContainer: Container;
+  missionContainer: Container;
+  uiContainer: Container;
   cells: CellNumber[][];
+  charas: Chara[];
   forces: Force[];
   cities: City[];
   squads: Map<string, MapSquad>;
@@ -256,9 +261,9 @@ export function getSquadLeader(state: MapState, squadId: string) {
 
   return state.units.get(squad.squad.leader);
 }
-export function getChara(scene: MapScene, squadId: string) {
-  const leader = getSquadLeader(scene.state, squadId);
-  return scene.charas.find((c) => c.id === leader.id);
+export function getChara(state: MapState, squadId: string) {
+  const leader = getSquadLeader(state, squadId);
+  return state.charas.find((c) => c.id === leader.id);
 }
 
 export function updateState(scene: MapScene, state: MapState) {

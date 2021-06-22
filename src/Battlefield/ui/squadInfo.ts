@@ -1,12 +1,12 @@
-import createStaticBoard from "../../Board/createBoard";
-import { PLAYER_FORCE } from "../../constants";
-import button from "../../UI/button";
-import text from "../../UI/text";
-import { disableMapInput, enableInput } from "../board/input";
-import squadDetails from "../effects/squadDetails";
-import { MapScene } from "../MapScene";
-import { getMapSquad, getSquadLeader, getSquadUnits } from "../Model";
-import playerSquad from "./playerSquad";
+import createStaticBoard from '../../Board/createBoard';
+import { PLAYER_FORCE } from '../../constants';
+import button from '../../UI/button';
+import text from '../../UI/text';
+import { disableMapInput, enableInput } from '../board/input';
+import squadDetails from '../effects/squadDetails';
+import { MapScene } from '../MapScene';
+import { getMapSquad, getSquadLeader, getSquadUnits } from '../Model';
+import playerSquad from './playerSquad';
 
 /**
  * Rendering text is *very* slow.
@@ -25,7 +25,7 @@ export async function squadInfo(
   text(320, baseY, leader.name, uiContainer, scene);
 
   if (mapSquad.squad.force !== PLAYER_FORCE) {
-    button(430, baseY, "Squad Details", scene.uiContainer, scene, () => {
+    button(430, baseY, 'Squad Details', scene.state.uiContainer, scene, () => {
       viewSquadDetails(scene, id);
     });
   }

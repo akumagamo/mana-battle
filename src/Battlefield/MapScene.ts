@@ -13,8 +13,6 @@ export class MapScene extends Phaser.Scene {
   isPaused = false;
   squadsInMovement: Map<string, { path: Vector[]; squad: MapSquad }> = Map();
 
-  // TODO: use a map
-  charas: Chara[] = [];
   tiles: MapTile[] = [];
   moveableCells: Set<VectorRec> = Set();
   walkableGrid: number[][] = [[]];
@@ -22,14 +20,26 @@ export class MapScene extends Phaser.Scene {
   citySprites: Image[] = [];
   mode: Mode = DEFAULT_MODE;
 
-  // Containers can't be created in the constructor, so we are casting the types here
-  // TODO: consider receiving containers from parent or pass them around in functions
-  // or use separated scenes
-  mapContainer = {} as Container;
-  missionContainer = {} as Container;
-  uiContainer = {} as Container;
-
-  state = {} as MapState;
+  state = {
+    id: "",
+    name: "",
+    author: "",
+    description: "",
+    cells: [[]],
+    charas: [],
+    forces: [],
+    cities: [],
+    mapContainer: {} as Container,
+    missionContainer: {} as Container,
+    uiContainer: {} as Container,
+    squads: Map(),
+    units: Map(),
+    timeOfDay: 0,
+    tick: 0,
+    ai: Map(),
+    /** Contains the ids from all dispatched squads (from all forces). Should this move to the force? */
+    dispatchedSquads: Set(),
+  } as MapState;
 
   dragState: null | Vector = null;
   mapX: number = 0;

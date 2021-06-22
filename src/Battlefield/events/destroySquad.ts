@@ -3,7 +3,7 @@ import { MapScene } from "../MapScene";
 import { getChara } from "../Model";
 
 export default async function (scene: MapScene, id: string) {
-  const chara = getChara(scene, id);
+  const chara = getChara(scene.state, id);
 
   await fadeOutChara(chara);
 
@@ -23,8 +23,10 @@ async function removeSquadFromState(scene: MapScene, id: string) {
   scene.state.squads = scene.state.squads.filter((s) => s.id !== id);
   scene.state.units = scene.state.units.filter((u) => u.squad !== squadId);
 
-  const chara = getChara(scene, id);
+  const chara = getChara(scene.state, id);
   chara.destroy();
 
-  scene.charas = scene.charas.filter((c) => c.props.unit.squad !== id);
+  scene.state.charas = scene.state.charas.filter(
+    (c) => c.props.unit.squad !== id
+  );
 }

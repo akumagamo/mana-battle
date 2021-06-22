@@ -21,7 +21,7 @@ export default function (scene: MapScene) {
 
     const dist = getDistance(squad.pos, next);
 
-    const chara = getChara(scene, squadId);
+    const chara = getChara(scene.state, squadId);
 
     if (dist >= MOVE_SPEED) {
       direction = stepChara(scene, next, squad, direction, chara);
@@ -35,11 +35,11 @@ export default function (scene: MapScene) {
   // check collision
   // TODO: divide by each squad, store lists of enemies then compare
   movedSquads.forEach(async (sqd) => {
-    const current = getChara(scene, sqd);
+    const current = getChara(scene.state, sqd);
 
     // TODO: only enemies
     // how: have indexes per team
-    scene.charas
+    scene.state.charas
       .filter((c) => {
         const a = getMapSquad(scene.state, c.props.unit.squad).squad.force;
         const b = getMapSquad(scene.state, sqd).squad.force;

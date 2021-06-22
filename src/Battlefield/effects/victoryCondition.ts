@@ -43,7 +43,7 @@ export default async (scene: MapScene) => {
   pic.setAlpha(0);
   name.setAlpha(0);
 
-  scene.missionContainer.add(pic);
+  scene.state.missionContainer.add(pic);
 
   await tween_({
     targets: [pic, name],
@@ -52,13 +52,13 @@ export default async (scene: MapScene) => {
   });
   await delay_(1000);
   await tween_({
-    targets: scene.missionContainer,
+    targets: scene.state.missionContainer,
     alpha: 0,
     duration: 1000,
   });
 
-  scene.missionContainer.destroy();
-  scene.missionContainer = scene.add.container();
+  scene.state.missionContainer.destroy();
+  scene.state.missionContainer = scene.add.container();
   const start = label(
     scene,
     SCREEN_WIDTH / 2,
@@ -73,7 +73,7 @@ export default async (scene: MapScene) => {
   });
   await delay_(1000);
   await tween_({
-    targets: scene.missionContainer,
+    targets: scene.state.missionContainer,
     alpha: 0,
     duration: 1000,
   });

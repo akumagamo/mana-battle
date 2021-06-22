@@ -4,6 +4,7 @@ import { makeUnit } from '../Unit/makeUnit';
 import { toMapSquad } from '../Unit/Model';
 import { CPU_FORCE, PLAYER_FORCE } from '../constants';
 import { createSquad, makeMember } from '../Squad/Model';
+import { Container } from '../Models';
 
 const enemyCastle: City = {
   id: 'castle2',
@@ -36,6 +37,10 @@ const map: () => MapState = () => {
     timeOfDay: 0,
     tick: 0,
     cells: tiles,
+    charas: [],
+    mapContainer: {} as Container,
+    missionContainer: {} as Container,
+    uiContainer: {} as Container,
     squads: List([
       toMapSquad(
         createSquad({

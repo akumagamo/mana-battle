@@ -19,7 +19,7 @@ export default function (scene: MapScene, x: number, y: number, text: string) {
 
   container.add(text_);
 
-  scene.missionContainer.add(container);
+  scene.state.missionContainer.add(container);
 
   return container;
 }

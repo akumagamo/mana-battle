@@ -1,14 +1,14 @@
-import createBoard from "../../Board/createBoard";
-import { PLAYER_FORCE, SCREEN_WIDTH, SCREEN_HEIGHT } from "../../constants";
-import { GAME_SPEED } from "../../env";
-import { delay } from "../../Scenes/utils";
-import panel from "../../UI/panel";
-import speech from "../../UI/speech";
-import { disableMapInput } from "../board/input";
-import { MapScene } from "../MapScene";
-import { MapSquad, getSquadUnits, getSquadLeader } from "../Model";
-import { destroyUI } from "../ui";
-import attack from "./attack";
+import createBoard from '../../Board/createBoard';
+import { PLAYER_FORCE, SCREEN_WIDTH, SCREEN_HEIGHT } from '../../constants';
+import { GAME_SPEED } from '../../env';
+import { delay } from '../../Scenes/utils';
+import panel from '../../UI/panel';
+import speech from '../../UI/speech';
+import { disableMapInput } from '../board/input';
+import { MapScene } from '../MapScene';
+import { MapSquad, getSquadUnits, getSquadLeader } from '../Model';
+import { destroyUI } from '../ui';
+import attack from './attack';
 
 export default async function (
   scene: MapScene,
@@ -27,7 +27,14 @@ export default async function (
   disableMapInput(scene);
   destroyUI(scene);
 
-  const bg = panel(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, scene.uiContainer, scene);
+  const bg = panel(
+    0,
+    0,
+    SCREEN_WIDTH,
+    SCREEN_HEIGHT,
+    scene.state.uiContainer,
+    scene
+  );
   bg.setAlpha(0.4);
 
   const leader = getSquadLeader(scene.state, playerSquad.id);
@@ -60,8 +67,8 @@ export default async function (
     leader,
     450,
     70,
-    "Ready for Combat",
-    scene.uiContainer,
+    'Ready for Combat',
+    scene.state.uiContainer,
     scene,
     GAME_SPEED
   );

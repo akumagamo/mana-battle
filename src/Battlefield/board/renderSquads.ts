@@ -1,12 +1,12 @@
-import { getMapSquad, MapSquad } from "../Model";
-import { INVALID_STATE } from "../../errors";
-import { MapScene } from "../MapScene";
-import { PLAYER_FORCE } from "../../constants";
-import { CHARA_MAP_SCALE } from "../config";
-import createChara from "../../Chara/createChara";
+import { getMapSquad, MapSquad } from '../Model';
+import { INVALID_STATE } from '../../errors';
+import { MapScene } from '../MapScene';
+import { PLAYER_FORCE } from '../../constants';
+import { CHARA_MAP_SCALE } from '../config';
+import createChara from '../../Chara/createChara';
 
 export const renderSquad = (scene: MapScene, mapSquad: MapSquad): void => {
-  const { mapContainer } = scene;
+  const { mapContainer } = scene.state;
   const squadLeader = mapSquad.squad.members.find(
     (mem) => mem.id === mapSquad.squad.leader
   );
@@ -30,14 +30,14 @@ export const renderSquad = (scene: MapScene, mapSquad: MapSquad): void => {
   const emblem = scene.add.image(
     100,
     -20,
-    mapSquad.squad.force === PLAYER_FORCE ? "ally_emblem" : "enemy_emblem"
+    mapSquad.squad.force === PLAYER_FORCE ? 'ally_emblem' : 'enemy_emblem'
   );
 
   chara.container.add(emblem);
 
   mapContainer.add(chara.container);
 
-  scene.charas.push(chara);
+  scene.state.charas.push(chara);
 };
 
 export default (scene: MapScene): void => {
