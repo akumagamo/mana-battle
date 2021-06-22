@@ -10,6 +10,7 @@ import ReturnedFromCombat from '../events/ReturnedFromCombat';
 import { MapScene } from '../MapScene';
 import { MapSquad, MapState } from '../Model';
 import turnOff from '../turnOff';
+import markSquadForRemoval from './markSquadForRemoval';
 
 export default async function (
   scene: MapScene,
@@ -40,25 +41,20 @@ export default async function (
       return xs;
     }, {} as { [x: string]: number });
 
-    const updateUnits = units.map((unit) => ({ type: 'UPDATE_UNIT', unit }));
+    units.forEach((unit) => (state.units = state.units.set(unit.id, unit)));
 
-    let commands = Map(squadsTotalHP)
+    Map(squadsTotalHP)
       .filter((v) => v === 0)
       .keySeq()
-      .map((target) => ({ type: 'DESTROY_TEAM', target }))
-      .concat(updateUnits)
-      .toJS()
-      .concat([
-        {
-          type: 'PUSH_SQUAD',
-          winner: starter.id,
-          loser: loser,
-          direction,
-        },
-      ]);
+      .forEach((target) => markSquadForRemoval(state, target));
 
-    // TODO: use safe start
-    scene.scene.start('MapScene', units.concat(commands));
+    state.squadToPush = {
+      winner: starter.id,
+      loser: loser,
+      direction,
+    };
+
+    scene.scene.start('MapScene', state);
 
     ReturnedFromCombat(scene).emit(null);
   };

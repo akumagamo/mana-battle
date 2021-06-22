@@ -17,9 +17,7 @@ export default async function (
 ) {
   await Promise.all(
     cmds.map(async (cmd) => {
-      if (cmd.type === 'DESTROY_TEAM') {
-        markSquadForRemoval(state, cmd.target);
-      } else if (cmd.type === 'UPDATE_SQUAD_POS') {
+     if (cmd.type === 'UPDATE_SQUAD_POS') {
         state.squads = state.squads.update(cmd.id, (sqd) => ({
           ...sqd,
           pos: cmd.pos,
@@ -42,9 +40,7 @@ export default async function (
         selectCity(scene, state, cmd.id);
       } else if (cmd.type === 'CAPTURE_CITY') {
         captureCity(state, cmd);
-      } else if (cmd.type === 'PUSH_SQUAD') {
-        state.squadToPush = cmd;
-      }
+      } 
     })
   );
 }

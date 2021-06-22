@@ -8,11 +8,8 @@ import renderSquads from './board/renderSquads';
 import renderStructures from './board/renderStructures';
 import { makeWorldDraggable, setWorldBounds } from './dragging';
 import destroySquad from './events/destroySquad';
-import { MapCommands } from './MapCommands';
 import { MapScene } from './MapScene';
-import { DEFAULT_MODE } from './Mode';
 import { MapState } from './Model';
-import signal from './signal';
 import pushSquad from './squads/pushSquad';
 import subscribe from './subscribe';
 import { refreshUI } from './ui';
@@ -20,6 +17,10 @@ import update from './update';
 
 export default async (scene: MapScene, state: MapState) => {
   subscribe(scene, state);
+
+  scene.events.on('update', () => {
+    update(scene, state);
+  });
 
   if (process.env.SOUND_ENABLED) {
     scene.sound.stopAll();
@@ -42,7 +43,6 @@ export default async (scene: MapScene, state: MapState) => {
 
   await fadeIn(scene, 1000 / GAME_SPEED);
 
-  console.log(state);
   makeWorldDraggable(scene, state);
   setWorldBounds(state);
 
@@ -61,9 +61,5 @@ export default async (scene: MapScene, state: MapState) => {
 
   refreshUI(scene, state);
 
-  console.log(state);
   scene.game.events.emit('MapSceneCreated', { scene, state });
-  scene.events.on('update', () => {
-    update(scene, state);
-  });
 };

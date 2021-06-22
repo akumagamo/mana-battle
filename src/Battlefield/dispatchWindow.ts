@@ -90,7 +90,7 @@ export const handleDispatchSquad = async (
 ) => {
   container.destroy();
 
-  dispatchSquad(state, mapSquad.squad);
+  dispatchSquad(scene, state, mapSquad.squad);
   enableInput(scene, state);
   state.isPaused = false;
   changeMode(scene, state, { type: 'SQUAD_SELECTED', id: mapSquad.squad.id });
@@ -109,17 +109,17 @@ export const handleDispatchSquad = async (
   SquadDispatched(scene).emit(mapSquad.id);
 };
 
-function dispatchSquad(state: MapState, squad: SquadRecord) {
+function dispatchSquad(scene: MapScene, state: MapState, squad: SquadRecord) {
   const force = getForce(state, PLAYER_FORCE);
   let mapSquad = toMapSquad(
     squad,
-    getCity(this.state, force.initialPosition),
+    getCity(state, force.initialPosition),
     state.timeOfDay
   );
 
-  this.state.dispatchedSquads = this.state.dispatchedSquads.add(squad.id);
+  state.dispatchedSquads = state.dispatchedSquads.add(squad.id);
 
   force.squads.push(squad.id);
 
-  renderSquad(this, state, mapSquad);
+  renderSquad(scene, state, mapSquad);
 }

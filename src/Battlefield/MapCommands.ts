@@ -4,10 +4,6 @@ export type MapCommands =
   | { type: 'UPDATE_SQUAD_POS'; id: string; pos: Vector }
   | { type: 'UPDATE_UNIT'; unit: Unit }
   | {
-      type: 'DESTROY_TEAM';
-      target: string;
-    }
-  | {
       type: 'CLICK_CELL';
       cell: Vector;
     }
@@ -19,5 +15,4 @@ export type MapCommands =
   | { type: 'REFRESH_UI' }
   | { type: 'CITY_CLICK'; id: string }
   | { type: 'CAPTURE_CITY'; id: string; force: string }
-  | { type: 'PUSH_SQUAD'; winner: string; loser: string; direction: string }
   | { type: 'MOVE_SQUAD'; mapTile: MapTile; squad: MapSquad };

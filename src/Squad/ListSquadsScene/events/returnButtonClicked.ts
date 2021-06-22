@@ -21,7 +21,7 @@ const returnButtonClicked = (mapScene: MapScene, state: MapState) => (
   });
 
   mapScene.scene.manager.stop('ListSquadsScene');
-  mapScene.scene.manager.start('MapScene', []);
+  mapScene.scene.manager.start('MapScene', state);
 };
 
 function addNewSquad(state: MapState, squad: SquadRecord) {
