@@ -1,18 +1,16 @@
-import { PLAYER_FORCE } from "../../constants";
-import * as ListSquads from "../../Squad/ListSquadsScene/ListSquadsScene";
-import { MapState, getForceUnits, getForceSquads } from "../Model";
+import { PLAYER_FORCE } from '../../constants';
+import * as ListSquads from '../../Squad/ListSquadsScene/ListSquadsScene';
+import { MapState, getForceUnits, getForceSquads } from '../Model';
 
 export function organizeButtonClicked(
   {
     turnOff,
     state,
-    scene: { manager },
+    scene,
   }: {
     turnOff: () => void;
     state: MapState;
-    scene: {
-      manager: Phaser.Scenes.SceneManager;
-    };
+    scene: Phaser.Scene;
   },
   onReturnClick: (listSquadScene: ListSquads.ListSquadsScene) => void
 ) {
@@ -25,6 +23,6 @@ export function organizeButtonClicked(
       dispatched: state.dispatchedSquads,
       onReturnClick: (listSquadScene) => onReturnClick(listSquadScene),
     },
-    manager
+    scene.scene.manager
   );
 }

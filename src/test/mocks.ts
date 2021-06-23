@@ -1,4 +1,4 @@
-import { Container } from "../Models";
+import { Container } from '../Models';
 
 export const eventsMock = () => ({
   on: jest.fn(),
@@ -68,6 +68,11 @@ export const sceneMock = () => {
     },
     game: {
       events: { ...eventsMock() },
+    },
+    scene: {
+      scene: {
+        manager: jest.fn(),
+      },
     },
   } as unknown) as Phaser.Scene;
 };
