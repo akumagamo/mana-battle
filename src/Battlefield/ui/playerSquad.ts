@@ -4,7 +4,6 @@ import { MapScene } from '../MapScene';
 import EditSquadModal from '../../Squad/EditSquadModal/createEditSquadModal';
 import MovePlayerSquadButtonClicked from '../events/MovePlayerSquadButtonClicked';
 import { disableMapInput, enableInput } from '../board/input';
-import signal from '../signal';
 import { changeMode } from '../Mode';
 
 export default (

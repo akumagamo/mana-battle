@@ -79,6 +79,10 @@ export default (props: {
     destroy: () => {
       container.destroy();
     }, //todo: make this an external function. check other destroy fns
+    events: {
+      select: () => container.emit("selectChara"),
+      deselect: () => container.emit("deselectChara"),
+    },
   };
 
   initial(chara, headOnly);
@@ -117,11 +121,11 @@ export default (props: {
   // originGraphic.fillRectShape(origin);
   // chara.container.add(originGraphic);
 
-  chara.container.on("selectChara", () => {
+  container.on("selectChara", () => {
     selectChara(chara);
   });
 
-  chara.container.on("deselectChara", () => {
+  container.on("deselectChara", () => {
     deselectChara(chara);
   });
 

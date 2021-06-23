@@ -1,14 +1,14 @@
-import { MapScene } from '../MapScene';
-import { makeVector } from '../makeVector';
-import { PLAYER_FORCE } from '../../constants';
-import { getMapSquad, MapState, Vector } from '../Model';
-import { cellToScreenPosition, screenToCellPosition } from './position';
-import SquadClicked from '../events/SquadClicked';
-import moveSquadTo from '../squads/moveSquadTo';
-import signal from '../signal';
-import { refreshUI } from '../ui';
-import { getDistance } from '../../utils';
-import { changeMode } from '../Mode';
+import { MapScene } from "../MapScene";
+import { makeVector } from "../makeVector";
+import { PLAYER_FORCE } from "../../constants";
+import { getChara, getMapSquad, MapState, Vector } from "../Model";
+import { cellToScreenPosition, screenToCellPosition } from "./position";
+import SquadClicked from "../events/SquadClicked";
+import moveSquadTo from "../squads/moveSquadTo";
+import signal from "../signal";
+import { refreshUI } from "../ui";
+import { getDistance } from "../../utils";
+import { changeMode } from "../Mode";
 
 export default async (scene: MapScene, state: MapState, cell: Vector) => {
   const { x, y } = cell;
@@ -18,7 +18,7 @@ export default async (scene: MapScene, state: MapState, cell: Vector) => {
   const select = () => {
     if (mapSquad) {
       changeMode(scene, state, {
-        type: 'SQUAD_SELECTED',
+        type: "SQUAD_SELECTED",
         id: mapSquad.squad.id,
       });
       SquadClicked(scene).emit(mapSquad);
@@ -29,17 +29,17 @@ export default async (scene: MapScene, state: MapState, cell: Vector) => {
 
     if (city) {
       const selectCity = () => {
-        signal(scene, state, 'there was just a squad in the cell, select it', [
-          { type: 'SELECT_CITY', id: city.id },
+        signal(scene, state, "there was just a squad in the cell, select it", [
+          { type: "SELECT_CITY", id: city.id },
         ]);
-        changeMode(scene, state, { type: 'CITY_SELECTED', id: city.id });
+        changeMode(scene, state, { type: "CITY_SELECTED", id: city.id });
       };
       switch (state.mode.type) {
-        case 'NOTHING_SELECTED':
+        case "NOTHING_SELECTED":
           return selectCity();
-        case 'CITY_SELECTED':
+        case "CITY_SELECTED":
           return selectCity();
-        case 'SQUAD_SELECTED':
+        case "SQUAD_SELECTED":
           return selectCity();
         default:
           return;
@@ -48,10 +48,10 @@ export default async (scene: MapScene, state: MapState, cell: Vector) => {
   };
 
   switch (state.mode.type) {
-    case 'MOVING_SQUAD':
+    case "MOVING_SQUAD":
       await handleMovingSquad(scene, state, x, y, state.mode.id);
       break;
-    case 'SELECT_SQUAD_MOVE_TARGET':
+    case "SELECT_SQUAD_MOVE_TARGET":
       await handleSelectSquadMoveTarget(scene, state, x, y, state.mode.id);
       break;
     default:
@@ -73,8 +73,8 @@ async function handleMovingSquad(
 
     if (isWalkable) {
       await moveSquadTo(scene, state, selectedSquad.squad.id, { x, y });
-      signal(scene, state, 'squad moved, updating position', [
-        { type: 'UPDATE_SQUAD_POS', id, pos: { x, y } },
+      signal(scene, state, "squad moved, updating position", [
+        { type: "UPDATE_SQUAD_POS", id, pos: { x, y } },
       ]);
       refreshUI(scene, state);
     }
@@ -98,13 +98,13 @@ async function handleSelectSquadMoveTarget(
       await moveSquadTo(scene, state, selectedSquad.squad.id, { x, y });
       state.squads = state.squads.update(id, (sqd) => ({
         ...sqd,
-        status: 'moving',
+        status: "moving",
       }));
-      signal(scene, state, 'squad moved, updating position', [
-        { type: 'UPDATE_SQUAD_POS', id, pos: { x, y } },
+      signal(scene, state, "squad moved, updating position", [
+        { type: "UPDATE_SQUAD_POS", id, pos: { x, y } },
       ]);
     } else {
-      changeMode(scene, state, { type: 'SQUAD_SELECTED', id });
+      changeMode(scene, state, { type: "SQUAD_SELECTED", id });
     }
   }
 }

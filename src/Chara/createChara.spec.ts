@@ -115,3 +115,31 @@ it('Should listen to the "deselectChara" event', () => {
     expect.any(Function)
   );
 });
+it('Should fire the "selectChara" event', () => {
+  const scene = sceneMock() as any;
+
+  const chara = createChara({
+    parent: scene,
+    unit: makeUnit({}),
+  });
+
+  chara.events.select()
+
+  expect(chara.container.emit).toHaveBeenCalledWith(
+    "selectChara",
+  );
+});
+it('Should fire the "deselectChara" event', () => {
+  const scene = sceneMock() as any;
+
+  const chara = createChara({
+    parent: scene,
+    unit: makeUnit({}),
+  });
+
+  chara.events.deselect()
+
+  expect(chara.container.emit).toHaveBeenCalledWith(
+    "deselectChara",
+  );
+});
