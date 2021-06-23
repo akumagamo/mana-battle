@@ -42,4 +42,6 @@ export type Chara = {
 
   hpBarContainer: Container | null;
   destroy: () => void;
+
+  selectedCharaIndicator: Image | null;
 };

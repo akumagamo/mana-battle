@@ -23,7 +23,7 @@ export default function (scene: MapScene, state: MapState) {
       {
         turnOff: () => turnOff(scene, state),
         state,
-        scene: scene.scene,
+        scene,
       },
       (listScene) => returnButtonClicked(scene, state)(listScene)
     )

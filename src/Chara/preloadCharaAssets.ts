@@ -9,6 +9,7 @@ export default (scene: Phaser.Scene) => {
     "head",
     "chara/head_male",
     "chara/head_female",
+    "chara/selected_chara",
   ].forEach((str) => scene.load.image(str, PUBLIC_URL + "/" + str + ".svg"));
   const hairs = [
     "dark1",

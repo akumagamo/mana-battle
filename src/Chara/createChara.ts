@@ -1,8 +1,10 @@
-import { Unit } from '../Unit/Model';
-import initial from './animations/initial';
-import stand from './animations/stand';
-import { Chara } from './Model';
-import hpBar from './ui/hpBar';
+import { Unit } from "../Unit/Model";
+import initial from "./animations/initial";
+import stand from "./animations/stand";
+import { Chara } from "./Model";
+import hpBar from "./ui/hpBar";
+import selectChara from "./commands/selectChara";
+import deselectChara from "./commands/deselectChara";
 
 export default (props: {
   parent: Phaser.Scene;
@@ -73,6 +75,7 @@ export default (props: {
     rightHandEquip: null,
     leftHandEquip: null,
     hat: null,
+    selectedCharaIndicator: null,
     destroy: () => {
       container.destroy();
     }, //todo: make this an external function. check other destroy fns
@@ -113,6 +116,14 @@ export default (props: {
 
   // originGraphic.fillRectShape(origin);
   // chara.container.add(originGraphic);
+
+  chara.container.on("selectChara", () => {
+    selectChara(chara);
+  });
+
+  chara.container.on("deselectChara", () => {
+    deselectChara(chara);
+  });
 
   return chara;
 };
