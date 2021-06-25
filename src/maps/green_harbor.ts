@@ -5,7 +5,7 @@ import {
   initialBattlefieldState,
   MapState,
 } from '../Battlefield/Model';
-import { makeUnit } from '../Unit/makeUnit';
+import createUnit from '../Unit/createUnit';
 import { toMapSquad } from '../Unit/Model';
 import { CPU_FORCE, PLAYER_FORCE } from '../constants';
 import { createSquad, makeMember } from '../Squad/Model';
@@ -142,7 +142,7 @@ const map: () => MapState = () => {
 };
 
 const createEnemyUnit = (squad: string) => (id: string) => ({
-  ...makeUnit(id),
+  ...createUnit(id),
   squad,
   force: CPU_FORCE,
 });

@@ -5,7 +5,7 @@ import { getMockCalls, sceneMock } from '../../test/mocks';
 import { CPU_FORCE, PLAYER_FORCE } from '../../constants';
 import { toMapSquad, Unit } from '../../Unit/Model';
 import { Map, Set } from 'immutable';
-import { makeUnit } from '../../Unit/makeUnit';
+import createUnit from '../../Unit/createUnit';
 import { createSquad, makeMember, SquadRecord } from '../../Squad/Model';
 
 jest.mock('../../Squad/ListSquadsScene/ListSquadsScene');
@@ -15,7 +15,7 @@ const defaultProps = () => ({
   state: {
     ...map(),
     units: map().units.set('ally1', {
-      ...makeUnit('ally1'),
+      ...createUnit('ally1'),
       force: PLAYER_FORCE,
     }),
     dispatchedSquads: Set(['ally_squad']),

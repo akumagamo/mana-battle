@@ -2,7 +2,7 @@ import { List, Map, Set } from 'immutable';
 import { PLAYER_FORCE } from '../constants';
 import maps from '../maps';
 import { createSquad, makeMember, squadBuilder } from '../Squad/Model';
-import { makeUnit } from '../Unit/makeUnit';
+import createUnit from '../Unit/createUnit';
 import { toMapSquad, Unit } from '../Unit/Model';
 import startBattlefieldScene from '../Battlefield/startBattlefieldScene';
 
@@ -22,32 +22,32 @@ export default async (scene: Phaser.Scene, unit: Unit) => {
 
   const alliedUnits = Map({
     [unit.id]: { ...unit, squad: '1' },
-    m1: { ...makeUnit('m1', 'fighter'), squad: '1' },
-    m2: { ...makeUnit('m2', 'fighter'), squad: '1' },
-    m3: { ...makeUnit('m3', 'archer'), squad: '1' },
-    m4: { ...makeUnit('m4', 'mage'), squad: '1' },
+    m1: { ...createUnit('m1', 'fighter'), squad: '1' },
+    m2: { ...createUnit('m2', 'fighter'), squad: '1' },
+    m3: { ...createUnit('m3', 'archer'), squad: '1' },
+    m4: { ...createUnit('m4', 'mage'), squad: '1' },
 
-    c1: { ...makeUnit('c1'), squad: 'c' },
-    c2: { ...makeUnit('c2'), squad: 'c' },
-    c3: { ...makeUnit('c3'), squad: 'c' },
-    c4: { ...makeUnit('c4'), squad: 'c' },
-    c5: { ...makeUnit('c5'), squad: 'c' },
-    d1: { ...makeUnit('d1'), squad: 'd' },
-    d2: { ...makeUnit('d2'), squad: 'd' },
-    d3: { ...makeUnit('d3'), squad: 'd' },
-    d4: { ...makeUnit('d4'), squad: 'd' },
-    d5: { ...makeUnit('d5'), squad: 'd' },
+    c1: { ...createUnit('c1'), squad: 'c' },
+    c2: { ...createUnit('c2'), squad: 'c' },
+    c3: { ...createUnit('c3'), squad: 'c' },
+    c4: { ...createUnit('c4'), squad: 'c' },
+    c5: { ...createUnit('c5'), squad: 'c' },
+    d1: { ...createUnit('d1'), squad: 'd' },
+    d2: { ...createUnit('d2'), squad: 'd' },
+    d3: { ...createUnit('d3'), squad: 'd' },
+    d4: { ...createUnit('d4'), squad: 'd' },
+    d5: { ...createUnit('d5'), squad: 'd' },
 
     // units without squad
-    e5: { ...makeUnit('e5') },
-    e6: { ...makeUnit('e6') },
-    e7: { ...makeUnit('e7') },
-    e8: { ...makeUnit('e8') },
-    e9: { ...makeUnit('e9') },
-    e10: { ...makeUnit('e10') },
-    e11: { ...makeUnit('e11') },
-    e12: { ...makeUnit('e12') },
-    e13: { ...makeUnit('e13') },
+    e5: { ...createUnit('e5') },
+    e6: { ...createUnit('e6') },
+    e7: { ...createUnit('e7') },
+    e8: { ...createUnit('e8') },
+    e9: { ...createUnit('e9') },
+    e10: { ...createUnit('e10') },
+    e11: { ...createUnit('e11') },
+    e12: { ...createUnit('e12') },
+    e13: { ...createUnit('e13') },
   });
 
   const sqd = firstSquad.mergeDeep(

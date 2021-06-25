@@ -1,4 +1,4 @@
-import { makeUnit } from '../Unit/makeUnit';
+import createUnit from '../Unit/createUnit';
 import stand from './animations/stand';
 import createChara from './createChara';
 import hpBar from './ui/hpBar';
@@ -19,7 +19,7 @@ it('Should be rendered at the passed position', () => {
     scene: scene,
     x: 100,
     y: 99,
-    unit: makeUnit(),
+    unit: createUnit(),
   });
   expect(chara.container).toMatchObject({ x: 100, y: 99, name: '1' });
 });
@@ -31,7 +31,7 @@ it('Should not render a hp bar by default', () => {
     scene: scene,
     x: 100,
     y: 100,
-    unit: makeUnit(),
+    unit: createUnit(),
   });
   expect(chara.hpBarContainer.add).not.toHaveBeenCalled();
 });
@@ -43,7 +43,7 @@ it('Should render a hp bar if argument is present', () => {
     scene: scene,
     x: 100,
     y: 100,
-    unit: makeUnit(),
+    unit: createUnit(),
     showHpBar: true,
   });
 
@@ -57,7 +57,7 @@ it('Should be animated by default', () => {
     scene: scene,
     x: 100,
     y: 100,
-    unit: makeUnit(),
+    unit: createUnit(),
   });
 
   expect(stand).toHaveBeenCalledWith(expect.objectContaining({ id: '1' }));
@@ -69,7 +69,7 @@ it('Should not be animated if defined by a prop', () => {
     scene: scene,
     x: 100,
     y: 100,
-    unit: makeUnit(),
+    unit: createUnit(),
     animated: false,
   });
 
@@ -82,7 +82,7 @@ it('Should be animated if defined by a prop', () => {
     scene: scene,
     x: 100,
     y: 100,
-    unit: makeUnit(),
+    unit: createUnit(),
     animated: true,
   });
 
@@ -94,7 +94,7 @@ it('Should listen to the "selectChara" event', () => {
 
   const chara = createChara({
     scene: scene,
-    unit: makeUnit(),
+    unit: createUnit(),
   });
 
   expect(chara.container.on).toHaveBeenCalledWith(
@@ -107,7 +107,7 @@ it('Should listen to the "deselectChara" event', () => {
 
   const chara = createChara({
     scene: scene,
-    unit: makeUnit(),
+    unit: createUnit(),
   });
 
   expect(chara.container.on).toHaveBeenCalledWith(

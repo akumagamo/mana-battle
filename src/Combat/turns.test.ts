@@ -1,6 +1,6 @@
 import { initiativeList, runCombat } from './turns';
 import { assignSquad } from '../Unit/Model';
-import { makeUnit } from '../Unit/makeUnit';
+import createUnit from '../Unit/createUnit';
 import { createSquad, makeMember } from '../Squad/Model';
 import { List, Map } from 'immutable';
 import { equals } from '../test/utils';
@@ -10,10 +10,10 @@ jest.mock('../Unit/mods');
 
 test('Should sort by initiave correctly', () => {
   const units = Map({
-    '0': { ...makeUnit('0'), dex: 9 },
-    '1': { ...makeUnit('1'), dex: 6 },
-    '2': { ...makeUnit('2'), dex: 7 },
-    '3': { ...makeUnit('3'), dex: 8 },
+    '0': { ...createUnit('0'), dex: 9 },
+    '1': { ...createUnit('1'), dex: 6 },
+    '2': { ...createUnit('2'), dex: 7 },
+    '3': { ...createUnit('3'), dex: 8 },
   });
 
   const sorted = initiativeList(units);
@@ -23,10 +23,10 @@ test('Should sort by initiave correctly', () => {
 
 test('Combat should have the expected outcome', () => {
   const units = Map({
-    '0': assignSquad(makeUnit('0'), 's1'),
-    '1': assignSquad(makeUnit('1'), 's1'),
-    '2': assignSquad(makeUnit('2'), 's1'),
-    '3': assignSquad(makeUnit('3'), 's2'),
+    '0': assignSquad(createUnit('0'), 's1'),
+    '1': assignSquad(createUnit('1'), 's1'),
+    '2': assignSquad(createUnit('2'), 's1'),
+    '3': assignSquad(createUnit('3'), 's2'),
   });
 
   const squadIndex = Map({

@@ -1,7 +1,7 @@
 import { SquadRecord, MemberIndex, makeMember, createSquad } from './Model';
 import { UnitClass, UnitIndex } from '../Unit/Model';
 import { Map } from 'immutable';
-import { makeUnit } from '../Unit/makeUnit';
+import createUnit from '../Unit/createUnit';
 
 type SquadGeneratorResponse = { units: UnitIndex; squad: SquadRecord };
 
@@ -42,7 +42,7 @@ export function squadGenerator(
 
   const units = unitList.reduce((xs, [class_], index) => {
     return xs.set(unitId(index), {
-      ...makeUnit(unitId(index), class_, level),
+      ...createUnit(unitId(index), class_, level),
       squad: squadId,
     });
   }, Map() as UnitIndex);

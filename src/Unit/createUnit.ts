@@ -13,7 +13,7 @@ import { getUnitAttacks } from './Skills';
 import { baseEquips } from './Jobs';
 import { PLAYER_FORCE } from '../constants';
 
-export function makeUnit(
+export default function createUnit(
   id = '1',
   job = 'fighter' as UnitJob,
   lvl = 1,

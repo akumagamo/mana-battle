@@ -1,8 +1,8 @@
-import { makeUnit } from '../makeUnit';
+import createUnit from '../createUnit';
 import healUnit from './healUnit';
 
 it('Should heal the unit by the expected amount', () => {
-  const unit = { ...makeUnit(), currentHp: 10 };
+  const unit = { ...createUnit(), currentHp: 10 };
   const amount = 20;
   const healedUnit = healUnit(unit, amount);
 
@@ -10,7 +10,7 @@ it('Should heal the unit by the expected amount', () => {
 });
 
 it('Should not heal beyond the maximum hp', () => {
-  const unit = { ...makeUnit(), currentHp: 10, hp: 30 };
+  const unit = { ...createUnit(), currentHp: 10, hp: 30 };
   const amount = 40;
   const healedUnit = healUnit(unit, amount);
 
@@ -20,7 +20,7 @@ it('Should not heal beyond the maximum hp', () => {
 });
 
 it('Should not a dead unit', () => {
-  const unit = { ...makeUnit(), currentHp: 0, hp: 30 };
+  const unit = { ...createUnit(), currentHp: 0, hp: 30 };
   const amount = 40;
   const healedUnit = healUnit(unit, amount);
 

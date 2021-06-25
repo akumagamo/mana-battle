@@ -1,13 +1,13 @@
 import { destroyImage } from '../../Browser/phaser';
 import { Image } from '../../Models';
 import { imageMock, sceneMock } from '../../test/mocks';
-import { makeUnit } from '../../Unit/makeUnit';
+import createUnit from '../../Unit/createUnit';
 import createChara from '../createChara';
 import deselectChara from './deselectChara';
 
 jest.mock('../../Browser/phaser');
 
-const chara = () => createChara({ scene: sceneMock(), unit: makeUnit() });
+const chara = () => createChara({ scene: sceneMock(), unit: createUnit() });
 
 it('should do nothing if the chara has no `selectedCharaIndicator`', () => {
   const chara_ = chara();

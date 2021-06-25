@@ -3,12 +3,12 @@ import {
   SKIN_COLOR_LIGHT,
 } from '../../Chara/animations/constants';
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../../constants';
-import { makeUnit } from '../../Unit/makeUnit';
+import createUnit from '../../Unit/createUnit';
 import { Gender, Unit } from '../../Unit/Model';
 import { SceneConfig } from '../Models';
 
 const priest = {
-  ...makeUnit('yordja', 'mage'),
+  ...createUnit('yordja', 'mage'),
   name: 'Yordja',
   gender: Gender.Female,
   style: {

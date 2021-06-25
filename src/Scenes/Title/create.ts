@@ -1,6 +1,6 @@
 import button from '../../UI/button';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../../constants';
-import { makeUnit } from '../../Unit/makeUnit';
+import createUnit from '../../Unit/createUnit';
 import createChara from '../../Chara/createChara';
 import { TitleSceneState } from './Model';
 import { turnOff } from './turnOff';
@@ -25,7 +25,7 @@ export function create(scene: Phaser.Scene, state: TitleSceneState) {
   state.charas = [
     createChara({
       scene: scene,
-      unit: makeUnit('1', 'fighter'),
+      unit: createUnit('1', 'fighter'),
       x: 250,
       y: 500,
       scale: 1.3,
@@ -34,7 +34,7 @@ export function create(scene: Phaser.Scene, state: TitleSceneState) {
     }),
     createChara({
       scene: scene,
-      unit: makeUnit('1', 'mage'),
+      unit: createUnit('1', 'mage'),
       x: 350,
       y: 520,
       scale: 1.5,
@@ -43,7 +43,7 @@ export function create(scene: Phaser.Scene, state: TitleSceneState) {
     }),
     createChara({
       scene: scene,
-      unit: makeUnit('2', 'archer'),
+      unit: createUnit('2', 'archer'),
       x: 450,
       y: 550,
       scale: 1.6,

@@ -2,7 +2,7 @@ import { Map } from 'immutable';
 import { createSquad, makeMember, squadBuilder } from '../Squad/Model';
 import { printSquad } from '../Squad/Model.test';
 import { equals } from '../test/utils';
-import { makeUnit } from '../Unit/makeUnit';
+import createUnit from '../Unit/createUnit';
 import { getMeleeTarget } from './getMeleeTarget';
 
 jest.mock('../utils');
@@ -57,15 +57,15 @@ test('Should get correct melee targets', () => {
   });
 
   const unitIndex = Map({
-    '0': { ...makeUnit('0'), squad: '1' },
-    '1': { ...makeUnit('1'), squad: '1' },
-    '2': { ...makeUnit('2'), squad: '1' },
-    '3': { ...makeUnit('3'), squad: '1' },
-    '4': { ...makeUnit('4'), squad: '1' },
-    '5': { ...makeUnit('5'), squad: '2' },
-    '6': { ...makeUnit('6'), squad: '2' },
-    '7': { ...makeUnit('7'), squad: '2' },
-    '8': { ...makeUnit('8'), squad: '2' },
+    '0': { ...createUnit('0'), squad: '1' },
+    '1': { ...createUnit('1'), squad: '1' },
+    '2': { ...createUnit('2'), squad: '1' },
+    '3': { ...createUnit('3'), squad: '1' },
+    '4': { ...createUnit('4'), squad: '1' },
+    '5': { ...createUnit('5'), squad: '2' },
+    '6': { ...createUnit('6'), squad: '2' },
+    '7': { ...createUnit('7'), squad: '2' },
+    '8': { ...createUnit('8'), squad: '2' },
   });
 
   const targetOf = (id: string) =>
@@ -116,10 +116,10 @@ test('Should choose closer enemy on diagonal', () => {
   });
 
   const unitIndex = Map({
-    '0': { ...makeUnit('0'), squad: '1' },
-    '1': { ...makeUnit('1'), squad: '2' },
-    '2': { ...makeUnit('2'), squad: '2' },
-    '3': { ...makeUnit('3'), squad: '2' },
+    '0': { ...createUnit('0'), squad: '1' },
+    '1': { ...createUnit('1'), squad: '2' },
+    '2': { ...createUnit('2'), squad: '2' },
+    '3': { ...createUnit('3'), squad: '2' },
   });
 
   const targetOf = (id: string) =>

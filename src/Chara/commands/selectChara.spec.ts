@@ -1,9 +1,9 @@
 import { sceneMock } from '../../test/mocks';
-import { makeUnit } from '../../Unit/makeUnit';
+import createUnit from '../../Unit/createUnit';
 import createChara from '../createChara';
 import selectChara from './selectChara';
 
-const chara = () => createChara({ scene: sceneMock(), unit: makeUnit() });
+const chara = () => createChara({ scene: sceneMock(), unit: createUnit() });
 
 it('should create an image in the `selectedCharaIndicator` property', () => {
   const chara_ = chara();
