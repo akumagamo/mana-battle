@@ -26,7 +26,7 @@ export default function ui(
   // the parent is already removing (refreshUI)
   const baseY = BOTTOM_PANEL_Y + 25;
 
-  if (state.mode.type !== 'SELECT_SQUAD_MOVE_TARGET') {
+  if (state.uiMode.type !== 'SELECT_SQUAD_MOVE_TARGET') {
     button(50, 40, 'Organize', uiContainer, scene, () =>
       OrganizeButtonClicked(scene).emit(scene)
     );
@@ -42,9 +42,9 @@ export default function ui(
     });
   }
 
-  if (state.mode.type === 'NOTHING_SELECTED') return;
+  if (state.uiMode.type === 'NOTHING_SELECTED') return;
 
-  if (state.mode.type !== 'SELECT_SQUAD_MOVE_TARGET')
+  if (state.uiMode.type !== 'SELECT_SQUAD_MOVE_TARGET')
     panel(
       BOTTOM_PANEL_X,
       BOTTOM_PANEL_Y,
@@ -54,11 +54,11 @@ export default function ui(
       scene
     );
 
-  switch (state.mode.type) {
+  switch (state.uiMode.type) {
     case 'SQUAD_SELECTED':
-      return squadInfo(scene, state, uiContainer, baseY, state.mode.id);
+      return squadInfo(scene, state, uiContainer, baseY, state.uiMode.id);
     case 'CITY_SELECTED':
-      return city(scene, state, uiContainer, baseY, state.mode.id);
+      return city(scene, state, uiContainer, baseY, state.uiMode.id);
     case 'SELECT_SQUAD_MOVE_TARGET':
       return new Promise(() => {
         panel(SCREEN_WIDTH / 2, 15, 220, 50, uiContainer, scene);
@@ -83,7 +83,7 @@ export async function destroyUI(state: MapState) {
 export async function refreshUI(scene: MapScene, state: MapState) {
   destroyUI(state);
 
-  if (state.mode.type === 'CHANGING_SQUAD_FORMATION') return;
+  if (state.uiMode.type === 'CHANGING_SQUAD_FORMATION') return;
 
   const { uiContainer } = state;
 

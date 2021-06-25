@@ -5,7 +5,6 @@ import { MapCommands } from './MapCommands';
 import { MapScene } from './MapScene';
 import { MapState } from './Model';
 import moveCameraTo from './rendering/moveCameraTo';
-import markSquadForRemoval from './squads/markSquadForRemoval';
 import { refreshUI } from './ui';
 import { viewSquadDetails } from './ui/squadInfo';
 

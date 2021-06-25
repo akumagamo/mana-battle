@@ -7,8 +7,8 @@ import turnOff from "./turnOff";
 import returnButtonClicked from "../Squad/ListSquadsScene/events/returnButtonClicked";
 import { handleCellClick } from "./events/CellClicked";
 import { getChara, MapState } from "./Model";
-import * as deselectChara from "../Chara/commands/deselectChara";
 import * as selectChara from "../Chara/commands/selectChara";
+import deselectAllEntities from "./commands/deselectAllEntities";
 
 export default function (scene: MapScene, state: MapState) {
   const index = events();
@@ -35,9 +35,9 @@ export default function (scene: MapScene, state: MapState) {
   );
 
   index.SquadClicked(scene).on((mapSquad) => {
-    state.charas.forEach(deselectChara.emit);
-    const chara = getChara(state, mapSquad.id);
+    deselectAllEntities(state);
 
+    const chara = getChara(state, mapSquad.id);
     selectChara.emit(chara);
   });
 }

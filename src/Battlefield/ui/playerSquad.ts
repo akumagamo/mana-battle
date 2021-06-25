@@ -13,7 +13,7 @@ export default (
   mapSquad: MapSquad
 ) => {
   const baseX = 300;
-  const mode = state.mode.type;
+  const mode = state.uiMode.type;
 
   if (mode === 'SQUAD_SELECTED') {
     button(baseX + 400, baseY, 'Formation', state.uiContainer, mapScene, () => {

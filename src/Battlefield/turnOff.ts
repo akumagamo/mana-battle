@@ -14,7 +14,7 @@ export default function (scene: MapScene, state: MapState) {
   state.tiles = [];
   state.tileIndex = [[]];
 
-  state.mode = DEFAULT_MODE;
+  state.uiMode = DEFAULT_MODE;
 
   scene.scene.manager.stop('MapScene');
 

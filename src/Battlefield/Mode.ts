@@ -11,6 +11,6 @@ export type Mode =
 export const DEFAULT_MODE: Mode = { type: 'NOTHING_SELECTED' };
 
 export function changeMode(scene: MapScene, state: MapState, mode: Mode) {
-  state.mode = mode;
+  state.uiMode = mode;
   refreshUI(scene, state);
 }
