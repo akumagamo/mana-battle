@@ -9,15 +9,15 @@ export default function (
   squad: MapSquad,
   direction: string,
   chara: Chara
-) {
+): string {
   if (next.x > squad.pos.x) {
     squad.pos.x += 1 * MOVE_SPEED;
     direction = 'right';
-    chara.container.scaleX = CHARA_MAP_SCALE;
+    chara.innerWrapper.scaleX = 1;
   } else if (next.x < squad.pos.x) {
     squad.pos.x -= 1 * MOVE_SPEED;
     direction = 'left';
-    chara.container.scaleX = CHARA_MAP_SCALE * -1;
+    chara.innerWrapper.scaleX = -1;
   } else if (next.y > squad.pos.y) {
     squad.pos.y += 1 * MOVE_SPEED;
     direction = 'bottom';

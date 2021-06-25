@@ -20,7 +20,7 @@ export default async (
   speed: number
 ) => {
   const portrait = createChara({
-    parent: scene,
+    scene: scene,
     unit,
     x: x + 70,
     y: y + 70,

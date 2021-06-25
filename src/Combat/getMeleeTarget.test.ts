@@ -57,15 +57,15 @@ test('Should get correct melee targets', () => {
   });
 
   const unitIndex = Map({
-    '0': { ...makeUnit({ job: 'fighter', id: 0, lvl: 1 }), squad: '1' },
-    '1': { ...makeUnit({ job: 'fighter', id: 1, lvl: 1 }), squad: '1' },
-    '2': { ...makeUnit({ job: 'fighter', id: 2, lvl: 1 }), squad: '1' },
-    '3': { ...makeUnit({ job: 'fighter', id: 3, lvl: 1 }), squad: '1' },
-    '4': { ...makeUnit({ job: 'fighter', id: 4, lvl: 1 }), squad: '1' },
-    '5': { ...makeUnit({ job: 'fighter', id: 5, lvl: 1 }), squad: '2' },
-    '6': { ...makeUnit({ job: 'fighter', id: 6, lvl: 1 }), squad: '2' },
-    '7': { ...makeUnit({ job: 'fighter', id: 7, lvl: 1 }), squad: '2' },
-    '8': { ...makeUnit({ job: 'fighter', id: 8, lvl: 1 }), squad: '2' },
+    '0': { ...makeUnit('0'), squad: '1' },
+    '1': { ...makeUnit('1'), squad: '1' },
+    '2': { ...makeUnit('2'), squad: '1' },
+    '3': { ...makeUnit('3'), squad: '1' },
+    '4': { ...makeUnit('4'), squad: '1' },
+    '5': { ...makeUnit('5'), squad: '2' },
+    '6': { ...makeUnit('6'), squad: '2' },
+    '7': { ...makeUnit('7'), squad: '2' },
+    '8': { ...makeUnit('8'), squad: '2' },
   });
 
   const targetOf = (id: string) =>
@@ -116,10 +116,10 @@ test('Should choose closer enemy on diagonal', () => {
   });
 
   const unitIndex = Map({
-    '0': { ...makeUnit({ job: 'fighter', id: 0, lvl: 1 }), squad: '1' },
-    '1': { ...makeUnit({ job: 'fighter', id: 1, lvl: 1 }), squad: '2' },
-    '2': { ...makeUnit({ job: 'fighter', id: 2, lvl: 1 }), squad: '2' },
-    '3': { ...makeUnit({ job: 'fighter', id: 3, lvl: 1 }), squad: '2' },
+    '0': { ...makeUnit('0'), squad: '1' },
+    '1': { ...makeUnit('1'), squad: '2' },
+    '2': { ...makeUnit('2'), squad: '2' },
+    '3': { ...makeUnit('3'), squad: '2' },
   });
 
   const targetOf = (id: string) =>

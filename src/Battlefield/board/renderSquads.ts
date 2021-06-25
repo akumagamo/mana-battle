@@ -3,6 +3,7 @@ import { INVALID_STATE } from '../../errors';
 import { PLAYER_FORCE } from '../../constants';
 import { CHARA_MAP_SCALE } from '../config';
 import createChara from '../../Chara/createChara';
+import { addInsignea } from '../../Chara/commands/addInsignea';
 
 export const renderSquad = (
   scene: Phaser.Scene,
@@ -23,20 +24,14 @@ export const renderSquad = (
   const { x, y } = mapSquad.pos;
 
   const chara = createChara({
-    parent: scene,
+    scene: scene,
     unit: leader,
     x,
     y,
     scale: CHARA_MAP_SCALE,
   });
 
-  const emblem = scene.add.image(
-    100,
-    -20,
-    mapSquad.squad.force === PLAYER_FORCE ? 'ally_emblem' : 'enemy_emblem'
-  );
-
-  chara.container.add(emblem);
+  addInsignea(chara);
 
   mapContainer.add(chara.container);
 

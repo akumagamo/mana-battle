@@ -2,7 +2,7 @@ import { Unit } from '../Unit/Model';
 import { Container, Graphics, Image } from '../Models';
 
 export type CharaProps = {
-  parent: Phaser.Scene;
+  scene: Phaser.Scene;
   unit: Unit;
   x: number;
   y: number;

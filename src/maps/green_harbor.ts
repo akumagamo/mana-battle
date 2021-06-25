@@ -124,46 +124,14 @@ const map: () => MapState = () => {
       },
     ],
     units: Map({
-      enemy1: {
-        ...makeUnit({ id: 'enemy1' }),
-        squad: 'squad1',
-        force: CPU_FORCE,
-      },
-      enemy2: {
-        ...makeUnit({ id: 'enemy2' }),
-        squad: 'squad1',
-        force: CPU_FORCE,
-      },
-      enemy3: {
-        ...makeUnit({ id: 'enemy3' }),
-        squad: 'squad1',
-        force: CPU_FORCE,
-      },
-      enemy4: {
-        ...makeUnit({ id: 'enemy4' }),
-        squad: 'squad1',
-        force: CPU_FORCE,
-      },
-      enemy5: {
-        ...makeUnit({ id: 'enemy5' }),
-        squad: 'squad2',
-        force: CPU_FORCE,
-      },
-      enemy6: {
-        ...makeUnit({ id: 'enemy6' }),
-        squad: 'squad2',
-        force: CPU_FORCE,
-      },
-      enemy7: {
-        ...makeUnit({ id: 'enemy7' }),
-        squad: 'squad2',
-        force: CPU_FORCE,
-      },
-      enemy8: {
-        ...makeUnit({ id: 'enemy8' }),
-        squad: 'squad2',
-        force: CPU_FORCE,
-      },
+      enemy1: createEnemyUnit('squad1')('enemy1'),
+      enemy2: createEnemyUnit('squad1')('enemy2'),
+      enemy3: createEnemyUnit('squad1')('enemy3'),
+      enemy4: createEnemyUnit('squad1')('enemy4'),
+      enemy5: createEnemyUnit('squad2')('enemy5'),
+      enemy6: createEnemyUnit('squad2')('enemy6'),
+      enemy7: createEnemyUnit('squad2')('enemy7'),
+      enemy8: createEnemyUnit('squad2')('enemy8'),
     }),
     ai: Map({
       squad1: 'DEFEND',
@@ -172,5 +140,11 @@ const map: () => MapState = () => {
     }),
   };
 };
+
+const createEnemyUnit = (squad: string) => (id: string) => ({
+  ...makeUnit(id),
+  squad,
+  force: CPU_FORCE,
+});
 
 export default map;

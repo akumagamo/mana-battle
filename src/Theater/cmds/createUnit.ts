@@ -1,5 +1,4 @@
 import createChara from '../../Chara/createChara';
-import { Chara } from '../../Chara/Model';
 import { Unit } from '../../Unit/Model';
 import TheaterScene from '../TheaterScene';
 
@@ -18,7 +17,7 @@ export const createUnit = (
 ) => {
   const key = scene.charaKey(unit.id);
   const chara = createChara({
-    parent: scene,
+    scene,
     unit,
     x: x,
     y: y,

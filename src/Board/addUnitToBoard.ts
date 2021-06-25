@@ -10,7 +10,7 @@ export default (board: Board, unit: Unit) => {
   const { x, y } = getUnitPositionOnScreen(member);
 
   const chara = createChara({
-    parent: board.scene,
+    scene: board.scene,
     unit,
     x: x * board.scale,
     y: y * board.scale,

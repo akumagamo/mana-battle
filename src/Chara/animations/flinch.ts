@@ -3,12 +3,13 @@ import die from './die';
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 
+// TODO: refactor to return promise
 export default (chara: Chara, isKilled: boolean) => {
   const FLINCH_DURATION = 200 / GAME_SPEED;
   const FLINCH_ROTATION = -0.2;
 
-  chara.props.parent.tweens.add({
-    targets: chara?.container,
+  chara.props.scene.tweens.add({
+    targets: chara.container,
     rotation: chara.props.front ? FLINCH_ROTATION : FLINCH_ROTATION * -1,
     yoyo: !isKilled,
     duration: isKilled ? FLINCH_DURATION : FLINCH_DURATION,
@@ -28,5 +29,4 @@ export default (chara: Chara, isKilled: boolean) => {
     repeat: 2,
     duration: 20 / GAME_SPEED,
   });
-
 };

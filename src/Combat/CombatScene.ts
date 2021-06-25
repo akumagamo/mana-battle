@@ -156,7 +156,7 @@ export default class CombatScene extends Phaser.Scene {
           );
 
           const chara = createChara({
-            parent: this,
+            scene: this,
             unit,
             x: x,
             y: y,

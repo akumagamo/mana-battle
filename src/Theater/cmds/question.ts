@@ -31,7 +31,7 @@ export const question = async (
   panel(0, 0, SCREEN_WIDTH, PANEL_HEIGHT, container, scene);
 
   const head = createChara({
-    parent: scene,
+    scene,
     unit: chara.props.unit,
     x: 100,
     y: 120,

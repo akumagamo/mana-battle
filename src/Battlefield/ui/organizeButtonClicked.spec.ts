@@ -7,8 +7,6 @@ import { toMapSquad, Unit } from '../../Unit/Model';
 import { Map, Set } from 'immutable';
 import { makeUnit } from '../../Unit/makeUnit';
 import { createSquad, makeMember, SquadRecord } from '../../Squad/Model';
-import squadDetails from '../effects/squadDetails';
-import { MapSquad } from '../Model';
 
 jest.mock('../../Squad/ListSquadsScene/ListSquadsScene');
 
@@ -17,7 +15,7 @@ const defaultProps = () => ({
   state: {
     ...map(),
     units: map().units.set('ally1', {
-      ...makeUnit({ id: 'ally1' }),
+      ...makeUnit('ally1'),
       force: PLAYER_FORCE,
     }),
     dispatchedSquads: Set(['ally_squad']),

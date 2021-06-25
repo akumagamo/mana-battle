@@ -10,10 +10,10 @@ jest.mock('../Unit/mods');
 
 test('Should sort by initiave correctly', () => {
   const units = Map({
-    '0': { ...makeUnit({ job: 'fighter', id: 0, lvl: 1 }), dex: 9 },
-    '1': { ...makeUnit({ job: 'fighter', id: 1, lvl: 1 }), dex: 6 },
-    '2': { ...makeUnit({ job: 'fighter', id: 2, lvl: 1 }), dex: 7 },
-    '3': { ...makeUnit({ job: 'fighter', id: 3, lvl: 1 }), dex: 8 },
+    '0': { ...makeUnit('0'), dex: 9 },
+    '1': { ...makeUnit('1'), dex: 6 },
+    '2': { ...makeUnit('2'), dex: 7 },
+    '3': { ...makeUnit('3'), dex: 8 },
   });
 
   const sorted = initiativeList(units);
@@ -23,10 +23,10 @@ test('Should sort by initiave correctly', () => {
 
 test('Combat should have the expected outcome', () => {
   const units = Map({
-    '0': assignSquad(makeUnit({ job: 'fighter', id: '0', lvl: 1 }), 's1'),
-    '1': assignSquad(makeUnit({ job: 'fighter', id: '1', lvl: 1 }), 's1'),
-    '2': assignSquad(makeUnit({ job: 'fighter', id: '2', lvl: 1 }), 's1'),
-    '3': assignSquad(makeUnit({ job: 'fighter', id: '3', lvl: 1 }), 's2'),
+    '0': assignSquad(makeUnit('0'), 's1'),
+    '1': assignSquad(makeUnit('1'), 's1'),
+    '2': assignSquad(makeUnit('2'), 's1'),
+    '3': assignSquad(makeUnit('3'), 's2'),
   });
 
   const squadIndex = Map({

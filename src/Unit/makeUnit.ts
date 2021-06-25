@@ -1,6 +1,6 @@
-import { HAIR_COLORS, SKIN_COLORS } from "../Chara/animations/constants";
-import { maleNames } from "../constants/names";
-import { randomItem } from "../utils";
+import { HAIR_COLORS, SKIN_COLORS } from '../Chara/animations/constants';
+import { maleNames } from '../constants/names';
+import { randomItem } from '../utils';
 import {
   Elem,
   Gender,
@@ -8,22 +8,17 @@ import {
   Movement,
   Unit,
   UnitClass as UnitJob,
-} from "./Model";
-import { getUnitAttacks } from "./Skills";
-import { baseEquips } from "./Jobs";
-import { PLAYER_FORCE } from "../constants";
+} from './Model';
+import { getUnitAttacks } from './Skills';
+import { baseEquips } from './Jobs';
+import { PLAYER_FORCE } from '../constants';
 
-export function makeUnit({
-  job = "fighter",
-  id = "1",
+export function makeUnit(
+  id = '1',
+  job = 'fighter' as UnitJob,
   lvl = 1,
-  overrides = {},
-}: {
-  id?: number | string;
-  job?: UnitJob;
-  lvl?: number;
-  overrides?: Object;
-}): Unit {
+  overrides = {}
+): Unit {
   const baseStats: {
     [job in UnitJob]: { hp: number; str: number; dex: number; int: number };
   } = {
@@ -49,14 +44,14 @@ export function makeUnit({
 
   return {
     name: randomItem(maleNames),
-    id: typeof id === "string" ? id : id.toString(),
+    id,
     class: job,
     equips: baseEquips[job],
     lvl,
     attacks: getUnitAttacks(job),
-    movement: "plain" as Movement,
-    elem: "neutral" as Elem,
-    gender: randomItem(["male", "female"] as Gender[]),
+    movement: 'plain' as Movement,
+    elem: 'neutral' as Elem,
+    gender: randomItem(['male', 'female'] as Gender[]),
     exp: 0,
     squad: null,
     force: PLAYER_FORCE,

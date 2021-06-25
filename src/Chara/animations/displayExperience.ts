@@ -7,7 +7,7 @@ export function displayExperience(chara: Chara, experience: number) {
     -100,
     `${experience.toString()} xp`,
     chara.container,
-    chara.props.parent
+    chara.props.scene
   );
   xp.setScale(1.5);
   xp.setShadow(0, 0, '#000', 2);
@@ -15,7 +15,7 @@ export function displayExperience(chara: Chara, experience: number) {
   chara.container.add(xp);
 
   return new Promise<void>((resolve) => {
-    chara.props.parent.tweens.add({
+    chara.props.scene.tweens.add({
       targets: xp,
       y: -120,
       alpha: 0,

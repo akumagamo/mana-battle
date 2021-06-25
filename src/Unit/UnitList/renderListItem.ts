@@ -19,7 +19,7 @@ export default (unitList: UnitList, unit: Unit, index: number) => {
   background_.setPosition(x,y)
 
   const chara = createChara({
-    parent: scene,
+    scene: scene,
     unit,
     x,
     y,

@@ -20,7 +20,7 @@ export default function (
     .toJS()
     .forEach((unit, iter) => {
       createChara({
-        parent: scene,
+        scene: scene,
         x: 50,
         y: 100 + 100 * iter,
         scale: 0.4,

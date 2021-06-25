@@ -93,7 +93,7 @@ export class ListUnitsScene extends Phaser.Scene {
     const tile = this.add.image(x_ + 2, y_ + 63, 'tile');
     tile.setScale(0.4);
     const chara = createChara({
-      parent: this,
+      scene: this,
       unit,
       x: x_,
       y: y_,

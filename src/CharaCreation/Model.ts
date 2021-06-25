@@ -1,7 +1,7 @@
-import { Chara } from "../Chara/Model";
-import { Container } from "../Models";
-import { makeUnit } from "../Unit/makeUnit";
-import { Unit } from "../Unit/Model";
+import { Chara } from '../Chara/Model';
+import { Container } from '../Models';
+import { makeUnit } from '../Unit/makeUnit';
+import { Unit } from '../Unit/Model';
 
 export type CharaCreationState = {
   unit: Unit;
@@ -9,7 +9,7 @@ export type CharaCreationState = {
   chara: Chara;
 };
 
-const unit = makeUnit({ id: "new_chara" });
+const unit = makeUnit('new_chara');
 
 export const initialUnit = {
   ...unit,

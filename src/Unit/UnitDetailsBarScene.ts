@@ -78,7 +78,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
 
     this.scene.remove("pic");
     const pic = createChara({
-      parent: this,
+      scene: this,
       unit,
       x: baseX + 80,
       y: baseY + 130,

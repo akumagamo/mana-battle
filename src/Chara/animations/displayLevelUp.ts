@@ -7,7 +7,7 @@ export async function displayLevelUp(chara: Chara) {
     -100,
     'Level up!',
     chara.container,
-    chara.props.parent
+    chara.props.scene
   );
   lvlUp.setScale(1.5);
   lvlUp.setShadow(0, 0, '#000', 2);
@@ -16,9 +16,9 @@ export async function displayLevelUp(chara: Chara) {
   chara.container.add(lvlUp);
 
   return new Promise<void>((resolve) => {
-    chara.props.parent.tweens.add({
+    chara.props.scene.tweens.add({
       targets: lvlUp,
-      y: -120,
+      y: lvlUp.y - 100,
       alpha: 0,
       duration: 1000,
       onComplete: () => {

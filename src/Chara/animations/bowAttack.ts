@@ -6,8 +6,8 @@ const ATTACK_DURATION = 500;
 export default (chara: Chara, onComplete: () => void) => {
   defaultPose(chara);
 
-  chara.props.parent.tweens.add({
-    targets: chara?.mainHandContainer,
+  chara.props.scene.tweens.add({
+    targets: chara.mainHandContainer,
     yoyo: true,
     x: (chara.mainHandContainer?.x || 0) + (chara.props.front ? -30 : 30),
     y: (chara.mainHandContainer?.y || 0) - 20,
@@ -18,8 +18,8 @@ export default (chara: Chara, onComplete: () => void) => {
     },
   });
 
-  chara.props.parent.tweens.add({
-    targets: chara?.offHandContainer,
+  chara.props.scene.tweens.add({
+    targets: chara.offHandContainer,
     yoyo: true,
     rotation: chara.props.front ? -1.2 : 0.5,
     x: (chara.mainHandContainer?.y || 0) + 20,

@@ -1,13 +1,13 @@
-import { Unit } from "../Unit/Model";
-import initial from "./animations/initial";
-import stand from "./animations/stand";
-import { Chara } from "./Model";
-import hpBar from "./ui/hpBar";
-import * as selectChara from "./commands/selectChara";
-import * as deselectChara from "./commands/deselectChara";
+import { Unit } from '../Unit/Model';
+import initial from './animations/initial';
+import stand from './animations/stand';
+import { Chara } from './Model';
+import hpBar from './ui/hpBar';
+import * as selectChara from './commands/selectChara';
+import * as deselectChara from './commands/deselectChara';
 
 export default (props: {
-  parent: Phaser.Scene;
+  scene: Phaser.Scene;
   unit: Unit;
   x?: number;
   y?: number;
@@ -19,7 +19,7 @@ export default (props: {
   showWeapon?: boolean;
 }): Chara => {
   const {
-    parent,
+    scene,
     unit,
     x = 0,
     y = 0,
@@ -31,11 +31,11 @@ export default (props: {
     showWeapon = false,
   } = props;
   //the unit has two wrappers to allow multiple tweens at once
-  const container = parent.add.container(x, y);
+  const container = scene.add.container(x, y);
   container.name = unit.id;
 
-  const charaWrapper = parent.add.container();
-  container.add(charaWrapper);
+  const innerWrapper = scene.add.container();
+  container.add(innerWrapper);
 
   container.setDepth(y);
   const container_width = 100;
@@ -56,10 +56,10 @@ export default (props: {
       showHpBar,
       showWeapon,
     },
-    scene: parent,
+    scene,
     container,
-    innerWrapper: charaWrapper,
-    hpBarContainer: parent.add.container(),
+    innerWrapper,
+    hpBarContainer: scene.add.container(),
 
     hair: null,
     head: null,
@@ -79,7 +79,6 @@ export default (props: {
     destroy: () => {
       container.destroy();
     }, //todo: make this an external function. check other destroy fns
-
   };
 
   initial(chara, headOnly);
@@ -118,9 +117,8 @@ export default (props: {
   // originGraphic.fillRectShape(origin);
   // chara.container.add(originGraphic);
 
-
-  selectChara.subscribe(chara)
-  deselectChara.subscribe(chara)
+  selectChara.subscribe(chara);
+  deselectChara.subscribe(chara);
 
   return chara;
 };

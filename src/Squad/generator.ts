@@ -42,7 +42,7 @@ export function squadGenerator(
 
   const units = unitList.reduce((xs, [class_], index) => {
     return xs.set(unitId(index), {
-      ...makeUnit({ job: class_, id: unitId(index), lvl: level }),
+      ...makeUnit(unitId(index), class_, level),
       squad: squadId,
     });
   }, Map() as UnitIndex);

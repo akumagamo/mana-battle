@@ -8,7 +8,7 @@ import { Gender, Unit } from '../../Unit/Model';
 import { SceneConfig } from '../Models';
 
 const priest = {
-  ...makeUnit({ job: 'mage', id: 'priest', lvl: 1, overrides: {} }),
+  ...makeUnit('yordja', 'mage'),
   name: 'Yordja',
   gender: Gender.Female,
   style: {

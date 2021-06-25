@@ -3,7 +3,7 @@ import {Unit} from "../../Unit/Model";
 
 export default (scene: Phaser.Scene, unit: Unit) =>
   createChara({
-    parent: scene,
+    scene: scene,
     unit,
     x: 250,
     y: 250,

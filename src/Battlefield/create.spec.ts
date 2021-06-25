@@ -39,7 +39,7 @@ it('should not be paused after creation', () => {
   expect(state.isPaused).toBeFalsy();
 });
 
-it('should communicate that the game that the has started', async () => {
+it('should communicate the game that the scene has started', async () => {
   const scene = sceneMock();
   const state = map();
 

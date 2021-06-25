@@ -1,10 +1,10 @@
-import { destroyImage } from "../../Browser/phaser";
-import { createEvent } from "../../utils";
-import { Chara } from "../Model";
+import { destroyImage } from '../../Browser/phaser';
+import { EventEmitter } from '../../Models';
+import { createEvent } from '../../utils';
+import { Chara } from '../Model';
 
-const event = (
-  emitter: Phaser.Events.EventEmitter | Phaser.GameObjects.GameObject
-) => createEvent<Chara>(emitter, "deselectChara");
+const event = (emitter: EventEmitter) =>
+  createEvent<Chara>(emitter, 'deselectChara');
 
 export default function deselectChara(chara: Chara) {
   if (chara.selectedCharaIndicator) {
