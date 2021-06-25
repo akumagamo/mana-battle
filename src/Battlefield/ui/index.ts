@@ -6,7 +6,6 @@ import text from '../../UI/text';
 import { disableMapInput } from '../board/input';
 import dispatchWindow from '../dispatchWindow';
 import OrganizeButtonClicked from '../events/OrganizeButtonClicked';
-import { MapScene } from '../MapScene';
 import { MapState } from '../Model';
 import turnOff from '../turnOff';
 import city from './city';
@@ -18,7 +17,7 @@ const BOTTOM_PANEL_X = 0;
 export const BOTTOM_PANEL_Y = SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT;
 
 export default function ui(
-  scene: MapScene,
+  scene: Phaser.Scene,
   state: MapState,
   uiContainer: Container
 ): Promise<void> {
@@ -80,7 +79,7 @@ export async function destroyUI(state: MapState) {
   uiContainer.removeAll(true);
 }
 
-export async function refreshUI(scene: MapScene, state: MapState) {
+export async function refreshUI(scene: Phaser.Scene, state: MapState) {
   destroyUI(state);
 
   if (state.uiMode.type === 'CHANGING_SQUAD_FORMATION') return;

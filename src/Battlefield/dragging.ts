@@ -3,7 +3,6 @@ import { Image, Pointer } from '../Models';
 import { delay } from '../Scenes/utils';
 import { disableCellClick, enableCellClick } from './board/input';
 import { cellSize } from './config';
-import { MapScene } from './MapScene';
 import { MapState } from './Model';
 
 export function setWorldBounds(state: MapState) {
@@ -15,7 +14,7 @@ export function setWorldBounds(state: MapState) {
   };
 }
 
-export function makeWorldDraggable(scene: MapScene, state: MapState) {
+export function makeWorldDraggable(scene: Phaser.Scene, state: MapState) {
   state.mapContainer.setSize(
     state.mapContainer.getBounds().width,
     state.mapContainer.getBounds().height

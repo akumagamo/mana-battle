@@ -1,5 +1,5 @@
 import CharaCreationScene from './CharaCreation/CharaCreationScene';
-import { MapScene } from './Battlefield/MapScene';
+import { Battlefield } from './Battlefield/MapScene';
 import TitleScene from './Scenes/Title/TitleScene';
 import { initialState } from './Scenes/Title/Model';
 import * as newgamebtn from './Scenes/Title/events/newGameButtonClicked';
@@ -40,37 +40,37 @@ export async function endToEndTesting(game: Phaser.Game) {
   //   charaCreationScene.onHeroCreated
   // );
 
-  // const mapScene = (await event(game.events)("MapSceneCreated")) as MapScene;
+  // const Phaser.Scene = (await event(game.events)("Phaser.SceneCreated")) as Phaser.Scene;
 
-  // const squad = mapScene.state.squads.find(
+  // const squad = Phaser.Scene.state.squads.find(
   //   (sqd) => sqd.squad.force === PLAYER_FORCE
   // );
-  // clickCell(mapScene, 3, 5);
-  // mapScene.evs.MovePlayerSquadButonClicked.emit({
-  //   mapScene: mapScene,
+  // clickCell(Phaser.Scene, 3, 5);
+  // Phaser.Scene.evs.MovePlayerSquadButonClicked.emit({
+  //   Phaser.Scene: Phaser.Scene,
   //   mapSquad: squad,
   // });
-  // assert("MapScene is paused after clicking 'Move'", mapscene.state.isPaused, true);
+  // assert("Phaser.Scene is paused after clicking 'Move'", Phaser.Scene.state.isPaused, true);
 
-  // clickCell(mapScene, 7, 5);
+  // clickCell(Phaser.Scene, 7, 5);
 
-  // mapScene.evs.SquadDispatched.once((_id) => {
+  // Phaser.Scene.evs.SquadDispatched.once((_id) => {
   //   assert(
-  //     "MapScene is no longer paused selecting move destination",
-  //     mapscene.state.isPaused,
+  //     "Phaser.Scene is no longer paused selecting move destination",
+  //     Phaser.Scene.state.isPaused,
   //     false
   //   );
   // });
 
-  // mapScene.evs.SquadArrivedInfoMessageCompleted.once((chara) => {
-  //   mapScene.evs.CloseSquadArrivedInfoMessage.emit(chara);
+  // Phaser.Scene.evs.SquadArrivedInfoMessageCompleted.once((chara) => {
+  //   Phaser.Scene.evs.CloseSquadArrivedInfoMessage.emit(chara);
 
-  //   mapScene.evs.MovePlayerSquadButonClicked.emit({
-  //     mapScene: mapScene,
+  //   Phaser.Scene.evs.MovePlayerSquadButonClicked.emit({
+  //     Phaser.Scene: Phaser.Scene,
   //     mapSquad: squad,
   //   });
 
-  //   mapScene.evs.OrganizeButtonClicked.emit(mapScene);
+  //   Phaser.Scene.evs.OrganizeButtonClicked.emit(Phaser.Scene);
   // });
 }
 
@@ -104,7 +104,7 @@ async function startGame(scn: Phaser.Scene) {
     .emit({ scene: scn, state: initialState });
 }
 
-function clickCell(scn: MapScene, x: number, y: number) {
+function clickCell(scn: Phaser.Scene, x: number, y: number) {
   mapEvents()
     .CellClicked(scn)
     .emit({

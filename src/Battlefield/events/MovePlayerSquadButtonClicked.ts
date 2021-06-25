@@ -1,11 +1,10 @@
 import { createEvent } from '../../utils';
-import { MapScene } from '../MapScene';
 import { MapSquad, MapState } from '../Model';
 
 export const key = 'MovePlayerSquadButonClicked';
 export default (scene: Phaser.Scene) =>
   createEvent<{
-    mapScene: MapScene;
+    scene: Phaser.Scene;
     state: MapState;
     mapSquad: MapSquad;
   }>(scene.events, key);

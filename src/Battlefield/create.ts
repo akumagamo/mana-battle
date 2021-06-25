@@ -8,14 +8,13 @@ import renderSquads from './board/renderSquads';
 import renderStructures from './board/renderStructures';
 import { makeWorldDraggable, setWorldBounds } from './dragging';
 import destroySquad from './events/destroySquad';
-import { MapScene } from './MapScene';
 import { MapState } from './Model';
 import pushSquad from './squads/pushSquad';
 import subscribe from './subscribe';
 import { refreshUI } from './ui';
 import update from './update';
 
-export default async (scene: MapScene, state: MapState) => {
+export default async (scene: Phaser.Scene, state: MapState) => {
   subscribe(scene, state);
 
   scene.events.on('update', () => {
@@ -61,5 +60,5 @@ export default async (scene: MapScene, state: MapState) => {
 
   refreshUI(scene, state);
 
-  scene.game.events.emit('MapSceneCreated', { scene, state });
+  scene.game.events.emit('Phaser.SceneCreated', { scene, state });
 };

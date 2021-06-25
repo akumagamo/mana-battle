@@ -1,4 +1,3 @@
-import { MapScene } from './MapScene';
 import { MapState, Vector } from './Model';
 import { refreshUI } from './ui';
 
@@ -10,7 +9,7 @@ export type Mode =
   | { type: 'CHANGING_SQUAD_FORMATION' };
 export const DEFAULT_MODE: Mode = { type: 'NOTHING_SELECTED' };
 
-export function changeMode(scene: MapScene, state: MapState, mode: Mode) {
+export function changeMode(scene: Phaser.Scene, state: MapState, mode: Mode) {
   state.uiMode = mode;
   refreshUI(scene, state);
 }

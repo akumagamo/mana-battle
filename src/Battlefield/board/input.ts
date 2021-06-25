@@ -1,6 +1,5 @@
 import { Pointer } from '../../Models';
 import CellClicked from '../events/CellClicked';
-import { MapScene } from '../MapScene';
 import { MapState, MapTile } from '../Model';
 import { refreshUI } from '../ui';
 
@@ -10,7 +9,7 @@ export function disableMapInput(state: MapState) {
   state.dragDisabled = true;
 }
 
-export function enableInput(scene: MapScene, state: MapState) {
+export function enableInput(scene: Phaser.Scene, state: MapState) {
   state.dragDisabled = false;
   enableCellClick(state);
 
@@ -27,7 +26,7 @@ export function enableCellClick(state: MapState) {
   state.cellClickDisabled = false;
 }
 export function makeInteractive(
-  scene: MapScene,
+  scene: Phaser.Scene,
   state: MapState,
   cell: MapTile
 ) {
@@ -47,7 +46,7 @@ export function clearAllTileEvents(state: MapState) {
   });
 }
 
-export function clearAllTileTint(scene: MapScene, state: MapState) {
+export function clearAllTileTint(scene: Phaser.Scene, state: MapState) {
   state.tiles.forEach((tile) => {
     tile.tile.clearTint();
     scene.tweens.killTweensOf(tile.tile);

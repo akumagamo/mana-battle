@@ -1,13 +1,12 @@
 import { MapSquad, MapState } from '../Model';
 import button from '../../UI/button';
-import { MapScene } from '../MapScene';
 import EditSquadModal from '../../Squad/EditSquadModal/createEditSquadModal';
 import MovePlayerSquadButtonClicked from '../events/MovePlayerSquadButtonClicked';
 import { disableMapInput, enableInput } from '../board/input';
 import { changeMode } from '../Mode';
 
 export default (
-  mapScene: MapScene,
+  scene: Phaser.Scene,
   state: MapState,
   baseY: number,
   mapSquad: MapSquad
@@ -16,12 +15,12 @@ export default (
   const mode = state.uiMode.type;
 
   if (mode === 'SQUAD_SELECTED') {
-    button(baseX + 400, baseY, 'Formation', state.uiContainer, mapScene, () => {
-      changeMode(mapScene, state, { type: 'CHANGING_SQUAD_FORMATION' });
+    button(baseX + 400, baseY, 'Formation', state.uiContainer, scene, () => {
+      changeMode(scene, state, { type: 'CHANGING_SQUAD_FORMATION' });
       disableMapInput(state);
 
       EditSquadModal({
-        scene: mapScene,
+        scene,
         squad: mapSquad.squad,
         units: state.units,
         addUnitEnabled: false,
@@ -32,16 +31,16 @@ export default (
           );
         },
         onClose: () => {
-          enableInput(mapScene, state);
-          changeMode(mapScene, state, {
+          enableInput(scene, state);
+          changeMode(scene, state, {
             type: 'SQUAD_SELECTED',
             id: mapSquad.squad.id,
           });
         },
       });
     });
-    button(baseX + 200, baseY, 'Move', state.uiContainer, mapScene, () =>
-      MovePlayerSquadButtonClicked(mapScene).emit({ mapScene, state, mapSquad })
+    button(baseX + 200, baseY, 'Move', state.uiContainer, scene, () =>
+      MovePlayerSquadButtonClicked(scene).emit({ scene, state, mapSquad })
     );
   }
 };
@@ -49,13 +48,13 @@ export default (
 export function handleMovePlayerSquadButtonClicked({
   mapSquad,
   state,
-  mapScene,
+  scene,
 }: {
-  mapScene: MapScene;
+  scene: Phaser.Scene;
   state: MapState;
   mapSquad: MapSquad;
 }) {
-  changeMode(mapScene, state, {
+  changeMode(scene, state, {
     type: 'SELECT_SQUAD_MOVE_TARGET',
     id: mapSquad.id,
     start: mapSquad.pos,

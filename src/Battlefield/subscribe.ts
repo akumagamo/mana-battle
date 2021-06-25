@@ -1,4 +1,3 @@
-import { MapScene } from "./MapScene";
 import events from "./events";
 import { handleMovePlayerSquadButtonClicked } from "./ui/playerSquad";
 import { handleCloseSquadArrivedInfoMessage } from "./events/SquadArrivedInfoMessageClosed";
@@ -10,7 +9,7 @@ import { getChara, MapState } from "./Model";
 import * as selectChara from "../Chara/commands/selectChara";
 import deselectAllEntities from "./commands/deselectAllEntities";
 
-export default function (scene: MapScene, state: MapState) {
+export default function (scene: Phaser.Scene, state: MapState) {
   const index = events();
 
   index.CellClicked(scene).on((c) => handleCellClick(c));

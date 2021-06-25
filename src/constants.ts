@@ -13,7 +13,7 @@ export const PUBLIC_URL = 'assets';
 export const SCENES = {
   TITLE_SCENE: 'TitleScene',
   MAP_LIST_SCENE: 'MapListScene',
-  MAP_SCENE: 'MapScene',
+  MAP_SCENE: 'Phaser.Scene',
   COMBAT_SCENE: 'CombatScene',
   LIST_UNITS_SCENE: 'ListUnitsScene',
   CREATE_SQUAD_SCENE: 'CreateSquadScene',

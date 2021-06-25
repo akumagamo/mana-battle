@@ -1,9 +1,8 @@
 import { healSquads } from './events/healSquadsTick';
-import { MapScene } from './MapScene';
 import { MapState } from './Model';
 import moveSquads from './update/moveSquads';
 
-export default function (scene: MapScene, state: MapState) {
+export default function (scene: Phaser.Scene, state: MapState) {
   if (!state.isPaused) {
     moveSquads(scene, state);
 

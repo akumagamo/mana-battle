@@ -1,11 +1,10 @@
 import { Image } from "../../Models";
-import { MapScene } from "../MapScene";
 import { MapState } from "../Model";
 import { cellToScreenPosition } from "./position";
 
 const CITY_SCALE = 0.5;
 
-export default (scene: MapScene, state: MapState) => {
+export default (scene: Phaser.Scene, state: MapState) => {
   state.cities.forEach((city) => {
     const { x, y } = cellToScreenPosition({ x: city.x, y: city.y });
 

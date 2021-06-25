@@ -9,7 +9,6 @@ import { renderSquad } from './board/renderSquads';
 import DispatchWindowRendered from './events/DispatchWindowRendered';
 import SquadClicked from './events/SquadClicked';
 import SquadDispatched from './events/SquadDispatched';
-import { MapScene } from './MapScene';
 import { changeMode } from './Mode';
 import {
   getCity,
@@ -22,7 +21,7 @@ import {
 } from './Model';
 import signal from './signal';
 
-export default (scene: MapScene, state: MapState) => {
+export default (scene: Phaser.Scene, state: MapState) => {
   let container = scene.add.container();
 
   const x = SCREEN_WIDTH / 4;
@@ -84,7 +83,7 @@ export default (scene: MapScene, state: MapState) => {
 
 export const handleDispatchSquad = async (
   container: Phaser.GameObjects.Container,
-  scene: MapScene,
+  scene: Phaser.Scene,
   state: MapState,
   mapSquad: MapSquad
 ) => {
@@ -109,7 +108,11 @@ export const handleDispatchSquad = async (
   SquadDispatched(scene).emit(mapSquad.id);
 };
 
-function dispatchSquad(scene: MapScene, state: MapState, squad: SquadRecord) {
+function dispatchSquad(
+  scene: Phaser.Scene,
+  state: MapState,
+  squad: SquadRecord
+) {
   const force = getForce(state, PLAYER_FORCE);
   let mapSquad = toMapSquad(
     squad,

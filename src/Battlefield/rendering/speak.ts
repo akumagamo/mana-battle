@@ -2,11 +2,10 @@ import { GAME_SPEED } from '../../env';
 import button from '../../UI/button';
 import speech from '../../UI/speech';
 import SquadArrivedInfoMessageClosed from '../events/SquadArrivedInfoMessageClosed';
-import { MapScene } from '../MapScene';
 import { getSquadLeader, MapSquad, MapState } from '../Model';
 
 export default async function (
-  scene: MapScene,
+  scene: Phaser.Scene,
   state: MapState,
   squad: MapSquad
 ) {

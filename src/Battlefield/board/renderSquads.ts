@@ -1,12 +1,11 @@
 import { getMapSquad, MapSquad, MapState } from '../Model';
 import { INVALID_STATE } from '../../errors';
-import { MapScene } from '../MapScene';
 import { PLAYER_FORCE } from '../../constants';
 import { CHARA_MAP_SCALE } from '../config';
 import createChara from '../../Chara/createChara';
 
 export const renderSquad = (
-  scene: MapScene,
+  scene: Phaser.Scene,
   state: MapState,
   mapSquad: MapSquad
 ): void => {
@@ -44,7 +43,7 @@ export const renderSquad = (
   state.charas.push(chara);
 };
 
-export default (scene: MapScene, state: MapState): void => {
+export default (scene: Phaser.Scene, state: MapState): void => {
   state.dispatchedSquads.forEach((id) =>
     renderSquad(scene, state, getMapSquad(state, id))
   );

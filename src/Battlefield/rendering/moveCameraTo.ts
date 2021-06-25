@@ -1,10 +1,9 @@
 import { Vector } from 'matter';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../../constants';
-import { MapScene } from '../MapScene';
 import { MapState } from '../Model';
 
 export default function moveCameraTo(
-  scene: MapScene,
+  scene: Phaser.Scene,
   state: MapState,
   { x, y }: Vector,
   duration: number

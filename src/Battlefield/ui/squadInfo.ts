@@ -4,12 +4,11 @@ import button from '../../UI/button';
 import text from '../../UI/text';
 import { disableMapInput, enableInput } from '../board/input';
 import squadDetails from '../effects/squadDetails';
-import { MapScene } from '../MapScene';
 import { getMapSquad, getSquadLeader, getSquadUnits, MapState } from '../Model';
 import playerSquad from './playerSquad';
 
 export async function squadInfo(
-  scene: MapScene,
+  scene: Phaser.Scene,
   state: MapState,
   uiContainer: Phaser.GameObjects.Container,
   baseY: number,
@@ -44,7 +43,7 @@ export async function squadInfo(
 }
 
 export function viewSquadDetails(
-  scene: MapScene,
+  scene: Phaser.Scene,
   state: MapState,
   id: string
 ): void {

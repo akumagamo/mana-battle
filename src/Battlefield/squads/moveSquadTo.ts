@@ -1,12 +1,11 @@
 import { Vector } from 'matter';
 import { getPathTo } from '../api';
 import { screenToCellPosition } from '../board/position';
-import { MapScene } from '../MapScene';
 import { changeMode } from '../Mode';
 import { getMapSquad, MapState } from '../Model';
 
 export default async function (
-  scene: MapScene,
+  scene: Phaser.Scene,
   state: MapState,
   id: string,
   target: Vector

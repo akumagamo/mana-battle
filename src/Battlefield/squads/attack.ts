@@ -7,13 +7,12 @@ import { fadeOut } from '../../UI/Transition';
 import { Unit } from '../../Unit/Model';
 import CombatInitiated from '../events/CombatInitiated';
 import ReturnedFromCombat from '../events/ReturnedFromCombat';
-import { MapScene } from '../MapScene';
 import { MapSquad, MapState } from '../Model';
 import turnOff from '../turnOff';
 import markSquadForRemoval from './markSquadForRemoval';
 
 export default async function (
-  scene: MapScene,
+  scene: Phaser.Scene,
   state: MapState,
   starter: MapSquad,
   target: MapSquad,
@@ -54,7 +53,7 @@ export default async function (
       direction,
     };
 
-    scene.scene.start('MapScene', state);
+    scene.scene.start('Phaser.Scene', state);
 
     ReturnedFromCombat(scene).emit(null);
   };

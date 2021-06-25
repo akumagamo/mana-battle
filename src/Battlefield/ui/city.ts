@@ -1,10 +1,9 @@
 import { Container } from '../../Models';
 import text from '../../UI/text';
-import { MapScene } from '../MapScene';
 import { getCity, getForce, MapState } from '../Model';
 
 export default async (
-  scene: MapScene,
+  scene: Phaser.Scene,
   state: MapState,
   uiContainer: Container,
   baseY: number,

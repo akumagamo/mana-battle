@@ -1,4 +1,3 @@
-import { MapScene } from "../MapScene";
 import { PLAYER_FORCE } from "../../constants";
 import { getMapSquad, MapState, Vector } from "../Model";
 import { cellToScreenPosition, screenToCellPosition } from "./position";
@@ -9,7 +8,7 @@ import { getDistance } from "../../utils";
 import { changeMode } from "../Mode";
 import selectCityCommand from "../commands/selectCityCommand";
 
-export default async (scene: MapScene, state: MapState, cell: Vector) => {
+export default async (scene: Phaser.Scene, state: MapState, cell: Vector) => {
   const { x, y } = cell;
 
   const mapSquad = squadAt(state, x, y);
@@ -39,7 +38,7 @@ export default async (scene: MapScene, state: MapState, cell: Vector) => {
 };
 
 async function handleSelectSquadMoveTarget(
-  scene: MapScene,
+  scene: Phaser.Scene,
   state: MapState,
   x: number,
   y: number,

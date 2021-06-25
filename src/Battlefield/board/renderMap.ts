@@ -1,9 +1,8 @@
 import { MapState, tileMap, translateTiles } from '../Model';
-import { MapScene } from '../MapScene';
 import { cellToScreenPosition } from './position';
 import { cellSize } from '../config';
 
-export default (scene: MapScene, state: MapState) => {
+export default (scene: Phaser.Scene, state: MapState) => {
   const { mapContainer } = state;
   translateTiles(state.cells).forEach((arr, col) =>
     arr.forEach((n, row) => {

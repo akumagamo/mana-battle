@@ -1,11 +1,10 @@
 import { Chara } from '../../Chara/Model';
 import { createEvent } from '../../utils';
-import { MapScene } from '../MapScene';
 import { MapState } from '../Model';
 import { refreshUI } from '../ui';
 
 export function handleCloseSquadArrivedInfoMessage(
-  scene: MapScene,
+  scene: Phaser.Scene,
   state: MapState,
   chara: Chara
 ) {

@@ -52,7 +52,7 @@ it('should start ListSquadScene when clicked', () => {
   expect(getMockCalls(run).length).toEqual(1);
 });
 
-it('should stop MapScene when clicked', () => {
+it('should stop Phaser.Scene when clicked', () => {
   const props = defaultProps();
 
   organizeButtonClicked(props, () => {});

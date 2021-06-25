@@ -2,7 +2,6 @@ import { Vector } from "matter";
 import { GAME_SPEED } from "../../env";
 import { tween } from "../../Scenes/utils";
 import { createEvent } from "../../utils";
-import { MapScene } from "../MapScene";
 import { MapState } from "../Model";
 import signal from "../signal";
 
@@ -14,7 +13,7 @@ export async function handleCellClick({
   tile,
   pointer,
 }: {
-  scene: MapScene;
+  scene: Phaser.Scene;
   state: MapState;
   tile: Vector;
   pointer: Vector;
@@ -36,16 +35,16 @@ export async function handleCellClick({
   handlePhaserTweenInterruptionBug(scene, ping);
 }
 
-export default (scene: MapScene) =>
+export default (scene: Phaser.Scene) =>
   createEvent<{
-    scene: MapScene;
+    scene: Phaser.Scene;
     state: MapState;
     tile: Vector;
     pointer: Vector;
   }>(scene.events, key);
 
 function handlePhaserTweenInterruptionBug(
-  scene: MapScene,
+  scene: Phaser.Scene,
   ping: Phaser.GameObjects.Image
 ) {
   scene.time.addEvent({

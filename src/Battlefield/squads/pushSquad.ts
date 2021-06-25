@@ -1,9 +1,8 @@
 import { GAME_SPEED } from '../../env';
 import { cellSize } from '../config';
-import { MapScene } from '../MapScene';
 import { getChara, getMapSquad, MapState } from '../Model';
 
-export default async function (scene: MapScene, state: MapState) {
+export default async function (scene: Phaser.Scene, state: MapState) {
   if (state.squadToPush) {
     const loser = getMapSquad(state, state.squadToPush.loser);
 

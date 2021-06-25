@@ -1,9 +1,8 @@
-import { MapScene } from '../MapScene';
 import { getCity, MapState } from '../Model';
 import signal from '../signal';
 import { refreshUI } from '../ui';
 
-export default async function (scene: MapScene, state: MapState, id: string) {
+export default async function (scene: Phaser.Scene, state: MapState, id: string) {
   refreshUI(scene, state);
   const { x, y } = getCity(state, id);
 

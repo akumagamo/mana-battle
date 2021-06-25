@@ -2,12 +2,11 @@ import { getDistance } from '../../utils';
 import { cellToScreenPosition } from '../board/position';
 import startCombat from '../squads/startCombat';
 import { cellSize, MOVE_SPEED } from '../config';
-import { MapScene } from '../MapScene';
 import finishMovement from './finishMovement';
 import stepChara from './stepChara';
 import { getChara, getMapSquad, MapState } from '../Model';
 
-export default function (scene: MapScene, state: MapState) {
+export default function (scene: Phaser.Scene, state: MapState) {
   const movedSquads = state.squadsInMovement.keySeq();
 
   let direction = '';

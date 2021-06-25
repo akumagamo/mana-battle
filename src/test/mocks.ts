@@ -1,4 +1,4 @@
-import { Container } from '../Models';
+import { Container } from "../Models";
 
 export const eventsMock = () => ({
   on: jest.fn(),
@@ -22,12 +22,12 @@ export const containerMock = (jest.fn((x?: number, y?: number) => ({
   y,
   add: jest.fn(),
   ...gameObjectMock(),
-  __type__: "container"
+  __type__: "container",
 })) as unknown) as () => Container;
 export const imageMock = jest.fn(() => ({
   setTint: jest.fn(),
   ...gameObjectMock(),
-  __type__: "image"
+  __type__: "image",
 }));
 
 export const textMock = jest.fn(() => ({
@@ -35,7 +35,7 @@ export const textMock = jest.fn(() => ({
   setColor: jest.fn(),
   getTextMetrics: jest.fn(),
   ...gameObjectMock(),
-  __type__: "text"
+  __type__: "text",
 }));
 export const graphicsMock = jest.fn(() => ({
   ...gameObjectMock(),
@@ -43,7 +43,7 @@ export const graphicsMock = jest.fn(() => ({
   fillGradientStyle: jest.fn(),
   strokeRect: jest.fn(),
   fillRect: jest.fn(),
-  __type__: "graphics"
+  __type__: "graphics",
 }));
 export const tweensMock = {
   add: jest.fn(),
@@ -79,6 +79,8 @@ export const sceneMock = () => {
         manager: jest.fn(),
       },
     },
+    preload: jest.fn(),
+    create: jest.fn(),
   } as unknown) as Phaser.Scene;
 };
 

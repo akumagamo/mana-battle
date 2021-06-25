@@ -1,10 +1,9 @@
 import { Chara } from '../../Chara/Model';
 import { MOVE_SPEED, CHARA_MAP_SCALE } from '../config';
-import { MapScene } from '../MapScene';
 import { MapSquad, MapState } from '../Model';
 
 export default function (
-  scene: MapScene,
+  scene: Phaser.Scene,
   state: MapState,
   next: { x: number; y: number },
   squad: MapSquad,

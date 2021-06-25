@@ -5,14 +5,13 @@ import { Container } from '../../Models';
 import button from '../../UI/button';
 import { Unit, UnitIndex } from '../../Unit/Model';
 import SmallUnitDetailsBar from '../../Unit/SmallUnitDetailsBar';
-import { MapScene } from '../MapScene';
 import { findMember } from '../../Squad/Model';
 import onBoardUnitClicked from '../../Board/events/onBoardUnitClicked';
 import createStaticBoard from '../../Board/createBoard';
 import highlightTile from '../../Board/highlightTile';
 
 export default (
-  scene: MapScene,
+  scene: Phaser.Scene,
   mapSquad: MapSquad,
   units: UnitIndex,
   onClose: () => void
@@ -67,7 +66,7 @@ export default (
   });
 };
 
-function backdrop(scene: MapScene) {
+function backdrop(scene: Phaser.Scene) {
   const backdrop = scene.add.graphics();
   backdrop.fillStyle(0x000000, 0.5);
   backdrop.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);

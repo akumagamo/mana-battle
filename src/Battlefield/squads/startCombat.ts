@@ -5,13 +5,12 @@ import { delay } from '../../Scenes/utils';
 import panel from '../../UI/panel';
 import speech from '../../UI/speech';
 import { disableMapInput } from '../board/input';
-import { MapScene } from '../MapScene';
 import { MapSquad, getSquadUnits, getSquadLeader, MapState } from '../Model';
 import { destroyUI } from '../ui';
 import attack from './attack';
 
 export default async function (
-  scene: MapScene,
+  scene: Phaser.Scene,
   state: MapState,
   squadA: MapSquad,
   squadB: MapSquad,

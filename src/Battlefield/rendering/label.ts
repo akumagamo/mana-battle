@@ -1,9 +1,8 @@
 import panel from '../../UI/panel';
-import { MapScene } from '../MapScene';
 import { MapState } from '../Model';
 
 export default function (
-  scene: MapScene,
+  scene: Phaser.Scene,
   state: MapState,
   x: number,
   y: number,

@@ -6,7 +6,7 @@ import panel from './panel';
 import text from './text';
 
 /**
- * Be careful calling this after MapScene's CLICK_SQUAD, as refreshing
+ * Be careful calling this after Phaser.Scene's CLICK_SQUAD, as refreshing
  * the UI container (and having it as parent for this) will throw
  * errors at the Chara and text container levels
  */

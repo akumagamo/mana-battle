@@ -2,12 +2,11 @@ import { Vector } from 'matter';
 import stand from '../../Chara/animations/stand';
 import { screenToCellPosition } from '../board/position';
 import SquadArrivedInfoMessageCompleted from '../events/SquadArrivedInfoMessageCompleted';
-import { MapScene } from '../MapScene';
 import { getChara, MapSquad, MapState } from '../Model';
 import speak from '../rendering/speak';
 
 export default async function (
-  scene: MapScene,
+  scene: Phaser.Scene,
   state: MapState,
   path: Vector[],
   squad: MapSquad

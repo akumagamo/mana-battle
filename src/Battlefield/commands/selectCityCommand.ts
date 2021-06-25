@@ -1,10 +1,9 @@
 import { createImage } from "../../Browser/phaser";
-import { MapScene } from "../MapScene";
 import { City, MapState } from "../Model";
 import { refreshUI } from "../ui";
 import deselectAllEntities from "./deselectAllEntities";
 
-const selectCityCommand = (scene: MapScene, state: MapState) => (
+const selectCityCommand = (scene: Phaser.Scene, state: MapState) => (
   city: City
 ) => {
   state.uiMode = { type: "CITY_SELECTED", id: city.id };
@@ -21,7 +20,7 @@ export default selectCityCommand;
 function createSelectedCityIndicator(
   state: MapState,
   city: City,
-  scene: MapScene
+  scene: Phaser.Scene
 ) {
   const city_ = state.citySprites.find((c) => c.id === city.id);
   const selectedIndicator = createImage(scene, "chara/selected_chara", 0, 20);
