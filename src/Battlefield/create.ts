@@ -34,8 +34,6 @@ export default async (scene: Phaser.Scene, state: MapState) => {
   state.uiContainer = scene.add.container();
   state.missionContainer = scene.add.container();
 
-  await delay(scene, 100);
-
   renderMap(scene, state);
   renderStructures(scene, state);
   renderSquads(scene, state);
@@ -60,5 +58,5 @@ export default async (scene: Phaser.Scene, state: MapState) => {
 
   refreshUI(scene, state);
 
-  scene.game.events.emit('Phaser.SceneCreated', { scene, state });
+  scene.game.events.emit('BattlefieldSceneCreated', { scene, state });
 };

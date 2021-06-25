@@ -1,10 +1,11 @@
-import { Container } from "../Models";
+import { Container } from '../Models';
 
 export const eventsMock = () => ({
   on: jest.fn(),
   once: jest.fn(),
   emit: jest.fn(),
   off: jest.fn(),
+  removeAllListeners: jest.fn(),
 });
 export const gameObjectMock = () => ({
   ...eventsMock(),
@@ -16,18 +17,20 @@ export const gameObjectMock = () => ({
   destroy: jest.fn(),
   setOrigin: jest.fn(),
   setInteractive: jest.fn(),
+  getBounds: () => ({ width: 111, height: 111 }),
 });
 export const containerMock = (jest.fn((x?: number, y?: number) => ({
   x,
   y,
   add: jest.fn(),
+  removeAll: jest.fn(),
   ...gameObjectMock(),
-  __type__: "container",
+  __type__: 'container',
 })) as unknown) as () => Container;
 export const imageMock = jest.fn(() => ({
   setTint: jest.fn(),
   ...gameObjectMock(),
-  __type__: "image",
+  __type__: 'image',
 }));
 
 export const textMock = jest.fn(() => ({
@@ -35,7 +38,7 @@ export const textMock = jest.fn(() => ({
   setColor: jest.fn(),
   getTextMetrics: jest.fn(),
   ...gameObjectMock(),
-  __type__: "text",
+  __type__: 'text',
 }));
 export const graphicsMock = jest.fn(() => ({
   ...gameObjectMock(),
@@ -43,7 +46,7 @@ export const graphicsMock = jest.fn(() => ({
   fillGradientStyle: jest.fn(),
   strokeRect: jest.fn(),
   fillRect: jest.fn(),
-  __type__: "graphics",
+  __type__: 'graphics',
 }));
 export const tweensMock = {
   add: jest.fn(),
@@ -52,7 +55,7 @@ export const tweensMock = {
 
 export const sceneMock = () => {
   return ({
-    __type__: "scene",
+    __type__: 'scene',
     add: {
       container: containerMock,
       image: imageMock,
@@ -73,6 +76,10 @@ export const sceneMock = () => {
     },
     game: {
       events: { ...eventsMock() },
+    },
+    input: {
+      setDraggable: jest.fn(),
+      ...eventsMock(),
     },
     scene: {
       scene: {
