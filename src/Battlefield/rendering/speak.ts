@@ -22,7 +22,7 @@ export default async function (
     GAME_SPEED
   );
 
-  button(950, 180, 'Ok', state.uiContainer, scene, () =>
+  button(850, 185, 'Ok', state.uiContainer, scene, () =>
     SquadArrivedInfoMessageClosed(scene).emit(res.portrait)
   );
 
