@@ -44,8 +44,4 @@ export type Chara = {
   destroy: () => void;
 
   selectedCharaIndicator: Image | null;
-  events: {
-    select: ()=>void,
-    deselect: ()=>void
-  }
 };

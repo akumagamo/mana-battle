@@ -57,8 +57,6 @@ export default function ui(
   switch (state.mode.type) {
     case 'SQUAD_SELECTED':
       return squadInfo(scene, state, uiContainer, baseY, state.mode.id);
-    case 'MOVING_SQUAD':
-      return squadInfo(scene, state, uiContainer, baseY, state.mode.id);
     case 'CITY_SELECTED':
       return city(scene, state, uiContainer, baseY, state.mode.id);
     case 'SELECT_SQUAD_MOVE_TARGET':

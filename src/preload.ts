@@ -13,6 +13,7 @@ export function preload(this: Phaser.Scene) {
     "button_move",
     "button_attack",
     "close_btn",
+    "ping",
   ];
   ui.forEach((id: string) => {
     this.load.image(id, `${PUBLIC_URL}/ui/${id}.svg`);

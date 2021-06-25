@@ -4,7 +4,6 @@ import { Container, Image } from '../Models';
 import { SquadRecord } from '../Squad/Model';
 import { UnitIndex } from '../Unit/Model';
 import { VectorRec } from './makeVector';
-import { MapScene } from './MapScene';
 import { DEFAULT_MODE, Mode } from './Mode';
 export type UnitId = string;
 export type ForceId = string;

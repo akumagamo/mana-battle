@@ -1,12 +1,12 @@
-import { Vector } from 'matter';
-import { GAME_SPEED } from '../../env';
-import { tween } from '../../Scenes/utils';
-import { createEvent } from '../../utils';
-import { MapScene } from '../MapScene';
-import { MapState } from '../Model';
-import signal from '../signal';
+import { Vector } from "matter";
+import { GAME_SPEED } from "../../env";
+import { tween } from "../../Scenes/utils";
+import { createEvent } from "../../utils";
+import { MapScene } from "../MapScene";
+import { MapState } from "../Model";
+import signal from "../signal";
 
-export const key = 'CellClicked';
+export const key = "CellClicked";
 
 export async function handleCellClick({
   scene,
@@ -20,19 +20,20 @@ export async function handleCellClick({
   pointer: Vector;
 }) {
   if (!state.cellClickDisabled)
-    signal(scene, state, 'regular click cell', [
-      { type: 'CLICK_CELL', cell: tile },
+    signal(scene, state, "regular click cell", [
+      { type: "CLICK_CELL", cell: tile },
     ]);
 
-  var ping = scene.add.circle(pointer.x, pointer.y, 20, 0xffff66);
+  var ping = scene.add.image(pointer.x, pointer.y, "ping");
 
-  await tween(scene, {
+  ping.setScale(0.3);
+  tween(scene, {
     targets: ping,
     alpha: 0,
-    duration: 500 / GAME_SPEED,
-    scale: 2,
-    onComplete: () => ping.destroy(),
+    duration: 300 / GAME_SPEED,
+    scale: 0.6,
   });
+  handlePhaserTweenInterruptionBug(scene, ping);
 }
 
 export default (scene: MapScene) =>
@@ -42,3 +43,15 @@ export default (scene: MapScene) =>
     tile: Vector;
     pointer: Vector;
   }>(scene.events, key);
+
+function handlePhaserTweenInterruptionBug(
+  scene: MapScene,
+  ping: Phaser.GameObjects.Image
+) {
+  scene.time.addEvent({
+    delay: 300 / GAME_SPEED,
+    callback: () => {
+      ping.destroy();
+    },
+  });
+}

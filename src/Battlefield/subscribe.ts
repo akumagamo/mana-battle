@@ -7,18 +7,23 @@ import turnOff from "./turnOff";
 import returnButtonClicked from "../Squad/ListSquadsScene/events/returnButtonClicked";
 import { handleCellClick } from "./events/CellClicked";
 import { getChara, MapState } from "./Model";
+import * as deselectChara from "../Chara/commands/deselectChara";
+import * as selectChara from "../Chara/commands/selectChara";
 
 export default function (scene: MapScene, state: MapState) {
-  // IDEA: provide state and scene to all events, making them automatically bound
-  const events_ = events();
-  events_.CellClicked(scene).on((c) => handleCellClick(c));
-  events_
+  const index = events();
+
+  index.CellClicked(scene).on((c) => handleCellClick(c));
+
+  index
     .MovePlayerSquadButonClicked(scene)
     .on((c) => handleMovePlayerSquadButtonClicked(c));
-  events_
-    .SquadArrivedInfoMessageCompleted(scene)
-    .on((chara) => handleCloseSquadArrivedInfoMessage(scene, state, chara));
-  events_.OrganizeButtonClicked(scene).on(() =>
+
+  index.CloseSquadArrivedInfoMessage(scene).on((chara) => {
+    handleCloseSquadArrivedInfoMessage(scene, state, chara);
+  });
+
+  index.OrganizeButtonClicked(scene).on(() =>
     organizeButtonClicked(
       {
         turnOff: () => turnOff(scene, state),
@@ -28,9 +33,11 @@ export default function (scene: MapScene, state: MapState) {
       (listScene) => returnButtonClicked(scene, state)(listScene)
     )
   );
-  events_.SquadClicked(scene).on((mapSquad) => {
-    state.charas.forEach((c) => c.events.deselect());
+
+  index.SquadClicked(scene).on((mapSquad) => {
+    state.charas.forEach(deselectChara.emit);
     const chara = getChara(state, mapSquad.id);
-    chara.events.select();
+
+    selectChara.emit(chara);
   });
 }

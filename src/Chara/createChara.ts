@@ -3,8 +3,8 @@ import initial from "./animations/initial";
 import stand from "./animations/stand";
 import { Chara } from "./Model";
 import hpBar from "./ui/hpBar";
-import selectChara from "./commands/selectChara";
-import deselectChara from "./commands/deselectChara";
+import * as selectChara from "./commands/selectChara";
+import * as deselectChara from "./commands/deselectChara";
 
 export default (props: {
   parent: Phaser.Scene;
@@ -79,10 +79,7 @@ export default (props: {
     destroy: () => {
       container.destroy();
     }, //todo: make this an external function. check other destroy fns
-    events: {
-      select: () => container.emit("selectChara"),
-      deselect: () => container.emit("deselectChara"),
-    },
+
   };
 
   initial(chara, headOnly);
@@ -121,13 +118,9 @@ export default (props: {
   // originGraphic.fillRectShape(origin);
   // chara.container.add(originGraphic);
 
-  container.on("selectChara", () => {
-    selectChara(chara);
-  });
 
-  container.on("deselectChara", () => {
-    deselectChara(chara);
-  });
+  selectChara.subscribe(chara)
+  deselectChara.subscribe(chara)
 
   return chara;
 };

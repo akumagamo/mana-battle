@@ -48,9 +48,6 @@ export default async (scene: MapScene, state: MapState, cell: Vector) => {
   };
 
   switch (state.mode.type) {
-    case "MOVING_SQUAD":
-      await handleMovingSquad(scene, state, x, y, state.mode.id);
-      break;
     case "SELECT_SQUAD_MOVE_TARGET":
       await handleSelectSquadMoveTarget(scene, state, x, y, state.mode.id);
       break;
@@ -76,7 +73,9 @@ async function handleMovingSquad(
       signal(scene, state, "squad moved, updating position", [
         { type: "UPDATE_SQUAD_POS", id, pos: { x, y } },
       ]);
+      console.time('ui')
       refreshUI(scene, state);
+      console.timeEnd('ui')
     }
   }
 }
