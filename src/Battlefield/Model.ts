@@ -286,6 +286,9 @@ export function getSquadUnits(state: MapState, squadId: string) {
 export function getForceSquads(state: MapState, force: string) {
   return state.squads.filter((u) => u.squad.force === force);
 }
+export function getForceCities(state: MapState, force: string) {
+  return state.cities.filter((c) => c.force === force);
+}
 export function getForce(state: MapState, id: string) {
   return state.forces.find((f) => f.id === id);
 }

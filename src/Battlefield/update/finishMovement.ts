@@ -39,6 +39,8 @@ export default async function (
       const portrait = await speak(scene, state, squad);
 
       SquadArrivedInfoMessageCompleted(scene).emit(portrait);
+    } else {
+      state.ai = state.ai.set(squad.id, 'DEFEND');
     }
   }
 }
