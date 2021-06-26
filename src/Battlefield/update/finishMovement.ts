@@ -1,5 +1,6 @@
 import { Vector } from 'matter';
 import stand from '../../Chara/animations/stand';
+import { PLAYER_FORCE } from '../../constants';
 import { screenToCellPosition } from '../board/position';
 import SquadArrivedInfoMessageCompleted from '../events/SquadArrivedInfoMessageCompleted';
 import { getChara, MapSquad, MapState } from '../Model';
@@ -32,10 +33,12 @@ export default async function (
       status: isCity ? 'guarding_fort' : 'standing',
     }));
 
-    const chara = getChara(state, squad.id);
-    stand(chara);
-    const portrait = await speak(scene, state, squad);
+    if (squad.squad.force === PLAYER_FORCE) {
+      const chara = getChara(state, squad.id);
+      stand(chara);
+      const portrait = await speak(scene, state, squad);
 
-    SquadArrivedInfoMessageCompleted(scene).emit(portrait);
+      SquadArrivedInfoMessageCompleted(scene).emit(portrait);
+    }
   }
 }

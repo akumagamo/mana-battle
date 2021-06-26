@@ -1,4 +1,5 @@
 import { Vector } from 'matter';
+import { PLAYER_FORCE } from '../../constants';
 import { getPathTo } from '../api';
 import { screenToCellPosition } from '../board/position';
 import { changeMode } from '../Mode';
@@ -15,6 +16,7 @@ export default async function (
   const grid = makeWalkableGrid(state);
 
   const startCell = screenToCellPosition(squad.pos);
+
   const [, ...path] = getPathTo(grid)(startCell)(target).map(([x, y]) => ({
     x,
     y,
@@ -25,7 +27,9 @@ export default async function (
     squad,
   });
 
-  changeMode(scene, state, { type: 'SQUAD_SELECTED', id });
+  // TODO: remove this, moving squad should have no relation with selection
+  if (squad.squad.force === PLAYER_FORCE)
+    changeMode(scene, state, { type: 'SQUAD_SELECTED', id });
 }
 
 function makeWalkableGrid(state: MapState): number[][] {
