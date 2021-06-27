@@ -12,10 +12,12 @@ export default function (scene: Phaser.Scene, state: MapState) {
   });
   state.tiles = [];
   state.tileIndex = [[]];
+  state.citySprites.forEach((city) => city.container.destroy());
+  state.citySprites = [];
 
   state.uiMode = DEFAULT_MODE;
 
   scene.scene.manager.stop('Phaser.Scene');
 
-  Object.keys(events).forEach((k) => scene.events.off(k));
+  Object.keys(events()).forEach((k) => scene.events.off(k));
 }
