@@ -2,7 +2,7 @@ import { CPU_FORCE, SCREEN_HEIGHT, SCREEN_WIDTH } from '../../constants';
 import { delay, tween } from '../../Scenes/utils';
 import moveCameraTo from '../rendering/moveCameraTo';
 import label from '../rendering/label';
-import { MapState } from '../Model';
+import { getCity, MapState } from '../Model';
 
 export default async (scene: Phaser.Scene, state: MapState) => {
   const title = label(scene, state, SCREEN_WIDTH / 2, 60, 'Victory Condition');
@@ -82,10 +82,9 @@ export default async (scene: Phaser.Scene, state: MapState) => {
 };
 
 export function showCityInfo(scene: Phaser.Scene, state: MapState, id: string) {
-  state.cities.find((c) => c.id === id);
-
+  const city = getCity(state, id);
   const pic = scene.add.sprite(SCREEN_WIDTH / 2, 350, 'merano');
   pic.setOrigin(0.5);
   pic.setDisplaySize(250, 250);
-  label(scene, state, SCREEN_WIDTH / 2, 520, 'Merano Castle');
+  label(scene, state, SCREEN_WIDTH / 2, 520, city.name);
 }
