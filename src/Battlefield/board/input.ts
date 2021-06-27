@@ -9,7 +9,7 @@ export function disableMapInput(state: MapState) {
   state.dragDisabled = true;
 }
 
-export function enableInput(scene: Phaser.Scene, state: MapState) {
+export function enableMapInput(scene: Phaser.Scene, state: MapState) {
   state.dragDisabled = false;
   enableCellClick(state);
 

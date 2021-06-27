@@ -2,7 +2,7 @@ import { MapSquad, MapState } from '../Model';
 import button from '../../UI/button';
 import EditSquadModal from '../../Squad/EditSquadModal/createEditSquadModal';
 import MovePlayerSquadButtonClicked from '../events/MovePlayerSquadButtonClicked';
-import { disableMapInput, enableInput } from '../board/input';
+import { disableMapInput, enableMapInput } from '../board/input';
 import { changeMode } from '../Mode';
 
 export default (
@@ -31,7 +31,7 @@ export default (
           );
         },
         onClose: () => {
-          enableInput(scene, state);
+          enableMapInput(scene, state);
           changeMode(scene, state, {
             type: 'SQUAD_SELECTED',
             id: mapSquad.squad.id,

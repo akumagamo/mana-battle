@@ -4,7 +4,7 @@ import button from '../UI/button';
 import panel from '../UI/panel';
 import text from '../UI/text';
 import { toMapSquad } from '../Unit/Model';
-import { enableInput } from './board/input';
+import { enableMapInput } from './board/input';
 import { renderSquad } from './board/renderSquads';
 import DispatchWindowRendered from './events/DispatchWindowRendered';
 import SquadClicked from './events/SquadClicked';
@@ -51,7 +51,7 @@ export default (scene: Phaser.Scene, state: MapState) => {
   close.setInteractive();
   close.on('pointerup', () => {
     container.destroy();
-    enableInput(scene, state);
+    enableMapInput(scene, state);
   });
 
   let squadsToRender = getForceSquads(state, PLAYER_FORCE).filter(
@@ -90,7 +90,7 @@ export const handleDispatchSquad = async (
   container.destroy();
 
   dispatchSquad(scene, state, mapSquad.squad);
-  enableInput(scene, state);
+  enableMapInput(scene, state);
   state.isPaused = false;
   changeMode(scene, state, { type: 'SQUAD_SELECTED', id: mapSquad.squad.id });
 

@@ -2,7 +2,7 @@ import { Set } from 'immutable';
 import { GAME_SPEED } from '../env';
 import { delay } from '../Scenes/utils';
 import { fadeIn } from '../UI/Transition';
-import { enableInput } from './board/input';
+import { enableMapInput } from './board/input';
 import renderMap from './board/renderMap';
 import renderSquads from './board/renderSquads';
 import renderStructures from './board/renderStructures';
@@ -53,7 +53,7 @@ export default async (scene: Phaser.Scene, state: MapState) => {
 
   await pushSquad(scene, state);
 
-  enableInput(scene, state);
+  enableMapInput(scene, state);
   state.isPaused = false;
 
   refreshUI(scene, state);

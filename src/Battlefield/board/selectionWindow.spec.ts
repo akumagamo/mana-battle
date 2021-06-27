@@ -4,17 +4,29 @@ import { sceneMock } from '../../test/mocks';
 import button from '../../UI/button';
 import panel from '../../UI/panel';
 import squadDetails from '../effects/squadDetails';
+import { getMapSquad, getSquadLeader, MapState } from '../Model';
 import { selectionWindow } from './selectionWindow';
 
 jest.mock('../../UI/button');
 jest.mock('../../UI/panel');
+const buttonRenderedWithLabel = (button: jest.Mock) => (label: string) =>
+  expect(button.mock.calls.some(([x, y, label_]) => label_ === label)).toBe(
+    true
+  );
 
-it("should select a squad if there's no other squad or city in the cell", () => {
-  const state = map();
+const buttonRendered = buttonRenderedWithLabel(button as jest.Mock);
 
-  const scene = sceneMock();
+it('should not render anything if squad nor city are in the cell', () => {
+  const { state, scene } = given();
 
-  state.uiContainer = scene.add.container();
+  selectionWindow(Set(), scene, state, 3, 3);
+
+  expect(button as jest.Mock).not.toBeCalled();
+  expect(panel as jest.Mock).not.toBeCalled();
+});
+
+it("should select a squad if there's a squad and no city in the cell", () => {
+  const { state, scene } = given();
 
   selectionWindow(Set(), scene, state, 1, 1);
 
@@ -23,27 +35,16 @@ it("should select a squad if there's no other squad or city in the cell", () => 
 });
 
 it("should select a city if there's no squad and only a city in the cell", () => {
-  // GIVEN
-  const state = map();
+  const { state, scene } = given();
 
-  const scene = sceneMock();
-
-  state.uiContainer = scene.add.container();
-
-  // WHEN
   selectionWindow(Set(), scene, state, 2, 6);
 
-  // EXPECT
   expect(button as jest.Mock).not.toBeCalled();
   expect(panel as jest.Mock).not.toBeCalled();
 });
 
 it("should render a list of squads if there's multiple squads in the cell", () => {
-  const state = map();
-
-  const scene = sceneMock();
-
-  state.uiContainer = scene.add.container();
+  const { state, scene } = given();
 
   const updatedSquads = state.squads.map((sqd) => ({
     ...sqd,
@@ -54,16 +55,11 @@ it("should render a list of squads if there's multiple squads in the cell", () =
 
   selectionWindow(updatedSquads.toSet(), scene, state, 3, 3);
 
-  expect(button as jest.Mock).toBeCalledTimes(2);
-  expect(panel as jest.Mock).toBeCalledTimes(1);
+  renderedAllSquads(state);
 });
 
 it("should render a list of squads and add the city if there's multiple squads in the cell and a city", () => {
-  const state = map();
-
-  const scene = sceneMock();
-
-  state.uiContainer = scene.add.container();
+  const { state, scene } = given();
 
   const updatedSquads = state.squads.map((sqd) => ({
     ...sqd,
@@ -74,13 +70,24 @@ it("should render a list of squads and add the city if there's multiple squads i
 
   selectionWindow(updatedSquads.toSet(), scene, state, 2, 6);
 
-  expect(button as jest.Mock).toBeCalledTimes(3);
+  renderedAllSquads(state);
 
-  const renderedCity = (button as jest.Mock).mock.calls.some(
-    ([x, y, cityName]) => cityName === 'Arabella'
-  );
-
-  expect(renderedCity).toBe(true);
+  buttonRendered('Arabella');
 
   expect(panel as jest.Mock).toBeCalledTimes(1);
 });
+
+function given() {
+  const state = map();
+
+  const scene = sceneMock();
+
+  state.uiContainer = scene.add.container();
+  return { state, scene };
+}
+
+function renderedAllSquads(state: MapState) {
+  state.squads.forEach((sqd) => {
+    buttonRendered(getSquadLeader(state, sqd.id).name);
+  });
+}

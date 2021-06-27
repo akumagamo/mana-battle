@@ -2,7 +2,7 @@ import createStaticBoard from '../../Board/createBoard';
 import { PLAYER_FORCE } from '../../constants';
 import button from '../../UI/button';
 import text from '../../UI/text';
-import { disableMapInput, enableInput } from '../board/input';
+import { disableMapInput, enableMapInput } from '../board/input';
 import squadDetails from '../effects/squadDetails';
 import { getMapSquad, getSquadLeader, getSquadUnits, MapState } from '../Model';
 import playerSquad from './playerSquad';
@@ -53,6 +53,6 @@ export function viewSquadDetails(
     scene,
     mapSquad,
     state.units.filter((u) => mapSquad.squad.members.has(u.id)),
-    () => enableInput(scene, state)
+    () => enableMapInput(scene, state)
   );
 }
