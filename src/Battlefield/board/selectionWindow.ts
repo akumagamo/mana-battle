@@ -32,9 +32,10 @@ export function selectionWindow(
     const mapSquad = mapSquads.first() as MapSquad;
     selectSquad(mapSquad);
   } else {
+    state.isPaused = true;
+    disableMapInput(state);
     deselectAllEntities(state);
     changeMode(scene, state, { type: 'NOTHING_SELECTED' });
-    disableMapInput(state);
     const container = scene.add.container(400, 100);
     state.uiContainer.add(container);
     panel(0, 0, 200, mapSquads.size * 50 + (city ? 150 : 50), container, scene);
@@ -51,6 +52,7 @@ export function selectionWindow(
           selectSquad(sqd);
           container.destroy();
           enableMapInput(scene, state);
+          state.isPaused = false;
         }
       );
     });
@@ -61,6 +63,7 @@ export function selectionWindow(
         selectCityCommand(scene, state)(city);
         container.destroy();
         enableMapInput(scene, state);
+        state.isPaused = false;
       });
     }
   }
