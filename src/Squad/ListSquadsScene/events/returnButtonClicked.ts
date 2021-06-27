@@ -1,5 +1,10 @@
 import { PLAYER_FORCE } from '../../../constants';
-import { getCity, getForceSquads, MapState } from '../../../Battlefield/Model';
+import {
+  getCity,
+  getForce,
+  getForceSquads,
+  MapState,
+} from '../../../Battlefield/Model';
 import { toMapSquad } from '../../../Unit/Model';
 import { ListSquadsScene } from '../../ListSquadsScene/ListSquadsScene';
 import { SquadRecord } from '../../Model';
@@ -24,7 +29,7 @@ const returnButtonClicked = (scene: Phaser.Scene, state: MapState) => (
 };
 
 function addNewSquad(state: MapState, squad: SquadRecord) {
-  const force = state.forces.find((force) => force.id === squad.force);
+  const force = getForce(state, squad.force);
 
   // TODO: create 'addSquadToPhaser.Scene' method
   const city = getCity(state, force.initialPosition);
