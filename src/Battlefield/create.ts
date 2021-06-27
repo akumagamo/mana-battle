@@ -1,6 +1,5 @@
 import { Set } from 'immutable';
 import { GAME_SPEED } from '../env';
-import { delay } from '../Scenes/utils';
 import { fadeIn } from '../UI/Transition';
 import { enableMapInput } from './board/input';
 import renderMap from './board/renderMap';

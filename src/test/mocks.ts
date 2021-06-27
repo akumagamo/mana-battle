@@ -55,6 +55,7 @@ export const graphicsMock = jest.fn(() => ({
 export const tweensMock = {
   add: jest.fn(),
   killAll: jest.fn(),
+  killTweensOf: jest.fn(),
 };
 
 export const sceneMock = () => {
