@@ -3,7 +3,9 @@ import { cellSize } from '../config';
 import { getChara, getMapSquad, MapState } from '../Model';
 
 export default async function (scene: Phaser.Scene, state: MapState) {
+  // TODO: make this a create parameter, as we don't need to store this for later
   if (state.squadToPush) {
+    state.isPaused = true;
     const loser = getMapSquad(state, state.squadToPush.loser);
 
     const { direction } = state.squadToPush;
@@ -28,8 +30,10 @@ export default async function (scene: Phaser.Scene, state: MapState) {
         duration: 1000 / GAME_SPEED,
         ...newPos,
         onComplete: () => {
-          state.squadToPush = null;
+          chara.container.setPosition(newPos.x, newPos.y);
           state.squads = state.squads.setIn([loser.id, 'pos'], newPos);
+          state.squadToPush = null;
+          state.isPaused = false;
           resolve();
         },
       });

@@ -1,4 +1,3 @@
-import { INVALID_STATE } from '../../errors';
 import { Chara } from '../Model';
 import {
   CHARA_WRAPPER_X,
