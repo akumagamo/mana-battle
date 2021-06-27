@@ -17,7 +17,6 @@ const front = (chara: Chara) => {
     yoyo: true,
     repeat: -1,
   });
-
   chara.scene.tweens.add({
     targets: chara.trunk,
     y: TRUNK_FRONT_Y + 2,

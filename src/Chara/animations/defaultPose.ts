@@ -26,7 +26,22 @@ import {
 } from './constants';
 
 export default (chara: Chara) => {
-  chara.scene.tweens.killAll();
+  chara.scene.tweens.killTweensOf([
+    chara.container,
+    chara.innerWrapper,
+    chara.hair,
+    chara.head,
+    chara.trunk,
+    chara.leftHand,
+    chara.rightHand,
+    chara.leftFoot,
+    chara.rightFoot,
+    chara.mainHandContainer,
+    chara.offHandContainer,
+    chara.rightHandEquip,
+    chara.leftHandEquip,
+    chara.hat,
+  ]);
 
   chara.head.rotation = 0;
   chara.leftFoot.rotation = 0;

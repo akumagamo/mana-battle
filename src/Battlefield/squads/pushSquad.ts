@@ -26,8 +26,7 @@ export default async function (scene: Phaser.Scene, state: MapState) {
       scene.add.tween({
         targets: chara.container,
         duration: 1000 / GAME_SPEED,
-        x: newPos.x,
-        y: newPos.y,
+        ...newPos,
         onComplete: () => {
           state.squadToPush = null;
           state.squads = state.squads.setIn([loser.id, 'pos'], newPos);

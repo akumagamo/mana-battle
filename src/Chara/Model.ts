@@ -1,5 +1,6 @@
 import { Unit } from '../Unit/Model';
 import { Container, Graphics, Image } from '../Models';
+import { Tweens } from 'phaser';
 
 export type CharaProps = {
   scene: Phaser.Scene;

@@ -12,7 +12,7 @@ export function displayExperience(chara: Chara, experience: number) {
   xp.setScale(1.5);
   xp.setShadow(0, 0, '#000', 2);
   xp.setStroke('#000000', 2);
-  chara.container.add(xp);
+  //chara.container.add(xp);
 
   return new Promise<void>((resolve) => {
     chara.props.scene.tweens.add({
