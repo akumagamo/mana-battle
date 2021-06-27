@@ -5,19 +5,17 @@ import moveSquadTo from '../squads/moveSquadTo';
 import signal from '../signal';
 import { getDistance } from '../../utils';
 import { changeMode } from '../Mode';
-import { selectionWindow } from './selectionWindow';
+import selectCell from './selectCell';
 
 export default async (scene: Phaser.Scene, state: MapState, cell: Vector) => {
   const { x, y } = cell;
-
-  const mapSquads = squadsAt(state, x, y);
 
   switch (state.uiMode.type) {
     case 'SELECT_SQUAD_MOVE_TARGET':
       await handleSelectSquadMoveTarget(scene, state, x, y, state.uiMode.id);
       break;
     default:
-      selectionWindow(mapSquads, scene, state, x, y);
+      selectCell(scene, state, cell);
   }
 };
 
@@ -49,8 +47,4 @@ async function handleSelectSquadMoveTarget(
   }
 }
 
-function squadsAt(state: MapState, x: number, y: number) {
-  return state.dispatchedSquads
-    .map((id) => getMapSquad(state, id))
-    .filter((s) => getDistance(cellToScreenPosition({ x, y }), s.pos) < 50);
-}
+

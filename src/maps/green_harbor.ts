@@ -9,8 +9,6 @@ import createUnit from '../Unit/createUnit';
 import { toMapSquad } from '../Unit/Model';
 import { CPU_FORCE, PLAYER_FORCE } from '../constants';
 import { createSquad, makeMember } from '../Squad/Model';
-import { Container } from '../Models';
-import { DEFAULT_MODE } from '../Battlefield/Mode';
 
 const enemyCastle: City = {
   id: 'castle2',
@@ -51,6 +49,7 @@ const map: () => MapState = () => {
     author: 'Leonardo Farroco',
     description: 'The first map',
     cells: tiles,
+    dispatchedSquads: Set(['squad1', 'squad2']),
     squads: List([
       toMapSquad(
         createSquad({
