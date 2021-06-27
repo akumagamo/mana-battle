@@ -7,15 +7,14 @@ export function displayExperience(chara: Chara, experience: number) {
     -100,
     `${experience.toString()} xp`,
     chara.container,
-    chara.props.scene
+    chara.scene
   );
   xp.setScale(1.5);
   xp.setShadow(0, 0, '#000', 2);
   xp.setStroke('#000000', 2);
-  //chara.container.add(xp);
 
   return new Promise<void>((resolve) => {
-    chara.props.scene.tweens.add({
+    chara.scene.tweens.add({
       targets: xp,
       y: -120,
       alpha: 0,

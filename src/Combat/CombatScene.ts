@@ -1,7 +1,7 @@
 import { Chara } from '../Chara/Model';
 import { cartesianToIsometricBattle } from '../utils/isometric';
 import { INVALID_STATE } from '../errors';
-import { Unit, UnitIndex } from '../Unit/Model';
+import { isAlive, Unit, UnitIndex } from '../Unit/Model';
 import { Command, runCombat, XPInfo } from './turns';
 import plains from '../Backgrounds/plains';
 import { Container } from '../Models';
@@ -13,7 +13,12 @@ import announcement from '../UI/announcement';
 import { fadeIn, fadeOut } from '../UI/Transition';
 import { displayExperience } from '../Chara/animations/displayExperience';
 import { displayLevelUp } from '../Chara/animations/displayLevelUp';
-import { PUBLIC_URL, SCREEN_HEIGHT, SCREEN_WIDTH } from '../constants';
+import {
+  PLAYER_FORCE,
+  PUBLIC_URL,
+  SCREEN_HEIGHT,
+  SCREEN_WIDTH,
+} from '../constants';
 import panel from '../UI/panel';
 import { Scene } from 'phaser';
 import hpBar from '../Chara/ui/hpBar';
@@ -235,8 +240,6 @@ export default class CombatScene extends Phaser.Scene {
   async execute(commands: Command[]) {
     const cmd = commands[0];
 
-    console.log(`CombatScene CMDs:`, cmd);
-
     const next = (arr: Command[]) => {
       const [, ...rest] = arr;
       return rest;
@@ -281,17 +284,13 @@ export default class CombatScene extends Phaser.Scene {
       await this.displayExperienceGain(cmd.xpInfo);
       step();
     } else if (cmd.type === 'END_COMBAT') {
-      console.log(`Combat reached its end`);
 
       await this.combatEnd(cmd.units);
 
-      console.log(`onCombatFinish END_COMBAT`);
 
       this.turnOff();
     } else if (cmd.type === 'VICTORY') {
-      console.log('Winning Team:', cmd.target);
 
-      console.log(`onCombatFinish VICTORY`);
 
       await this.combatEnd(cmd.units);
 
@@ -310,14 +309,21 @@ export default class CombatScene extends Phaser.Scene {
   }
   async displayExperienceGain(xps: List<XPInfo>) {
     await Promise.all(
-      xps.map(
-        async ({ id, xp }) => await displayExperience(this.getChara(id), xp)
-      )
+      xps.map(async ({ id, xp }) => {
+        const unit = this.unitIndex.get(id);
+        if (isAlive(unit) && unit.force === PLAYER_FORCE)
+          await displayExperience(this.getChara(id), xp);
+      })
     );
 
     return await Promise.all(
       xps
         .filter(({ lvls }) => lvls > 0)
+        .filter(
+          ({ id }) =>
+            isAlive(this.unitIndex.get(id)) &&
+            this.unitIndex.get(id).force === PLAYER_FORCE
+        )
         .map(async ({ id }) => await displayLevelUp(this.getChara(id)))
     );
   }
@@ -435,6 +441,11 @@ export default class CombatScene extends Phaser.Scene {
 
     displayDamage(chara, damage);
 
+    this.unitIndex = this.unitIndex.setIn(
+      [chara.id, 'currentHp'],
+      updatedTarget.currentHp
+    );
+
     this.updateMinisquadHP(targetId, updatedTarget.currentHp);
   }
 
@@ -521,28 +532,11 @@ export default class CombatScene extends Phaser.Scene {
     const coords = getBoardCoords(this.top === chara.props.unit.squad)(
       this.squads.get(chara.props.unit.squad).members.get(id)
     );
-
-    console.log(
-      `for`,
-      chara.props.unit.id,
-      `return with params`,
-      chara.props.unit.id,
-      coords.x,
-      coords.y
-    );
+    
     const { x, y } = cartesianToIsometricBattle(
       this.top === chara.props.unit.squad,
       coords.x,
       coords.y
-    );
-
-    console.log(
-      `returning, `,
-
-      this.top === chara.props.unit.squad,
-      chara.props.unit.id,
-      x,
-      y
     );
 
     const config = (onComplete: () => void) => ({
