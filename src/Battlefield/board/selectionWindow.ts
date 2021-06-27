@@ -26,9 +26,9 @@ export function selectionWindow(
   };
   if (mapSquads.size < 1 && !city) {
     return;
-  } else if (squadInCellWithoutCity()) {
-    selectCityCommand(scene, state)(city);
-  } else if (cityInCellWithoutSquad()) {
+  } else if (cellWithJustACity()) {
+    selectCityCommand(scene, state, city);
+  } else if (cellWithJustASquad()) {
     const mapSquad = mapSquads.first() as MapSquad;
     selectSquad(mapSquad);
   } else {
@@ -60,7 +60,7 @@ export function selectionWindow(
     if (city) {
       text(10, mapSquads.size * 50 + 50, 'City', container, scene);
       button(10, mapSquads.size * 50 + 100, city.name, container, scene, () => {
-        selectCityCommand(scene, state)(city);
+        selectCityCommand(scene, state, city);
         container.destroy();
         enableMapInput(scene, state);
         state.isPaused = false;
@@ -68,11 +68,11 @@ export function selectionWindow(
     }
   }
 
-  function cityInCellWithoutSquad() {
+  function cellWithJustASquad() {
     return mapSquads.size === 1 && !city;
   }
 
-  function squadInCellWithoutCity() {
+  function cellWithJustACity() {
     return mapSquads.size === 0 && city;
   }
 }

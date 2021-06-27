@@ -18,6 +18,7 @@ export const gameObjectMock = () => ({
   setOrigin: jest.fn(),
   setInteractive: jest.fn(),
   setAlpha: jest.fn(),
+  setName: jest.fn(),
   getBounds: () => ({ width: 111, height: 111 }),
 });
 export const containerMock = (jest.fn((x?: number, y?: number) => ({
