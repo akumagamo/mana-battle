@@ -3,8 +3,6 @@ import upAndDown from './upAndDown';
 import defaultPose from './defaultPose';
 import { Chara } from '../Model';
 
-// TODO: ^^^^ these constants belong to something that we may call "default pose"
-//
 const GAME_SPEED = parseInt(process.env.SPEED);
 
 const front = (chara: Chara) => {
@@ -45,8 +43,8 @@ const front = (chara: Chara) => {
   });
 
   chara.scene.add.tween({
-    targets: chara.container,
-    y: chara.container.y - 20,
+    targets: chara.innerWrapper,
+    y: chara.innerWrapper.y - 20,
     yoyo: true,
     repeat: -1,
     duration: 100 / GAME_SPEED,
@@ -95,8 +93,8 @@ const back = (chara: Chara) => {
   });
 
   chara.scene.add.tween({
-    targets: chara.container,
-    y: chara.container.y - 20,
+    targets: chara.innerWrapper,
+    y: chara.innerWrapper.y - 20,
     yoyo: true,
     repeat: -1,
     duration: 100 / GAME_SPEED,
