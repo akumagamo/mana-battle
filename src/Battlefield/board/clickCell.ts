@@ -1,39 +1,23 @@
-import { PLAYER_FORCE } from "../../constants";
-import { getMapSquad, MapState, Vector } from "../Model";
-import { cellToScreenPosition, screenToCellPosition } from "./position";
-import SquadClicked from "../events/SquadClicked";
-import moveSquadTo from "../squads/moveSquadTo";
-import signal from "../signal";
-import { getDistance } from "../../utils";
-import { changeMode } from "../Mode";
-import selectCityCommand from "../commands/selectCityCommand";
+import { PLAYER_FORCE } from '../../constants';
+import { getMapSquad, MapState, Vector } from '../Model';
+import { cellToScreenPosition, screenToCellPosition } from './position';
+import moveSquadTo from '../squads/moveSquadTo';
+import signal from '../signal';
+import { getDistance } from '../../utils';
+import { changeMode } from '../Mode';
+import { selectionWindow } from './selectionWindow';
 
 export default async (scene: Phaser.Scene, state: MapState, cell: Vector) => {
   const { x, y } = cell;
 
-  const mapSquad = squadAt(state, x, y);
-
-  const select = () => {
-    if (mapSquad) {
-      changeMode(scene, state, {
-        type: "SQUAD_SELECTED",
-        id: mapSquad.squad.id,
-      });
-      SquadClicked(scene).emit(mapSquad);
-      return;
-    }
-
-    const city = state.cities.find((c) => c.x === x && c.y === y);
-
-    if (city) selectCityCommand(scene, state)(city);
-  };
+  const mapSquads = squadAt(state, x, y);
 
   switch (state.uiMode.type) {
-    case "SELECT_SQUAD_MOVE_TARGET":
+    case 'SELECT_SQUAD_MOVE_TARGET':
       await handleSelectSquadMoveTarget(scene, state, x, y, state.uiMode.id);
       break;
     default:
-      select();
+      selectionWindow(mapSquads, scene, state, x, y);
   }
 };
 
@@ -54,13 +38,13 @@ async function handleSelectSquadMoveTarget(
       await moveSquadTo(scene, state, selectedSquad.squad.id, { x, y });
       state.squads = state.squads.update(id, (sqd) => ({
         ...sqd,
-        status: "moving",
+        status: 'moving',
       }));
-      signal(scene, state, "squad moved, updating position", [
-        { type: "UPDATE_SQUAD_POS", id, pos: { x, y } },
+      signal(scene, state, 'squad moved, updating position', [
+        { type: 'UPDATE_SQUAD_POS', id, pos: { x, y } },
       ]);
     } else {
-      changeMode(scene, state, { type: "SQUAD_SELECTED", id });
+      changeMode(scene, state, { type: 'SQUAD_SELECTED', id });
     }
   }
 }
@@ -68,5 +52,5 @@ async function handleSelectSquadMoveTarget(
 function squadAt(state: MapState, x: number, y: number) {
   return state.dispatchedSquads
     .map((id) => getMapSquad(state, id))
-    .find((s) => getDistance(cellToScreenPosition({ x, y }), s.pos) < 50);
+    .filter((s) => getDistance(cellToScreenPosition({ x, y }), s.pos) < 50);
 }

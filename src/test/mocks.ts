@@ -17,6 +17,7 @@ export const gameObjectMock = () => ({
   destroy: jest.fn(),
   setOrigin: jest.fn(),
   setInteractive: jest.fn(),
+  setAlpha: jest.fn(),
   getBounds: () => ({ width: 111, height: 111 }),
 });
 export const containerMock = (jest.fn((x?: number, y?: number) => ({
@@ -46,6 +47,8 @@ export const graphicsMock = jest.fn(() => ({
   fillGradientStyle: jest.fn(),
   strokeRect: jest.fn(),
   fillRect: jest.fn(),
+  strokeRectShape: jest.fn(),
+  fillRectShape: jest.fn(),
   __type__: 'graphics',
 }));
 export const tweensMock = {
@@ -61,6 +64,7 @@ export const sceneMock = () => {
       image: imageMock,
       text: textMock,
       graphics: graphicsMock,
+      rectangle: graphicsMock,
       zone: containerMock,
     },
     tweens: tweensMock,

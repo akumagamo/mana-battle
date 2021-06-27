@@ -9,7 +9,7 @@ export default (
   container: Container,
   scene: Scene
 ) => {
-  var rect = new Phaser.Geom.Rectangle(x, y, width, height);
+  var rect = scene.add.rectangle(x, y, width, height);
   var graphics = scene.add.graphics({
     fillStyle: { color: 0x000000 },
     lineStyle: {
@@ -20,9 +20,9 @@ export default (
 
   graphics.setAlpha(0.8);
 
-  graphics.strokeRectShape(rect);
+  graphics.strokeRectShape((rect as unknown) as Phaser.Geom.Rectangle);
 
-  graphics.fillRectShape(rect);
+  graphics.fillRectShape((rect as unknown) as Phaser.Geom.Rectangle);
   graphics.strokeRect(x, y, width, height);
 
   container.add(graphics);
