@@ -29,66 +29,21 @@ export default function (scene: Phaser.Scene) {
 
   nameInput(scene, 430, 50);
 
-  createRadio(
-    scene,
-    state.container,
-    730,
-    50,
-    380,
-    'Gender',
-    'gender',
-    genders,
-    genderLabels,
-    (a: any, b: any) => {
-      state.unit = { ...state.unit, [a]: b };
-      refreshChara(scene, state);
-    }
-  );
+  genderInput(scene, state);
 
-  createFormField(
-    scene,
-    state.container,
-    430,
-    50 + 120,
-    0,
-    'Skin Color',
-    'skinColor',
-    SKIN_COLORS,
-    (u) => {
-      state.unit.style = { ...state.unit.style, ...u };
-      refreshChara(scene, state);
-    }
-  );
+  skinColorInput(scene, state);
 
-  createFormField(
-    scene,
-    state.container,
-    430,
-    50 + 120 * 2,
-    0,
-    'Hair Color',
-    'hairColor',
-    HAIR_COLORS,
-    (u) => {
-      state.unit.style = { ...state.unit.style, ...u };
-      refreshChara(scene, state);
-    }
-  );
-  createFormField(
-    scene,
-    state.container,
-    430,
-    50 + 120 * 3,
-    0,
-    'Hair Style',
-    'hair',
-    HAIR_STYLES,
-    (u) => {
-      state.unit.style = { ...state.unit.style, ...u };
-      refreshChara(scene, state);
-    }
-  );
+  hairColorInput(scene, state);
 
+  hairStyleInput(scene, state);
+
+  classInput(scene, state);
+
+  confirmButton(scene, state);
+
+  scene.game.events.emit('CharaCreationSceneCreated', { scene, state });
+}
+function classInput(scene: Phaser.Scene, state: CharaCreationState) {
   createRadio(
     scene,
     state.container,
@@ -104,8 +59,73 @@ export default function (scene: Phaser.Scene) {
       refreshChara(scene, state);
     }
   );
+}
 
-  confirmButton(scene, state);
+function hairStyleInput(scene: Phaser.Scene, state: CharaCreationState) {
+  createFormField(
+    scene,
+    state.container,
+    430,
+    50 + 120 * 3,
+    0,
+    'Hair Style',
+    'hair',
+    HAIR_STYLES,
+    (u) => {
+      state.unit.style = { ...state.unit.style, ...u };
+      refreshChara(scene, state);
+    }
+  );
+}
 
-  scene.game.events.emit('CharaCreationSceneCreated', { scene, state });
+function hairColorInput(scene: Phaser.Scene, state: CharaCreationState) {
+  createFormField(
+    scene,
+    state.container,
+    430,
+    50 + 120 * 2,
+    0,
+    'Hair Color',
+    'hairColor',
+    HAIR_COLORS,
+    (u) => {
+      state.unit.style = { ...state.unit.style, ...u };
+      refreshChara(scene, state);
+    }
+  );
+}
+
+function skinColorInput(scene: Phaser.Scene, state: CharaCreationState) {
+  createFormField(
+    scene,
+    state.container,
+    430,
+    50 + 120,
+    0,
+    'Skin Color',
+    'skinColor',
+    SKIN_COLORS,
+    (u) => {
+      state.unit.style = { ...state.unit.style, ...u };
+      refreshChara(scene, state);
+    }
+  );
+}
+
+function genderInput(scene: Phaser.Scene, state: CharaCreationState) {
+  createRadio(
+    scene,
+    state.container,
+    730,
+    50,
+    380,
+    'Gender',
+    'gender',
+    genders,
+    genderLabels,
+    (a: any, b: any) => {
+      state.unit = { ...state.unit, [a]: b };
+      refreshChara(scene, state);
+    }
+  );
 }
