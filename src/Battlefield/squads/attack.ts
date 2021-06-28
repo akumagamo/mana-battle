@@ -53,7 +53,7 @@ export default async function (
       direction,
     };
 
-    scene.scene.start('Phaser.Scene', state);
+    scene.scene.start('MapScene', state);
 
     ReturnedFromCombat(scene).emit(null);
   };

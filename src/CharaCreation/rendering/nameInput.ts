@@ -1,16 +1,11 @@
-import {addChildToContainer} from "../../Browser/phaser";
-import { CharaCreationState } from "../Model";
-import formPanel from "./formPanel";
+import formPanel from './formPanel';
 
-export default function (
-  scene: Phaser.Scene,
-  state: CharaCreationState,
-  x: number,
-  y: number
-) {
-  formPanel(scene, state, x, y, "Character Name", 300);
+export default function (scene: Phaser.Scene, x: number, y: number) {
+  const container = scene.add.container(x, y);
+  formPanel(scene, container, 'Character Name', 300, 100);
 
-  var element = scene.add.dom(x + 10, y + 50).createFromCache("nameform");
+  var element = scene.add.dom(10, 50).createFromCache('nameform');
   element.setPerspective(800);
   element.setOrigin(0);
+  container.add(element);
 }

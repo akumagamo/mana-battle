@@ -47,6 +47,7 @@ export default (
   fill();
 
   const border = scene.add.graphics();
+  container.add(border);
   if (active) {
     border.lineStyle(4, 0xd4af37, 1);
     border.strokeRect(rectX - 1, rectY - 1, rectWidth + 1, rectHeight + 2);

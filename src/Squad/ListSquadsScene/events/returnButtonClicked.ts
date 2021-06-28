@@ -25,7 +25,7 @@ const returnButtonClicked = (scene: Phaser.Scene, state: MapState) => (
   });
 
   scene.scene.manager.stop('ListSquadsScene');
-  scene.scene.manager.start('Phaser.Scene', state);
+  scene.scene.manager.start('MapScene', state);
 };
 
 function addNewSquad(state: MapState, squad: SquadRecord) {

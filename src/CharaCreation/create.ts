@@ -1,20 +1,20 @@
-import { HAIR_COLORS, SKIN_COLORS } from "../Chara/animations/constants";
-import { GAME_SPEED } from "../env";
-import { classes, classLabels } from "../Unit/Jobs";
-import { genderLabels, genders, HAIR_STYLES } from "../Unit/Model";
-import { CharaCreationState, initialUnit } from "./Model";
-import background from "./rendering/background";
-import Chara from "./rendering/Chara";
-import confirmButton from "./rendering/confirmButton";
-import { panelHeight } from "./rendering/formPanel";
-import nameInput from "./rendering/nameInput";
-import propSelector, { baseX, baseY } from "./rendering/propSelector";
-import radio from "./rendering/radio";
+import { HAIR_COLORS, SKIN_COLORS } from '../Chara/animations/constants';
+import { GAME_SPEED } from '../env';
+import { classes, classLabels } from '../Unit/Jobs';
+import { genderLabels, genders, HAIR_STYLES } from '../Unit/Model';
+import { CharaCreationState, initialUnit } from './Model';
+import background from './rendering/background';
+import Chara from './rendering/Chara';
+import confirmButton from './rendering/confirmButton';
+import createRadio from './rendering/formField/radio';
+import createFormField from './rendering/formField/select';
+import nameInput from './rendering/nameInput';
+import refreshChara from './rendering/refreshChara';
 
 export default function (scene: Phaser.Scene) {
   if (process.env.SOUND_ENABLED) {
     scene.sound.stopAll();
-    const music = scene.sound.add("jshaw_dream_of_first_flight");
+    const music = scene.sound.add('jshaw_dream_of_first_flight');
     music.play();
   }
   scene.cameras.main.fadeIn(1000 / GAME_SPEED);
@@ -27,53 +27,85 @@ export default function (scene: Phaser.Scene) {
 
   background(scene, state);
 
-  const prop = (
-    y: number,
-    label: string,
-    prop: "hair" | "hairColor" | "skinColor",
-    index: any[]
-  ) =>
-    propSelector(
-      scene,
-      state,
-      baseX,
-      y,
-      index.indexOf(state.unit.style[prop]),
-      label,
-      prop,
-      index
-    );
+  nameInput(scene, 430, 50);
 
-  nameInput(scene, state, baseX, baseY);
-
-  radio(
+  createRadio(
     scene,
-    state,
-    baseX + 300,
-    baseY,
-    "Gender",
-    "gender",
+    state.container,
+    730,
+    50,
+    380,
+    'Gender',
+    'gender',
     genders,
     genderLabels,
-    300
+    (a: any, b: any) => {
+      state.unit = { ...state.unit, [a]: b };
+      refreshChara(scene, state);
+    }
   );
 
-  prop(baseY + panelHeight, "Skin Color", "skinColor", SKIN_COLORS);
-  prop(baseY + panelHeight * 2, "Hair Color", "hairColor", HAIR_COLORS);
-  prop(baseY + panelHeight * 3, "Hair Style", "hair", HAIR_STYLES);
-
-  radio(
+  createFormField(
     scene,
-    state,
-    baseX,
-    baseY + panelHeight * 4,
-    "Class",
-    "class",
-    classes, // change to initial classes
-    classLabels
+    state.container,
+    430,
+    50 + 120,
+    0,
+    'Skin Color',
+    'skinColor',
+    SKIN_COLORS,
+    (u) => {
+      state.unit.style = { ...state.unit.style, ...u };
+      refreshChara(scene, state);
+    }
+  );
+
+  createFormField(
+    scene,
+    state.container,
+    430,
+    50 + 120 * 2,
+    0,
+    'Hair Color',
+    'hairColor',
+    HAIR_COLORS,
+    (u) => {
+      state.unit.style = { ...state.unit.style, ...u };
+      refreshChara(scene, state);
+    }
+  );
+  createFormField(
+    scene,
+    state.container,
+    430,
+    50 + 120 * 3,
+    0,
+    'Hair Style',
+    'hair',
+    HAIR_STYLES,
+    (u) => {
+      state.unit.style = { ...state.unit.style, ...u };
+      refreshChara(scene, state);
+    }
+  );
+
+  createRadio(
+    scene,
+    state.container,
+    430,
+    550,
+    570,
+    'Class',
+    'class',
+    classes,
+    classLabels,
+    (a: any, b: any) => {
+      state.unit = { ...state.unit, [a]: b };
+      refreshChara(scene, state);
+    }
   );
 
   confirmButton(scene, state);
 
-  scene.game.events.emit("CharaCreationSceneCreated", {scene, state});
+  scene.game.events.emit('CharaCreationSceneCreated', { scene, state });
 }

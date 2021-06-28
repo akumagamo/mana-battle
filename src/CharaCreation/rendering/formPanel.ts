@@ -1,27 +1,30 @@
-import panel from "../../UI/panel";
-import text from "../../UI/text";
-import { CharaCreationState } from "../Model";
+import { Container } from '../../Models';
+import panel from '../../UI/panel';
+import text from '../../UI/text';
+import { CharaCreationState } from '../Model';
 
-export const panelWidth = 600;
-export const panelHeight = 120;
 
 export default function (
   scene: Phaser.Scene,
-  state: CharaCreationState,
-  x: number,
-  y: number,
+  container: Container,
   label: string,
-  width?: number
+  width: number,
+  height: number
 ) {
   const panel_ = panel(
-    x,
-    y,
-    width ? width : panelWidth,
-    panelHeight,
-    state.container,
+    0,
+    0,
+    width,
+    height,
+    container,
     scene
   ).setAlpha(0.6);
-  text(x + 10, y + 10, label, state.container, scene);
+  const text_ = text(10, 10, label, container, scene);
 
-  return panel_;
+  return {
+    destroy: () => {
+      panel_.destroy();
+      text_.destroy();
+    },
+  };
 }

@@ -38,6 +38,6 @@ import CharaCreationScene from './CharaCreation/CharaCreationScene';
     // @ts-ignore
     window.game = game;
 
-    endToEndTesting(game);
+    //endToEndTesting(game);
   }
 })();

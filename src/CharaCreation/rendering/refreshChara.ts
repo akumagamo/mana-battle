@@ -1,8 +1,9 @@
-import createChara from "../../Chara/createChara";
-import { CharaCreationState } from "../Model";
+import createChara from '../../Chara/createChara';
+import { CharaCreationState } from '../Model';
 
 export default function (scene: Phaser.Scene, state: CharaCreationState) {
-  if (state.chara) state.chara.destroy();
+  state.chara.destroy();
+  state.container.remove(state.chara.container);
 
   state.chara = createChara({
     scene: scene,

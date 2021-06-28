@@ -43,7 +43,7 @@ export default (
   container.add(board.container);
 
   onBoardUnitClicked(board, (chara) => {
-    charaStats.removeAll();
+    charaStats.removeAll(true);
 
     detailsBar(chara.props.unit);
   });
@@ -70,13 +70,6 @@ function backdrop(scene: Phaser.Scene) {
   const backdrop = scene.add.graphics();
   backdrop.fillStyle(0x000000, 0.5);
   backdrop.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-  // let rect = new Phaser.Geom.Rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-  // backdrop.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
-  // backdrop.on('pointerdown', () => {
-  //   backdrop.destroy();
-  //   onClose();
-  // });
   return backdrop;
 }
 

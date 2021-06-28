@@ -1,10 +1,10 @@
-import { MapState } from "./Model";
-import preload from "./preload";
-import create from "./create";
+import { MapState } from './Model';
+import preload from './preload';
+import create from './create';
 
 export class Battlefield extends Phaser.Scene {
   constructor() {
-    super("Phaser.Scene");
+    super('MapScene');
   }
 
   preload = preload;

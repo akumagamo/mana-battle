@@ -17,7 +17,7 @@ export default function (scene: Phaser.Scene, state: MapState) {
 
   state.uiMode = DEFAULT_MODE;
 
-  scene.scene.manager.stop('Phaser.Scene');
+  scene.scene.manager.stop('MapScene');
 
   Object.keys(events()).forEach((k) => scene.events.off(k));
 }
