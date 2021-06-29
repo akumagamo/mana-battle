@@ -58,8 +58,7 @@ export default async function (
     ReturnedFromCombat(scene).emit(null);
   };
 
-  // URGENT TODO: type scene scene integration
-  // change scene.state.squads to squadIndex
+  console.log(`starting`);
   CombatScene.start(scene, {
     squads: state.squads
       .filter((sqd) => [starter.id, target.id].includes(sqd.id))
