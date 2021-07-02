@@ -16,6 +16,8 @@ import update from './update';
 export default async (scene: Phaser.Scene, state: MapState) => {
   subscribe(scene, state);
 
+  scene.input.mouse.disableContextMenu();
+
   scene.events.on('update', () => {
     update(scene, state);
   });

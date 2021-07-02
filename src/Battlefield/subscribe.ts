@@ -8,6 +8,7 @@ import { handleCellClick } from "./events/CellClicked";
 import { getChara, MapState } from "./Model";
 import * as selectChara from "../Chara/commands/selectChara";
 import deselectAllEntities from "./commands/deselectAllEntities";
+import cellRightClicked from "./board/cellRightClicked";
 
 export default function (scene: Phaser.Scene, state: MapState) {
   const index = events();
@@ -16,7 +17,7 @@ export default function (scene: Phaser.Scene, state: MapState) {
 
   index
     .MovePlayerSquadButonClicked(scene)
-    .on((c) => handleMovePlayerSquadButtonClicked(c));
+    .on(handleMovePlayerSquadButtonClicked);
 
   index.CloseSquadArrivedInfoMessage(scene).on((chara) => {
     handleCloseSquadArrivedInfoMessage(scene, state, chara);
@@ -39,4 +40,6 @@ export default function (scene: Phaser.Scene, state: MapState) {
     const chara = getChara(state, mapSquad.id);
     selectChara.emit(chara);
   });
+
+  index.RightButtonClickedOnCell(scene).on(cellRightClicked);
 }
