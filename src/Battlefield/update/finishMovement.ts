@@ -36,9 +36,9 @@ export default async function (
     if (squad.squad.force === PLAYER_FORCE) {
       const chara = getChara(state, squad.id);
       stand(chara);
-      const portrait = await speak(scene, state, squad);
+      const speechWindow = speak(scene, state, squad);
 
-      SquadArrivedInfoMessageCompleted(scene).emit(portrait);
+      SquadArrivedInfoMessageCompleted(scene).emit(speechWindow);
     } else {
       state.ai = state.ai.set(squad.id, 'DEFEND');
     }

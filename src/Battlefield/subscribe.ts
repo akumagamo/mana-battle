@@ -19,8 +19,8 @@ export default function (scene: Phaser.Scene, state: MapState) {
     .MovePlayerSquadButonClicked(scene)
     .on(handleMovePlayerSquadButtonClicked);
 
-  index.CloseSquadArrivedInfoMessage(scene).on((chara) => {
-    handleCloseSquadArrivedInfoMessage(scene, state, chara);
+  index.CloseSquadArrivedInfoMessage(scene).on((container) => {
+    handleCloseSquadArrivedInfoMessage(container);
   });
 
   index.OrganizeButtonClicked(scene).on(() =>

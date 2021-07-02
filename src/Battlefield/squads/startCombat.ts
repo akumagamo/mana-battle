@@ -1,13 +1,13 @@
-import createBoard from '../../Board/createBoard';
-import { PLAYER_FORCE, SCREEN_WIDTH, SCREEN_HEIGHT } from '../../constants';
-import { GAME_SPEED } from '../../env';
-import { delay } from '../../Scenes/utils';
-import panel from '../../UI/panel';
-import speech from '../../UI/speech';
-import { disableMapInput } from '../board/input';
-import { MapSquad, getSquadUnits, getSquadLeader, MapState } from '../Model';
-import { destroyUI } from '../ui';
-import attack from './attack';
+import createBoard from "../../Board/createBoard";
+import { PLAYER_FORCE, SCREEN_WIDTH, SCREEN_HEIGHT } from "../../constants";
+import { GAME_SPEED } from "../../env";
+import { delay } from "../../Scenes/utils";
+import panel from "../../UI/panel";
+import speech from "../../UI/speech";
+import { disableMapInput } from "../board/input";
+import { MapSquad, getSquadUnits, getSquadLeader, MapState } from "../Model";
+import { destroyUI } from "../ui";
+import attack from "./attack";
 
 export default async function (
   scene: Phaser.Scene,
@@ -56,19 +56,18 @@ export default async function (
     false
   );
 
-  const { portrait } = await speech(
+  const speechWindow = speech(
     leader,
     450,
     70,
-    'Ready for Combat',
+    "Ready for Combat",
     state.uiContainer,
-    scene,
-    GAME_SPEED
+    scene
   );
 
   await delay(scene, 3000 / GAME_SPEED);
 
-  portrait.destroy();
+  speechWindow.destroy();
 
   ally.destroy();
   enemy.destroy();

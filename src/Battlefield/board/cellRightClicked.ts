@@ -1,3 +1,4 @@
+import { pingEffect } from "../events/pingEffect";
 import { MapState, Vector } from "../Model";
 import { issueSquadMoveOrder } from "./issueSquadMoveOrder";
 
@@ -12,6 +13,9 @@ export default function cellRightClicked({
   tile: Vector;
   pointer: Vector;
 }) {
-  if (state.uiMode.type === "SQUAD_SELECTED")
+  if (state.uiMode.type === "SQUAD_SELECTED") {
     issueSquadMoveOrder(scene, state, tile, state.uiMode.id);
+
+    pingEffect(scene, pointer);
+  }
 }

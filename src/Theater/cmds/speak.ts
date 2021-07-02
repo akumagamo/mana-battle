@@ -1,20 +1,16 @@
-import createChara from '../../Chara/createChara';
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../../constants';
-import panel from '../../UI/panel';
-import text from '../../UI/text';
-import TheaterScene from '../TheaterScene';
+import createChara from "../../Chara/createChara";
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../constants";
+import panel from "../../UI/panel";
+import text from "../../UI/text";
+import TheaterScene from "../TheaterScene";
 
 export type Speak = {
-  type: 'SPEAK';
+  type: "SPEAK";
   id: string;
   text: string;
 };
 
-export const speak = (
-  scene: TheaterScene,
-  { id, text: text_ }: Speak,
-  speed: number
-) => {
+export const speak = (scene: TheaterScene, { id, text: text_ }: Speak) => {
   const chara = scene.charas.get(scene.charaKey(id));
 
   const PANEL_HEIGHT = 200;
@@ -35,29 +31,26 @@ export const speak = (
   container.add(head.container);
 
   text(190, 20, chara.props.unit.name, container, scene);
-  //const unitText = text(190, 60, text_, container, scene);
 
   const clickZone = scene.add.zone(0, y, SCREEN_WIDTH, PANEL_HEIGHT);
   clickZone.setInteractive();
   clickZone.setOrigin(0);
 
   return new Promise<void>(async (resolve) => {
-    //await animatedText(scene, text_, unitText, speed);
-
-    const img = scene.add.image(SCREEN_WIDTH - 100, 100, 'arrow_right');
+    const img = scene.add.image(SCREEN_WIDTH - 100, 100, "arrow_right");
     container.add(img);
     scene.tweens.add({
       targets: img,
       y: 80,
       duration: 2000,
       yoyo: true,
-      ease: 'Cubic',
+      ease: "Cubic",
       repeat: -1,
     });
 
-    clickZone.on('pointerdown', () => {
+    clickZone.on("pointerdown", () => {
       container.destroy();
-      scene.scene.remove('head');
+      scene.scene.remove("head");
       resolve();
     });
   });
