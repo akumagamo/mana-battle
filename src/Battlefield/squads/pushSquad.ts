@@ -1,6 +1,7 @@
-import { GAME_SPEED } from '../../env';
-import { cellSize } from '../config';
-import { getChara, getMapSquad, MapState } from '../Model';
+import { GAME_SPEED } from "../../env";
+import { screenToCellPosition } from "../board/position";
+import { cellSize } from "../config";
+import { getChara, getMapSquad, MapState } from "../Model";
 
 export default async function (scene: Phaser.Scene, state: MapState) {
   // TODO: make this a create parameter, as we don't need to store this for later
@@ -12,10 +13,10 @@ export default async function (scene: Phaser.Scene, state: MapState) {
     const dist = cellSize;
     let xPush = 0;
     let yPush = 0;
-    if (direction === 'left') xPush = dist * -1;
-    if (direction === 'right') xPush = dist;
-    if (direction === 'top') yPush = dist * -1;
-    if (direction === 'bottom') yPush = dist;
+    if (direction === "left") xPush = dist * -1;
+    if (direction === "right") xPush = dist;
+    if (direction === "top") yPush = dist * -1;
+    if (direction === "bottom") yPush = dist;
 
     const chara = getChara(state, loser.id);
 
@@ -24,6 +25,15 @@ export default async function (scene: Phaser.Scene, state: MapState) {
       y: chara.container.y + yPush,
     };
 
+    const targetCell = screenToCellPosition(newPos);
+
+    const cellType = state.cells[targetCell.y][targetCell.x];
+
+    if (cellType === 3) {
+      complete();
+      return Promise.resolve();
+    }
+
     return new Promise((resolve) => {
       scene.add.tween({
         targets: chara.container,
@@ -31,12 +41,16 @@ export default async function (scene: Phaser.Scene, state: MapState) {
         ...newPos,
         onComplete: () => {
           chara.container.setPosition(newPos.x, newPos.y);
-          state.squads = state.squads.setIn([loser.id, 'pos'], newPos);
-          state.squadToPush = null;
-          state.isPaused = false;
+          state.squads = state.squads.setIn([loser.id, "pos"], newPos);
+          complete();
           resolve();
         },
       });
     }) as Promise<void>;
   } else return Promise.resolve();
+
+  function complete() {
+    state.squadToPush = null;
+    state.isPaused = false;
+  }
 }
