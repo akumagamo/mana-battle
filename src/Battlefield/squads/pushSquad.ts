@@ -50,7 +50,6 @@ export default async function (scene: Phaser.Scene, state: MapState) {
   } else return Promise.resolve();
 
   function complete() {
-    state.squadToPush = null;
     state.isPaused = false;
   }
 }

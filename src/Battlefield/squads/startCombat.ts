@@ -20,6 +20,8 @@ export default async function (
   const baseY = 300;
   const scale = 0.5;
 
+  state.isPaused = true;
+
   const playerSquad = [squadA, squadB].find(
     (sqd) => sqd.squad.force === PLAYER_FORCE
   );

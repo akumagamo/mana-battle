@@ -1,15 +1,16 @@
-import { getDistance } from '../../utils';
-import { cellToScreenPosition } from '../board/position';
-import startCombat from '../squads/startCombat';
-import { cellSize, MOVE_SPEED } from '../config';
-import finishMovement from './finishMovement';
-import stepChara from './stepChara';
-import { getChara, getMapSquad, MapState } from '../Model';
+import { getDistance } from "../../utils";
+import { cellToScreenPosition } from "../board/position";
+import { MOVE_SPEED } from "../config";
+import finishMovement from "./finishMovement";
+import stepChara from "./stepChara";
+import { getChara, getMapSquad, MapState } from "../Model";
+import { checkCollision } from "./checkCollision";
+import startCombat from "../squads/startCombat";
 
 export default function (scene: Phaser.Scene, state: MapState) {
   const movedSquads = state.squadsInMovement.keySeq();
 
-  let direction = '';
+  let direction = "";
 
   state.squadsInMovement.forEach(async (value, squadId) => {
     const { path, squad } = value;
@@ -31,33 +32,17 @@ export default function (scene: Phaser.Scene, state: MapState) {
     return squadId;
   });
 
-  // check collision
   // TODO: divide by each squad, store lists of enemies then compare
-  movedSquads.forEach(async (sqd) => {
-    const current = getChara(state, sqd);
+  movedSquads.forEach((id) => {
+    const collided = checkCollision(state, scene, direction)(id);
 
-    // TODO: only enemies
-    // how: have indexes per team
-    state.charas
-      .filter((c) => {
-        const a = getMapSquad(state, c.props.unit.squad).squad.force;
-        const b = getMapSquad(state, sqd).squad.force;
-
-        return a !== b;
-      })
-      .forEach((c) => {
-        const distance = getDistance(c.container, current.container);
-
-        if (distance < cellSize * 0.8) {
-          state.isPaused = true;
-          startCombat(
-            scene,
-            state,
-            getMapSquad(state, sqd),
-            getMapSquad(state, c.props.unit.squad),
-            direction
-          );
-        }
-      });
+    if (collided)
+      startCombat(
+        scene,
+        state,
+        getMapSquad(state, id),
+        getMapSquad(state, collided.props.unit.squad),
+        direction // TODO: direction is bugged, is using the last iteration
+      );
   });
 }
