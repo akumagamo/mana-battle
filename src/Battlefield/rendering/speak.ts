@@ -6,14 +6,15 @@ import { getSquadLeader, MapSquad, MapState } from "../Model";
 export default function (
   scene: Phaser.Scene,
   state: MapState,
-  squad: MapSquad
+  squad: MapSquad,
+  message: string
 ) {
   const leader = getSquadLeader(state, squad.id);
   const speechWindow = speech(
     leader,
     450,
     -200,
-    "We arrived at the target destination.",
+    message,
     state.uiContainer,
     scene
   );
