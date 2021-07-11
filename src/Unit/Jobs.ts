@@ -1,4 +1,4 @@
-import {UnitClass} from "./Model";
+import {UnitJobs} from "./Model";
 
 export const baseEquips = {
   mage: {
@@ -24,8 +24,8 @@ export const baseEquips = {
   },
 };
 
-export const classes: UnitClass[] = ["fighter", "mage", "archer"];
-export const classLabels: { [label in UnitClass]: string } = {
+export const classes: UnitJobs[] = ["fighter", "mage", "archer"];
+export const classLabels: { [label in UnitJobs]: string } = {
   fighter: "Fighter",
   mage: "Mage",
   archer: "Archer",

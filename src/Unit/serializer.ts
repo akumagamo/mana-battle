@@ -1,11 +1,11 @@
-import { Unit, HAIR_STYLES, genders, UnitClass } from "./Model";
+import { Unit, HAIR_STYLES, genders, UnitJobs } from "./Model";
 import { maleNames } from "../constants/names";
 import { randomItem } from "../utils";
 import { SKIN_COLORS, HAIR_COLORS } from "../Chara/animations/constants";
 import { baseEquips } from "./Jobs";
 import { PLAYER_FORCE } from "../constants";
 
-export const classes = ["fighter", "mage", "archer"] as UnitClass[];
+export const classes = ["fighter", "mage", "archer"] as UnitJobs[];
 
 /**
  * @todo replace with reading data from the database (JSON) and generating a valid unit
@@ -16,7 +16,7 @@ export function fromJSON(n: number): Unit {
   return {
     id: n.toString(),
     name: randomItem(maleNames),
-    class: job,
+    job: job,
     movement: "plain",
     elem: "neutral",
     gender: randomItem(genders),

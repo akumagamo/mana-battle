@@ -143,7 +143,7 @@ export const runTurn = (
 
   if (hasRemainingAttacks && Unit.isAlive(unit)) {
     let res;
-    switch (unit.class) {
+    switch (unit.job) {
       case 'fighter':
         res = slash(turnState, commands);
         turnCommands = res.commands;

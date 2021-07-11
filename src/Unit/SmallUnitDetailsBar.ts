@@ -46,7 +46,7 @@ function unitStats(
 
   row(container, scene)(x + 10, y + 10, [
     name,
-    unitJobLabels[unit.class],
+    unitJobLabels[unit.job],
     `Lvl ${lvl}`,
     `Exp ${exp}`,
     `${currentHp} / ${hp} HP`,

@@ -1,6 +1,6 @@
 import * as Squad from "../Squad/Model";
 import { random } from "../utils/random";
-import { Elem, Unit, UnitClass } from "./Model";
+import { Elem, Unit, UnitJobs } from "./Model";
 import { atk, attrMod, mAtk } from "./mods";
 
 export type Attack = {
@@ -60,7 +60,7 @@ export type UnitAttacks = {
   };
 };
 
-export const skillsIndex: { [x in UnitClass]: UnitAttacks } = {
+export const skillsIndex: { [x in UnitJobs]: UnitAttacks } = {
   fighter: {
     front: { times: 2, skill: slash },
     middle: { times: 1, skill: slash },
@@ -78,7 +78,7 @@ export const skillsIndex: { [x in UnitClass]: UnitAttacks } = {
   },
 };
 
-export function getUnitAttacks(class_: UnitClass) {
+export function getUnitAttacks(class_: UnitJobs) {
   return skillsIndex[class_];
 }
 
@@ -94,5 +94,5 @@ export function getUnitAttack(squadIndex: Squad.Index, unit: Unit) {
     else return "front";
   };
 
-  return getUnitAttacks(unit.class)[getPos()];
+  return getUnitAttacks(unit.job)[getPos()];
 }

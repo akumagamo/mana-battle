@@ -68,7 +68,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
 
     this.row(baseX, baseY, [
       unit.name,
-      unitJobLabels[unit.class],
+      unitJobLabels[unit.job],
       `Lvl ${lvl}`,
       `Exp ${exp}`,
       "",
@@ -95,7 +95,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
       `INT ${int}`,
     ]);
 
-    const attacks = getUnitAttacks(unit.class);
+    const attacks = getUnitAttacks(unit.job);
 
     let front = attacks.front;
     let middle = attacks.middle;

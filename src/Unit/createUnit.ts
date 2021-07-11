@@ -7,7 +7,7 @@ import {
   HAIR_STYLES,
   Movement,
   Unit,
-  UnitClass as UnitJob,
+  UnitJobs as UnitJob,
 } from "./Model";
 import { baseEquips } from "./Jobs";
 import { PLAYER_FORCE } from "../constants";
@@ -44,7 +44,7 @@ export default function createUnit(
   return {
     name: randomItem(maleNames),
     id,
-    class: job,
+    job: job,
     equips: baseEquips[job],
     lvl,
     movement: "plain" as Movement,

@@ -91,14 +91,14 @@ function front(chara: Chara, headOnly = false) {
 
   chara.leftFoot = renderFoot(LEFT_FOOT_FRONT_X, LEFT_FOOT_FRONT_Y);
   chara.rightFoot = renderFoot(RIGHT_FOOT_FRONT_X, RIGHT_FOOT_FRONT_Y);
-  if (chara.props.unit.class === 'mage') {
+  if (chara.props.unit.job === 'mage') {
     chara.leftFoot.visible = false;
     chara.rightFoot.visible = false;
   }
 
   chara.leftHand = renderHand(0, 0);
   chara.trunk = renderTrunk(
-    chara.props.unit.class,
+    chara.props.unit.job,
     TRUNK_FRONT_X,
     TRUNK_FRONT_Y
   );
@@ -129,7 +129,7 @@ function front(chara: Chara, headOnly = false) {
   chara.innerWrapper.bringToTop(chara.mainHandContainer);
 }
 function renderFrontWeapon(chara: Chara) {
-  if (chara.props.unit.class === 'mage') {
+  if (chara.props.unit.job === 'mage') {
     chara.rightHandEquip = chara.scene.add.image(
       23,
       17,
@@ -143,7 +143,7 @@ function renderFrontWeapon(chara: Chara) {
 
     chara.mainHandContainer.add(chara.rightHandEquip);
     chara.mainHandContainer.sendToBack(chara.rightHandEquip);
-  } else if (chara.props.unit.class === 'fighter') {
+  } else if (chara.props.unit.job === 'fighter') {
     chara.rightHandEquip = chara.scene.add.image(
       23,
       17,
@@ -155,7 +155,7 @@ function renderFrontWeapon(chara: Chara) {
 
     chara.mainHandContainer.add(chara.rightHandEquip);
     chara.mainHandContainer.sendToBack(chara.rightHandEquip);
-  } else if (chara.props.unit.class === 'archer') {
+  } else if (chara.props.unit.job === 'archer') {
     chara.leftHandEquip = chara.scene.add.image(
       0,
       0,
@@ -246,12 +246,12 @@ function back(chara: Chara, headOnly = false) {
   chara.leftFoot.setScale(1, 1);
   chara.rightFoot.setScale(1, 1);
 
-  if (chara.props.unit.class === 'mage') {
+  if (chara.props.unit.job === 'mage') {
     chara.leftFoot.visible = false;
     chara.rightFoot.visible = false;
   }
   chara.leftHand = renderHand(0, 0);
-  chara.trunk = renderTrunk(chara.props.unit.class, TRUNK_BACK_X, TRUNK_BACK_Y);
+  chara.trunk = renderTrunk(chara.props.unit.job, TRUNK_BACK_X, TRUNK_BACK_Y);
   chara.rightHand = renderHand(0, 0);
 
   chara.offHandContainer = chara.scene.add.container(
@@ -283,7 +283,7 @@ export default (chara: Chara, headOnly = false) => {
 };
 
 function renderBackWeapon(chara: Chara) {
-  if (chara.props.unit.class === 'mage') {
+  if (chara.props.unit.job === 'mage') {
     chara.rightHandEquip = chara.scene.add.image(
       13,
       17,
@@ -297,7 +297,7 @@ function renderBackWeapon(chara: Chara) {
 
     chara.mainHandContainer.add(chara.rightHandEquip);
     chara.mainHandContainer.sendToBack(chara.rightHandEquip);
-  } else if (chara.props.unit.class === 'fighter') {
+  } else if (chara.props.unit.job === 'fighter') {
     chara.rightHandEquip = chara.scene.add.image(
       -10,
       15,
@@ -309,7 +309,7 @@ function renderBackWeapon(chara: Chara) {
 
     chara.mainHandContainer.add(chara.rightHandEquip);
     chara.mainHandContainer.sendToBack(chara.rightHandEquip);
-  } else if (chara.props.unit.class === 'archer') {
+  } else if (chara.props.unit.job === 'archer') {
     chara.leftHandEquip = chara.scene.add.image(
       0,
       20,

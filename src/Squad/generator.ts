@@ -1,5 +1,5 @@
 import { SquadRecord, MemberIndex, makeMember, createSquad } from './Model';
-import { UnitClass, UnitIndex } from '../Unit/Model';
+import { UnitJobs, UnitIndex } from '../Unit/Model';
 import { Map } from 'immutable';
 import createUnit from '../Unit/createUnit';
 
@@ -34,7 +34,7 @@ export function fighterArcherSquad(
  */
 export function squadGenerator(
   squadId: string,
-  unitList: [UnitClass, [number, number]][],
+  unitList: [UnitJobs, [number, number]][],
   level: number,
   force: string
 ): { units: UnitIndex; squad: SquadRecord } {

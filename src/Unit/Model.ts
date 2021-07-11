@@ -41,9 +41,9 @@ export type Elem =
   | "shadow"
   | "neutral";
 
-export type UnitClass = "fighter" | "mage" | "archer";
+export type UnitJobs = "fighter" | "mage" | "archer";
 
-export const unitJobLabels: { [x in UnitClass]: string } = {
+export const unitJobLabels: { [x in UnitJobs]: string } = {
   archer: "Archer",
   mage: "Mage",
   fighter: "Fighter",
@@ -57,7 +57,7 @@ export const update = (unit: Unit) => (index: UnitIndex) =>
 export type Unit = {
   id: string;
   name: string;
-  class: UnitClass;
+  job: UnitJobs;
   gender: Gender;
   movement: Movement;
   squad: string | null; // todo: remove
@@ -85,7 +85,7 @@ export type Unit = {
 export const createUnit = (id: string): Unit => ({
   id,
   name: "",
-  class: "fighter",
+  job: "fighter",
   gender: "male" as Gender,
   movement: "plain", // this should belong to a job
   squad: null,
