@@ -2,7 +2,7 @@ import chapter1 from "../../Campaign/chapter1";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../constants";
 import button from "../../UI/button";
 import {createUnit} from "../../Unit/Model";
-import {skills} from "../../Unit/Skills";
+import {skillsIndex} from "../../Unit/Skills";
 import { SaveFile } from "./Model";
 
 export function create(scene: Phaser.Scene) {
@@ -21,7 +21,6 @@ export function create(scene: Phaser.Scene) {
       scene,
       () => {
         let unit = save.hero
-        unit.attacks = skills[unit.class]
         chapter1(scene, unit)
       },
       false,

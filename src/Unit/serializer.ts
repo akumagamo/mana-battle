@@ -1,14 +1,11 @@
-import {Unit, HAIR_STYLES, genders, UnitClass} from './Model';
-import {maleNames} from '../constants/names';
-import {randomItem } from '../utils';
-import {SKIN_COLORS, HAIR_COLORS} from '../Chara/animations/constants';
-import {getUnitAttacks} from './Skills';
-import {baseEquips} from './Jobs';
-import {PLAYER_FORCE} from '../constants';
+import { Unit, HAIR_STYLES, genders, UnitClass } from "./Model";
+import { maleNames } from "../constants/names";
+import { randomItem } from "../utils";
+import { SKIN_COLORS, HAIR_COLORS } from "../Chara/animations/constants";
+import { baseEquips } from "./Jobs";
+import { PLAYER_FORCE } from "../constants";
 
-
-export const classes =['fighter' , 'mage', 'archer'] as UnitClass[] 
-
+export const classes = ["fighter", "mage", "archer"] as UnitClass[];
 
 /**
  * @todo replace with reading data from the database (JSON) and generating a valid unit
@@ -20,8 +17,8 @@ export function fromJSON(n: number): Unit {
     id: n.toString(),
     name: randomItem(maleNames),
     class: job,
-    movement: 'plain',
-    elem: 'neutral',
+    movement: "plain",
+    elem: "neutral",
     gender: randomItem(genders),
     equips: baseEquips[job],
     squad: null,
@@ -39,11 +36,9 @@ export function fromJSON(n: number): Unit {
       hair: randomItem(HAIR_STYLES),
       displayHat: randomItem([true, false]),
     },
-    attacks: getUnitAttacks(job),
   };
 }
 
-
 export function toJSON(_: Unit) {
-  throw new Error('Not implemented.');
+  throw new Error("Not implemented.");
 }

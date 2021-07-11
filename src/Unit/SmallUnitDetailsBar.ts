@@ -1,5 +1,5 @@
 import {Container} from '../Models';
-import {Unit, unitClassLabels} from './Model';
+import {Unit, unitJobLabels} from './Model';
 import text from '../UI/text';
 import panel from '../UI/panel';
 import {SCREEN_WIDTH} from '../constants';
@@ -46,7 +46,7 @@ function unitStats(
 
   row(container, scene)(x + 10, y + 10, [
     name,
-    unitClassLabels[unit.class],
+    unitJobLabels[unit.class],
     `Lvl ${lvl}`,
     `Exp ${exp}`,
     `${currentHp} / ${hp} HP`,
