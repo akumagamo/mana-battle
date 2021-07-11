@@ -106,5 +106,6 @@ export default async (scene: Phaser.Scene, unit: Unit) => {
     ),
     units: map.units.merge(alliedUnits),
   };
+
   startBattlefieldScene(scene, state);
 };

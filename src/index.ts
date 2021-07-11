@@ -6,6 +6,7 @@ import CombatScene from './Combat/CombatScene';
 import TitleScene from './Scenes/Title/TitleScene';
 import { Battlefield } from './Battlefield/MapScene';
 import CharaCreationScene from './CharaCreation/CharaCreationScene';
+import SaveListScene from './Scenes/SaveList/SaveListScene';
 
 (() => {
   const config: Phaser.Types.Core.GameConfig = {
@@ -19,6 +20,7 @@ import CharaCreationScene from './CharaCreation/CharaCreationScene';
     },
     scene: [
       TitleScene,
+      SaveListScene,
       ListSquadsScene,
       CombatScene,
       OptionsScene,
