@@ -102,13 +102,13 @@ export class UnitDetailsBarScene extends Phaser.Scene {
     let back = attacks.back;
 
     this.col(baseX + this.colWidth * 2 + 20, baseY + this.rowHeight + 20, [
-      `Front  - ${front.skill(unit).name} - ${front.skill(unit).damage} x ${
+      `Front  - ${front.skill.name} - ${front.skill.formula(unit)} x ${
         front.times
       }`,
-      `Middle - ${middle.skill(unit).name} - ${middle.skill(unit).damage} x ${
+      `Middle - ${middle.skill.name} - ${middle.skill.formula(unit)} x ${
         middle.times
       }`,
-      `Back   - ${back.skill(unit).name} - ${back.skill(unit).damage} x ${
+      `Back   - ${back.skill.name} - ${back.skill.formula(unit)} x ${
         back.times
       }`,
     ]);

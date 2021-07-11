@@ -1,7 +1,6 @@
 import { Modifier, ItemSlot, ItemMap, ItemType } from "../Item/Model";
 import { sum } from "../utils/math";
 import { Container } from "../Models";
-import { skillsIndex, UnitAttacks } from "./Skills";
 import { MapSquad, Vector } from "../Battlefield/Model";
 import { SquadRecord } from "../Squad/Model";
 import { Map } from "immutable";
@@ -79,7 +78,6 @@ export type Unit = {
     [x in ItemSlot]: string;
   };
   elem: Elem;
-  //attacks: UnitAttacks;
 };
 
 export const createUnit = (id: string): Unit => ({
@@ -203,30 +201,34 @@ export const HAIR_STYLES = [
 ];
 
 export type Skill = {
+  id: string;
   name: string;
   formula: (u: Unit) => number;
-  attacksPerRow: {
-    front: number;
-    middle: number;
-    back: number;
-  };
+  elem: Elem;
 };
 
 export type Job = {
+  id: string;
   name: string;
   statsPerLevel: {
     str: number;
     dex: number;
     int: number;
   };
-  attack: Skill;
+  attacks: {
+    front: { times: number; skill: Skill };
+    middle: { times: number; skill: Skill };
+    back: { times: number; skill: Skill };
+  };
   equips: {
     [x in ItemSlot]: ItemType;
   };
 };
 
 const slash: Skill = {
-  name: "slash",
+  id: "slash",
+  name: "Slash",
+  elem: "neutral",
   formula: (unit) => {
     // const items = getItemsFromDB();
     // const weapon = items.get( unit.equips.mainHand );
@@ -236,21 +238,49 @@ const slash: Skill = {
     // return str + dex / 4 + weapon.modifiers.atk;
     return 3;
   },
-  attacksPerRow: {
-    front: 2,
-    middle: 1,
-    back: 1,
+};
+const shoot: Skill = {
+  id: "shoot",
+  name: "Shoot",
+  elem: "neutral",
+  formula: (unit) => {
+    // const items = getItemsFromDB();
+    // const weapon = items.get( unit.equips.mainHand );
+    // const str = getActualStat('str', items, unit);
+    // const dex = getActualStat('dex', items, unit);
+
+    // return str + dex / 4 + weapon.modifiers.atk;
+    return 3;
+  },
+};
+const fireball: Skill = {
+  id: "fireball",
+  name: "Fireball",
+  elem: "fire",
+  formula: (unit) => {
+    // const items = getItemsFromDB();
+    // const weapon = items.get( unit.equips.mainHand );
+    // const str = getActualStat('str', items, unit);
+    // const dex = getActualStat('dex', items, unit);
+
+    // return str + dex / 4 + weapon.modifiers.atk;
+    return 3;
   },
 };
 
 export const fighter: Job = {
-  name: "fighter",
+  id: "fighter",
+  name: "Fighter",
   statsPerLevel: {
     str: 6,
     dex: 4,
     int: 2,
   },
-  attack: slash,
+  attacks: {
+    front: { times: 2, skill: slash },
+    middle: { times: 1, skill: slash },
+    back: { times: 1, skill: slash },
+  },
   equips: {
     head: "helm",
     mainHand: "sword",
@@ -258,6 +288,60 @@ export const fighter: Job = {
     chest: "heavy_armor",
     ornament: "accessory",
   },
+};
+export const archer: Job = {
+  id: "archer",
+  name: "Archer",
+  statsPerLevel: {
+    str: 6,
+    dex: 4,
+    int: 2,
+  },
+  attacks: {
+    front: { times: 1, skill: shoot },
+    middle: { times: 1, skill: shoot },
+    back: { times: 2, skill: shoot },
+  },
+  equips: {
+    head: "helm",
+    mainHand: "sword",
+    offHand: "shield",
+    chest: "heavy_armor",
+    ornament: "accessory",
+  },
+};
+export const mage: Job = {
+  id: "mage",
+  name: "Mage",
+  statsPerLevel: {
+    str: 6,
+    dex: 4,
+    int: 2,
+  },
+  attacks: {
+    front: { times: 1, skill: fireball },
+    middle: { times: 1, skill: fireball },
+    back: { times: 2, skill: fireball },
+  },
+  equips: {
+    head: "helm",
+    mainHand: "sword",
+    offHand: "shield",
+    chest: "heavy_armor",
+    ornament: "accessory",
+  },
+};
+
+export const JOBS = {
+  fighter: fighter,
+  archer: archer,
+  mage: mage,
+};
+
+export const SKILLZ = {
+  slash: slash,
+  shoot: shoot,
+  fireball: fireball,
 };
 
 export function isAlive(unit: Unit) {
