@@ -1,28 +1,32 @@
-import { Set } from 'immutable';
-import { GAME_SPEED } from '../env';
-import { fadeIn } from '../UI/Transition';
-import { enableMapInput } from './board/input';
-import renderMap from './board/renderMap';
-import renderSquads from './board/renderSquads';
-import renderStructures from './board/renderStructures';
-import { makeWorldDraggable, setWorldBounds } from './dragging';
-import destroySquad from './events/destroySquad';
-import { MapState } from './Model';
-import pushSquad from './squads/pushSquad';
-import subscribe from './subscribe';
-import { refreshUI } from './ui';
-import update from './update';
+import { Set } from "immutable";
+import { GAME_SPEED } from "../env";
+import { fadeIn } from "../UI/Transition";
+import { enableMapInput } from "./board/input";
+import renderMap from "./board/renderMap";
+import renderSquads from "./board/renderSquads";
+import renderStructures from "./board/renderStructures";
+import { makeWorldDraggable, setWorldBounds } from "./dragging";
+import destroySquad from "./events/destroySquad";
+import { getMapSquad, MapState } from "./Model";
+import pushSquad from "./squads/pushSquad";
+import startCombat from "./squads/startCombat";
+import subscribe from "./subscribe";
+import { refreshUI } from "./ui";
+import update from "./update";
+import { checkCollision } from "./update/checkCollision";
 
 export default async (scene: Phaser.Scene, state: MapState) => {
   subscribe(scene, state);
 
-  scene.events.on('update', () => {
+  scene.input.mouse.disableContextMenu();
+
+  scene.events.on("update", () => {
     update(scene, state);
   });
 
   if (process.env.SOUND_ENABLED) {
     scene.sound.stopAll();
-    const music = scene.sound.add('map1');
+    const music = scene.sound.add("map1");
 
     //@ts-ignore
     music.setVolume(0.3);
@@ -52,10 +56,29 @@ export default async (scene: Phaser.Scene, state: MapState) => {
 
   await pushSquad(scene, state);
 
+  if (state.squadToPush) {
+    const collided = checkCollision(
+      state,
+      scene,
+      state.squadToPush.direction
+    )(state.squadToPush.loser);
+    if (collided) {
+      startCombat(
+        scene,
+        state,
+        getMapSquad(state, state.squadToPush.loser),
+        getMapSquad(state, collided.props.unit.squad),
+        state.squadToPush.direction
+      );
+    }
+
+    state.squadToPush = null;
+  }
+
   enableMapInput(scene, state);
   state.isPaused = false;
 
   refreshUI(scene, state);
 
-  scene.game.events.emit('BattlefieldSceneCreated', { scene, state });
+  scene.game.events.emit("BattlefieldSceneCreated", { scene, state });
 };

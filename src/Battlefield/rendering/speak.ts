@@ -1,32 +1,44 @@
-import { GAME_SPEED } from '../../env';
-import button from '../../UI/button';
-import speech from '../../UI/speech';
-import SquadArrivedInfoMessageClosed from '../events/SquadArrivedInfoMessageClosed';
-import { getSquadLeader, MapSquad, MapState } from '../Model';
+import { GAME_SPEED } from "../../env";
+import speech from "../../UI/speech";
+import SquadArrivedInfoMessageClosed from "../events/SquadArrivedInfoMessageClosed";
+import { getSquadLeader, MapSquad, MapState } from "../Model";
 
-export default async function (
+export default function (
   scene: Phaser.Scene,
   state: MapState,
-  squad: MapSquad
+  squad: MapSquad,
+  message: string
 ) {
-  state.isPaused = true;
-
   const leader = getSquadLeader(state, squad.id);
-  const res = await speech(
+  const speechWindow = speech(
     leader,
     450,
-    70,
-    'We arrived at the target destination.',
+    -200,
+    message,
     state.uiContainer,
-    scene,
-    GAME_SPEED
+    scene
   );
 
-  button(850, 185, 'Ok', state.uiContainer, scene, () =>
-    SquadArrivedInfoMessageClosed(scene).emit(res.portrait)
-  );
+  scene.tweens.add({
+    targets: speechWindow,
+    y: 20,
+    ease: "Cubic",
+    duration: 1000 / GAME_SPEED,
+    onComplete: () => {
+      scene.tweens.add({
+        delay: 1000 / GAME_SPEED,
+        targets: speechWindow,
+        y: -200,
+        ease: "Cubic",
+        duration: 1000 / GAME_SPEED,
+        onComplete: () => {
+          SquadArrivedInfoMessageClosed(scene).emit(speechWindow);
+        },
+      });
+    },
+  });
 
-  state.uiContainer.add(res.portrait.container);
+  state.uiContainer.add(speechWindow);
 
-  return res.portrait;
+  return speechWindow;
 }

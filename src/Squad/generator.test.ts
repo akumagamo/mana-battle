@@ -40,8 +40,8 @@ test('generates units', () => {
     })
   );
 
-  equals(units.get(unit1Id).class, 'fighter');
-  equals(units.get(unit2Id).class, 'archer');
+  equals(units.get(unit1Id).job, 'fighter');
+  equals(units.get(unit2Id).job, 'archer');
 
   equals(units.get(unit1Id).lvl, 22);
   equals(units.get(unit2Id).lvl, 22);

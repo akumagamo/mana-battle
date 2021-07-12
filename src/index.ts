@@ -2,10 +2,11 @@ import { SCREEN_WIDTH, SCREEN_HEIGHT } from './constants';
 import OptionsScene from './Scenes/OptionsScene';
 import { ListSquadsScene } from './Squad/ListSquadsScene/ListSquadsScene';
 import CombatScene from './Combat/CombatScene';
-import { endToEndTesting } from './endToEndTesting';
+//import { endToEndTesting } from './endToEndTesting';
 import TitleScene from './Scenes/Title/TitleScene';
 import { Battlefield } from './Battlefield/MapScene';
 import CharaCreationScene from './CharaCreation/CharaCreationScene';
+import SaveListScene from './Scenes/SaveList/SaveListScene';
 
 (() => {
   const config: Phaser.Types.Core.GameConfig = {
@@ -19,6 +20,7 @@ import CharaCreationScene from './CharaCreation/CharaCreationScene';
     },
     scene: [
       TitleScene,
+      SaveListScene,
       ListSquadsScene,
       CombatScene,
       OptionsScene,

@@ -1,3 +1,4 @@
+import {GAME_SPEED} from '../../env';
 import { Chara } from '../Model';
 import defaultPose from './defaultPose';
 
@@ -11,7 +12,7 @@ export default (chara: Chara, onComplete: () => void) => {
     yoyo: true,
     x: (chara.mainHandContainer?.x || 0) + (chara.props.front ? -30 : 30),
     y: (chara.mainHandContainer?.y || 0) - 20,
-    duration: ATTACK_DURATION,
+    duration: ATTACK_DURATION / GAME_SPEED,
     ease: 'ExpoOut',
     onComplete: () => {
       onComplete();
@@ -24,7 +25,7 @@ export default (chara: Chara, onComplete: () => void) => {
     rotation: chara.props.front ? -1.2 : 0.5,
     x: (chara.mainHandContainer?.y || 0) + 20,
     Y: (chara.mainHandContainer?.y || 0) - 5,
-    duration: ATTACK_DURATION,
+    duration: ATTACK_DURATION / GAME_SPEED,
     ease: 'ExpoOut',
   });
 

@@ -1,18 +1,11 @@
-import { Chara } from '../../Chara/Model';
-import { createEvent } from '../../utils';
-import { MapState } from '../Model';
-import { refreshUI } from '../ui';
+import { Container } from "../../Models";
+import { createEvent } from "../../utils";
 
-export function handleCloseSquadArrivedInfoMessage(
-  scene: Phaser.Scene,
-  state: MapState,
-  chara: Chara
-) {
-  chara.destroy();
-  refreshUI(scene, state);
-  state.isPaused = false;
+export function handleCloseSquadArrivedInfoMessage(container: Container) {
+  container.destroy();
 }
 
-export const key = 'CloseSquadArrivedInfoMessage';
+export const key = "CloseSquadArrivedInfoMessage";
 
-export default (scene: Phaser.Scene) => createEvent<Chara>(scene.events, key);
+export default (scene: Phaser.Scene) =>
+  createEvent<Container>(scene.events, key);

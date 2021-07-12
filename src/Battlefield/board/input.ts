@@ -1,7 +1,8 @@
-import { Pointer } from '../../Models';
-import CellClicked from '../events/CellClicked';
-import { MapState, MapTile } from '../Model';
-import { refreshUI } from '../ui';
+import { Pointer } from "../../Models";
+import CellClicked from "../events/CellClicked";
+import RightButtonClickedOnCell from "../events/RightButtonClickedOnCell";
+import { MapState, MapTile } from "../Model";
+import { refreshUI } from "../ui";
 
 export function disableMapInput(state: MapState) {
   clearAllTileEvents(state);
@@ -30,14 +31,25 @@ export function makeInteractive(
   state: MapState,
   cell: MapTile
 ) {
-  cell.tile.on('pointerup', (pointer: Pointer) =>
-    CellClicked(scene).emit({
-      scene,
-      state,
-      tile: cell,
-      pointer: { x: pointer.upX, y: pointer.upY },
-    })
-  );
+  cell.tile.on("pointerup", (pointer: Pointer) => {
+    if (pointer.wasTouch || pointer.leftButtonReleased())
+      CellClicked(scene).emit({
+        scene,
+        state,
+        tile: cell,
+        pointer: { x: pointer.upX, y: pointer.upY },
+      });
+  });
+  cell.tile.on("pointerdown", (pointer: Pointer) => {
+    if (pointer.rightButtonDown()) {
+      RightButtonClickedOnCell(scene).emit({
+        scene,
+        state,
+        tile: cell,
+        pointer,
+      });
+    }
+  });
 }
 
 export function clearAllTileEvents(state: MapState) {

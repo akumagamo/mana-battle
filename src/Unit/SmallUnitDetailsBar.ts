@@ -1,30 +1,30 @@
-import {Container} from '../Models';
-import {Unit, unitClassLabels} from './Model';
-import text from '../UI/text';
-import panel from '../UI/panel';
-import {SCREEN_WIDTH} from '../constants';
+import { Container } from "../Models";
+import { Unit } from "./Model";
+import text from "../UI/text";
+import panel from "../UI/panel";
+import { JOBS } from "./Jobs/Jobs";
 
 const colWidth = 130;
 
 const row = (container: Container, scene: Phaser.Scene) => (
   x: number,
   y: number,
-  strs: (string | number)[],
+  strs: (string | number)[]
 ) =>
   strs.forEach((str, index) =>
-    write(container, scene)(x + colWidth * index, y, str),
+    write(container, scene)(x + colWidth * index, y, str)
   );
 
 const write = (container: Container, scene: Phaser.Scene) => (
   x: number,
   y: number,
-  str: string | number,
+  str: string | number
 ) => text(x, y, str, container, scene);
 export default function (
   x: number,
   y: number,
   scene: Phaser.Scene,
-  unit: Unit,
+  unit: Unit
 ) {
   const container = scene.add.container();
 
@@ -40,13 +40,13 @@ function unitStats(
   y: number,
   container: Container,
   scene: Phaser.Scene,
-  unit: Unit,
+  unit: Unit
 ) {
-  const {name, lvl, exp, currentHp, hp} = unit;
+  const { name, lvl, exp, currentHp, hp } = unit;
 
   row(container, scene)(x + 10, y + 10, [
     name,
-    unitClassLabels[unit.class],
+    JOBS[unit.job].name,
     `Lvl ${lvl}`,
     `Exp ${exp}`,
     `${currentHp} / ${hp} HP`,

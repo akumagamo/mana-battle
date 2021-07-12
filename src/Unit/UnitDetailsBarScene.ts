@@ -1,12 +1,14 @@
 import { Container } from "../Models";
-import { Unit, unitClassLabels } from "./Model";
+import { Unit } from "./Model";
 import { ItemSlot } from "../Item/Model";
 import { ItemDetailWindowScene } from "../Item/ItemDetailWindowScene";
 import text from "../UI/text";
 import button from "../UI/button";
 import panel from "../UI/panel";
-import {Chara} from "../Chara/Model";
+import { Chara } from "../Chara/Model";
 import createChara from "../Chara/createChara";
+import { JOBS } from "./Jobs/Jobs";
+import { getUnitAttacks } from "./Skills/Skills";
 
 export class UnitDetailsBarScene extends Phaser.Scene {
   colWidth = 150;
@@ -60,14 +62,14 @@ export class UnitDetailsBarScene extends Phaser.Scene {
     strs.forEach((str, index) => this.write(x + this.colWidth * index, y, str));
 
   unitStats(unit: Unit) {
-    const { str, int, dex, lvl, exp, currentHp, hp, attacks } = unit;
+    const { str, int, dex, lvl, exp, currentHp, hp } = unit;
 
     const baseX = 20;
     const baseY = 20;
 
     this.row(baseX, baseY, [
       unit.name,
-      unitClassLabels[unit.class],
+      JOBS[unit.job].name,
       `Lvl ${lvl}`,
       `Exp ${exp}`,
       "",
@@ -94,14 +96,22 @@ export class UnitDetailsBarScene extends Phaser.Scene {
       `INT ${int}`,
     ]);
 
-    let front = attacks.front(unit);
-    let middle = attacks.middle(unit);
-    let back = attacks.back(unit);
+    const attacks = getUnitAttacks(unit.job);
+
+    let front = attacks.front;
+    let middle = attacks.middle;
+    let back = attacks.back;
 
     this.col(baseX + this.colWidth * 2 + 20, baseY + this.rowHeight + 20, [
-      `Front  - ${front.name} - ${front.damage} x ${front.times}`,
-      `Middle - ${middle.name} - ${middle.damage} x ${middle.times}`,
-      `Back   - ${back.name} - ${back.damage} x ${back.times}`,
+      `Front  - ${front.skill.name} - ${front.skill.formula(unit)} x ${
+        front.times
+      }`,
+      `Middle - ${middle.skill.name} - ${middle.skill.formula(unit)} x ${
+        middle.times
+      }`,
+      `Back   - ${back.skill.name} - ${back.skill.formula(unit)} x ${
+        back.times
+      }`,
     ]);
   }
 
@@ -117,28 +127,21 @@ export class UnitDetailsBarScene extends Phaser.Scene {
     const item = (x: number, y: number, slotId: ItemSlot) => {
       //const itemId = unit.equips[slotId];
       //const slot = itemId !== "none" ? api.getItemFromDB(itemId) : null;
-
       //const bg = this.add.image(x, y, "panel");
-
       //bg.displayWidth = iconSize + padding;
       //bg.displayHeight = iconSize + padding;
-
       //this.container?.add(bg);
-
       //// TODO: implement adding a item to an empty slot
       //if (slot) {
       //  const icon = this.add.image(x, y, slot.id);
       //  icon.displayWidth = iconSize;
       //  icon.displayHeight = iconSize;
-
       //  icon.setInteractive();
       //  icon.on("pointerdown", () => {
       //    this.itemDetail?.render(slot.id, unit.id, () => this.render(unit));
       //    //this.renderItemDetails()
       //  });
-
       //  this.container?.add(icon);
-
       //  if (this.container)
       //    text(
       //      x + iconSize / 2 + margin + padding,

@@ -6,8 +6,9 @@ import update from './update';
 jest.mock('../Scenes/utils');
 jest.mock('./update');
 jest.mock('../Squad/ListSquadsScene/ListSquadsScene');
-
 jest.mock('../UI/Transition');
+jest.mock('./squads/startCombat');
+
 
 beforeEach(() => {
   (update as jest.Mock).mockReset();

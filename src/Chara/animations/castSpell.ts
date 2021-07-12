@@ -1,5 +1,6 @@
-import { Chara } from '../Model';
-import defaultPose from './defaultPose';
+import { GAME_SPEED } from "../../env";
+import { Chara } from "../Model";
+import defaultPose from "./defaultPose";
 
 const ATTACK_DURATION = 500;
 
@@ -11,8 +12,8 @@ export default (chara: Chara, onComplete: () => void) => {
     yoyo: true,
     x: chara.mainHandContainer?.x + (chara.props.front ? -5 : 5),
     y: chara.mainHandContainer?.y - 5,
-    duration: ATTACK_DURATION,
-    ease: 'ExpoOut',
+    duration: ATTACK_DURATION / GAME_SPEED,
+    ease: "ExpoOut",
     onComplete: () => {
       onComplete();
     },
@@ -24,11 +25,11 @@ export default (chara: Chara, onComplete: () => void) => {
     rotation: chara.props.front ? -1.2 : 0.5,
     x: chara.offHandContainer.x + (chara.props.front ? 5 : -5),
     Y: chara.offHandContainer.y - 5,
-    duration: ATTACK_DURATION,
-    ease: 'ExpoOut',
+    duration: ATTACK_DURATION / GAME_SPEED,
+    ease: "ExpoOut",
   });
 
   if (process.env.SOUND_ENABLED) {
-    chara.scene.sound.add('fireball').play();
+    chara.scene.sound.add("fireball").play();
   }
 };
