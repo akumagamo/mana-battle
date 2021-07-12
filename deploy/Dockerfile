@@ -1,6 +1,6 @@
 FROM beevelop/cordova:latest
 
-ADD ./dist /mana
+ADD . /mana
 
 WORKDIR /mana
 
@@ -11,8 +11,6 @@ WORKDIR /mana/manabattle
 RUN cordova platform add android
 
 CMD rm -rf www/* && \ 
-    cp /mana/config.xml /mana/manabattle/config.xml && \ 
-    mv /mana/index.html /mana/manabattle/www/index.html && \ 
-    mv /mana/assets/ /mana/manabattle/www/assets/ && \ 
-    mv /mana/dist/ /mana/manabattle/www/dist && \ 
-    cd /mana/manabattle && cordova build android 
+    cp config.xml manabattle/config.xml && \ 
+    mv web-bundle www && \
+    cd manabattle && cordova build android 
