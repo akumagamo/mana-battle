@@ -18,6 +18,7 @@ export function create(scene: Phaser.Scene) {
       container,
       scene,
       () => {
+        scene.children.removeAll();
         let unit = save.hero;
         chapter1(scene, unit);
       },
@@ -33,6 +34,7 @@ export function create(scene: Phaser.Scene) {
     container,
     scene,
     () => {
+      scene.children.removeAll();
       scene.scene.start("TitleScene");
     }
   );
