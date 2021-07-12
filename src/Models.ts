@@ -14,14 +14,18 @@ export type BoardPiece = {
   Y: 1 | 2 | 3;
 };
 
-export type Pointer = Phaser.Input.Pointer
-export type Image = Phaser.GameObjects.Image
-export type Container = Phaser.GameObjects.Container
-export type Text = Phaser.GameObjects.Text
+export type Pointer = Phaser.Input.Pointer;
+export type Image = Phaser.GameObjects.Image;
+export type Container = Phaser.GameObjects.Container;
+export type Text = Phaser.GameObjects.Text;
 export type Tween = Phaser.Tweens.Tween;
 export type Graphics = Phaser.GameObjects.Graphics;
 
 export type Options = {
-  soundEnabled: boolean,
-  musicEnabled: boolean,
-}
+  soundEnabled: boolean;
+  musicEnabled: boolean;
+};
+
+export type EventEmitter =
+  | Phaser.Events.EventEmitter
+  | Phaser.GameObjects.GameObject;

@@ -1,17 +1,20 @@
-import { Chara } from "../../Chara/Chara";
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../constants";
-import { animatedText } from "../../UI/animatedText";
-import panel from "../../UI/panel";
-import text from "../../UI/text";
-import TheaterScene from "../TheaterScene";
+import createChara from '../../Chara/createChara';
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../../constants';
+import panel from '../../UI/panel';
+import text from '../../UI/text';
+import TheaterScene from '../TheaterScene';
 
 export type Speak = {
-  type: "SPEAK";
+  type: 'SPEAK';
   id: string;
   text: string;
 };
 
-export const speak = (scene: TheaterScene, { id, text: text_ }: Speak, speed:number) => {
+export const speak = (
+  scene: TheaterScene,
+  { id, text: text_ }: Speak,
+  speed: number
+) => {
   const chara = scene.charas.get(scene.charaKey(id));
 
   const PANEL_HEIGHT = 200;
@@ -20,13 +23,12 @@ export const speak = (scene: TheaterScene, { id, text: text_ }: Speak, speed:num
 
   panel(0, 0, SCREEN_WIDTH, PANEL_HEIGHT, container, scene);
 
-  const head = new Chara({
-    key: "head",
-    parent: scene,
+  const head = createChara({
+    scene,
     unit: chara.props.unit,
-    cx: 100,
-    cy: 120,
-    scaleSizing: 1.4,
+    x: 100,
+    y: 120,
+    scale: 1.4,
     headOnly: true,
   });
 
@@ -42,20 +44,20 @@ export const speak = (scene: TheaterScene, { id, text: text_ }: Speak, speed:num
   return new Promise<void>(async (resolve) => {
     //await animatedText(scene, text_, unitText, speed);
 
-    const img = scene.add.image(SCREEN_WIDTH - 100, 100, "arrow_right");
+    const img = scene.add.image(SCREEN_WIDTH - 100, 100, 'arrow_right');
     container.add(img);
     scene.tweens.add({
       targets: img,
       y: 80,
       duration: 2000,
       yoyo: true,
-      ease: "Cubic",
+      ease: 'Cubic',
       repeat: -1,
     });
 
-    clickZone.on("pointerdown", () => {
+    clickZone.on('pointerdown', () => {
       container.destroy();
-      scene.scene.remove("head");
+      scene.scene.remove('head');
       resolve();
     });
   });

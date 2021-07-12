@@ -1,18 +1,16 @@
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from "./constants";
-import TitleScene from "./Scenes/TitleScene";
-import OptionsScene from "./Scenes/OptionsScene";
-import WorldScene from "./Scenes/World";
-import defaultData from "./defaultData";
-import { ListSquadsScene } from "./Squad/ListSquadsScene";
-import { ListUnitsScene } from "./Unit/ListUnits";
-import MapListScene from "./Map/MapListScene";
-import CombatScene from "./Combat/CombatScene";
-import { endToEndTesting } from "./endToEndTesting";
+import { SCREEN_WIDTH, SCREEN_HEIGHT } from './constants';
+import OptionsScene from './Scenes/OptionsScene';
+import { ListSquadsScene } from './Squad/ListSquadsScene/ListSquadsScene';
+import CombatScene from './Combat/CombatScene';
+import { endToEndTesting } from './endToEndTesting';
+import TitleScene from './Scenes/Title/TitleScene';
+import { Battlefield } from './Battlefield/MapScene';
+import CharaCreationScene from './CharaCreation/CharaCreationScene';
 
 (() => {
   const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
-    backgroundColor: "#000000",
+    backgroundColor: '#000000',
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
     scale: {
@@ -22,29 +20,24 @@ import { endToEndTesting } from "./endToEndTesting";
     scene: [
       TitleScene,
       ListSquadsScene,
-      ListUnitsScene,
-      MapListScene,
       CombatScene,
       OptionsScene,
-      WorldScene,
+      Battlefield,
+      CharaCreationScene,
     ],
     dom: {
       createContainer: true,
     },
-    parent: "content",
+    parent: 'content',
   };
-
-  if (localStorage.getItem("player") === null) {
-    defaultData(true);
-  }
 
   const game = new Phaser.Game(config);
   game.scale.lockOrientation(Phaser.Scale.PORTRAIT);
 
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === 'development') {
     // @ts-ignore
     window.game = game;
 
-    endToEndTesting(game);
+    //endToEndTesting(game);
   }
 })();

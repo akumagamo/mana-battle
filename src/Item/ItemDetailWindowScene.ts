@@ -1,4 +1,3 @@
-import * as api from "../DB";
 import { Container } from "../Models";
 import { INVALID_STATE } from "../errors";
 import { Item, Modifier } from "../Item/Model";
@@ -29,24 +28,22 @@ export class ItemDetailWindowScene extends Phaser.Scene {
 
     this.renderPanel(0, 0, 300, 300, this.container);
 
-    const item = api.getItemFromDB(itemId);
+    // const item = api.getItemFromDB(itemId);
 
-    if (!item) throw new Error(INVALID_STATE);
+    // if (!item) throw new Error(INVALID_STATE);
 
-    this.itemIcon(100, 50, item, 60, this.container);
+    // this.itemIcon(100, 50, item, 60, this.container);
 
-    this.write(100, 10, item.name, this.container);
+    // this.write(100, 10, item.name, this.container);
 
-    this.itemStats(item, 10, 120, this.container);
+    // this.itemStats(item, 10, 120, this.container);
 
-    //this.btn(300, 0, 'X', () => this.clearChildren());
 
-    if (this.allowReplace)
-      this.btn(150, 250, "Replace", () =>
-        this.replaceItemList(item, unitId, onItemSelect)
-      );
+    // if (this.allowReplace)
+    //   this.btn(150, 250, "Replace", () =>
+    //     this.replaceItemList(item, unitId, onItemSelect)
+    //   );
 
-    //this.renderItemDetails();
   }
 
   renderBgLayer(container: Container) {
@@ -96,43 +93,43 @@ export class ItemDetailWindowScene extends Phaser.Scene {
     unitId: string,
     onItemSelect: () => void
   ) {
-    const otherItems = api
-      .getItemList()
-      .filter(
-        (item) =>
-          item.slot === itemToReplace.slot && item.id !== itemToReplace.id
-      );
+    // const otherItems = api
+    //   .getItemList()
+    //   .filter(
+    //     (item) =>
+    //       item.slot === itemToReplace.slot && item.id !== itemToReplace.id
+    //   );
 
-    const baseX = 350;
-    const baseY = 0;
-    const rowHeight = 100;
+    // const baseX = 350;
+    // const baseY = 0;
+    // const rowHeight = 100;
 
-    this.renderPanel(baseX, baseY, 300, 400, this.container);
+    // this.renderPanel(baseX, baseY, 300, 400, this.container);
 
-    otherItems.forEach((item, index) => {
-      if (!this.container) throw new Error(INVALID_STATE);
+    // otherItems.forEach((item, index) => {
+    //   if (!this.container) throw new Error(INVALID_STATE);
 
-      const rowX = baseX + 10;
-      const rowY = rowHeight * index + 10;
+    //   const rowX = baseX + 10;
+    //   const rowY = rowHeight * index + 10;
 
-      const bg = this.makeBackground(baseX, baseY);
+    //   const bg = this.makeBackground(baseX, baseY);
 
-      bg.x = rowX;
-      bg.y = rowY;
+    //   bg.x = rowX;
+    //   bg.y = rowY;
 
-      var rect = new Phaser.Geom.Rectangle(0, 0, 300, 80);
-      bg.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
+    //   var rect = new Phaser.Geom.Rectangle(0, 0, 300, 80);
+    //   bg.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
 
-      bg.on("pointerdown", () => {
-        this.selectedItemDetails(item, unitId, baseX, baseY, onItemSelect);
-      });
+    //   bg.on("pointerdown", () => {
+    //     this.selectedItemDetails(item, unitId, baseX, baseY, onItemSelect);
+    //   });
 
-      this.container.add(bg);
+    //   this.container.add(bg);
 
-      this.itemIcon(rowX, rowY, item, 50, this.container);
+    //   this.itemIcon(rowX, rowY, item, 50, this.container);
 
-      this.write(baseX + 100, 50 + rowY, item.name, this.container);
-    });
+    //   this.write(baseX + 100, 50 + rowY, item.name, this.container);
+    // });
   }
 
   itemIcon(
@@ -175,10 +172,9 @@ export class ItemDetailWindowScene extends Phaser.Scene {
     this.itemStats(item, x + 370, y + 130, this.selectecItemDetailsContainer);
 
     this.btn(x + 400, y + 250, "Equip", () => {
-      console.log(item);
-      api.equipItem(item.id, unitId);
-      this.clearChildren();
-      onItemSelect();
+      // api.equipItem(item.id, unitId);
+      // this.clearChildren();
+      // onItemSelect();
     });
   }
 

@@ -1,7 +1,7 @@
-import * as Squad from "../Squad/Model";
-import { random } from "../utils/random";
-import { Elem, Unit, UnitClass } from "./Model";
-import { atk, attrMod, mAtk } from "./mods";
+import * as Squad from '../Squad/Model';
+import { random } from '../utils/random';
+import { Elem, Unit, UnitClass } from './Model';
+import { atk, attrMod, mAtk } from './mods';
 
 export type Attack = {
   name: string;
@@ -10,7 +10,7 @@ export type Attack = {
   times: number;
 };
 
-type Row = "front" | "middle" | "back";
+type Row = 'front' | 'middle' | 'back';
 
 // TODO: should get total str (including other equips)
 // TODO: should avoid getting items from DB
@@ -18,18 +18,18 @@ type Row = "front" | "middle" | "back";
 // changing items
 const slash = (times: number) => (unit: Unit): Attack => {
   return {
-    name: "Slash",
+    name: 'Slash',
     damage: atk(unit) + attrMod(unit.str) + random(1, 6),
-    elem: "neutral",
+    elem: 'neutral',
     times: times,
   };
 };
 
 const fireball = (times: number) => (unit: Unit): Attack => {
   return {
-    name: "Fireball",
+    name: 'Fireball',
     damage: mAtk(unit) + attrMod(unit.int) + random(1, 6),
-    elem: "fire",
+    elem: 'fire',
     times: times,
   };
 };
@@ -44,9 +44,9 @@ const fireball = (times: number) => (unit: Unit): Attack => {
 
 const shoot = (times: number) => (unit: Unit): Attack => {
   return {
-    name: "Shoot",
+    name: 'Shoot',
     damage: atk(unit) + attrMod(unit.dex) + random(1, 6),
-    elem: "neutral",
+    elem: 'neutral',
     times: times,
   };
 };
@@ -88,9 +88,9 @@ export function getUnitDamage(squadIndex: Squad.Index, unit: Unit) {
 export function getUnitAttack(squadIndex: Squad.Index, unit: Unit) {
   const member = Squad.getMember(unit.id, squadIndex.get(unit.squad));
   const getPos = (): Row => {
-    if (member.y === 0) return "back";
-    else if (member.y === 1) return "middle";
-    else return "front";
+    if (member.y === 0) return 'back';
+    else if (member.y === 1) return 'middle';
+    else return 'front';
   };
 
   return unit.attacks[getPos()](unit);

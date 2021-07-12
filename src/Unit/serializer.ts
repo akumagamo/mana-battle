@@ -1,6 +1,5 @@
-import {Unit, HAIR_STYLES, genders} from './Model';
+import {Unit, HAIR_STYLES, genders, UnitClass} from './Model';
 import {maleNames} from '../constants/names';
-import { classes} from '../defaultData';
 import {randomItem } from '../utils';
 import {SKIN_COLORS, HAIR_COLORS} from '../Chara/animations/constants';
 import {getUnitAttacks} from './Skills';
@@ -8,6 +7,7 @@ import {baseEquips} from './Jobs';
 import {PLAYER_FORCE} from '../constants';
 
 
+export const classes =['fighter' , 'mage', 'archer'] as UnitClass[] 
 
 
 /**

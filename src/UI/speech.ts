@@ -1,12 +1,12 @@
-import { Scene } from "phaser";
-import { Chara } from "../Chara/Chara";
-import { Container } from "../Models";
-import { Unit } from "../Unit/Model";
-import panel from "./panel";
-import text from "./text";
+import { Scene } from 'phaser';
+import createChara from '../Chara/createChara';
+import { Container } from '../Models';
+import { Unit } from '../Unit/Model';
+import panel from './panel';
+import text from './text';
 
 /**
- * Be careful calling this after MapScene's CLICK_SQUAD, as refreshing
+ * Be careful calling this after Phaser.Scene's CLICK_SQUAD, as refreshing
  * the UI container (and having it as parent for this) will throw
  * errors at the Chara and text container levels
  */
@@ -19,12 +19,11 @@ export default async (
   scene: Scene,
   speed: number
 ) => {
-  const portrait = new Chara({
-    key: `speech_${unit.id}`,
-    parent: scene,
+  const portrait = createChara({
+    scene: scene,
     unit,
-    cx: x + 70,
-    cy: y + 70,
+    x: x + 70,
+    y: y + 70,
     headOnly: true,
     animated: false,
   });
@@ -49,5 +48,5 @@ export default async (
   const textCompleted = Promise.resolve();
 
   //TODO: return function that destroys the component and removes the portrait scene
-  return { bg, portraitKey: portrait.scene.key, speechText, textCompleted };
+  return { bg, portrait, speechText, textCompleted };
 };

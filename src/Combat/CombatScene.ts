@@ -1,23 +1,38 @@
-import { Chara } from "../Chara/Chara";
-import { cartesianToIsometricBattle } from "../utils/isometric";
-import { INVALID_STATE } from "../errors";
-import { Unit, UnitIndex } from "../Unit/Model";
-import { Command, runCombat, XPInfo } from "./turns";
-import plains from "../Backgrounds/plains";
-import { Container } from "../Models";
-import fireball from "../Chara/animations/spells/fireball";
-import castSpell from "../Chara/animations/castSpell";
-import * as Squad from "../Squad/Model";
-import { Vector } from "../Map/Model";
-import { List, Map } from "immutable";
-import announcement from "../UI/announcement";
-import { fadeIn, fadeOut } from "../UI/Transition";
-import { displayExperience } from "../Chara/animations/displayExperience";
-import { displayLevelUp } from "../Chara/animations/displayLevelUp";
-import StaticBoardScene from "../Board/StaticBoardScene";
-import { PUBLIC_URL, SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
-import panel from "../UI/panel";
-import { Scene } from "phaser";
+import { Chara } from '../Chara/Model';
+import { cartesianToIsometricBattle } from '../utils/isometric';
+import { INVALID_STATE } from '../errors';
+import * as Unit from '../Unit/Model';
+import { Command, runCombat, XPInfo } from './turns';
+import plains from '../Backgrounds/plains';
+import { Container } from '../Models';
+import fireball from '../Chara/animations/spells/fireball';
+import castSpell from '../Chara/animations/castSpell';
+import * as Squad from '../Squad/Model';
+import { List, Map } from 'immutable';
+import announcement from '../UI/announcement';
+import { fadeIn, fadeOut } from '../UI/Transition';
+import { displayExperience } from '../Chara/animations/displayExperience';
+import { displayLevelUp } from '../Chara/animations/displayLevelUp';
+import {
+  PLAYER_FORCE,
+  PUBLIC_URL,
+  SCREEN_HEIGHT,
+  SCREEN_WIDTH,
+} from '../constants';
+import panel from '../UI/panel';
+import { Scene } from 'phaser';
+import hpBar from '../Chara/ui/hpBar';
+import defaultPose from '../Chara/animations/defaultPose';
+import run from '../Chara/animations/run';
+import stand from '../Chara/animations/stand';
+import bowAttack from '../Chara/animations/bowAttack';
+import slash from '../Chara/animations/slash';
+import flinch from '../Chara/animations/flinch';
+import createChara from '../Chara/createChara';
+import { Board } from '../Board/Model';
+import createStaticBoard from '../Board/createBoard';
+import { displayDamage } from '../Chara/animations/displayDamage';
+import { Vector } from '../Battlefield/Model';
 
 const COMBAT_CHARA_SCALE = 1;
 const WALK_DURATION = 500;
@@ -35,22 +50,22 @@ type CombatSceneCreateParams = {
   top: string;
   bottom: string;
   squads: Squad.Index;
-  units: UnitIndex;
-  onCombatFinish: (cmd: List<Unit>) => void;
+  units: Unit.UnitIndex;
+  onCombatFinish: (cmd: List<Unit.Unit>) => void;
 };
 
 export default class CombatScene extends Phaser.Scene {
   charas: Chara[] = [];
-  top = "";
-  bottom = "";
+  top = '';
+  bottom = '';
   currentTurn = 0;
   container: Container | null = null;
-  onCombatFinish: ((cmd: List<Unit>) => void) | null = null;
+  onCombatFinish: ((cmd: List<Unit.Unit>) => void) | null = null;
   squads: Squad.Index = Map();
-  unitIndex: UnitIndex = Map();
+  unitIndex: Unit.UnitIndex = Map();
   miniSquads: {
-    top: StaticBoardScene | null;
-    bottom: StaticBoardScene | null;
+    top: Board | null;
+    bottom: Board | null;
   } = {
     top: null,
     bottom: null,
@@ -58,42 +73,42 @@ export default class CombatScene extends Phaser.Scene {
   miniSquadCharas: Chara[] = [];
 
   constructor() {
-    super("CombatScene");
+    super('CombatScene');
   }
 
-  updateUnit(unit: Unit) {
+  updateUnit(unit: Unit.Unit) {
     this.unitIndex = this.unitIndex.set(unit.id, unit);
   }
 
   preload() {
     [
-      "backgrounds/plain",
-      "backgrounds/castle",
-      "backgrounds/sunset",
-      "backgrounds/squad_edit",
-    ].forEach((str) => this.load.image(str, PUBLIC_URL + "/" + str + ".svg"));
-    ["backgrounds/throne_room"].forEach((str) =>
-      this.load.image(str, PUBLIC_URL + "/" + str + ".jpg")
+      'backgrounds/plain',
+      'backgrounds/castle',
+      'backgrounds/sunset',
+      'backgrounds/squad_edit',
+    ].forEach((str) => this.load.image(str, PUBLIC_URL + '/' + str + '.svg'));
+    ['backgrounds/throne_room'].forEach((str) =>
+      this.load.image(str, PUBLIC_URL + '/' + str + '.jpg')
     );
 
-    this.load.spritesheet("fire", `${PUBLIC_URL}/fire.svg`, {
+    this.load.spritesheet('fire', `${PUBLIC_URL}/fire.svg`, {
       frameWidth: 50,
       frameHeight: 117,
       endFrame: 7,
     });
 
     const props = [
-      "props/grass",
-      "props/bush",
-      "props/far_tree_1",
-      "props/branch",
+      'props/grass',
+      'props/bush',
+      'props/far_tree_1',
+      'props/branch',
     ];
     props.forEach((id: string) => {
       this.load.image(id, `${PUBLIC_URL}/${id}.svg`);
     });
 
     if (process.env.SOUND_ENABLED) {
-      const mp3s = ["combat1", "sword_hit", "arrow_critical", "fireball"];
+      const mp3s = ['combat1', 'sword_hit', 'arrow_critical', 'fireball'];
       mp3s.forEach((id: string) => {
         this.load.audio(id, `${PUBLIC_URL}/music/${id}.mp3`);
       });
@@ -101,6 +116,7 @@ export default class CombatScene extends Phaser.Scene {
   }
 
   async create(data: CombatSceneCreateParams) {
+    console.log(`create...`);// runnigng twice!!!
     if (this.container) this.container.destroy();
 
     this.squads = data.squads;
@@ -110,7 +126,7 @@ export default class CombatScene extends Phaser.Scene {
 
     if (process.env.SOUND_ENABLED) {
       this.sound.stopAll();
-      const music = this.sound.add("combat1");
+      const music = this.sound.add('combat1');
       music.play();
     }
 
@@ -145,14 +161,14 @@ export default class CombatScene extends Phaser.Scene {
             isTopSquad ? member.y : Squad.invertBoardPosition(member.y)
           );
 
-          const chara = new Chara({
-            key: `combat-chara-${member.id}`,
-            parent: this,
+          const chara = createChara({
+            scene: this,
             unit,
-            cx: x,
-            cy: y,
-            scaleSizing: COMBAT_CHARA_SCALE,
+            x: x,
+            y: y,
+            scale: COMBAT_CHARA_SCALE,
             front: isTopSquad,
+            showWeapon: true,
           });
 
           this.charas.push(chara);
@@ -163,25 +179,26 @@ export default class CombatScene extends Phaser.Scene {
 
     this.renderMiniSquads(data.top, data.bottom);
 
-    await announcement(this, "Fight it out!", 2000 / GAME_SPEED);
+    await announcement(this, 'Fight it out!', 2000 / GAME_SPEED);
 
     this.turn();
   }
 
   renderMiniSquads(top: string, bottom: string) {
     const pos = {
-      [top]: { x: SCREEN_WIDTH - 430, y: -20, top: true },
-      [bottom]: { x: -80, y: SCREEN_HEIGHT - 230, top: false },
+      [top]: { x: SCREEN_WIDTH - 170, y: 60, top: true },
+      [bottom]: { x: 160, y: SCREEN_HEIGHT - 150, top: false },
     };
 
     const panel_ = (id: string) =>
-      panel(pos[id].x + 80, pos[id].y, 360, 230, this.container, this);
+      panel(pos[id].x - 180, pos[id].y - 70, 360, 230, this.container, this);
 
     panel_(top).setAlpha(0.3);
     panel_(bottom).setAlpha(0.3);
 
     const render = (squadId: string) =>
-      new StaticBoardScene(
+      createStaticBoard(
+        this,
         this.squads.find((s) => s.id === squadId),
         this.unitIndex.filter((u) => u.squad === squadId),
         pos[squadId].x,
@@ -190,20 +207,13 @@ export default class CombatScene extends Phaser.Scene {
         pos[squadId].top
       );
 
-    this.miniSquads.top = render(top);
-    this.miniSquads.bottom = render(bottom);
-
-    this.scene.add(this.miniSquadId(top), this.miniSquads.top, true);
-    this.scene.add(this.miniSquadId(bottom), this.miniSquads.bottom, true);
+    this.miniSquads.top = render(top).board;
+    this.miniSquads.bottom = render(bottom).board;
 
     const push = (c: Chara) => this.miniSquadCharas.push(c);
 
     this.miniSquads.top.unitList.forEach(push);
     this.miniSquads.bottom.unitList.forEach(push);
-  }
-
-  private miniSquadId(id: string): string {
-    return `minisquad_${id}`;
   }
 
   turnOff() {
@@ -214,17 +224,10 @@ export default class CombatScene extends Phaser.Scene {
     this.squads = Map();
   }
   removeChildren() {
-    this.charas.forEach((chara) => {
-      chara.container.destroy();
-      this.scene.remove(chara);
-    });
+    this.charas.forEach((chara) => chara.destroy());
     this.charas = [];
 
-    this.miniSquads.top.turnOff();
-    this.miniSquads.bottom.turnOff();
-
-    this.scene.remove(this.miniSquads.top);
-    this.scene.remove(this.miniSquads.bottom);
+    this.miniSquadCharas.forEach((board) => board.destroy());
     this.miniSquadCharas = [];
   }
 
@@ -238,71 +241,58 @@ export default class CombatScene extends Phaser.Scene {
   async execute(commands: Command[]) {
     const cmd = commands[0];
 
-    console.log(`CombatScene CMDs:`, cmd);
-
-    const next = (arr: Command[]) => {
-      const [, ...rest] = arr;
-      return rest;
-    };
-
     const step = () => {
-      const next_ = next(commands);
+      const [, ...next_] = commands;
 
       if (next_.length === 0) console.log(`finish!`);
       else this.execute(next_);
     };
 
-    if (cmd.type === "MOVE") {
+    console.log(cmd);
+
+    if (cmd.type === 'MOVE') {
       await this.moveUnit(cmd.source, cmd.target);
       step();
-    } else if (cmd.type === "SLASH") {
+    } else if (cmd.type === 'SLASH') {
       await this.slash(cmd.source, cmd.target, cmd.damage, cmd.updatedTarget);
       step();
-    } else if (cmd.type === "SHOOT") {
+    } else if (cmd.type === 'SHOOT') {
       this.bowAttack(
         cmd.source,
         cmd.target,
         cmd.damage,
         cmd.updatedTarget
       ).then(step);
-    } else if (cmd.type === "FIREBALL") {
+    } else if (cmd.type === 'FIREBALL') {
       this.castFireball(
         cmd.source,
         cmd.target,
         cmd.damage,
         cmd.updatedTarget
       ).then(step);
-    } else if (cmd.type === "RETURN") {
+    } else if (cmd.type === 'RETURN') {
       this.returnToPosition(cmd.target).then(step);
-    } else if (cmd.type === "END_TURN") {
+    } else if (cmd.type === 'END_TURN') {
       this.currentTurn = this.currentTurn + 1;
       this.turn();
-    } else if (cmd.type === "RESTART_TURNS") {
+    } else if (cmd.type === 'RESTART_TURNS') {
       this.currentTurn = 0;
       this.turn();
-    } else if (cmd.type === "DISPLAY_XP") {
+    } else if (cmd.type === 'DISPLAY_XP') {
       await this.displayExperienceGain(cmd.xpInfo);
       step();
-    } else if (cmd.type === "END_COMBAT") {
-      console.log(`Combat reached its end`);
-
+    } else if (cmd.type === 'END_COMBAT') {
       await this.combatEnd(cmd.units);
 
-      console.log(`onCombatFinish END_COMBAT`);
-
       this.turnOff();
-    } else if (cmd.type === "VICTORY") {
-      console.log("Winning Team:", cmd.target);
-
-      console.log(`onCombatFinish VICTORY`);
-
+    } else if (cmd.type === 'VICTORY') {
       await this.combatEnd(cmd.units);
 
       this.turnOff();
     } else console.error(`Unknown command:`, cmd);
   }
 
-  async combatEnd(units: UnitIndex) {
+  async combatEnd(units: Unit.UnitIndex) {
     this.retreatUnits();
     await fadeOut(this, 1000 / GAME_SPEED);
 
@@ -313,14 +303,21 @@ export default class CombatScene extends Phaser.Scene {
   }
   async displayExperienceGain(xps: List<XPInfo>) {
     await Promise.all(
-      xps.map(
-        async ({ id, xp }) => await displayExperience(this.getChara(id), xp)
-      )
+      xps.map(async ({ id, xp }) => {
+        const unit = this.unitIndex.get(id);
+        if (Unit.isAlive(unit) && unit.force === PLAYER_FORCE)
+          await displayExperience(this.getChara(id), xp);
+      })
     );
 
     return await Promise.all(
       xps
         .filter(({ lvls }) => lvls > 0)
+        .filter(
+          ({ id }) =>
+            Unit.isAlive(this.unitIndex.get(id)) &&
+            this.unitIndex.get(id).force === PLAYER_FORCE
+        )
         .map(async ({ id }) => await displayLevelUp(this.getChara(id)))
     );
   }
@@ -331,11 +328,11 @@ export default class CombatScene extends Phaser.Scene {
   }
 
   moveUnit(sourceId: string, targetId: string) {
-    const unit = this.getChara(sourceId);
+    const chara = this.getChara(sourceId);
     const target = this.getChara(targetId);
 
-    unit.clearAnimations();
-    unit.run();
+    defaultPose(chara);
+    run(chara);
 
     if (!target.props.unit.squad) throw new Error(INVALID_STATE);
 
@@ -354,7 +351,7 @@ export default class CombatScene extends Phaser.Scene {
     );
 
     const config = (onComplete: () => void) => ({
-      targets: unit.container,
+      targets: chara.container,
       x: x,
       y: y,
       duration: WALK_DURATION / GAME_SPEED,
@@ -367,12 +364,7 @@ export default class CombatScene extends Phaser.Scene {
     const timeEvents = {
       delay: WALK_DURATION / WALK_FRAMES / GAME_SPEED,
       callback: () => {
-        // reordering a list of 10 scenes takes about 0.013ms
-        this.charas
-          .sort((a, b) =>
-            a.container && b.container ? a.container.y - b.container.y : 0
-          )
-          .forEach((unit) => this.scene.bringToTop(unit.props.key));
+        this.charas.sort((a, b) => a.container.depth - b.container.depth);
       },
       repeat: WALK_FRAMES,
     };
@@ -385,8 +377,7 @@ export default class CombatScene extends Phaser.Scene {
 
   async retreatUnits() {
     return this.charas.map((chara) => {
-      chara.clearAnimations();
-      chara.run();
+      run(chara);
 
       if (!chara.props.unit.squad) throw new Error(INVALID_STATE);
 
@@ -419,7 +410,7 @@ export default class CombatScene extends Phaser.Scene {
     sourceId: string,
     targetId: string,
     damage: number,
-    updatedTarget: Unit
+    updatedTarget: Unit.Unit
   ) {
     this.updateUnit(updatedTarget);
 
@@ -427,7 +418,7 @@ export default class CombatScene extends Phaser.Scene {
     const target = this.getChara(targetId);
 
     return new Promise<void>((resolve) => {
-      source.slash(resolve);
+      slash(source, resolve);
       this.damageUnit(target, damage, updatedTarget, targetId);
     });
   }
@@ -435,24 +426,34 @@ export default class CombatScene extends Phaser.Scene {
   private damageUnit(
     chara: Chara,
     damage: number,
-    updatedTarget: Unit,
+    updatedTarget: Unit.Unit,
     targetId: string
   ) {
-    chara.flinch(damage, updatedTarget.currentHp === 0);
+    if (chara.props.showHpBar) hpBar(chara, damage);
+
+    flinch(chara, updatedTarget.currentHp === 0);
+
+    displayDamage(chara, damage);
+
+    this.unitIndex = this.unitIndex.setIn(
+      [chara.id, 'currentHp'],
+      updatedTarget.currentHp
+    );
+
     this.updateMinisquadHP(targetId, updatedTarget.currentHp);
   }
 
   updateMinisquadHP(id: string, hp: number) {
     const chara = this.miniSquadCharas.find((c) => c.props.unit.id === id);
 
-    chara.renderHPBar(hp);
+    hpBar(chara, hp);
   }
 
   bowAttack(
     sourceId: string,
     targetId: string,
     damage: number,
-    updatedTarget: Unit
+    updatedTarget: Unit.Unit
   ) {
     this.updateUnit(updatedTarget);
 
@@ -462,7 +463,7 @@ export default class CombatScene extends Phaser.Scene {
     const arrow = this.add.image(
       source.container?.x,
       source.container?.y,
-      "arrow"
+      'arrow'
     );
 
     arrow.rotation = 0.5;
@@ -470,7 +471,7 @@ export default class CombatScene extends Phaser.Scene {
     if (!source.props.front) arrow.scaleX = -1;
 
     return new Promise<void>((resolve) => {
-      source.performBowAttack(resolve);
+      bowAttack(source, resolve);
       this.add.tween({
         targets: arrow,
         x: target.container?.x,
@@ -488,7 +489,7 @@ export default class CombatScene extends Phaser.Scene {
     sourceId: string,
     targetId: string,
     damage: number,
-    updatedTarget: Unit
+    updatedTarget: Unit.Unit
   ) {
     this.updateUnit(updatedTarget);
 
@@ -518,35 +519,18 @@ export default class CombatScene extends Phaser.Scene {
 
   returnToPosition(id: string) {
     const chara = this.getChara(id);
-    chara.clearAnimations();
-    chara.run();
+    defaultPose(chara);
+    run(chara);
 
     if (!chara.props.unit.squad) throw new Error(INVALID_STATE);
     const coords = getBoardCoords(this.top === chara.props.unit.squad)(
       this.squads.get(chara.props.unit.squad).members.get(id)
     );
 
-    console.log(
-      `for`,
-      chara.props.unit.id,
-      `return with params`,
-      chara.props.unit.id,
-      coords.x,
-      coords.y
-    );
     const { x, y } = cartesianToIsometricBattle(
       this.top === chara.props.unit.squad,
       coords.x,
       coords.y
-    );
-
-    console.log(
-      `returning, `,
-
-      this.top === chara.props.unit.squad,
-      chara.props.unit.id,
-      x,
-      y
     );
 
     const config = (onComplete: () => void) => ({
@@ -555,7 +539,7 @@ export default class CombatScene extends Phaser.Scene {
       y: y,
       duration: WALK_DURATION / GAME_SPEED,
       onComplete: () => {
-        chara.stand();
+        stand(chara);
         onComplete();
       },
     });
@@ -568,5 +552,5 @@ export default class CombatScene extends Phaser.Scene {
 
 export function start(scene: Scene, params: CombatSceneCreateParams) {
   const sceneManager = scene.scene;
-  sceneManager.start("CombatScene", params);
+  sceneManager.start('CombatScene', params);
 }

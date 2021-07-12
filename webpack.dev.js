@@ -1,13 +1,13 @@
-const { merge } = require("webpack-merge");
-const common = require("./webpack.common.js");
-const path = require("path");
-const webpack = require("webpack");
+const { merge } = require('webpack-merge');
+const common = require('./webpack.common.js');
+const path = require('path');
+const webpack = require('webpack');
 
 module.exports = merge(common, {
-  mode: "development",
-  devtool: "source-map",
+  mode: 'development',
+  devtool: 'source-map',
   devServer: {
-    contentBase: ["./", path.join(__dirname, "dist")],
+    contentBase: ['./', path.join(__dirname, 'dist')],
     compress: true,
     port: 3000,
     hot: true,
@@ -15,7 +15,7 @@ module.exports = merge(common, {
   plugins: [
     new webpack.EnvironmentPlugin({
       SOUND_ENABLED: false,
-      SPEED: 10 // Larger numbers will make things break, as there will be multiple events in the same frame
+      SPEED: 10,
     }),
   ],
 });

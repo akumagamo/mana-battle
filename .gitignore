@@ -3,8 +3,7 @@ dist/
 build/
 .vscode/
 .idea
-*.log
-src_old
+*.log src_old
 *.old.js
 phaserTilemapfix
 *.zip
@@ -24,3 +23,5 @@ package-lock.json
 *.swp
 assets/.DS_Store
 test/screens/
+coverage/
+*.log

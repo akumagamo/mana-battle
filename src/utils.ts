@@ -1,7 +1,8 @@
-import { Vector } from "./Map/Model";
+import { Map } from "immutable";
+import { Vector } from "./Battlefield/Model";
 
-export const indexById = (list: { id: string }[]) =>
-  list.reduce((acc, curr) => ({ ...acc, [curr.id]: curr }), {});
+export const indexById = (xs: Map<string, { id: string }>, x: { id: string }) =>
+  xs.set(x.id, x);
 
 export const maybeZero = (v: number | undefined | null) => (v ? v : 0);
 
@@ -18,17 +19,17 @@ export type EventFactory<ARGS> = {
   emit: (args: ARGS) => void;
 };
 
-export const SceneEventFactory = <ARGS>(
-  scene: Phaser.Scene,
+export const createEvent = <ARGS>(
+  emitter: Phaser.Events.EventEmitter | Phaser.GameObjects.GameObject,
   key: string
 ): EventFactory<ARGS> => ({
-  on: (callback: (args_: ARGS) => void) => {
-    scene.events.on(key, callback);
+  on: (callback: (args: ARGS) => void) => {
+    emitter.on(key, callback);
   },
-  once: (callback: (args_: ARGS) => void) => {
-    scene.events.once(key, callback);
+  once: (callback: (args: ARGS) => void) => {
+    emitter.once(key, callback);
   },
   emit: (args: ARGS) => {
-    scene.events.emit(key, args);
+    emitter.emit(key, args);
   },
 });

@@ -1,21 +1,20 @@
 import text from '../../UI/text';
-import {Chara} from '../Chara';
+import { Chara } from '../Model';
 
 export function displayExperience(chara: Chara, experience: number) {
   const xp = text(
     -50,
     -100,
     `${experience.toString()} xp`,
-    chara.charaWrapper,
-    chara.props.parent,
+    chara.container,
+    chara.scene
   );
   xp.setScale(1.5);
   xp.setShadow(0, 0, '#000', 2);
   xp.setStroke('#000000', 2);
-  chara.container.add(xp);
 
   return new Promise<void>((resolve) => {
-    chara.props.parent.tweens.add({
+    chara.scene.tweens.add({
       targets: xp,
       y: -120,
       alpha: 0,

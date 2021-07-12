@@ -1,3 +1,4 @@
+import {UnitClass} from "./Model";
 
 export const baseEquips = {
   mage: {
@@ -21,5 +22,12 @@ export const baseEquips = {
     offHand: "none",
     head: "archer_hat",
   },
+};
+
+export const classes: UnitClass[] = ["fighter", "mage", "archer"];
+export const classLabels: { [label in UnitClass]: string } = {
+  fighter: "Fighter",
+  mage: "Mage",
+  archer: "Archer",
 };
 

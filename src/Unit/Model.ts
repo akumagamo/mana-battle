@@ -1,12 +1,15 @@
 import { Modifier, ItemSlot, ItemMap, ItemType } from '../Item/Model';
 import { sum } from '../utils/math';
 import { Container } from '../Models';
-import { getItemsFromDB } from '../DB';
-import { UnitAttacks } from './Skills';
-import { MapSquad, Vector } from '../Map/Model';
+import { skills, UnitAttacks } from './Skills';
+import { MapSquad, Vector } from '../Battlefield/Model';
 import { SquadRecord } from '../Squad/Model';
-import { List, Map, Set } from 'immutable';
-import { cellToScreenPosition } from '../Map/board/position';
+import { Map } from 'immutable';
+import { cellToScreenPosition } from '../Battlefield/board/position';
+import { CPU_FORCE } from '../constants';
+
+// todo: refactor all operations that perform transformations on units and unitindexes
+// to use functions from here
 
 export type UnitIndex = Map<string, UnitInSquad>;
 
@@ -51,9 +54,6 @@ export type Movement = 'plain' | 'mountain' | 'sky' | 'forest';
 export const update = (unit: Unit) => (index: UnitIndex) =>
   index.set(unit.id, unit);
 
-/**
- * Database representation of a unit. Contains basic data.
- */
 export type Unit = {
   id: string;
   name: string;
@@ -81,23 +81,55 @@ export type Unit = {
   elem: Elem;
   attacks: UnitAttacks;
 };
+
+export const createUnit = (id: string): Unit => ({
+  id,
+  name: '',
+  class: 'fighter',
+  gender: 'male' as Gender,
+  movement: 'plain', // this should belong to a job
+  squad: null,
+  force: CPU_FORCE,
+  lvl: 1,
+  hp: 50,
+  currentHp: 50,
+  exp: 0,
+  str: 10,
+  dex: 10,
+  int: 10,
+  style: {
+    skinColor: 1,
+    hairColor: 1,
+    hair: 'short',
+    displayHat: true,
+  },
+  equips: {
+    mainHand: '',
+    offHand: '',
+    chest: '',
+    ornament: '',
+    head: '',
+  },
+  elem: 'fire',
+  attacks: skills['fighter'], // this should belong to the job
+});
+
 export type UnitInSquad = Unit & { squad: string };
 
 export function assignSquad(unit: Unit, squad: string): UnitInSquad {
   return { ...unit, squad };
 }
 
-export function toMapSquad(squad: SquadRecord, pos: Vector): MapSquad {
+export function toMapSquad(
+  squad: SquadRecord,
+  pos: Vector,
+  dispatchTime = 0
+): MapSquad {
   return {
     id: squad.id,
     squad,
     pos: cellToScreenPosition({ x: pos.x, y: pos.y }),
-    range: 5,
-    validSteps: List(),
-    steps: Set(),
-    enemiesInRange: [],
-    pathFinder: () => () => [],
-    status: 'alive',
+    status: 'standing',
   };
 }
 
@@ -136,7 +168,7 @@ function getItemModifier({
 }) {
   const itemId = unit.equips[slot];
 
-  const item = items[itemId];
+  const item = items.get(itemId);
 
   if (!item) {
     throw new Error('Invalid State: Item should be in index');
@@ -197,12 +229,13 @@ export type Job = {
 const slash: Skill = {
   name: 'slash',
   formula: (unit) => {
-    const items = getItemsFromDB();
-    const weapon = items[unit.equips.mainHand];
-    const str = getActualStat('str', items, unit);
-    const dex = getActualStat('dex', items, unit);
+    // const items = getItemsFromDB();
+    // const weapon = items.get( unit.equips.mainHand );
+    // const str = getActualStat('str', items, unit);
+    // const dex = getActualStat('dex', items, unit);
 
-    return str + dex / 4 + weapon.modifiers.atk;
+    // return str + dex / 4 + weapon.modifiers.atk;
+    return 3;
   },
   attacksPerRow: {
     front: 2,

@@ -1,26 +1,28 @@
-import text from "../../UI/text";
-import { Chara } from "../Chara";
+import text from '../../UI/text';
+import { Chara } from '../Model';
 
 const GAME_SPEED = parseInt(process.env.SPEED);
 export function displayDamage(chara: Chara, damage: number) {
   const dmg = text(
-    chara.container.x - 20,
-    chara.container.y - 100,
+    -20,
+    -100,
     damage.toString(),
-    chara.charaWrapper,
-    chara.props.parent
+    chara.container,
+    chara.props.scene
   );
   dmg.setScale(2);
-  //dmg.setShadow(2, 2, '#000');
-  dmg.setStroke("#000000", 4);
-  dmg.setAlign("center");
+  dmg.setShadow(2, 2, '#000');
+  dmg.setStroke('#000000', 4);
+  dmg.setAlign('center');
+  dmg.setDepth(Infinity);
 
-  chara.props.parent.tweens.add({
+  chara.props.scene.tweens.add({
     targets: dmg,
-    y: chara.container.y - 120,
+    y: dmg.y - 20,
     alpha: 0,
-    duration: 3000 / GAME_SPEED,
-    ease: "Expo",
-    onComplete: () => dmg.destroy(),
+    duration: 1500 / GAME_SPEED,
+    onComplete: () => {
+      dmg.destroy();
+    },
   });
 }
