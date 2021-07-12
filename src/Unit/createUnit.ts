@@ -9,7 +9,7 @@ import {
   Unit,
   UnitJobs as UnitJob,
 } from "./Model";
-import { baseEquips } from "./Jobs";
+import { baseEquips } from "./Jobs/Jobs";
 import { PLAYER_FORCE } from "../constants";
 
 export default function createUnit(

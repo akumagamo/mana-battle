@@ -1,5 +1,5 @@
 import { PUBLIC_URL } from "../constants";
-import { classes } from "../Unit/Jobs";
+import { JOBS } from "../Unit/Jobs/Jobs";
 
 export default (scene: Phaser.Scene) => {
   [
@@ -29,7 +29,7 @@ export default (scene: Phaser.Scene) => {
   scene.load.image("head", PUBLIC_URL + "/head.svg");
   scene.load.image("back_head", PUBLIC_URL + "/back_head.svg");
 
-  classes.forEach((job) => {
+  Object.keys(JOBS).forEach((job) => {
     scene.load.image(`trunk_${job}`, `${PUBLIC_URL}/trunk_${job}.svg`);
     scene.load.image(
       `trunk_back_${job}`,

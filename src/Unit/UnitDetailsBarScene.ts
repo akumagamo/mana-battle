@@ -1,5 +1,5 @@
 import { Container } from "../Models";
-import { Unit, unitJobLabels } from "./Model";
+import { Unit } from "./Model";
 import { ItemSlot } from "../Item/Model";
 import { ItemDetailWindowScene } from "../Item/ItemDetailWindowScene";
 import text from "../UI/text";
@@ -7,7 +7,8 @@ import button from "../UI/button";
 import panel from "../UI/panel";
 import { Chara } from "../Chara/Model";
 import createChara from "../Chara/createChara";
-import { getUnitAttacks } from "./Skills";
+import { JOBS } from "./Jobs/Jobs";
+import { getUnitAttacks } from "./Skills/Skills";
 
 export class UnitDetailsBarScene extends Phaser.Scene {
   colWidth = 150;
@@ -68,7 +69,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
 
     this.row(baseX, baseY, [
       unit.name,
-      unitJobLabels[unit.job],
+      JOBS[unit.job].name,
       `Lvl ${lvl}`,
       `Exp ${exp}`,
       "",

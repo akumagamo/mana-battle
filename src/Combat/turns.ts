@@ -1,10 +1,9 @@
-import * as Unit from '../Unit/Model';
-import { getUnitAttack, getUnitDamage } from '../Unit/Skills';
-import { INVALID_STATE } from '../errors';
-import { getMeleeTarget } from './getMeleeTarget';
-import { random } from '../utils/random';
-import * as Squad from '../Squad/Model';
-import { List } from 'immutable';
+import * as Unit from "../Unit/Model";
+import { getUnitAttack, getUnitDamage } from "../Unit/Skills/Skills";
+import { getMeleeTarget } from "./getMeleeTarget";
+import { random } from "../utils/random";
+import * as Squad from "../Squad/Model";
+import { List } from "immutable";
 
 const sortInitiative = (unit: Unit.Unit) => {
   return random(1, 6) + unit.dex;
@@ -16,10 +15,10 @@ export const initiativeList = (units: Unit.UnitIndex): List<string> =>
     .sort((a, b) => sortInitiative(b) - sortInitiative(a))
     .map((u) => u.id);
 
-export type Move = { type: 'MOVE'; source: string; target: string };
-export type Return = { type: 'RETURN'; target: string };
+export type Move = { type: "MOVE"; source: string; target: string };
+export type Return = { type: "RETURN"; target: string };
 export type Slash = {
-  type: 'SLASH';
+  type: "SLASH";
   source: string;
   target: string;
   damage: number;
@@ -27,7 +26,7 @@ export type Slash = {
   updatedSource: Unit.Unit;
 };
 export type Shoot = {
-  type: 'SHOOT';
+  type: "SHOOT";
   source: string;
   target: string;
   damage: number;
@@ -35,7 +34,7 @@ export type Shoot = {
   updatedSource: Unit.Unit;
 };
 export type Fireball = {
-  type: 'FIREBALL';
+  type: "FIREBALL";
   source: string;
   target: string;
   damage: number;
@@ -43,15 +42,15 @@ export type Fireball = {
   updatedSource: Unit.Unit;
 };
 export type Victory = {
-  type: 'VICTORY';
+  type: "VICTORY";
   target: string;
   units: Unit.UnitIndex;
 };
-export type EndCombat = { type: 'END_COMBAT'; units: Unit.UnitIndex };
-export type EndTurn = { type: 'END_TURN' };
-export type RestartTurns = { type: 'RESTART_TURNS' };
+export type EndCombat = { type: "END_COMBAT"; units: Unit.UnitIndex };
+export type EndTurn = { type: "END_TURN" };
+export type RestartTurns = { type: "RESTART_TURNS" };
 export type DisplayXP = {
-  type: 'DISPLAY_XP';
+  type: "DISPLAY_XP";
   xpInfo: List<XPInfo>;
 };
 
@@ -62,7 +61,7 @@ export type XPInfo = {
 };
 
 const displayXPCmd = (xpInfo: List<XPInfo>): DisplayXP => ({
-  type: 'DISPLAY_XP',
+  type: "DISPLAY_XP",
   xpInfo,
 });
 
@@ -144,19 +143,19 @@ export const runTurn = (
   if (hasRemainingAttacks && Unit.isAlive(unit)) {
     let res;
     switch (unit.job) {
-      case 'fighter':
+      case "fighter":
         res = slash(turnState, commands);
         turnCommands = res.commands;
         turnState.unitIndex = res.updatedUnits;
         turnState.remainingAttacksIndex = res.remainingAttacks;
         break;
-      case 'archer':
+      case "archer":
         res = shoot(turnState, commands);
         turnCommands = res.commands;
         turnState.unitIndex = res.updatedUnits;
         turnState.remainingAttacksIndex = res.remainingAttacks;
         break;
-      case 'mage':
+      case "mage":
         res = fireball(turnState, commands);
         turnCommands = res.commands;
         turnState.unitIndex = res.updatedUnits;
@@ -170,7 +169,7 @@ export const runTurn = (
   const { squad } = unit;
 
   const victory = (units: Unit.UnitIndex): Victory => ({
-    type: 'VICTORY',
+    type: "VICTORY",
     target: squad,
     units,
   });
@@ -180,7 +179,7 @@ export const runTurn = (
   const endCombat: (cmds: Command[]) => Command[] = (commands: Command[]) => {
     return commands
       .concat(xpCmds)
-      .concat([{ type: 'END_COMBAT', units: unitsWithXp.map((u) => u.unit) }]);
+      .concat([{ type: "END_COMBAT", units: unitsWithXp.map((u) => u.unit) }]);
   };
 
   if (isVictory(currentUnitId, turnState.unitIndex)) {
@@ -271,9 +270,9 @@ function slash(state: TurnState, commands: Command[]) {
 
   const updatedSource = updatedUnits.get(current.id);
 
-  const move: Command = { type: 'MOVE', source: current.id, target: target.id };
+  const move: Command = { type: "MOVE", source: current.id, target: target.id };
   const slash: Command = {
-    type: 'SLASH',
+    type: "SLASH",
     source: current.id,
     target: target.id,
     damage,
@@ -281,7 +280,7 @@ function slash(state: TurnState, commands: Command[]) {
     updatedSource: updatedSource,
   };
 
-  const returnCmd: Command = { type: 'RETURN', target: current.id };
+  const returnCmd: Command = { type: "RETURN", target: current.id };
 
   return {
     commands: commands.concat([move, slash, returnCmd]),
@@ -323,7 +322,7 @@ function shoot(state: TurnState, commands: Command[]) {
   const updatedSource = updatedUnits.get(current.id);
 
   const shoot: Command = {
-    type: 'SHOOT',
+    type: "SHOOT",
     source: current.id,
     target: target.id,
     damage,
@@ -370,7 +369,7 @@ function fireball(state: TurnState, commands: Command[]) {
   const updatedSource = updatedUnits.get(current.id);
 
   const shoot: Command = {
-    type: 'FIREBALL',
+    type: "FIREBALL",
     source: current.id,
     target: target.id,
     damage,
