@@ -25,3 +25,4 @@ assets/.DS_Store
 test/screens/
 coverage/
 *.log
+*.apk
