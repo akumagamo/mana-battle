@@ -1,13 +1,8 @@
-import { getDistance } from "../../utils";
-import startCombat from "../squads/startCombat";
-import { cellSize } from "../config";
-import { getChara, getMapSquad, MapState } from "../Model";
+import {getDistance} from '../../utils';
+import {cellSize} from '../config';
+import {getChara, getMapSquad, MapState} from '../Model';
 
-export function checkCollision(
-  state: MapState,
-  scene: Phaser.Scene,
-  direction: string
-) {
+export function checkCollision(state: MapState) {
   return (sqd: string) => {
     const current = getChara(state, sqd);
 
@@ -24,14 +19,6 @@ export function checkCollision(
         const distance = getDistance(c.container, current.container);
 
         return distance < cellSize * 0.8;
-        // startCombat(
-        //   scene,
-        //   state,
-        //   getMapSquad(state, sqd),
-        //   getMapSquad(state, c.props.unit.squad),
-        //   direction
-        // );
-        //}
       });
   };
 }

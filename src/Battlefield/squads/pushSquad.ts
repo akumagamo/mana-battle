@@ -1,7 +1,8 @@
-import { GAME_SPEED } from "../../env";
-import { screenToCellPosition } from "../board/position";
-import { cellSize } from "../config";
-import { getChara, getMapSquad, MapState } from "../Model";
+import {GAME_SPEED} from '../../env';
+import {screenToCellPosition} from '../board/position';
+import {cellSize} from '../config';
+import {getChara, getMapSquad, MapState} from '../Model';
+import moveSquadTo from './moveSquadTo';
 
 export default async function (scene: Phaser.Scene, state: MapState) {
   // TODO: make this a create parameter, as we don't need to store this for later
@@ -9,14 +10,14 @@ export default async function (scene: Phaser.Scene, state: MapState) {
     state.isPaused = true;
     const loser = getMapSquad(state, state.squadToPush.loser);
 
-    const { direction } = state.squadToPush;
+    const {direction} = state.squadToPush;
     const dist = cellSize;
     let xPush = 0;
     let yPush = 0;
-    if (direction === "left") xPush = dist * -1;
-    if (direction === "right") xPush = dist;
-    if (direction === "top") yPush = dist * -1;
-    if (direction === "bottom") yPush = dist;
+    if (direction === 'left') xPush = dist * -1;
+    if (direction === 'right') xPush = dist;
+    if (direction === 'top') yPush = dist * -1;
+    if (direction === 'bottom') yPush = dist;
 
     const chara = getChara(state, loser.id);
 
@@ -30,7 +31,7 @@ export default async function (scene: Phaser.Scene, state: MapState) {
     const cellType = state.cells[targetCell.y][targetCell.x];
 
     if (cellType === 3) {
-      complete();
+      state.isPaused = false;
       return Promise.resolve();
     }
 
@@ -41,15 +42,21 @@ export default async function (scene: Phaser.Scene, state: MapState) {
         ...newPos,
         onComplete: () => {
           chara.container.setPosition(newPos.x, newPos.y);
-          state.squads = state.squads.setIn([loser.id, "pos"], newPos);
-          complete();
+          state.squads = state.squads.setIn([loser.id, 'pos'], newPos);
+
+          if (state.squadsInMovement.has(loser.id)) {
+            moveSquadTo(
+              scene,
+              state,
+              loser.id,
+              state.squadsInMovement.get(loser.id).path.reverse()[0],
+            );
+          }
+
+          state.isPaused = false;
           resolve();
         },
       });
     }) as Promise<void>;
   } else return Promise.resolve();
-
-  function complete() {
-    state.isPaused = false;
-  }
 }

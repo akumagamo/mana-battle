@@ -1,13 +1,13 @@
-import { List, Map } from 'immutable';
+import {List, Map} from 'immutable';
 import * as CombatScene from '../../Combat/CombatScene';
-import { PLAYER_FORCE } from '../../constants';
-import { GAME_SPEED } from '../../env';
-import { createSquad, Index } from '../../Squad/Model';
-import { fadeOut } from '../../UI/Transition';
-import { Unit } from '../../Unit/Model';
+import {PLAYER_FORCE} from '../../constants';
+import {GAME_SPEED} from '../../env';
+import {createSquad, Index} from '../../Squad/Model';
+import {fadeOut} from '../../UI/Transition';
+import {Unit} from '../../Unit/Model';
 import CombatInitiated from '../events/CombatInitiated';
 import ReturnedFromCombat from '../events/ReturnedFromCombat';
-import { MapSquad, MapState } from '../Model';
+import {getChara, getMapSquad, MapSquad, MapState} from '../Model';
 import turnOff from '../turnOff';
 import markSquadForRemoval from './markSquadForRemoval';
 
@@ -16,7 +16,6 @@ export default async function (
   state: MapState,
   starter: MapSquad,
   target: MapSquad,
-  direction: string
 ) {
   await fadeOut(scene, 1000 / GAME_SPEED);
 
@@ -24,10 +23,10 @@ export default async function (
 
   const isPlayer = starter.squad.force === PLAYER_FORCE;
 
-  // for now, player always wins
-  const loser = target.id;
-
-  const combatCallback = (units: List<Unit>) => {
+  const combatCallback = (
+    units: List<Unit>,
+    squadDamage: Map<string, number>,
+  ) => {
     let squadsTotalHP = units.reduce((xs, unit) => {
       let sqdId = unit.squad || '';
 
@@ -38,7 +37,7 @@ export default async function (
       xs[sqdId] += unit.currentHp;
 
       return xs;
-    }, {} as { [x: string]: number });
+    }, {} as {[x: string]: number});
 
     units.forEach((unit) => (state.units = state.units.set(unit.id, unit)));
 
@@ -47,10 +46,25 @@ export default async function (
       .keySeq()
       .forEach((target) => markSquadForRemoval(state, target));
 
+    const sortedSquads = squadDamage.sort().keySeq();
+
+    const loser = getMapSquad(state, sortedSquads.first());
+
+    const winner = getMapSquad(state, sortedSquads.last());
+
+    const direction = () => {
+      if (winner.pos.x < loser.pos.x) return 'right';
+      else if (winner.pos.x > loser.pos.x) return 'left';
+      else if (winner.pos.y < loser.pos.y) return 'bottom';
+      else if (winner.pos.y > loser.pos.y) return 'top';
+    };
+
+    console.log(`>>>`, winner, loser, direction());
+
     state.squadToPush = {
-      winner: starter.id,
-      loser: loser,
-      direction,
+      winner: winner.id,
+      loser: loser.id,
+      direction: direction(),
     };
 
     scene.scene.start('MapScene', state);

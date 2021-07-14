@@ -1,10 +1,10 @@
-import { Map, Set } from 'immutable';
-import { Chara } from '../Chara/Model';
-import { Container, Image } from '../Models';
-import { SquadRecord } from '../Squad/Model';
-import { UnitIndex } from '../Unit/Model';
-import { VectorRec } from './makeVector';
-import { DEFAULT_MODE, Mode } from './Mode';
+import {Map, Set} from 'immutable';
+import {Chara} from '../Chara/Model';
+import {Container, Image} from '../Models';
+import {SquadRecord} from '../Squad/Model';
+import {UnitIndex} from '../Unit/Model';
+import {VectorRec} from './makeVector';
+import {DEFAULT_MODE, Mode} from './Mode';
 export type UnitId = string;
 export type ForceId = string;
 export type CityId = string;
@@ -55,7 +55,7 @@ export type MapState = {
   /** Contains the ids from all dispatched squads (from all forces). Should this move to the force? */
   dispatchedSquads: Set<string>;
   isPaused: boolean;
-  squadsInMovement: Map<string, { path: Vector[]; squad: MapSquad }>;
+  squadsInMovement: Map<string, {path: Vector[]; squad: MapSquad}>;
   tiles: MapTile[];
   moveableCells: Set<VectorRec>;
   walkableGrid: number[][];
@@ -72,8 +72,8 @@ export type MapState = {
   mapY: number;
   isDragging: boolean;
   bounds: {
-    x: { min: number; max: number };
-    y: { min: number; max: number };
+    x: {min: number; max: number};
+    y: {min: number; max: number};
   };
 
   hasShownVictoryCondition: boolean;
@@ -91,7 +91,7 @@ export type Force = {
   id: ForceId;
   name: string;
   squads: string[];
-  relations: { [id: string]: 'hostile' | 'neutral' | 'ally' };
+  relations: {[id: string]: 'hostile' | 'neutral' | 'ally'};
   initialPosition: string;
 };
 
@@ -99,9 +99,9 @@ export function createForce(
   id: ForceId,
   name: string,
   squads: string[],
-  initialPosition: string
+  initialPosition: string,
 ): Force {
-  return { id, name, squads, initialPosition, relations: {} };
+  return {id, name, squads, initialPosition, relations: {}};
 }
 
 export type City = {
@@ -123,13 +123,13 @@ export function createCity(id: string, x: number, y: number): City {
   };
 }
 
-export type Vector = { x: number; y: number };
-export type ValidStep = { target: Vector; steps: Vector[] };
-export type EnemyInRange = { enemy: string; steps: Vector[] };
+export type Vector = {x: number; y: number};
+export type ValidStep = {target: Vector; steps: Vector[]};
+export type EnemyInRange = {enemy: string; steps: Vector[]};
 export type MapSquad = {
   id: string;
   squad: SquadRecord;
-  pos: Vector;
+  pos: Vector; // Screen or board position?
   status:
     | 'standing'
     | 'moving'
@@ -143,7 +143,7 @@ export function createMapSquad(squad: SquadRecord): MapSquad {
   return {
     id: squad.id,
     squad,
-    pos: { x: 1, y: 1 },
+    pos: {x: 1, y: 1},
     status: 'standing',
   };
 }
@@ -156,9 +156,9 @@ export type TurnManager = {
   walkableCells: number[];
 };
 
-export type Step = { target: Vector; steps: Vector[] };
+export type Step = {target: Vector; steps: Vector[]};
 
-export const tileMap: { [x in CellNumber]: string } = {
+export const tileMap: {[x in CellNumber]: string} = {
   0: 'grass',
   1: 'woods',
   2: 'mountain',
@@ -262,7 +262,7 @@ export const translateTiles = (tiles: CellNumber[][]) => {
       }
 
       return cell;
-    })
+    }),
   );
 };
 
@@ -270,7 +270,7 @@ export type BattleFieldMap = {
   [x: string]: MapState;
 };
 
-export function getMapSquad(state: MapState, squadId: string) {
+export function getMapSquad(state: MapState, squadId: string): MapSquad {
   return state.squads.get(squadId);
 }
 
@@ -334,8 +334,8 @@ export const initialBattlefieldState = {
   mapY: 0,
   isDragging: false,
   bounds: {
-    x: { min: 0, max: 0 },
-    y: { min: 0, max: 0 },
+    x: {min: 0, max: 0},
+    y: {min: 0, max: 0},
   },
   hasShownVictoryCondition: false,
   dragDisabled: false,
