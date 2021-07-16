@@ -19,13 +19,16 @@ export type Member = {
 export type MemberRecord = RecordOf<Member>;
 
 export type MemberIndex = Map<string, MemberRecord>;
+export const emptyMemberIndex = Map() as MemberIndex;
 
 export type Index = Map<string, SquadRecord>;
+
+export const emptyIndex = Map() as Index;
 
 export const createSquad = Record(
   {
     id: '',
-    members: Map<string, MemberRecord>(),
+    members: emptyMemberIndex,
     force: '',
     leader: '',
   },

@@ -47,7 +47,7 @@ export type MapState = {
   charas: Chara[];
   forces: Force[];
   cities: City[];
-  squads: Map<string, MapSquad>;
+  squads: MapSquadIndex;
   units: UnitIndex;
   timeOfDay: number;
   tick: number;
@@ -138,6 +138,8 @@ export type MapSquad = {
     | 'sleeping'
     | 'guarding_fort';
 };
+export type MapSquadIndex = Map<string, MapSquad>
+export const emptyMapSquadIndex = Map() as MapSquadIndex
 
 export function createMapSquad(squad: SquadRecord): MapSquad {
   return {

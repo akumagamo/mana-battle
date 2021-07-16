@@ -1,22 +1,23 @@
-import { List, Map, Set } from 'immutable';
+import { List, Map, Set } from "immutable";
 import {
   CellNumber,
   City,
+  emptyMapSquadIndex,
   initialBattlefieldState,
   MapState,
-} from '../Battlefield/Model';
-import createUnit from '../Unit/createUnit';
-import { toMapSquad } from '../Unit/Model';
-import { CPU_FORCE, PLAYER_FORCE } from '../constants';
-import { createSquad, makeMember } from '../Squad/Model';
+} from "../Battlefield/Model";
+import createUnit from "../Unit/createUnit";
+import { toMapSquad } from "../Unit/Model";
+import { CPU_FORCE, PLAYER_FORCE } from "../constants";
+import { createSquad, makeMember } from "../Squad/Model";
 
 const enemyCastle: City = {
-  id: 'castle2',
-  name: 'Madamaxe',
+  id: "castle2",
+  name: "Madamaxe",
   x: 10,
   y: 4,
   force: CPU_FORCE,
-  type: 'castle',
+  type: "castle",
 };
 
 const tiles: CellNumber[][] = [
@@ -44,22 +45,22 @@ const tiles: CellNumber[][] = [
 const map: () => MapState = () => {
   return {
     ...initialBattlefieldState,
-    id: 'greenHarbor',
-    name: 'Green Harbor',
-    author: 'Leonardo Farroco',
-    description: 'The first map',
+    id: "greenHarbor",
+    name: "Green Harbor",
+    author: "Leonardo Farroco",
+    description: "The first map",
     cells: tiles,
-    dispatchedSquads: Set(['squad1', 'squad2']),
+    dispatchedSquads: Set(["squad1", "squad2"]),
     squads: List([
       toMapSquad(
         createSquad({
-          id: 'squad1',
-          leader: 'enemy1',
+          id: "squad1",
+          leader: "enemy1",
           members: Map({
-            enemy1: makeMember({ id: 'enemy1', x: 1, y: 2 }),
-            enemy2: makeMember({ id: 'enemy2', x: 3, y: 1 }),
-            enemy3: makeMember({ id: 'enemy3', x: 3, y: 2 }),
-            enemy4: makeMember({ id: 'enemy4', x: 3, y: 3 }),
+            enemy1: makeMember({ id: "enemy1", x: 1, y: 2 }),
+            enemy2: makeMember({ id: "enemy2", x: 3, y: 1 }),
+            enemy3: makeMember({ id: "enemy3", x: 3, y: 2 }),
+            enemy4: makeMember({ id: "enemy4", x: 3, y: 3 }),
           }),
           force: CPU_FORCE,
         }),
@@ -67,84 +68,84 @@ const map: () => MapState = () => {
       ),
       toMapSquad(
         createSquad({
-          id: 'squad2',
-          leader: 'enemy5',
+          id: "squad2",
+          leader: "enemy5",
           members: Map({
-            enemy5: makeMember({ id: 'enemy5', x: 2, y: 2 }),
-            enemy6: makeMember({ id: 'enemy6', x: 3, y: 1 }),
-            enemy7: makeMember({ id: 'enemy7', x: 3, y: 2 }),
-            enemy8: makeMember({ id: 'enemy8', x: 3, y: 3 }),
+            enemy5: makeMember({ id: "enemy5", x: 2, y: 2 }),
+            enemy6: makeMember({ id: "enemy6", x: 3, y: 1 }),
+            enemy7: makeMember({ id: "enemy7", x: 3, y: 2 }),
+            enemy8: makeMember({ id: "enemy8", x: 3, y: 3 }),
           }),
           force: CPU_FORCE,
         }),
         enemyCastle
       ),
-    ]).reduce((xs, x) => xs.set(x.id, x), Map()),
+    ]).reduce((xs, x) => xs.set(x.id, x), emptyMapSquadIndex),
     forces: [
       {
         id: PLAYER_FORCE,
-        name: 'Lankel Knights',
+        name: "Lankel Knights",
         squads: [],
-        relations: { [CPU_FORCE]: 'hostile' },
-        initialPosition: 'castle1',
+        relations: { [CPU_FORCE]: "hostile" },
+        initialPosition: "castle1",
       },
       {
         id: CPU_FORCE,
-        name: 'Enemy',
-        squads: ['squad1', 'squad2'],
-        relations: { [PLAYER_FORCE]: 'hostile' },
-        initialPosition: 'castle2',
+        name: "Enemy",
+        squads: ["squad1", "squad2"],
+        relations: { [PLAYER_FORCE]: "hostile" },
+        initialPosition: "castle2",
       },
     ],
     cities: [
       {
-        id: 'castle1',
-        name: 'Izabel',
+        id: "castle1",
+        name: "Izabel",
         x: 3,
         y: 5,
         force: PLAYER_FORCE,
-        type: 'castle',
+        type: "castle",
       },
       enemyCastle,
       {
-        id: 'c1',
-        name: 'Arabella',
+        id: "c1",
+        name: "Arabella",
         x: 2,
         y: 6,
         force: CPU_FORCE,
-        type: 'town',
+        type: "town",
       },
       {
-        id: 'c2',
-        name: 'Marqueze',
+        id: "c2",
+        name: "Marqueze",
         x: 10,
         y: 1,
         force: CPU_FORCE,
-        type: 'town',
+        type: "town",
       },
-      { id: 'c3', name: 'Bauhaus', x: 9, y: 5, force: CPU_FORCE, type: 'town' },
+      { id: "c3", name: "Bauhaus", x: 9, y: 5, force: CPU_FORCE, type: "town" },
       {
-        id: 'c4',
-        name: 'Vila Rica',
+        id: "c4",
+        name: "Vila Rica",
         x: 6,
         y: 4,
         force: CPU_FORCE,
-        type: 'town',
+        type: "town",
       },
     ],
     units: Map({
-      enemy1: createEnemyUnit('squad1')('enemy1'),
-      enemy2: createEnemyUnit('squad1')('enemy2'),
-      enemy3: createEnemyUnit('squad1')('enemy3'),
-      enemy4: createEnemyUnit('squad1')('enemy4'),
-      enemy5: createEnemyUnit('squad2')('enemy5'),
-      enemy6: createEnemyUnit('squad2')('enemy6'),
-      enemy7: createEnemyUnit('squad2')('enemy7'),
-      enemy8: createEnemyUnit('squad2')('enemy8'),
+      enemy1: createEnemyUnit("squad1")("enemy1"),
+      enemy2: createEnemyUnit("squad1")("enemy2"),
+      enemy3: createEnemyUnit("squad1")("enemy3"),
+      enemy4: createEnemyUnit("squad1")("enemy4"),
+      enemy5: createEnemyUnit("squad2")("enemy5"),
+      enemy6: createEnemyUnit("squad2")("enemy6"),
+      enemy7: createEnemyUnit("squad2")("enemy7"),
+      enemy8: createEnemyUnit("squad2")("enemy8"),
     }),
     ai: Map({
-      squad1: 'ATTACK',
-      squad2: 'DEFEND',
+      squad1: "ATTACK",
+      squad2: "DEFEND",
     }),
   };
 };

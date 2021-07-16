@@ -1,6 +1,6 @@
-import { Unit } from '../Unit/Model';
-import { Container, Graphics, Image } from '../Models';
-import { Tweens } from 'phaser';
+import { Unit } from "../Unit/Model";
+import { Container, Image } from "../Models";
+import { Map } from "immutable";
 
 export type CharaProps = {
   scene: Phaser.Scene;
@@ -46,3 +46,6 @@ export type Chara = {
 
   selectedCharaIndicator: Image | null;
 };
+
+export type CharaIndex = Map<string, Chara>;
+export const emptyIndex = Map() as CharaIndex;

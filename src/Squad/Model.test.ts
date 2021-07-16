@@ -101,7 +101,7 @@ function givenASquadWithTwoMembers() {
 export function printSquad(squad: SquadRecord) {
   let o = Range(0, 3)
     .map(() => Range(0, 6).map(() => "-"))
-    .toJS();
+    .toJS() as string[][];
   squad.members.forEach((m) => {
     const { y, x } = m;
     o[y - 1][x - 1] = m.id;

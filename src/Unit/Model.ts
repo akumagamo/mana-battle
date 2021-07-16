@@ -1,6 +1,5 @@
 import { Modifier, ItemSlot, ItemMap } from "../Item/Model";
 import { sum } from "../utils/math";
-import { Container } from "../Models";
 import { MapSquad, Vector } from "../Battlefield/Model";
 import { SquadRecord } from "../Squad/Model";
 import { Map } from "immutable";
@@ -11,6 +10,8 @@ import { CPU_FORCE } from "../constants";
 // to use functions from here
 
 export type UnitIndex = Map<string, UnitInSquad>;
+
+export const emptyIndex = Map() as UnitIndex;
 
 export type Stat = "str" | "dex" | "int";
 export const statLabels: {

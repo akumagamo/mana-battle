@@ -1,4 +1,4 @@
-import { List, Map, Set } from "immutable";
+import { List, Set } from "immutable";
 import menu from "../../Backgrounds/menu";
 import createStaticBoard from "../../Board/createBoard";
 import onBoardClicked from "../../Board/events/onBoardClicked";
@@ -11,7 +11,7 @@ import { Container, Pointer } from "../../Models";
 import button from "../../UI/button";
 import panel from "../../UI/panel";
 import text from "../../UI/text";
-import { UnitIndex } from "../../Unit/Model";
+import * as Unit from "../../Unit/Model";
 import EditSquadModal from "../EditSquadModal/createEditSquadModal";
 import * as Squad from "../Model";
 import { events } from "./events";
@@ -21,7 +21,7 @@ import editSquadButtonClicked from "./events/editSquadButtonClicked";
 
 type CreateParams = {
   squads: Squad.Index;
-  units: UnitIndex;
+  units: Unit.UnitIndex;
   onReturnClick: (scene: ListSquadsScene) => void;
   dispatched: Set<string>;
 };
@@ -41,8 +41,8 @@ export class ListSquadsScene extends Phaser.Scene {
   boards: Board[] = [];
   page: number = 0;
   itemsPerPage: number = 16;
-  squads = Map() as Squad.Index;
-  units = Map() as UnitIndex;
+  squads = Squad.emptyIndex;
+  units = Unit.emptyIndex;
   dispatched: Set<string> = Set();
   inputEnabled = true;
   uiContainer: Container | null = null;
@@ -187,7 +187,7 @@ export class ListSquadsScene extends Phaser.Scene {
       scene: this,
       squad: Squad.createSquad({
         id: "squad+" + new Date().getTime(),
-        members: Map(),
+        members: Squad.emptyMemberIndex,
         force: PLAYER_FORCE,
         leader: "",
       }),
@@ -359,8 +359,8 @@ export class ListSquadsScene extends Phaser.Scene {
 
   turnOff() {
     this.boards = [];
-    this.squads = Map();
-    this.units = Map();
+    this.squads = Squad.emptyIndex;
+    this.units = Unit.emptyIndex;
     this.uiContainer.destroy();
     this.scene.stop(key);
     events.forEach((k) => this.events.off(k));

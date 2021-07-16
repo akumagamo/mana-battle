@@ -1,6 +1,6 @@
 import { Map } from "immutable";
 import plains from "../Backgrounds/plains";
-import { Chara } from "../Chara/Model";
+import { CharaIndex, emptyIndex } from "../Chara/Model";
 import { Container } from "../Models";
 import { fadeOut } from "../UI/Transition";
 import { createUnit } from "./cmds/createUnit";
@@ -55,7 +55,7 @@ export default class TheaterScene extends Phaser.Scene {
       });
     }
   }
-  charas: Map<string, Chara> = Map();
+  charas: CharaIndex = emptyIndex;
 
   container: Container | null = null;
 
@@ -85,7 +85,7 @@ export default class TheaterScene extends Phaser.Scene {
         case "FINISH":
           await fadeOut(this, 1000 / GAME_SPEED);
           this.charas.forEach((c) => c.destroy());
-          this.charas = Map();
+          this.charas = emptyIndex;
           this.container.destroy();
           this.scene.remove(this);
           return resolve(answers);

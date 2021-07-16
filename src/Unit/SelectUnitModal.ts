@@ -17,7 +17,6 @@ export default function (
 
   units
     .toList()
-    .toJS()
     .forEach((unit, iter) => {
       createChara({
         scene: scene,
