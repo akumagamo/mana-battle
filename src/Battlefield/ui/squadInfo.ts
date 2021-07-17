@@ -1,11 +1,11 @@
-import createStaticBoard from '../../Board/createBoard';
-import { PLAYER_FORCE } from '../../constants';
-import button from '../../UI/button';
-import text from '../../UI/text';
-import { disableMapInput, enableMapInput } from '../board/input';
-import squadDetails from '../effects/squadDetails';
-import { getMapSquad, getSquadLeader, getSquadUnits, MapState } from '../Model';
-import playerSquad from './playerSquad';
+import createStaticBoard from "../../Board/createBoard";
+import { PLAYER_FORCE } from "../../constants";
+import button from "../../UI/button";
+import text from "../../UI/text";
+import { disableMapInput, enableMapInput } from "../board/input";
+import squadDetails from "../effects/squadDetails";
+import { getMapSquad, getSquadLeader, getSquadUnits, MapState } from "../Model";
+import playerSquad from "./playerSquad";
 
 export async function squadInfo(
   scene: Phaser.Scene,
@@ -21,7 +21,7 @@ export async function squadInfo(
   text(320, baseY, leader.name, uiContainer, scene);
 
   if (mapSquad.squad.force !== PLAYER_FORCE) {
-    button(430, baseY, 'Squad Details', state.uiContainer, scene, () => {
+    button(430, baseY, "Squad Details", state.uiContainer, scene, () => {
       viewSquadDetails(scene, state, id);
     });
   }
@@ -49,10 +49,14 @@ export function viewSquadDetails(
 ): void {
   const mapSquad = getMapSquad(state, id);
   disableMapInput(state);
+  state.isPaused = true;
   squadDetails(
     scene,
     mapSquad,
     state.units.filter((u) => mapSquad.squad.members.has(u.id)),
-    () => enableMapInput(scene, state)
+    () => {
+      enableMapInput(scene, state);
+      state.isPaused = false;
+    }
   );
 }

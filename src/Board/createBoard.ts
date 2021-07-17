@@ -15,7 +15,7 @@ export default (
   scale = 1,
   front = true,
   isSelected = false,
-  interactive: {
+  interactive?: {
     onSquadUpdated: (
       squad: SquadRecord,
       added: string[],
@@ -23,10 +23,6 @@ export default (
     ) => void;
     onDragStart?: (unit: Unit, x: number, y: number, chara: Chara) => void;
     onDragEnd?: (chara: Chara) => (x: number, y: number) => void;
-  } = {
-    onSquadUpdated: () => {},
-    onDragStart: () => {},
-    onDragEnd: () => () => {},
   }
 ) => {
   const container = scene.add.container(x, y);
@@ -66,6 +62,6 @@ export default (
     /** Interaction parameters that were used when creating the board are returned to allow other
      * functions refreshing new elements as they are added to the board
      */
-    interactions: { ...interactive },
+    interactions: interactive ? { ...interactive } : null,
   };
 };

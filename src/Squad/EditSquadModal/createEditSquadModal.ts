@@ -60,8 +60,6 @@ export default function ({
     true,
     false,
     {
-      onDragStart: () => {},
-      onDragEnd: () => () => {},
       onSquadUpdated: onSquadUpdated,
     }
   );
@@ -83,16 +81,17 @@ export default function ({
     x: number,
     y: number
   ) => {
-    onDragEndFromUnitList(
-      x,
-      y,
-      unitList,
-      board,
-      chara,
-      onSquadUpdated,
-      onListUpdated,
-      interactions
-    );
+    if (interactions)
+      onDragEndFromUnitList(
+        x,
+        y,
+        unitList,
+        board,
+        chara,
+        onSquadUpdated,
+        onListUpdated,
+        interactions
+      );
   };
 
   const onListUpdated = (charas: List<Chara>) => {

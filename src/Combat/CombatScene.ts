@@ -126,6 +126,7 @@ export default class CombatScene extends Phaser.Scene {
 
     this.squads = data.squads;
     this.unitIndex = data.units;
+    this.unitSquadIndex = Squad.createUnitSquadIndex(data.squads);
 
     this.onCombatFinish = data.onCombatFinish;
 
@@ -246,7 +247,9 @@ export default class CombatScene extends Phaser.Scene {
     this.scene.stop();
     this.squads = Squad.emptyIndex;
     this.unitIndex = Unit.emptyUnitIndex;
+    this.unitSquadIndex = Squad.emptyUnitSquadIndex;
   }
+
   removeChildren() {
     this.charas.forEach((chara) => chara.destroy());
     this.charas = [];
