@@ -191,7 +191,11 @@ export const runTurn = (
     units,
   });
 
-  const { unitsWithXp, cmds: xpCmds } = calcXp(squadIndex, turnState.unitIndex, unitSquadIndex);
+  const { unitsWithXp, cmds: xpCmds } = calcXp(
+    squadIndex,
+    turnState.unitIndex,
+    unitSquadIndex
+  );
 
   const endCombat: (cmds: Command[]) => Command[] = (commands: Command[]) => {
     return commands.concat(xpCmds).concat([

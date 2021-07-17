@@ -59,6 +59,7 @@ export class ListSquadsScene extends Phaser.Scene {
 
     this.squads = squads;
     this.units = units;
+    this.unitSquadIndex = Squad.createUnitSquadIndex(squads);
     this.dispatched = dispatched;
     this.onReturnClick = onReturnClick;
     this.uiContainer = this.add.container();
@@ -157,25 +158,16 @@ export class ListSquadsScene extends Phaser.Scene {
       onSquadUpdated: (sqd, added, removed) => {
         this.squads = this.squads.set(sqd.id, sqd);
         added.forEach((id) => {
-          this.units = this.units.update(id, (unit) => ({
-            ...unit,
-            squad: squad.id,
-          }));
+          this.unitSquadIndex = this.unitSquadIndex.set(id, squad.id);
         });
         removed.forEach((id) => {
-          this.units = this.units.update(id, (unit) => ({
-            ...unit,
-            squad: null,
-          }));
+          this.unitSquadIndex = this.unitSquadIndex.delete(id);
         });
       },
       onClose: (sqd) => {
         this.squads = this.squads.set(sqd.id, sqd);
         sqd.members.forEach((m) => {
-          this.units = this.units.update(m.id, (u) => ({
-            ...u,
-            squad: sqd.id,
-          }));
+          this.unitSquadIndex = this.unitSquadIndex.update(m.id, () => sqd.id);
         });
         this.inputEnabled = true;
         this.refreshBoards();
@@ -201,16 +193,10 @@ export class ListSquadsScene extends Phaser.Scene {
       onSquadUpdated: (sqd, added, removed) => {
         this.squads = this.squads.set(sqd.id, sqd);
         added.forEach((id) => {
-          this.units = this.units.update(id, (unit) => ({
-            ...unit,
-            squad: sqd.id,
-          }));
+          this.unitSquadIndex = this.unitSquadIndex.set(id, sqd.id);
         });
         removed.forEach((id) => {
-          this.units = this.units.update(id, (unit) => ({
-            ...unit,
-            squad: null,
-          }));
+          this.unitSquadIndex = this.unitSquadIndex.delete(id);
         });
       },
       onClose: (sqd) => {
