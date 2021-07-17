@@ -16,6 +16,7 @@ export default function (
   units: UnitIndex,
   onRefresh: (c: List<Chara>) => void
 ): UnitList {
+
   const container = scene.add.container(x, y);
 
   const unitList: UnitList = {
@@ -93,5 +94,5 @@ function getUnitsToRender({
 
 export function renderRows(unitList: UnitList) {
   const unitsToRender = getUnitsToRender(unitList);
-  unitsToRender.toIndexedSeq().map((u, i) => renderListItem(unitList, u, i));
+  unitsToRender.toList().map((u, i) => renderListItem(unitList, u, i));
 }

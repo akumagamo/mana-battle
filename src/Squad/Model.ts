@@ -56,8 +56,10 @@ export const getUnitSquad = (
   return getSquad(squad, index);
 };
 
-export const unitsWithoutSquad = (index: UnitSquadIndex, units: UnitIndex) =>
-  units.filter((u) => index.get(u.id));
+export const unitsWithoutSquad = (
+  unitSquadIndex: UnitSquadIndex,
+  unitIndex: UnitIndex
+) => unitIndex.filter((u) => !unitSquadIndex.get(u.id));
 
 export const createSquad = Record(
   {
