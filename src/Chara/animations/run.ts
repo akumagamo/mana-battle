@@ -4,7 +4,7 @@ import defaultPose from "./defaultPose";
 import { Chara } from "../Model";
 import { GAME_SPEED } from "../../env";
 
-const front = (chara: Chara) => {
+const front = (chara: Chara, speed: number = 1) => {
   chara.scene.add.tween({
     targets: chara.leftFoot,
     x: chara.leftFoot?.x || 0 - 20,
@@ -46,11 +46,11 @@ const front = (chara: Chara) => {
     y: chara.innerWrapper.y - 20,
     yoyo: true,
     repeat: -1,
-    duration: 100 / GAME_SPEED,
+    duration: (500 / GAME_SPEED) * speed,
   });
 };
 
-const back = (chara: Chara) => {
+const back = (chara: Chara, speed = 1) => {
   const bounce = upAndDown(chara);
 
   bounce(chara.innerWrapper, -12, 300);
@@ -96,14 +96,14 @@ const back = (chara: Chara) => {
     y: chara.innerWrapper.y - 20,
     yoyo: true,
     repeat: -1,
-    duration: 100 / GAME_SPEED,
+    duration: (100 / GAME_SPEED) * speed,
   });
 };
 
-export default (chara: Chara) => {
+export default (chara: Chara, speed?: number) => {
   defaultPose(chara);
   if (chara.props.front) {
-    front(chara);
+    front(chara, speed);
   } else {
     back(chara);
   }

@@ -14,6 +14,7 @@ export async function squadInfo(
   baseY: number,
   id: string
 ): Promise<void> {
+  state.isPaused = true;
   const mapSquad = getMapSquad(state, id);
 
   const leader = getSquadLeader(state, id);

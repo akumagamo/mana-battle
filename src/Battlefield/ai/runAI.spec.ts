@@ -1,11 +1,10 @@
 import map from "../../maps/green_harbor";
-import { sceneMock } from "../../test/mocks";
 import aiAttack from "./aiAttack";
 
 it("should get path to closest enemy-controlled city if ATTACK", () => {
   const state = map();
 
-  aiAttack(sceneMock(), state);
+  aiAttack(state);
 
   expect(state.squadsInMovement.get("squad1")?.path || []).toEqual([
     { x: 6, y: 5 },

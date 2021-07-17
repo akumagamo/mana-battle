@@ -5,5 +5,5 @@ export const boardPadding = 50;
 
 export const CHARA_MAP_SCALE = 0.45;
 
-export const MOVE_SPEED = 2 * GAME_SPEED;
+export const MOVE_SPEED = 0.2 * GAME_SPEED;
 export const CHARA_VERTICAL_OFFSET = -10;

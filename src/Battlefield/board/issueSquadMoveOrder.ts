@@ -19,16 +19,15 @@ export async function issueSquadMoveOrder(
     const cell = screenToCellPosition(squad.pos);
 
     if (cell.x !== x || cell.y !== y) {
-      await moveSquadTo(scene, state, id, { x, y });
+      await moveSquadTo(state, id, { x, y });
       state.squads = state.squads.update(id, (sqd) => ({
         ...sqd,
         status: "moving",
       }));
       const chara = getChara(state, id);
-      run(chara);
-      signal(scene, state, "squad moved, updating position", [
-        { type: "UPDATE_SQUAD_POS", id, pos: { x, y } },
-      ]);
+      run(chara, 0.2);
+
+      changeMode(scene, state, { type: "NOTHING_SELECTED" });
     } else {
       changeMode(scene, state, { type: "SQUAD_SELECTED", id });
     }

@@ -4,7 +4,7 @@ import { screenToCellPosition } from "../board/position";
 import { getForceCities, getMapSquad, MapState } from "../Model";
 import moveSquadTo from "../squads/moveSquadTo";
 
-export default function (scene: Phaser.Scene, state: MapState) {
+export default function (state: MapState) {
   state.ai = state.ai.map((cmd, eid) => {
     if (cmd === "DEFEND") {
       return cmd;
@@ -29,7 +29,7 @@ export default function (scene: Phaser.Scene, state: MapState) {
 
       const [target] = distances;
 
-      moveSquadTo(scene, state, squad.id, target.target);
+      moveSquadTo(state, squad.id, target.target);
 
       return "MOVING";
     }

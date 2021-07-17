@@ -46,7 +46,6 @@ export default async function (scene: Phaser.Scene, state: MapState) {
 
           if (state.squadsInMovement.has(loser.id)) {
             moveSquadTo(
-              scene,
               state,
               loser.id,
               state.squadsInMovement.get(loser.id)?.path.reverse()[0] || {

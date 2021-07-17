@@ -6,7 +6,6 @@ import {changeMode} from '../Mode';
 import {getMapSquad, MapState} from '../Model';
 
 export default async function (
-  scene: Phaser.Scene,
   state: MapState,
   id: string,
   target: Vector,
@@ -26,10 +25,6 @@ export default async function (
     path,
     squad,
   });
-
-  // TODO: remove this, moving squad should have no relation with selection
-  if (squad.squad.force === PLAYER_FORCE)
-    changeMode(scene, state, {type: 'SQUAD_SELECTED', id});
 }
 
 function makeWalkableGrid(state: MapState): number[][] {
