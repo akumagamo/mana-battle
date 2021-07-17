@@ -1,7 +1,7 @@
-import { SquadRecord, MemberIndex, makeMember, createSquad } from './Model';
-import { UnitJobs, UnitIndex } from '../Unit/Model';
-import { Map } from 'immutable';
-import createUnit from '../Unit/createUnit';
+import { SquadRecord, MemberIndex, makeMember, createSquad } from "./Model";
+import { UnitJobs, UnitIndex, getUnit } from "../Unit/Model";
+import { Map } from "immutable";
+import createUnit from "../Unit/createUnit";
 
 type SquadGeneratorResponse = { units: UnitIndex; squad: SquadRecord };
 
@@ -18,11 +18,11 @@ export function fighterArcherSquad(
   return squadGenerator(
     prefix,
     [
-      ['fighter', [3, 2]],
-      ['fighter', [3, 1]],
-      ['fighter', [3, 3]],
-      ['archer', [1, 1]],
-      ['archer', [1, 3]],
+      ["fighter", [3, 2]],
+      ["fighter", [3, 1]],
+      ["fighter", [3, 3]],
+      ["archer", [1, 1]],
+      ["archer", [1, 3]],
     ],
     level,
     force
@@ -38,12 +38,11 @@ export function squadGenerator(
   level: number,
   force: string
 ): { units: UnitIndex; squad: SquadRecord } {
-  const unitId = (n: number) => squadId + '_unit_' + n.toString();
+  const unitId = (n: number) => squadId + "_unit_" + n.toString();
 
   const units = unitList.reduce((xs, [class_], index) => {
     return xs.set(unitId(index), {
       ...createUnit(unitId(index), class_, level),
-      squad: squadId,
     });
   }, Map() as UnitIndex);
 
@@ -60,7 +59,7 @@ export function squadGenerator(
 
   const squad: SquadRecord = createSquad({
     id: squadId,
-    leader: units.get(unitId(0)).id,
+    leader: getUnit(unitId(0), units).id,
     members,
     force: force,
   });

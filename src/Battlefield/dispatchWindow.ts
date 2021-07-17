@@ -114,10 +114,10 @@ function dispatchSquad(
   squad: SquadRecord
 ) {
   const force = getForce(state, PLAYER_FORCE);
+  if(!force) return;
   let mapSquad = toMapSquad(
     squad,
     getCity(state, force.initialPosition),
-    state.timeOfDay
   );
 
   state.dispatchedSquads = state.dispatchedSquads.add(squad.id);

@@ -1,39 +1,38 @@
-import { organizeButtonClicked } from './organizeButtonClicked';
-import { run } from '../../Squad/ListSquadsScene/ListSquadsScene';
-import map from '../../maps/green_harbor';
-import { getMockCalls, sceneMock } from '../../test/mocks';
-import { CPU_FORCE, PLAYER_FORCE } from '../../constants';
-import { toMapSquad, Unit } from '../../Unit/Model';
-import { Map, Set } from 'immutable';
-import createUnit from '../../Unit/createUnit';
-import { createSquad, makeMember, SquadRecord } from '../../Squad/Model';
+import { organizeButtonClicked } from "./organizeButtonClicked";
+import { run } from "../../Squad/ListSquadsScene/ListSquadsScene";
+import map from "../../maps/green_harbor";
+import { getMockCalls, sceneMock } from "../../test/mocks";
+import { CPU_FORCE, PLAYER_FORCE } from "../../constants";
+import { toMapSquad, Unit } from "../../Unit/Model";
+import { Map, Set } from "immutable";
+import createUnit from "../../Unit/createUnit";
+import { createSquad, makeMember, SquadRecord } from "../../Squad/Model";
 
-jest.mock('../../Squad/ListSquadsScene/ListSquadsScene');
+jest.mock("../../Squad/ListSquadsScene/ListSquadsScene");
 
 const defaultProps = () => ({
   turnOff: jest.fn(),
   state: {
     ...map(),
-    units: map().units.set('ally1', {
-      ...createUnit('ally1'),
+    units: map().units.set("ally1", {
+      ...createUnit("ally1"),
       force: PLAYER_FORCE,
     }),
-    dispatchedSquads: Set(['ally_squad']),
+    dispatchedSquads: Set(["ally_squad"]),
     squads: map().squads.set(
-      'ally_squad',
+      "ally_squad",
       toMapSquad(
         {
           ...createSquad({
-            id: 'ally_squad',
+            id: "ally_squad",
             members: Map({
-              ally1: makeMember({ id: 'ally1', x: 1, y: 1 }),
+              ally1: makeMember({ id: "ally1", x: 1, y: 1 }),
             }),
-            leader: 'ally1',
+            leader: "ally1",
             force: PLAYER_FORCE,
           }),
         },
-        { x: 1, y: 1 },
-        0
+        { x: 1, y: 1 }
       )
     ),
   },
@@ -45,12 +44,12 @@ beforeEach(() => {
   run.mockClear();
 });
 
-it('should start ListSquadScene when clicked', () => {
+it("should start ListSquadScene when clicked", () => {
   organizeButtonClicked(defaultProps(), () => {});
   expect(getMockCalls(run).length).toEqual(1);
 });
 
-it('should stop Phaser.Scene when clicked', () => {
+it("should stop Phaser.Scene when clicked", () => {
   const props = defaultProps();
 
   organizeButtonClicked(props, () => {});
@@ -58,7 +57,7 @@ it('should stop Phaser.Scene when clicked', () => {
   expect(getMockCalls(props.turnOff).length).toEqual(1);
 });
 
-it('should only pass units owned by the player to ListSquadScene', () => {
+it("should only pass units owned by the player to ListSquadScene", () => {
   const props = defaultProps();
 
   expect(
@@ -76,7 +75,7 @@ it('should only pass units owned by the player to ListSquadScene', () => {
   ).toBeGreaterThan(0);
 });
 
-it('should only pass squads owned by the player to ListSquadScene', () => {
+it("should only pass squads owned by the player to ListSquadScene", () => {
   const props = defaultProps();
 
   expect(
@@ -96,12 +95,12 @@ it('should only pass squads owned by the player to ListSquadScene', () => {
     squadsProvided.filter((squad) => squad.force === PLAYER_FORCE).size
   ).toBeGreaterThan(0);
 });
-it('should pass the dispatched squads id to ListSquadScene', () => {
+it("should pass the dispatched squads id to ListSquadScene", () => {
   const props = defaultProps();
 
   organizeButtonClicked(props, () => {});
 
   const dispatched = getMockCalls(run)[0][0].dispatched as Set<string>;
 
-  expect(dispatched.toJS()).toStrictEqual(['ally_squad']);
+  expect(dispatched.toJS()).toStrictEqual(["ally_squad"]);
 });

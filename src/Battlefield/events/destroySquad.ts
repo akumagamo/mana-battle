@@ -12,9 +12,13 @@ export default async function (state: MapState, id: string) {
 async function removeSquadFromState(state: MapState, id: string) {
   const chara = getChara(state, id);
   chara.destroy();
-  state.charas = state.charas.filter((c) => c.props.unit.squad !== id);
+  state.charas = state.charas.filter(
+    (c) => state.unitSquadIndex.get(c.props.unit.id) !== id
+  );
 
-  state.units = state.units.filter((u) => u.squad !== id);
+  state.units = state.units.filter(
+    (u) => state.unitSquadIndex.get(u.id) !== id
+  );
 
   state.squads = state.squads.filter((s) => s.id !== id);
 

@@ -41,6 +41,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
   renderBgLayer() {}
 
   render(unit: Unit) {
+    if (!this.container) return;
     this.clearChildren();
 
     panel(0, 0, 1200, 220, this.container, this);

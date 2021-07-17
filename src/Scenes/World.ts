@@ -1,8 +1,7 @@
 import Phaser from "phaser";
+import { GAME_SPEED } from "../env";
 import { preload } from "../preload";
 import button from "../UI/button";
-
-const GAME_SPEED = parseInt(process.env.SPEED);
 
 export default class WorldScene extends Phaser.Scene {
   constructor() {

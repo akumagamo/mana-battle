@@ -1,15 +1,15 @@
-import createChara from '../../Chara/createChara';
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../../constants';
-import { delay } from '../../Scenes/utils';
-import { animatedText } from '../../UI/animatedText';
-import button from '../../UI/button';
-import panel from '../../UI/panel';
-import text from '../../UI/text';
-import TheaterScene from '../TheaterScene';
+import createChara from "../../Chara/createChara";
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../constants";
+import { delay } from "../../Scenes/utils";
+import { animatedText } from "../../UI/animatedText";
+import button from "../../UI/button";
+import panel from "../../UI/panel";
+import text from "../../UI/text";
+import TheaterScene from "../TheaterScene";
 
 export type Answer = { answer: string; value: number };
 export type Question = {
-  type: 'QUESTION';
+  type: "QUESTION";
   id: string;
   /** Question identifier */
   title: string;
@@ -22,26 +22,28 @@ export const question = async (
   { id, question, options, title }: Question,
   speed: number
 ) => {
-  const chara = scene.charas.get(scene.charaKey(id));
-
   const PANEL_HEIGHT = 200;
   const y = SCREEN_HEIGHT - PANEL_HEIGHT;
   const container = scene.add.container(0, y);
 
   panel(0, 0, SCREEN_WIDTH, PANEL_HEIGHT, container, scene);
 
-  const head = createChara({
-    scene,
-    unit: chara.props.unit,
-    x: 100,
-    y: 120,
-    scale: 1.4,
-  });
+  const chara = scene.charas.get(scene.charaKey(id));
+  if (chara) {
+    const head = createChara({
+      scene,
+      unit: chara.props.unit,
+      x: 100,
+      y: 120,
+      scale: 1.4,
+    });
 
-  container.add(head.container);
+    container.add(head.container);
 
-  text(190, 20, chara.props.unit.name, container, scene);
-  const unitText = text(190, 60, '', container, scene);
+    text(190, 20, chara.props.unit.name, container, scene);
+  }
+
+  const unitText = text(190, 60, "", container, scene);
 
   // const clickZone = scene.add.zone(0, y, SCREEN_WIDTH, PANEL_HEIGHT);
   // clickZone.setInteractive();
@@ -57,7 +59,7 @@ export const question = async (
 
       button(800, y, answer, container, scene, () => {
         container.destroy();
-        scene.scene.remove('head');
+        scene.scene.remove("head");
         resolve({ answer, value });
       });
     });

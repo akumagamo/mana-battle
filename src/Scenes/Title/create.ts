@@ -55,7 +55,7 @@ export function create(scene: Phaser.Scene, state: TitleSceneState) {
   state.charas.forEach((c) => {
     c.container.scaleX = c.container.scaleX * -1;
   });
-  state.charas.forEach((c) => state.container.add(c.container));
+  state.charas.forEach((c) => state.container?.add(c.container));
 
   changeMusic(scene, state, "title");
 

@@ -1,4 +1,4 @@
-import { Chara } from '../Model';
+import { Chara } from "../Model";
 import {
   CHARA_WRAPPER_X,
   CHARA_WRAPPER_Y,
@@ -22,7 +22,7 @@ import {
   LEFT_HAND_BACK_Y,
   RIGHT_HAND_BACK_X,
   RIGHT_HAND_BACK_Y,
-} from './constants';
+} from "./constants";
 
 export default (chara: Chara) => {
   chara.scene.tweens.killTweensOf([
@@ -41,6 +41,18 @@ export default (chara: Chara) => {
     chara.leftHandEquip,
     chara.hat,
   ]);
+
+  if (
+    !chara.head ||
+    !chara.leftFoot ||
+    !chara.leftHand ||
+    !chara.rightHand ||
+    !chara.rightFoot ||
+    !chara.mainHandContainer ||
+    !chara.offHandContainer ||
+    !chara.trunk
+  )
+    return;
 
   chara.head.rotation = 0;
   chara.leftFoot.rotation = 0;
@@ -71,7 +83,7 @@ export default (chara: Chara) => {
     chara.offHandContainer.y = LEFT_HAND_FRONT_Y;
 
     // TODO: weapon-> stance type mapping
-    if (chara.props.unit.equips.mainHand === 'iron_spear') {
+    if (chara.props.unit.equips.mainHand === "iron_spear") {
       chara.leftHand.setPosition(LEFT_HAND_FRONT_X + 5, LEFT_HAND_FRONT_Y + 10);
     }
   } else {

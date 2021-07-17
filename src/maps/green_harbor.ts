@@ -1,15 +1,19 @@
 import { List, Map, Set } from "immutable";
 import {
+  AI_COMMANDS,
   CellNumber,
   City,
+  CITY_TYPE_CASTLE,
+  CITY_TYPE_TOWN,
   emptyMapSquadIndex,
   initialBattlefieldState,
   MapState,
+  relationsTypes,
 } from "../Battlefield/Model";
 import createUnit from "../Unit/createUnit";
 import { toMapSquad } from "../Unit/Model";
 import { CPU_FORCE, PLAYER_FORCE } from "../constants";
-import { createSquad, makeMember } from "../Squad/Model";
+import { createSquad, emptyUnitSquadIndex, makeMember } from "../Squad/Model";
 
 const enemyCastle: City = {
   id: "castle2",
@@ -17,7 +21,7 @@ const enemyCastle: City = {
   x: 10,
   y: 4,
   force: CPU_FORCE,
-  type: "castle",
+  type: CITY_TYPE_CASTLE,
 };
 
 const tiles: CellNumber[][] = [
@@ -43,7 +47,7 @@ const tiles: CellNumber[][] = [
   [3, 3, 3, 3, 3, 3, 3, 2, 1, 2, 0, 0, 1, 3, 3, 3, 3, 3, 2, 1, 2, 0, 0, 2],
 ];
 const map: () => MapState = () => {
-  return {
+  const state = {
     ...initialBattlefieldState,
     id: "greenHarbor",
     name: "Green Harbor",
@@ -86,14 +90,14 @@ const map: () => MapState = () => {
         id: PLAYER_FORCE,
         name: "Lankel Knights",
         squads: [],
-        relations: { [CPU_FORCE]: "hostile" },
+        relations: Map({ [CPU_FORCE]: relationsTypes.hostile }),
         initialPosition: "castle1",
       },
       {
         id: CPU_FORCE,
         name: "Enemy",
         squads: ["squad1", "squad2"],
-        relations: { [PLAYER_FORCE]: "hostile" },
+        relations: Map({ [PLAYER_FORCE]: relationsTypes.hostile }),
         initialPosition: "castle2",
       },
     ],
@@ -104,7 +108,7 @@ const map: () => MapState = () => {
         x: 3,
         y: 5,
         force: PLAYER_FORCE,
-        type: "castle",
+        type: CITY_TYPE_CASTLE,
       },
       enemyCastle,
       {
@@ -113,7 +117,7 @@ const map: () => MapState = () => {
         x: 2,
         y: 6,
         force: CPU_FORCE,
-        type: "town",
+        type: CITY_TYPE_TOWN,
       },
       {
         id: "c2",
@@ -121,38 +125,56 @@ const map: () => MapState = () => {
         x: 10,
         y: 1,
         force: CPU_FORCE,
-        type: "town",
+        type: CITY_TYPE_TOWN,
       },
-      { id: "c3", name: "Bauhaus", x: 9, y: 5, force: CPU_FORCE, type: "town" },
+      {
+        id: "c3",
+        name: "Bauhaus",
+        x: 9,
+        y: 5,
+        force: CPU_FORCE,
+        type: CITY_TYPE_TOWN,
+      },
       {
         id: "c4",
         name: "Vila Rica",
         x: 6,
         y: 4,
         force: CPU_FORCE,
-        type: "town",
+        type: CITY_TYPE_TOWN,
       },
     ],
+    // this can be moved to a derivative property
     units: Map({
-      enemy1: createEnemyUnit("squad1")("enemy1"),
-      enemy2: createEnemyUnit("squad1")("enemy2"),
-      enemy3: createEnemyUnit("squad1")("enemy3"),
-      enemy4: createEnemyUnit("squad1")("enemy4"),
-      enemy5: createEnemyUnit("squad2")("enemy5"),
-      enemy6: createEnemyUnit("squad2")("enemy6"),
-      enemy7: createEnemyUnit("squad2")("enemy7"),
-      enemy8: createEnemyUnit("squad2")("enemy8"),
+      enemy1: createEnemyUnit("enemy1"),
+      enemy2: createEnemyUnit("enemy2"),
+      enemy3: createEnemyUnit("enemy3"),
+      enemy4: createEnemyUnit("enemy4"),
+      enemy5: createEnemyUnit("enemy5"),
+      enemy6: createEnemyUnit("enemy6"),
+      enemy7: createEnemyUnit("enemy7"),
+      enemy8: createEnemyUnit("enemy8"),
     }),
     ai: Map({
-      squad1: "ATTACK",
-      squad2: "DEFEND",
+      squad1: AI_COMMANDS.ATTACK,
+      squad2: AI_COMMANDS.DEFEND,
     }),
+  };
+
+  return {
+    ...state,
+    unitSquadIndex: state.squads.reduce((xs, x) => {
+      const units = x.squad.members.reduce(
+        (us, u) => us.set(u.id, x.id),
+        emptyUnitSquadIndex
+      );
+      return xs.merge(units);
+    }, emptyUnitSquadIndex),
   };
 };
 
-const createEnemyUnit = (squad: string) => (id: string) => ({
+const createEnemyUnit = (id: string) => ({
   ...createUnit(id),
-  squad,
   force: CPU_FORCE,
 });
 

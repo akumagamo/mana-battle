@@ -7,6 +7,7 @@ import { Board } from './Model';
 export default (board: Board, unit: Unit) => {
   const member = board.squad.members.get(unit.id);
 
+  if(!member) return;
   const { x, y } = getUnitPositionOnScreen(member);
 
   const chara = createChara({

@@ -1,10 +1,10 @@
-import { Chara } from '../Chara/Model';
-import { SquadRecord } from '../Squad/Model';
-import { Unit, UnitIndex } from '../Unit/Model';
-import makeUnitsDragable from './makeUnitsDragable';
-import { Board } from './Model';
-import createTiles from './placeTiles';
-import placeUnits from './placeUnits';
+import { Chara } from "../Chara/Model";
+import { SquadRecord } from "../Squad/Model";
+import { Unit, UnitIndex } from "../Unit/Model";
+import makeUnitsDragable from "./makeUnitsDragable";
+import { Board } from "./Model";
+import createTiles from "./placeTiles";
+import placeUnits from "./placeUnits";
 
 export default (
   scene: Phaser.Scene,
@@ -15,7 +15,7 @@ export default (
   scale = 1,
   front = true,
   isSelected = false,
-  interactive?: {
+  interactive: {
     onSquadUpdated: (
       squad: SquadRecord,
       added: string[],
@@ -23,6 +23,10 @@ export default (
     ) => void;
     onDragStart?: (unit: Unit, x: number, y: number, chara: Chara) => void;
     onDragEnd?: (chara: Chara) => (x: number, y: number) => void;
+  } = {
+    onSquadUpdated: () => {},
+    onDragStart: () => {},
+    onDragEnd: () => () => {},
   }
 ) => {
   const container = scene.add.container(x, y);
@@ -30,9 +34,9 @@ export default (
     mapWidth: 3,
     mapHeight: 3,
   });
-  const tileContainer = scene.add.container().setName('tileContainer')
-  tileContainer .add(tiles.map((t) => t.sprite));
-  container.add(tileContainer)
+  const tileContainer = scene.add.container().setName("tileContainer");
+  tileContainer.add(tiles.map((t) => t.sprite));
+  container.add(tileContainer);
   const board: Board = {
     scene,
     container,

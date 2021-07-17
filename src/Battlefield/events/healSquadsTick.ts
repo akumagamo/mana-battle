@@ -1,9 +1,9 @@
-import healByPercentage from '../../Unit/heal/healByPercentage';
-import { getSquadUnits, MapState } from '../Model';
+import healByPercentage from "../../Unit/heal/healByPercentage";
+import { getSquadUnits, MapState } from "../Model";
 
 export function healSquads(state: MapState) {
   state.squads
-    .filter((sqd) => sqd.status === 'guarding_fort')
+    .filter((sqd) => sqd.status === "guarding_fort")
     .forEach((sqd) => {
       getSquadUnits(state, sqd.id)
         .map((u) => healByPercentage(u, 10))

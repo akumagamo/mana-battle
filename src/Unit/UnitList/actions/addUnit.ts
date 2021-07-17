@@ -1,9 +1,9 @@
-import { Unit } from '../../Model';
-import { UnitList } from '../Model';
-import renderListItem from '../renderListItem';
+import { Unit } from "../../Model";
+import { UnitList } from "../Model";
+import renderListItem from "../renderListItem";
 
 export default (unitList: UnitList, unit: Unit) => {
-  unitList.units = unitList.units.push(unit);
+  unitList.units = unitList.units.set(unit.id, unit);
 
   if (unitList.units.size < unitList.itemsPerPage) {
     renderListItem(unitList, unit, unitList.units.size - 1);

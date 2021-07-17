@@ -1,11 +1,10 @@
-import { getMapSquad, MapSquad, MapState, Vector } from '../Model';
-import SquadClicked from '../events/SquadClicked';
-import { changeMode } from '../Mode';
-import selectCityCommand from '../commands/selectCityCommand';
-import { Set } from 'immutable';
-import { renderSelectionWindow } from './renderSelectionWindow';
-import { getDistance } from '../../utils';
-import { cellToScreenPosition } from './position';
+import { getMapSquad, MapSquad, MapState, Vector } from "../Model";
+import SquadClicked from "../events/SquadClicked";
+import { changeMode } from "../Mode";
+import selectCityCommand from "../commands/selectCityCommand";
+import { renderSelectionWindow } from "./renderSelectionWindow";
+import { getDistance } from "../../utils";
+import { cellToScreenPosition } from "./position";
 
 export default function selectCell(
   scene: Phaser.Scene,
@@ -14,16 +13,17 @@ export default function selectCell(
 ) {
   const mapSquads = squadsAt(state, x, y);
   const city = state.cities.find((c) => c.x === x && c.y === y);
+
   const selectSquad = (squad: MapSquad) => {
     changeMode(scene, state, {
-      type: 'SQUAD_SELECTED',
+      type: "SQUAD_SELECTED",
       id: squad.squad.id,
     });
     SquadClicked(scene).emit(squad);
   };
   if (mapSquads.size < 1 && !city) {
     return;
-  } else if (cellWithJustACity()) {
+  } else if (cellWithoutSquads() && city) {
     selectCityCommand(scene, state, city);
   } else if (cellWithJustASquad()) {
     const mapSquad = mapSquads.first() as MapSquad;
@@ -36,8 +36,8 @@ export default function selectCell(
     return mapSquads.size === 1 && !city;
   }
 
-  function cellWithJustACity() {
-    return mapSquads.size === 0 && city;
+  function cellWithoutSquads() {
+    return mapSquads.size === 0;
   }
 }
 

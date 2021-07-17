@@ -1,19 +1,19 @@
-import Phaser from 'phaser';
-import { Unit } from '../Model';
-import { Chara } from '../../Chara/Model';
-import { List } from 'immutable';
-import renderListItem from './renderListItem';
-import { UnitList } from './Model';
-import refresh from './actions/refresh';
-import { getRowPosition } from './actions/getRowPosition';
-import { GAME_SPEED } from '../../env';
+import Phaser from "phaser";
+import { UnitIndex } from "../Model";
+import { Chara } from "../../Chara/Model";
+import { List } from "immutable";
+import renderListItem from "./renderListItem";
+import { UnitList } from "./Model";
+import refresh from "./actions/refresh";
+import { getRowPosition } from "./actions/getRowPosition";
+import { GAME_SPEED } from "../../env";
 
 export default function (
   scene: Phaser.Scene,
   x: number,
   y: number,
   itemsPerPage: number,
-  units: List<Unit>,
+  units: UnitIndex,
   onRefresh: (c: List<Chara>) => void
 ): UnitList {
   const container = scene.add.container(x, y);
@@ -31,7 +31,7 @@ export default function (
 
   refresh(unitList, onRefresh);
 
-  scene.game.events.emit('UnitListSceneCreated', unitList);
+  scene.game.events.emit("UnitListSceneCreated", unitList);
   return unitList;
 }
 
@@ -41,7 +41,7 @@ export function reposition(unitList: UnitList, chara: Chara) {
   const pos = getRowPosition(
     unitList.container.x,
     unitList.container.y,
-    unitsToRender.findIndex((u) => u.id === chara.id)
+    unitsToRender.toList().findIndex((u) => u.id === chara.id)
   );
 
   unitList.scene.tweens.add({
@@ -49,7 +49,7 @@ export function reposition(unitList: UnitList, chara: Chara) {
     x: pos.x,
     y: pos.y,
     duration: 600 / GAME_SPEED,
-    ease: 'Cubic',
+    ease: "Cubic",
     repeat: 0,
     paused: false,
     yoyo: false,
@@ -60,7 +60,7 @@ export function scaleDown(unitList: UnitList, chara: Chara) {
     targets: chara.container,
     scale: 0.5,
     duration: 400,
-    ease: 'Cubic',
+    ease: "Cubic",
     repeat: 0,
     paused: false,
     yoyo: false,
@@ -72,7 +72,7 @@ export function scaleUp(scene: Phaser.Scene, chara: Chara) {
     targets: chara.container,
     scale: 1,
     duration: 400,
-    ease: 'Cubic',
+    ease: "Cubic",
     repeat: 0,
     paused: false,
     yoyo: false,
@@ -84,7 +84,7 @@ function getUnitsToRender({
   page,
   itemsPerPage,
 }: {
-  units: List<Unit>;
+  units: UnitIndex;
   page: number;
   itemsPerPage: number;
 }) {
@@ -93,5 +93,5 @@ function getUnitsToRender({
 
 export function renderRows(unitList: UnitList) {
   const unitsToRender = getUnitsToRender(unitList);
-  unitsToRender.map((u, i) => renderListItem(unitList, u, i));
+  unitsToRender.toIndexedSeq().map((u, i) => renderListItem(unitList, u, i));
 }

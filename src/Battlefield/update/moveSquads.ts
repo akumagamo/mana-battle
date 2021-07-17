@@ -1,17 +1,18 @@
-import {getDistance} from '../../utils';
-import {cellToScreenPosition} from '../board/position';
-import {MOVE_SPEED} from '../config';
-import finishMovement from './finishMovement';
-import stepChara from './stepChara';
-import {getChara, getMapSquad, MapState} from '../Model';
-import {checkCollision} from './checkCollision';
-import startCombat from '../squads/startCombat';
+import { getDistance } from "../../utils";
+import { cellToScreenPosition } from "../board/position";
+import { MOVE_SPEED } from "../config";
+import finishMovement from "./finishMovement";
+import stepChara from "./stepChara";
+import { getChara, getMapSquad, MapState } from "../Model";
+import { checkCollision } from "./checkCollision";
+import startCombat from "../squads/startCombat";
+import { getUnitSquad } from "../../Squad/Model";
 
 export default function (scene: Phaser.Scene, state: MapState) {
   const movedSquads = state.squadsInMovement.keySeq();
 
   state.squadsInMovement.forEach(async (value, squadId) => {
-    const {path, squad} = value;
+    const { path, squad } = value;
 
     const [head] = path;
 
@@ -33,11 +34,16 @@ export default function (scene: Phaser.Scene, state: MapState) {
     const collided = checkCollision(state)(id);
 
     if (collided) {
+      const squad = getUnitSquad(
+        collided.id,
+        state.squads.map((s) => s.squad),
+        state.unitSquadIndex
+      );
       startCombat(
         scene,
         state,
         getMapSquad(state, id),
-        getMapSquad(state, collided.props.unit.squad),
+        getMapSquad(state, squad.id)
       );
       return true;
     } else return false;

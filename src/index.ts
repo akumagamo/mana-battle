@@ -2,7 +2,6 @@ import { SCREEN_WIDTH, SCREEN_HEIGHT } from './constants';
 import OptionsScene from './Scenes/OptionsScene';
 import { ListSquadsScene } from './Squad/ListSquadsScene/ListSquadsScene';
 import CombatScene from './Combat/CombatScene';
-//import { endToEndTesting } from './endToEndTesting';
 import TitleScene from './Scenes/Title/TitleScene';
 import { Battlefield } from './Battlefield/MapScene';
 import CharaCreationScene from './CharaCreation/CharaCreationScene';

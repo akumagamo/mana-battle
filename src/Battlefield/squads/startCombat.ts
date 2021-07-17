@@ -1,19 +1,20 @@
-import createBoard from '../../Board/createBoard';
-import {PLAYER_FORCE, SCREEN_WIDTH, SCREEN_HEIGHT} from '../../constants';
-import {GAME_SPEED} from '../../env';
-import {delay} from '../../Scenes/utils';
-import panel from '../../UI/panel';
-import speech from '../../UI/speech';
-import {disableMapInput} from '../board/input';
-import {MapSquad, getSquadUnits, getSquadLeader, MapState} from '../Model';
-import {destroyUI} from '../ui';
-import attack from './attack';
+import createBoard from "../../Board/createBoard";
+import { PLAYER_FORCE, SCREEN_WIDTH, SCREEN_HEIGHT } from "../../constants";
+import { GAME_SPEED } from "../../env";
+import { INVALID_STATE } from "../../errors";
+import { delay } from "../../Scenes/utils";
+import panel from "../../UI/panel";
+import speech from "../../UI/speech";
+import { disableMapInput } from "../board/input";
+import { MapSquad, getSquadUnits, getSquadLeader, MapState } from "../Model";
+import { destroyUI } from "../ui";
+import attack from "./attack";
 
 export default async function (
   scene: Phaser.Scene,
   state: MapState,
   squadA: MapSquad,
-  squadB: MapSquad,
+  squadB: MapSquad
 ) {
   const baseX = 500;
   const baseY = 300;
@@ -22,8 +23,10 @@ export default async function (
   state.isPaused = true;
 
   const playerSquad = [squadA, squadB].find(
-    (sqd) => sqd.squad.force === PLAYER_FORCE,
+    (sqd) => sqd.squad.force === PLAYER_FORCE
   );
+
+  if (!playerSquad) throw new Error(INVALID_STATE);
 
   disableMapInput(state);
   destroyUI(state);
@@ -35,35 +38,35 @@ export default async function (
 
   const enemyUnits = getSquadUnits(state, squadB.id);
 
-  const {board: enemy} = createBoard(
+  const { board: enemy } = createBoard(
     scene,
     squadB.squad,
     enemyUnits,
     baseX + 10,
     baseY + 5,
     scale,
-    true,
+    true
   );
 
-  const alliedUnits = state.units.filter((u) => u.squad === squadA.id);
+  const alliedUnits = getSquadUnits(state, squadA.id);
 
-  const {board: ally} = createBoard(
+  const { board: ally } = createBoard(
     scene,
     squadA.squad,
     alliedUnits,
     baseX + 200,
     baseY + 100,
     scale,
-    false,
+    false
   );
 
   const speechWindow = speech(
     leader,
     450,
     70,
-    'Ready for Combat',
+    "Ready for Combat",
     state.uiContainer,
-    scene,
+    scene
   );
 
   await delay(scene, 3000 / GAME_SPEED);

@@ -141,8 +141,8 @@ function renderFrontWeapon(chara: Chara) {
     chara.rightHandEquip.setRotation(-0.2);
     chara.rightHandEquip.setPosition(3, 17);
 
-    chara.mainHandContainer.add(chara.rightHandEquip);
-    chara.mainHandContainer.sendToBack(chara.rightHandEquip);
+    chara.mainHandContainer?.add(chara.rightHandEquip);
+    chara.mainHandContainer?.sendToBack(chara.rightHandEquip);
   } else if (chara.props.unit.job === 'fighter') {
     chara.rightHandEquip = chara.scene.add.image(
       23,
@@ -153,8 +153,8 @@ function renderFrontWeapon(chara: Chara) {
     chara.rightHandEquip.setScale(0.2);
     chara.rightHandEquip.setOrigin(1, 1);
 
-    chara.mainHandContainer.add(chara.rightHandEquip);
-    chara.mainHandContainer.sendToBack(chara.rightHandEquip);
+    chara.mainHandContainer?.add(chara.rightHandEquip);
+    chara.mainHandContainer?.sendToBack(chara.rightHandEquip);
   } else if (chara.props.unit.job === 'archer') {
     chara.leftHandEquip = chara.scene.add.image(
       0,
@@ -162,10 +162,10 @@ function renderFrontWeapon(chara: Chara) {
       `equips/${chara.props.unit.equips.mainHand}`
     );
 
-    chara.offHandContainer.add(chara.leftHandEquip);
-    chara.offHandContainer.sendToBack(chara.leftHandEquip);
-    chara.leftHand.setPosition(5, 0);
-    chara.offHandContainer.sendToBack(chara.leftHandEquip);
+    chara.offHandContainer?.add(chara.leftHandEquip);
+    chara.offHandContainer?.sendToBack(chara.leftHandEquip);
+    chara.leftHand?.setPosition(5, 0);
+    chara.offHandContainer?.sendToBack(chara.leftHandEquip);
   }
 }
 
@@ -295,8 +295,8 @@ function renderBackWeapon(chara: Chara) {
     chara.rightHandEquip.setRotation(-0.2);
     chara.rightHandEquip.setPosition(3, 17);
 
-    chara.mainHandContainer.add(chara.rightHandEquip);
-    chara.mainHandContainer.sendToBack(chara.rightHandEquip);
+    chara.mainHandContainer?.add(chara.rightHandEquip);
+    chara.mainHandContainer?.sendToBack(chara.rightHandEquip);
   } else if (chara.props.unit.job === 'fighter') {
     chara.rightHandEquip = chara.scene.add.image(
       -10,
@@ -307,8 +307,8 @@ function renderBackWeapon(chara: Chara) {
     chara.rightHandEquip.setScale(-0.2, 0.2);
     chara.rightHandEquip.setOrigin(1, 1);
 
-    chara.mainHandContainer.add(chara.rightHandEquip);
-    chara.mainHandContainer.sendToBack(chara.rightHandEquip);
+    chara.mainHandContainer?.add(chara.rightHandEquip);
+    chara.mainHandContainer?.sendToBack(chara.rightHandEquip);
   } else if (chara.props.unit.job === 'archer') {
     chara.leftHandEquip = chara.scene.add.image(
       0,
@@ -317,10 +317,10 @@ function renderBackWeapon(chara: Chara) {
     );
     chara.leftHandEquip.rotation = 1;
 
-    chara.offHandContainer.add(chara.leftHandEquip);
-    chara.offHandContainer.sendToBack(chara.leftHandEquip);
-    chara.leftHand.setPosition(5, 0);
-    chara.offHandContainer.sendToBack(chara.leftHandEquip);
-    chara.offHandContainer.sendToBack(chara.leftHandEquip);
+    chara.offHandContainer?.add(chara.leftHandEquip);
+    chara.offHandContainer?.sendToBack(chara.leftHandEquip);
+    chara.leftHand?.setPosition(5, 0);
+    chara.offHandContainer?.sendToBack(chara.leftHandEquip);
+    chara.offHandContainer?.sendToBack(chara.leftHandEquip);
   }
 }

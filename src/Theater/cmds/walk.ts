@@ -1,5 +1,6 @@
 import run from "../../Chara/animations/run";
 import stand from "../../Chara/animations/stand";
+import { INVALID_STATE } from "../../errors";
 import { getDistance } from "../../utils";
 import TheaterScene from "../TheaterScene";
 export type Walk = {
@@ -12,7 +13,9 @@ export type Walk = {
 export const walk = async (scene: TheaterScene, { id, x, y }: Walk) => {
   const chara = scene.charas.get(scene.charaKey(id));
 
-  run(chara)
+  if (!chara) throw new Error(INVALID_STATE);
+
+  run(chara);
 
   const delta =
     getDistance({ x: chara.container.x, y: chara.container.y }, { x, y }) * 4;
@@ -24,7 +27,7 @@ export const walk = async (scene: TheaterScene, { id, x, y }: Walk) => {
       x,
       y,
       onComplete: () => {
-        stand(chara)
+        stand(chara);
         resolve();
       },
     });

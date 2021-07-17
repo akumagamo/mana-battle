@@ -41,7 +41,7 @@ export default function ui(
     });
   }
 
-  if (state.uiMode.type === 'NOTHING_SELECTED') return;
+  if (state.uiMode.type === 'NOTHING_SELECTED') return Promise.resolve();
 
   if (state.uiMode.type !== 'SELECT_SQUAD_MOVE_TARGET')
     panel(
@@ -70,7 +70,7 @@ export default function ui(
         );
       });
     default:
-      return;
+      return Promise.resolve();
   }
 }
 

@@ -1,10 +1,10 @@
-import onEnableDrag from '../Chara/events/onEnableDrag';
-import { Chara } from '../Chara/Model';
-import { SquadRecord } from '../Squad/Model';
-import { Unit } from '../Unit/Model';
-import changeUnitPositionInBoard from './changeUnitPositionInBoard';
-import onUnitDrag from './events/onUnitDrag';
-import { Board } from './Model';
+import onEnableDrag from "../Chara/events/onEnableDrag";
+import { Chara } from "../Chara/Model";
+import { SquadRecord } from "../Squad/Model";
+import { Unit } from "../Unit/Model";
+import changeUnitPositionInBoard from "./changeUnitPositionInBoard";
+import onUnitDrag from "./events/onUnitDrag";
+import { Board } from "./Model";
 
 export default (
   board: Board,
@@ -23,9 +23,9 @@ export default (
 export function makeUnitDragable(
   chara: Chara,
   board: Board,
-  onDragStart: (unit: Unit, x: number, y: number, chara: Chara) => void,
-  onDragEnd: (chara: Chara) => (x: number, y: number) => void,
-  onSquadUpdated: (
+  onDragStart?: (unit: Unit, x: number, y: number, chara: Chara) => void,
+  onDragEnd?: (chara: Chara) => (x: number, y: number) => void,
+  onSquadUpdated?: (
     squad: SquadRecord,
     added: string[],
     removed: string[]
@@ -40,7 +40,7 @@ export function makeUnitDragable(
       }
     },
     (c) => (x, y) => {
-      if (onDragEnd) {
+      if (onDragEnd && onSquadUpdated) {
         changeUnitPositionInBoard(
           board,
           { unit: c.props.unit, x, y },

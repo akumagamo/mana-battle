@@ -1,14 +1,18 @@
-import { Unit } from '../../Unit/Model';
-import TheaterScene from '../TheaterScene';
-import { createUnit } from './createUnit';
+import { INVALID_STATE } from "../../errors";
+import { Unit } from "../../Unit/Model";
+import TheaterScene from "../TheaterScene";
+import { createUnit } from "./createUnit";
 
 export type FlipUnit = {
-  type: 'FLIP';
+  type: "FLIP";
   unit: Unit;
 };
 
 export const flipUnit = (scene: TheaterScene, { unit }: FlipUnit) => {
   const chara = scene.charas.get(scene.charaKey(unit.id));
+
+  if (!chara) throw new Error(INVALID_STATE);
+
   const { x, y } = chara.container;
   const { front } = chara.props;
   chara.destroy();
@@ -19,7 +23,7 @@ export const flipUnit = (scene: TheaterScene, { unit }: FlipUnit) => {
     y,
     front: !front,
     showWeapon: false,
-    pose: '',
-    type: 'CREATE_UNIT',
+    pose: "",
+    type: "CREATE_UNIT",
   });
 };

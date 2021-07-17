@@ -1,13 +1,13 @@
-import { PLAYER_FORCE } from '../../../constants';
+import { PLAYER_FORCE } from "../../../constants";
 import {
   getCity,
   getForce,
   getForceSquads,
   MapState,
-} from '../../../Battlefield/Model';
-import { toMapSquad } from '../../../Unit/Model';
-import { ListSquadsScene } from '../../ListSquadsScene/ListSquadsScene';
-import { SquadRecord } from '../../Model';
+} from "../../../Battlefield/Model";
+import { toMapSquad } from "../../../Unit/Model";
+import { ListSquadsScene } from "../../ListSquadsScene/ListSquadsScene";
+import { SquadRecord } from "../../Model";
 
 const returnButtonClicked = (scene: Phaser.Scene, state: MapState) => (
   listSquadScene: ListSquadsScene
@@ -24,13 +24,14 @@ const returnButtonClicked = (scene: Phaser.Scene, state: MapState) => (
     }
   });
 
-  scene.scene.manager.stop('ListSquadsScene');
-  scene.scene.manager.start('MapScene', state);
+  scene.scene.manager.stop("ListSquadsScene");
+  scene.scene.manager.start("MapScene", state);
 };
 
 function addNewSquad(state: MapState, squad: SquadRecord) {
   const force = getForce(state, squad.force);
 
+  if (!force) return;
   // TODO: create 'addSquadToPhaser.Scene' method
   const city = getCity(state, force.initialPosition);
 

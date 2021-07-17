@@ -1,21 +1,26 @@
-import {List, Map} from 'immutable';
-import * as CombatScene from '../../Combat/CombatScene';
-import {PLAYER_FORCE} from '../../constants';
-import {GAME_SPEED} from '../../env';
-import {createSquad, Index} from '../../Squad/Model';
-import {fadeOut} from '../../UI/Transition';
-import {Unit} from '../../Unit/Model';
-import CombatInitiated from '../events/CombatInitiated';
-import ReturnedFromCombat from '../events/ReturnedFromCombat';
-import {getChara, getMapSquad, MapSquad, MapState} from '../Model';
-import turnOff from '../turnOff';
-import markSquadForRemoval from './markSquadForRemoval';
+import { List, Map } from "immutable";
+import * as CombatScene from "../../Combat/CombatScene";
+import { PLAYER_FORCE } from "../../constants";
+import { GAME_SPEED } from "../../env";
+import {
+  createSquad,
+  getSquadUnits,
+  getUnitSquad,
+  SquadIndex,
+} from "../../Squad/Model";
+import { fadeOut } from "../../UI/Transition";
+import { Unit } from "../../Unit/Model";
+import CombatInitiated from "../events/CombatInitiated";
+import ReturnedFromCombat from "../events/ReturnedFromCombat";
+import { getMapSquad, MapSquad, MapState } from "../Model";
+import turnOff from "../turnOff";
+import markSquadForRemoval from "./markSquadForRemoval";
 
 export default async function (
   scene: Phaser.Scene,
   state: MapState,
   starter: MapSquad,
-  target: MapSquad,
+  target: MapSquad
 ) {
   await fadeOut(scene, 1000 / GAME_SPEED);
 
@@ -25,10 +30,14 @@ export default async function (
 
   const combatCallback = (
     units: List<Unit>,
-    squadDamage: Map<string, number>,
+    squadDamage: Map<string, number>
   ) => {
     let squadsTotalHP = units.reduce((xs, unit) => {
-      let sqdId = unit.squad || '';
+      let sqdId = getUnitSquad(
+        unit.id,
+        state.squads.map((s) => s.squad),
+        state.unitSquadIndex
+      ).id;
 
       if (!xs[sqdId]) {
         xs[sqdId] = 0;
@@ -37,7 +46,7 @@ export default async function (
       xs[sqdId] += unit.currentHp;
 
       return xs;
-    }, {} as {[x: string]: number});
+    }, {} as { [x: string]: number });
 
     units.forEach((unit) => (state.units = state.units.set(unit.id, unit)));
 
@@ -53,13 +62,12 @@ export default async function (
     const winner = getMapSquad(state, sortedSquads.last());
 
     const direction = () => {
-      if (winner.pos.x < loser.pos.x) return 'right';
-      else if (winner.pos.x > loser.pos.x) return 'left';
-      else if (winner.pos.y < loser.pos.y) return 'bottom';
-      else if (winner.pos.y > loser.pos.y) return 'top';
+      if (winner.pos.x < loser.pos.x) return "right";
+      else if (winner.pos.x > loser.pos.x) return "left";
+      else if (winner.pos.y < loser.pos.y) return "bottom";
+      else if (winner.pos.y > loser.pos.y) return "top";
+      else return "top";
     };
-
-    console.log(`>>>`, winner, loser, direction());
 
     state.squadToPush = {
       winner: winner.id,
@@ -67,7 +75,7 @@ export default async function (
       direction: direction(),
     };
 
-    scene.scene.start('MapScene', state);
+    scene.scene.start("MapScene", state);
 
     ReturnedFromCombat(scene).emit(null);
   };
@@ -76,14 +84,10 @@ export default async function (
   CombatScene.start(scene, {
     squads: state.squads
       .filter((sqd) => [starter.id, target.id].includes(sqd.id))
-      .reduce((xs, x) => xs.set(x.id, createSquad(x.squad)), Map()) as Index,
-    units: state.units.filter((u) => [starter.id, target.id].includes(u.squad)),
-    // GOD mode
-    // .map((u) =>
-    //   u.id.startsWith("player")
-    //     ? { ...u, str: 999, dex: 999, hp: 999, currentHp: 999 }
-    //     : u
-    // ),
+      .reduce((xs, x) => xs.set(x.id, createSquad(x.squad)), Map()) as SquadIndex,
+    units: getSquadUnits(starter.id, state.units, state.unitSquadIndex).merge(
+      getSquadUnits(target.id, state.units, state.unitSquadIndex)
+    ),
     top: isPlayer ? target.id : starter.id,
     bottom: isPlayer ? starter.id : target.id,
     onCombatFinish: combatCallback,

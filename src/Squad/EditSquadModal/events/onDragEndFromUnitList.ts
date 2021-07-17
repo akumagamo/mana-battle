@@ -61,6 +61,8 @@ export default (
         (chara) => chara.props.unit.id === unitToReplace.id
       );
 
+      if(!charaToRemove) return;
+
       addUnit(unitList, charaToRemove.props.unit);
 
       board.scene.tweens.add({

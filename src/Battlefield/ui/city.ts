@@ -1,6 +1,6 @@
-import { Container } from '../../Models';
-import text from '../../UI/text';
-import { getCity, getForce, MapState } from '../Model';
+import { Container } from "../../Models";
+import text from "../../UI/text";
+import { getCity, getForce, MapState } from "../Model";
 
 export default async (
   scene: Phaser.Scene,
@@ -15,6 +15,7 @@ export default async (
 
   if (city.force) {
     const force = getForce(state, city.force);
-    text(1000, baseY, `Controlled by ${force.name}`, uiContainer, scene);
+    if (force)
+      text(1000, baseY, `Controlled by ${force.name}`, uiContainer, scene);
   }
 };

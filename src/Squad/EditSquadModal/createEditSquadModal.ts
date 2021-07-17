@@ -7,7 +7,7 @@ import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../../constants";
 import { Container } from "../../Models";
 import button from "../../UI/button";
 import panel from "../../UI/panel";
-import { Unit, UnitIndex } from "../../Unit/Model";
+import { getUnit, Unit, UnitIndex } from "../../Unit/Model";
 import SmallUnitDetailsBar from "../../Unit/SmallUnitDetailsBar";
 import createUnitList from "../../Unit/UnitList/createUnitList";
 import { UnitList } from "../../Unit/UnitList/Model";
@@ -30,6 +30,7 @@ export default function ({
   scene,
   squad,
   units,
+  unitSquadIndex,
   addUnitEnabled,
   onSquadUpdated,
   onClose,
@@ -38,6 +39,7 @@ export default function ({
   scene: Phaser.Scene;
   squad: Squad.SquadRecord;
   units: UnitIndex;
+  unitSquadIndex: Squad.UnitSquadIndex;
   addUnitEnabled: boolean;
   onSquadUpdated: (
     s: Squad.SquadRecord,
@@ -104,7 +106,7 @@ export default function ({
     30,
     30,
     5,
-    units.toList().filter((u) => !u.squad),
+    Squad.unitsWithoutSquad(unitSquadIndex, units),
     onListUpdated
   );
 
@@ -139,7 +141,7 @@ export default function ({
       300,
       SCREEN_HEIGHT - 200,
       board.scene,
-      units.find((u) => u.id === c.props.unit.id)
+      getUnit(c.id, units)
     );
     container.add(details);
   });

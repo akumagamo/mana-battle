@@ -51,7 +51,6 @@ export default function createUnit(
     elem: "neutral" as Elem,
     gender: randomItem(["male", "female"] as Gender[]),
     exp: 0,
-    squad: null,
     force: PLAYER_FORCE,
     style: {
       skinColor: randomItem(SKIN_COLORS),

@@ -1,7 +1,6 @@
+import {GAME_SPEED} from '../../env';
 import { Chara } from '../Model';
 import die from './die';
-
-const GAME_SPEED = parseInt(process.env.SPEED);
 
 export default (chara: Chara, isKilled: boolean) => {
   const FLINCH_DURATION = 200 / GAME_SPEED;

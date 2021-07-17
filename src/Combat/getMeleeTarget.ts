@@ -1,30 +1,41 @@
-import * as Squad from '../Squad/Model';
-import * as Unit from '../Unit/Model';
+import { INVALID_STATE } from "../errors";
+import * as Squad from "../Squad/Model";
+import * as Unit from "../Unit/Model";
 
 // TODO: this should receive alive members
 export function getMeleeTarget(
-  current: Unit.UnitInSquad,
+  current: Unit.Unit,
   unitIndex: Unit.UnitIndex,
-  squadIndex: Squad.Index
+  squadIndex: Squad.SquadIndex,
+  unitSquadIndex: Squad.UnitSquadIndex
 ): Squad.MemberRecord {
-  const aliveIndex = Squad.filterMembers((m) =>
-    Unit.isAlive(unitIndex.get(m.id))
-  )(squadIndex);
+  const aliveIndex = Squad.filterMembers((m) => {
+    const unit = unitIndex.get(m.id);
+    if (unit) return Unit.isAlive(unit);
+    else return false;
+  })(squadIndex);
 
-  const transposedIndex = Squad.mapMembers(Squad.transpose)(current.squad)(
-    aliveIndex
-  );
+  const squad = unitSquadIndex.get(current.id);
 
-  const units = Squad.rejectUnitsFromSquad(current.squad)(transposedIndex);
+  if (!squad) throw new Error(INVALID_STATE);
 
-  const get = (unitId: string, squadId: string) =>
-    transposedIndex.get(squadId).members.get(unitId);
+  const transposedIndex = Squad.mapMembers(Squad.transpose)(squad)(aliveIndex);
+
+  const units = Squad.rejectUnitsFromSquad(squad)(transposedIndex);
+
+  const get = (unitId: string) => {
+    const squadId = unitSquadIndex.get(unitId);
+
+    if (!squadId) throw new Error(INVALID_STATE);
+
+    return transposedIndex.get(squadId)?.members.get(unitId);
+  };
 
   const sorted = units
     .map((unit) => ({
       distance:
-        Math.abs(unit.x - get(current.id, current.squad).x) +
-        Math.abs(unit.y - get(current.id, current.squad).y),
+        Math.abs(unit.x - (get(current.id)?.x || 0)) +
+        Math.abs(unit.y - (get(current.id)?.y || 0)),
       unit,
     }))
     .sort((a, b) => a.distance - b.distance);

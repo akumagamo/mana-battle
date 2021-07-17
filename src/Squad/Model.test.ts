@@ -24,8 +24,8 @@ test("Generates squads", () => {
 test("Should get members", () => {
   const squad = givenASquadWithTwoMembers();
 
-  expect(getMember("u1", squad).id).toBe("u1");
-  expect(getMember("u2", squad).id).toBe("u2");
+  expect(getMember("u1", squad)?.id).toEqual("u1");
+  expect(getMember("u2", squad)?.id).toBe("u2");
 });
 
 test("Should add new members", () => {
@@ -34,7 +34,7 @@ test("Should add new members", () => {
     makeMember({ id: "u3" })
   );
 
-  expect(getMember("u3", squad).id).toBe("u3");
+  expect(getMember("u3", squad)?.id).toBe("u3");
 });
 
 test("Should change leader", () => {
@@ -50,14 +50,14 @@ test("Should get leader", () => {
   expect(defaultSquad.leader).toBe("u1");
   const leader = getLeader(defaultSquad);
 
-  expect(leader.id).toBe("u1");
+  expect(leader?.id).toBe("u1");
 });
 
 test("Should remove member", () => {
   const squad = removeMember("u1", givenASquadWithTwoMembers());
 
   expect(squad.members.size).toBe(1);
-  expect(getMember("u2", squad).id).toBe("u2");
+  expect(getMember("u2", squad)?.id).toBe("u2");
 });
 test("Should update position", () => {
   const defaultSquad = givenASquadWithTwoMembers();

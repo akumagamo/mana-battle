@@ -1,14 +1,15 @@
-import { Scene } from 'phaser';
-import { MapSquad } from '../Model';
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../../constants';
-import { Container } from '../../Models';
-import button from '../../UI/button';
-import { Unit, UnitIndex } from '../../Unit/Model';
-import SmallUnitDetailsBar from '../../Unit/SmallUnitDetailsBar';
-import { findMember } from '../../Squad/Model';
-import onBoardUnitClicked from '../../Board/events/onBoardUnitClicked';
-import createStaticBoard from '../../Board/createBoard';
-import highlightTile from '../../Board/highlightTile';
+import { Scene } from "phaser";
+import { MapSquad } from "../Model";
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../constants";
+import { Container } from "../../Models";
+import button from "../../UI/button";
+import { Unit, UnitIndex } from "../../Unit/Model";
+import SmallUnitDetailsBar from "../../Unit/SmallUnitDetailsBar";
+import { findMember } from "../../Squad/Model";
+import onBoardUnitClicked from "../../Board/events/onBoardUnitClicked";
+import createStaticBoard from "../../Board/createBoard";
+import highlightTile from "../../Board/highlightTile";
+import { INVALID_STATE } from "../../errors";
 
 export default (
   scene: Phaser.Scene,
@@ -20,6 +21,8 @@ export default (
     (m) => m.id === mapSquad.squad.leader,
     mapSquad.squad
   );
+
+  if (!leader) throw new Error(INVALID_STATE);
 
   let charaStats = scene.add.container(0, 0);
 
@@ -51,13 +54,13 @@ export default (
   const tile = board.tiles.find(
     (t) => t.boardX === leader.x && t.boardY === leader.y
   );
-  highlightTile(board, tile);
+  if(tile) highlightTile(board, tile);
 
   const defaultUnit = units.find((u) => u.id === leader.id);
 
-  detailsBar(defaultUnit);
+  if(defaultUnit) detailsBar(defaultUnit);
 
-  button(1050, 550, 'Close', container, scene, () => {
+  button(1050, 550, "Close", container, scene, () => {
     charaStats.destroy();
     backdrop_.destroy();
     container.destroy();
@@ -75,7 +78,7 @@ function backdrop(scene: Phaser.Scene) {
 
 function renderUnitDetailsBar(
   scene: Scene,
-  details: Container,
+  details: Container | null,
   parent: Container
 ) {
   return function (unit: Unit) {

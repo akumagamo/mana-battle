@@ -1,8 +1,9 @@
-import { makeMember, SquadRecord, updateMember } from '../Squad/Model';
-import { Unit } from '../Unit/Model';
-import findTileByXY from './findTileByXY';
-import { Board } from './Model';
-import animateUnitToBoardTile from './animateUnitToBoardTile';
+import { makeMember, SquadRecord, updateMember } from "../Squad/Model";
+import { Unit } from "../Unit/Model";
+import findTileByXY from "./findTileByXY";
+import { Board } from "./Model";
+import animateUnitToBoardTile from "./animateUnitToBoardTile";
+import { INVALID_STATE } from "../errors";
 
 export default (
   board: Board,
@@ -27,6 +28,9 @@ export default (
     animateUnitToBoardTile(board, unit.id);
   } else {
     const previousPosition = board.squad.members.get(unit.id);
+
+    if (!previousPosition) throw new Error(INVALID_STATE);
+
     const existing = board.squad.members.find(
       (m) => m.x === tile.boardX && m.y === tile.boardY
     );
@@ -34,10 +38,10 @@ export default (
     const updatedSquad = updateMember(
       board.squad,
       makeMember({ id: unit.id, x: tile.boardX, y: tile.boardY })
-    ).update('members', (members) => {
+    ).update("members", (members) => {
       if (existing)
         return members.update(existing.id, (member) =>
-          member.set('x', previousPosition.x).set('y', previousPosition.y)
+          member.set("x", previousPosition.x).set("y", previousPosition.y)
         );
       else return members;
     });

@@ -1,19 +1,19 @@
-import { List } from 'immutable';
-import { equals } from '../test/utils';
-import { squadGenerator } from './generator';
-import { makeMember } from './Model';
+import { List } from "immutable";
+import { equals } from "../test/utils";
+import { squadGenerator } from "./generator";
+import { makeMember } from "./Model";
 
-test('generates units', () => {
-  const squadId = 'SQD1';
+test("generates units", () => {
+  const squadId = "SQD1";
 
   const { squad, units } = squadGenerator(
     squadId,
     [
-      ['fighter', [2, 1]],
-      ['archer', [2, 2]],
+      ["fighter", [2, 1]],
+      ["archer", [2, 2]],
     ],
     22,
-    'TEST_FORCE'
+    "TEST_FORCE"
   );
 
   expect(squad.id).toBe(squadId);
@@ -40,12 +40,15 @@ test('generates units', () => {
     })
   );
 
-  equals(units.get(unit1Id).job, 'fighter');
-  equals(units.get(unit2Id).job, 'archer');
+  const get = (id: string) => {
+    const unit = units.get(id);
+    if (!unit) throw new Error("Non existing id");
+    return unit;
+  };
 
-  equals(units.get(unit1Id).lvl, 22);
-  equals(units.get(unit2Id).lvl, 22);
+  equals(get(unit1Id).job, "fighter");
+  equals(get(unit2Id).job, "archer");
 
-  equals(units.get(unit1Id).squad, squadId);
-  equals(units.get(unit2Id).squad, squadId);
+  equals(get(unit1Id).lvl, 22);
+  equals(get(unit2Id).lvl, 22);
 });

@@ -10,8 +10,8 @@ export default (chara: Chara, onComplete: () => void) => {
   chara.props.scene.tweens.add({
     targets: chara.mainHandContainer,
     yoyo: true,
-    x: chara.mainHandContainer?.x + (chara.props.front ? -5 : 5),
-    y: chara.mainHandContainer?.y - 5,
+    x: chara.mainHandContainer?.x || 0 + (chara.props.front ? -5 : 5),
+    y: chara.mainHandContainer?.y || 0 - 5,
     duration: ATTACK_DURATION / GAME_SPEED,
     ease: "ExpoOut",
     onComplete: () => {
@@ -23,8 +23,8 @@ export default (chara: Chara, onComplete: () => void) => {
     targets: chara.offHandContainer,
     yoyo: true,
     rotation: chara.props.front ? -1.2 : 0.5,
-    x: chara.offHandContainer.x + (chara.props.front ? 5 : -5),
-    Y: chara.offHandContainer.y - 5,
+    x: chara.offHandContainer?.x || 0 + (chara.props.front ? 5 : -5),
+    Y: chara.offHandContainer?.y || 0 - 5,
     duration: ATTACK_DURATION / GAME_SPEED,
     ease: "ExpoOut",
   });

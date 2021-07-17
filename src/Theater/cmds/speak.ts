@@ -13,6 +13,8 @@ export type Speak = {
 export const speak = (scene: TheaterScene, { id, text: text_ }: Speak) => {
   const chara = scene.charas.get(scene.charaKey(id));
 
+  if(!chara) return;
+
   const PANEL_HEIGHT = 200;
   const y = SCREEN_HEIGHT - PANEL_HEIGHT;
   const container = scene.add.container(0, y);

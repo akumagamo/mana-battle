@@ -7,7 +7,7 @@ import { Scene } from "phaser";
  * Rendering a couple words can vary between 15ms and 60ms.
  * */
 
-let metrics: Phaser.Types.GameObjects.Text.TextMetrics | null = null;
+let metrics: Phaser.Types.GameObjects.Text.TextMetrics | undefined = undefined;
 
 export default (
   x: number,

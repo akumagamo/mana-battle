@@ -1,6 +1,5 @@
 import { Container, Image } from '../Models';
 import { Chara } from '../Chara/Model';
-import { Graphics } from '../Models';
 import { Unit, UnitIndex } from '../Unit/Model';
 import { SquadRecord } from '../Squad/Model';
 

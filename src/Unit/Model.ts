@@ -1,17 +1,26 @@
 import { Modifier, ItemSlot, ItemMap } from "../Item/Model";
 import { sum } from "../utils/math";
 import { MapSquad, Vector } from "../Battlefield/Model";
-import { SquadRecord } from "../Squad/Model";
+import { SquadRecord, UnitSquadIndex } from "../Squad/Model";
 import { Map } from "immutable";
 import { cellToScreenPosition } from "../Battlefield/board/position";
 import { CPU_FORCE } from "../constants";
+import { INVALID_STATE } from "../errors";
 
 // todo: refactor all operations that perform transformations on units and unitindexes
 // to use functions from here
 
-export type UnitIndex = Map<string, UnitInSquad>;
+export type UnitIndex = Map<string, Unit>;
 
-export const emptyIndex = Map() as UnitIndex;
+export const emptyUnitIndex = Map() as UnitIndex;
+
+export const getUnit = (id: string, index: UnitIndex) => {
+  const unit = index.get(id);
+
+  if (!unit) throw new Error(`INVALID_STATE - failed to get unit ${id} on provided index`);
+
+  return unit;
+};
 
 export type Stat = "str" | "dex" | "int";
 export const statLabels: {
@@ -54,7 +63,6 @@ export type Unit = {
   job: UnitJobs;
   gender: Gender;
   movement: Movement;
-  squad: string | null; // todo: remove
   force: string;
   lvl: number;
   hp: number;
@@ -81,7 +89,6 @@ export const createUnit = (id: string): Unit => ({
   job: "fighter",
   gender: "male" as Gender,
   movement: "plain", // this should belong to a job
-  squad: null,
   force: CPU_FORCE,
   lvl: 1,
   hp: 50,
@@ -106,17 +113,7 @@ export const createUnit = (id: string): Unit => ({
   elem: "fire",
 });
 
-export type UnitInSquad = Unit & { squad: string };
-
-export function assignSquad(unit: Unit, squad: string): UnitInSquad {
-  return { ...unit, squad };
-}
-
-export function toMapSquad(
-  squad: SquadRecord,
-  pos: Vector,
-  dispatchTime = 0
-): MapSquad {
+export function toMapSquad(squad: SquadRecord, pos: Vector): MapSquad {
   return {
     id: squad.id,
     squad,
@@ -177,5 +174,7 @@ export function isAlive(unit: Unit) {
   return unit.currentHp > 0;
 }
 
-export const unitsWithoutSquad = (unitMap: UnitIndex) =>
-  unitMap.filter((unit) => unit.squad === null);
+export const unitsWithoutSquad = (
+  unitMap: UnitIndex,
+  unitSquadIndex: UnitSquadIndex
+) => unitMap.filter((unit) => !unitSquadIndex.get(unit.id));

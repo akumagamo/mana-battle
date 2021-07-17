@@ -1,14 +1,13 @@
-import { maybeZero } from '../../utils';
-import upAndDown from './upAndDown';
-import defaultPose from './defaultPose';
-import { Chara } from '../Model';
-
-const GAME_SPEED = parseInt(process.env.SPEED);
+import { maybeZero } from "../../utils";
+import upAndDown from "./upAndDown";
+import defaultPose from "./defaultPose";
+import { Chara } from "../Model";
+import { GAME_SPEED } from "../../env";
 
 const front = (chara: Chara) => {
   chara.scene.add.tween({
     targets: chara.leftFoot,
-    x: chara.leftFoot.x - 20,
+    x: chara.leftFoot?.x || 0 - 20,
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
@@ -17,7 +16,7 @@ const front = (chara: Chara) => {
 
   chara.scene.add.tween({
     targets: chara.rightFoot,
-    x: chara.rightFoot.x + 10,
+    x: chara.rightFoot?.x || 0 + 10,
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
@@ -26,7 +25,7 @@ const front = (chara: Chara) => {
 
   chara.scene.add.tween({
     targets: chara.leftHand,
-    x: chara.leftHand.x + 3,
+    x: chara.leftHand?.x || 0 + 3,
     yoyo: true,
     rotation: -0.2,
     repeat: -1,
@@ -35,7 +34,7 @@ const front = (chara: Chara) => {
 
   chara.scene.add.tween({
     targets: chara.mainHandContainer,
-    x: chara.mainHandContainer.x - 3,
+    x: chara.mainHandContainer?.x || 0 - 3,
     yoyo: true,
     rotation: -0.2,
     repeat: -1,

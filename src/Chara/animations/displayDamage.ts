@@ -1,7 +1,7 @@
-import text from '../../UI/text';
-import { Chara } from '../Model';
+import { GAME_SPEED } from "../../env";
+import text from "../../UI/text";
+import { Chara } from "../Model";
 
-const GAME_SPEED = parseInt(process.env.SPEED);
 export function displayDamage(chara: Chara, damage: number) {
   const dmg = text(
     -20,
@@ -11,9 +11,9 @@ export function displayDamage(chara: Chara, damage: number) {
     chara.props.scene
   );
   dmg.setScale(2);
-  dmg.setShadow(2, 2, '#000');
-  dmg.setStroke('#000000', 4);
-  dmg.setAlign('center');
+  dmg.setShadow(2, 2, "#000");
+  dmg.setStroke("#000000", 4);
+  dmg.setAlign("center");
   dmg.setDepth(Infinity);
 
   chara.props.scene.tweens.add({

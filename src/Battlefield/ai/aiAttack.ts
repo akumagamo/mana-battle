@@ -1,20 +1,14 @@
-import { Vector } from 'matter';
-import { PLAYER_FORCE } from '../../constants';
-import { getPathTo } from '../api';
-import { screenToCellPosition } from '../board/position';
-import {
-  getForceCities,
-  getForceSquads,
-  getMapSquad,
-  MapState,
-} from '../Model';
-import moveSquadTo from '../squads/moveSquadTo';
+import { PLAYER_FORCE } from "../../constants";
+import { getPathTo } from "../api";
+import { screenToCellPosition } from "../board/position";
+import { getForceCities, getMapSquad, MapState } from "../Model";
+import moveSquadTo from "../squads/moveSquadTo";
 
 export default function (scene: Phaser.Scene, state: MapState) {
   state.ai = state.ai.map((cmd, eid) => {
-    if (cmd === 'DEFEND') {
+    if (cmd === "DEFEND") {
       return cmd;
-    } else if (cmd === 'ATTACK') {
+    } else if (cmd === "ATTACK") {
       const squad = getMapSquad(state, eid);
       const cities = getForceCities(state, PLAYER_FORCE);
 
@@ -31,13 +25,15 @@ export default function (scene: Phaser.Scene, state: MapState) {
         })
         .sort((a, b) => a.distance - b.distance);
 
-      if (distances.length < 1) return;
+      if (distances.length < 1) return "DEFEND";
 
       const [target] = distances;
 
       moveSquadTo(scene, state, squad.id, target.target);
 
-      return 'MOVING';
+      return "MOVING";
     }
+
+    return cmd;
   });
 }

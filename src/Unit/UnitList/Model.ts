@@ -1,7 +1,7 @@
 import { List } from 'immutable';
 import { Chara } from '../../Chara/Model';
 import { Container } from '../../Models';
-import { Unit } from '../Model';
+import { UnitIndex } from '../Model';
 
 export type UnitList = {
   scene: Phaser.Scene;
@@ -10,11 +10,12 @@ export type UnitList = {
   x: number;
   y: number;
   itemsPerPage: number;
-  units: List<Unit>;
+  units: UnitIndex;
   charas: List<Chara>;
 };
 
 export const destroy = (unitList: UnitList) => {
   unitList.container.destroy();
-  unitList = null;
+  // TODO: remove reference to parent object
+  //unitList = null;
 };
