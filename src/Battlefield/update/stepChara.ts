@@ -1,4 +1,5 @@
 import { Chara } from "../../Chara/Model";
+import { GAME_SPEED } from "../../env";
 import { MOVE_SPEED } from "../config";
 import { MapSquad, MapState } from "../Model";
 
@@ -9,23 +10,23 @@ export default function (
   chara: Chara
 ): void {
   if (next.x > squad.pos.x) {
-    const nextStep = squad.pos.x + MOVE_SPEED;
+    const nextStep = squad.pos.x + MOVE_SPEED * GAME_SPEED;
     if (nextStep > next.x) squad.pos.x = next.x;
     else squad.pos.x = nextStep;
 
     chara.innerWrapper.scaleX = 1;
   } else if (next.x < squad.pos.x) {
-    const nextStep = squad.pos.x - MOVE_SPEED;
+    const nextStep = squad.pos.x - MOVE_SPEED * GAME_SPEED;
     if (nextStep < next.x) squad.pos.x = next.x;
     else squad.pos.x = nextStep;
 
     chara.innerWrapper.scaleX = -1;
   } else if (next.y > squad.pos.y) {
-    const nextStep = squad.pos.y + MOVE_SPEED;
+    const nextStep = squad.pos.y + MOVE_SPEED * GAME_SPEED;
     if (nextStep > next.y) squad.pos.y = next.y;
     else squad.pos.y = nextStep;
   } else if (next.y < squad.pos.y) {
-    const nextStep = squad.pos.y - MOVE_SPEED;
+    const nextStep = squad.pos.y - MOVE_SPEED * GAME_SPEED;
     if (nextStep < next.y) squad.pos.y = next.y;
     else squad.pos.y = nextStep;
   }

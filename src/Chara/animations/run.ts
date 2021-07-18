@@ -46,7 +46,7 @@ const front = (chara: Chara, speed: number = 1) => {
     y: chara.innerWrapper.y - 20,
     yoyo: true,
     repeat: -1,
-    duration: (500 / GAME_SPEED) * speed,
+    duration: (100 / GAME_SPEED) * speed,
   });
 };
 
@@ -105,6 +105,6 @@ export default (chara: Chara, speed?: number) => {
   if (chara.props.front) {
     front(chara, speed);
   } else {
-    back(chara);
+    back(chara, speed);
   }
 };
