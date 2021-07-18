@@ -10,10 +10,10 @@ it("Should heal injuried units in towns", () => {
     units: state.units.merge(
       getSquadUnits(state, "squad1").map((u) => ({ ...u, currentHp: 10 }))
     ),
-    squads: state.squads.update("squad1", (sqd) => ({
-      ...sqd,
-      status: "guarding_fort" as MapSquadStatus,
-    })),
+    squads: state.squads.setIn(
+      ["squad1", "status"],
+      "guarding_fort" as MapSquadStatus
+    ),
   };
   healSquads(state);
 
@@ -30,10 +30,10 @@ it("Should not heal injuried units in squads not guarding towns", () => {
     units: state.units.merge(
       getSquadUnits(state, "squad1").map((u) => ({ ...u, currentHp: 10 }))
     ),
-    squads: state.squads.update("squad1", (sqd) => ({
-      ...sqd,
-      status: "moving" as MapSquadStatus,
-    })),
+    squads: state.squads.setIn(
+      ["squad1", "status"],
+      "moving" as MapSquadStatus
+    ),
   };
   healSquads(state);
 

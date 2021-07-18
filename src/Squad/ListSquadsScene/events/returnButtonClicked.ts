@@ -8,6 +8,7 @@ import {
 import { toMapSquad } from "../../../Unit/Model";
 import { ListSquadsScene } from "../../ListSquadsScene/ListSquadsScene";
 import { SquadRecord } from "../../Model";
+import { INVALID_STATE } from "../../../errors";
 
 const returnButtonClicked = (scene: Phaser.Scene, state: MapState) => (
   listSquadScene: ListSquadsScene
@@ -40,10 +41,10 @@ function addNewSquad(state: MapState, squad: SquadRecord) {
 }
 
 function updateExistingSquad(state: MapState, squad: SquadRecord) {
-  state.squads = state.squads.update(squad.id, (sqd) => ({
-    ...sqd,
-    squad: squad,
-  }));
+  const mapSquad = state.squads.get(squad.id);
+  if (!mapSquad) throw new Error(INVALID_STATE);
+  mapSquad.squad = squad;
+  state.squads = state.squads.set(squad.id, mapSquad);
 }
 
 function removeDisbandedSquads(

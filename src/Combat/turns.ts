@@ -324,11 +324,13 @@ function slash(state: TurnState, commands: Command[]) {
     unitSquadIndex
   );
 
+  const currentSquadDamage = squadDamage.get(currentSquad.id) || 0;
+
   return {
     commands: commands.concat([move, slash, returnCmd]),
     updatedUnits,
     remainingAttacks: updatedRemainingAttacksIndex,
-    squadDamage: squadDamage.update(currentSquad.id, (n) => n + damage),
+    squadDamage: squadDamage.set(currentSquad.id, currentSquadDamage + damage),
   };
 }
 
@@ -380,11 +382,13 @@ function shoot(state: TurnState, commands: Command[]) {
     unitSquadIndex
   );
 
+  const currentSquadDamage = squadDamage.get(currentSquad.id) || 0;
+
   return {
     commands: commands.concat([shoot]),
     updatedUnits,
     remainingAttacks: updatedRemainingAttacksIndex,
-    squadDamage: squadDamage.update(currentSquad.id, (n) => n + damage),
+    squadDamage: squadDamage.set(currentSquad.id, currentSquadDamage + damage),
   };
 }
 function fireball(state: TurnState, commands: Command[]) {
@@ -435,11 +439,13 @@ function fireball(state: TurnState, commands: Command[]) {
     unitSquadIndex
   );
 
+  const currentSquadDamage = squadDamage.get(currentSquad.id) || 0;
+
   return {
     commands: commands.concat([shoot]),
     updatedUnits,
     remainingAttacks: updatedRemainingAttacksIndex,
-    squadDamage: squadDamage.update(currentSquad.id, (n) => n + damage),
+    squadDamage: squadDamage.set(currentSquad.id, currentSquadDamage + damage),
   };
 }
 

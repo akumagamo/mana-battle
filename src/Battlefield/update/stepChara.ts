@@ -19,7 +19,6 @@ export default function (
     const nextStep = squad.posScreen.x - MOVE_SPEED * GAME_SPEED;
     if (nextStep < next.x) squad.posScreen.x = next.x;
     else squad.posScreen.x = nextStep;
-
     chara.innerWrapper.scaleX = -1;
   } else if (next.y > squad.posScreen.y) {
     const nextStep = squad.posScreen.y + MOVE_SPEED * GAME_SPEED;
@@ -31,9 +30,5 @@ export default function (
     else squad.posScreen.y = nextStep;
   }
   chara.container.setPosition(squad.posScreen.x, squad.posScreen.y);
-  // TODO: update squad + add single source of "squad truth"
-  state.squads = state.squads.update(squad.id, (sqd) => ({
-    ...sqd,
-    posScreen: squad.posScreen,
-  }));
+  state.squads = state.squads.set(squad.id, squad);
 }

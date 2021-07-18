@@ -40,9 +40,9 @@ export default (
       makeMember({ id: unit.id, x: tile.boardX, y: tile.boardY })
     ).update("members", (members) => {
       if (existing)
-        return members.update(existing.id, (member) =>
-          member.set("x", previousPosition.x).set("y", previousPosition.y)
-        );
+        return members
+          .setIn([existing.id, "x"], previousPosition.x)
+          .setIn([existing.id, "y"], previousPosition.y);
       else return members;
     });
 
