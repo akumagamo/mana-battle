@@ -37,6 +37,15 @@ jobs:
 
     - name: Copy index
       run: cp src/index.html dist/index.html
+
+    - name: Create dist for bundle
+      run: mkdir dist/dist/
+
+    - name: Copy bunble
+      run: mv dist/bundle.js dist/dist/bundle.js
+
+    - name: Copy bunble
+      run: mv dist/bundle.js.LICENSE.txt dist/dist/bundle.js.LICENSE.txt
     
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
