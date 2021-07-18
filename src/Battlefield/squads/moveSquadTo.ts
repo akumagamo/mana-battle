@@ -1,15 +1,9 @@
-import {Vector} from 'matter';
-import {PLAYER_FORCE} from '../../constants';
-import {getPathTo} from '../api';
-import {screenToCellPosition} from '../board/position';
-import {changeMode} from '../Mode';
-import {getMapSquad, MapState} from '../Model';
+import { Vector } from "matter";
+import { getPathTo } from "../api";
+import { screenToCellPosition } from "../board/position";
+import { getMapSquad, MapState } from "../Model";
 
-export default async function (
-  state: MapState,
-  id: string,
-  target: Vector,
-) {
+export default function (state: MapState, id: string, target: Vector) {
   const squad = getMapSquad(state, id);
 
   const grid = makeWalkableGrid(state);
@@ -33,6 +27,6 @@ function makeWalkableGrid(state: MapState): number[][] {
       if (cell === 3) return 1;
       // 3 => Water
       else return 0;
-    }),
+    })
   );
 }

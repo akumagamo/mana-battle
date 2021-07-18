@@ -12,13 +12,14 @@ export async function issueSquadMoveOrder(
   id: string
 ) {
   const squad = getMapSquad(state, id);
+
   if (squad && squad.squad.force === PLAYER_FORCE) {
     state.isPaused = false;
 
     const cell = screenToCellPosition(squad.posScreen);
 
     if ((cell.x !== x || cell.y !== y) && state.cells[y][x] !== 3) {
-      await moveSquadTo(state, id, { x, y });
+      moveSquadTo(state, id, { x, y });
       state.squads = state.squads.setIn([id, "status"], "moving");
       const chara = getChara(state, id);
       animateSquadRun(chara);
