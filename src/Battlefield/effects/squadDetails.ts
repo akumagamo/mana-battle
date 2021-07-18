@@ -60,7 +60,7 @@ export default (
 
   if(defaultUnit) detailsBar(defaultUnit);
 
-  button(1050, 550, "Close", container, scene, () => {
+  button(1050, 480, "Close", container, scene, () => {
     charaStats.destroy();
     backdrop_.destroy();
     container.destroy();

@@ -1,7 +1,6 @@
 import createBoard from "../../Board/createBoard";
 import onBoardUnitClicked from "../../Board/events/onBoardUnitClicked";
 import { Board } from "../../Board/Model";
-import onEnableDrag from "../../Chara/events/onEnableDrag";
 import { Chara } from "../../Chara/Model";
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../../constants";
 import { Container } from "../../Models";
@@ -15,6 +14,7 @@ import { createEvent } from "../../utils";
 import * as Squad from "../Model";
 import onDragEndFromUnitList from "./events/onDragEndFromUnitList";
 import onDragFromUnitList from "./events/onDragFromUnitList";
+import onEnableDrag from "../../Chara/events/onEnableDrag";
 import { onCloseModal } from "./events/onCloseModal";
 import { List } from "immutable";
 import handleUnitDrag from "../../Unit/UnitList/actions/handleUnitDrag";
@@ -61,6 +61,8 @@ export default function ({
     false,
     {
       onSquadUpdated: onSquadUpdated,
+      onDragStart: () => {},
+      onDragEnd: () => () => {},
     }
   );
 
@@ -145,8 +147,8 @@ export default function ({
     container.add(details);
   });
   button(
-    SCREEN_WIDTH - 200,
-    SCREEN_HEIGHT - 200,
+    SCREEN_WIDTH - 210,
+    SCREEN_HEIGHT - 50,
     "Confirm",
     container,
     board.scene,
