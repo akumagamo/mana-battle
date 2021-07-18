@@ -17,7 +17,7 @@ export async function issueSquadMoveOrder(
 
     const cell = screenToCellPosition(squad.posScreen);
 
-    if (cell.x !== x || cell.y !== y) {
+    if ((cell.x !== x || cell.y !== y) && state.cells[y][x] !== 3) {
       await moveSquadTo(state, id, { x, y });
       state.squads = state.squads.setIn([id, "status"], "moving");
       const chara = getChara(state, id);
