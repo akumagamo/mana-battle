@@ -99,8 +99,8 @@ export const handleDispatchSquad = async (
   signal(scene, state, 'clicked dispatch squad button', [
     {
       type: 'MOVE_CAMERA_TO',
-      x: squad.pos.x,
-      y: squad.pos.y,
+      x: squad.posScreen.x,
+      y: squad.posScreen.y,
       duration: 500,
     },
   ]);

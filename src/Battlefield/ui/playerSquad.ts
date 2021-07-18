@@ -59,7 +59,7 @@ export function handleMovePlayerSquadButtonClicked({
   changeMode(scene, state, {
     type: "SELECT_SQUAD_MOVE_TARGET",
     id: mapSquad.id,
-    start: mapSquad.pos,
+    start: mapSquad.posScreen,
   });
   state.isPaused = true;
 }

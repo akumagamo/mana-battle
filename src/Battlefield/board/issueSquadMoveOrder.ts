@@ -15,14 +15,11 @@ export async function issueSquadMoveOrder(
   if (squad && squad.squad.force === PLAYER_FORCE) {
     state.isPaused = false;
 
-    const cell = screenToCellPosition(squad.pos);
+    const cell = screenToCellPosition(squad.posScreen);
 
     if (cell.x !== x || cell.y !== y) {
       await moveSquadTo(state, id, { x, y });
-      state.squads = state.squads.update(id, (sqd) => ({
-        ...sqd,
-        status: "moving",
-      }));
+      state.squads = state.squads.setIn([id, "status"], "moving");
       const chara = getChara(state, id);
       animateSquadRun(chara);
 

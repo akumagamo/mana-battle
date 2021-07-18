@@ -9,31 +9,31 @@ export default function (
   squad: MapSquad,
   chara: Chara
 ): void {
-  if (next.x > squad.pos.x) {
-    const nextStep = squad.pos.x + MOVE_SPEED * GAME_SPEED;
-    if (nextStep > next.x) squad.pos.x = next.x;
-    else squad.pos.x = nextStep;
+  if (next.x > squad.posScreen.x) {
+    const nextStep = squad.posScreen.x + MOVE_SPEED * GAME_SPEED;
+    if (nextStep > next.x) squad.posScreen.x = next.x;
+    else squad.posScreen.x = nextStep;
 
     chara.innerWrapper.scaleX = 1;
-  } else if (next.x < squad.pos.x) {
-    const nextStep = squad.pos.x - MOVE_SPEED * GAME_SPEED;
-    if (nextStep < next.x) squad.pos.x = next.x;
-    else squad.pos.x = nextStep;
+  } else if (next.x < squad.posScreen.x) {
+    const nextStep = squad.posScreen.x - MOVE_SPEED * GAME_SPEED;
+    if (nextStep < next.x) squad.posScreen.x = next.x;
+    else squad.posScreen.x = nextStep;
 
     chara.innerWrapper.scaleX = -1;
-  } else if (next.y > squad.pos.y) {
-    const nextStep = squad.pos.y + MOVE_SPEED * GAME_SPEED;
-    if (nextStep > next.y) squad.pos.y = next.y;
-    else squad.pos.y = nextStep;
-  } else if (next.y < squad.pos.y) {
-    const nextStep = squad.pos.y - MOVE_SPEED * GAME_SPEED;
-    if (nextStep < next.y) squad.pos.y = next.y;
-    else squad.pos.y = nextStep;
+  } else if (next.y > squad.posScreen.y) {
+    const nextStep = squad.posScreen.y + MOVE_SPEED * GAME_SPEED;
+    if (nextStep > next.y) squad.posScreen.y = next.y;
+    else squad.posScreen.y = nextStep;
+  } else if (next.y < squad.posScreen.y) {
+    const nextStep = squad.posScreen.y - MOVE_SPEED * GAME_SPEED;
+    if (nextStep < next.y) squad.posScreen.y = next.y;
+    else squad.posScreen.y = nextStep;
   }
-  chara.container.setPosition(squad.pos.x, squad.pos.y);
+  chara.container.setPosition(squad.posScreen.x, squad.posScreen.y);
   // TODO: update squad + add single source of "squad truth"
   state.squads = state.squads.update(squad.id, (sqd) => ({
     ...sqd,
-    pos: squad.pos,
+    posScreen: squad.posScreen,
   }));
 }

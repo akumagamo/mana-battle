@@ -18,7 +18,7 @@ export default function (scene: Phaser.Scene, state: MapState) {
 
     const next = cellToScreenPosition(head);
 
-    const dist = getDistance(squad.pos, next);
+    const dist = getDistance(squad.posScreen, next);
 
     const chara = getChara(state, squadId);
 

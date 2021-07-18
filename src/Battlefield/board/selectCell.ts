@@ -44,5 +44,5 @@ export default function selectCell(
 function squadsAt(state: MapState, x: number, y: number) {
   return state.dispatchedSquads
     .map((id) => getMapSquad(state, id))
-    .filter((s) => getDistance(cellToScreenPosition({ x, y }), s.pos) < 50);
+    .filter((s) => getDistance(cellToScreenPosition({ x, y }), s.posScreen) < 50);
 }

@@ -1,5 +1,5 @@
 import map from "../../maps/green_harbor";
-import { getSquadUnits } from "../Model";
+import { getSquadUnits, MapSquadStatus } from "../Model";
 import { healSquads } from "./healSquadsTick";
 
 it("Should heal injuried units in towns", () => {
@@ -12,7 +12,7 @@ it("Should heal injuried units in towns", () => {
     ),
     squads: state.squads.update("squad1", (sqd) => ({
       ...sqd,
-      status: "guarding_fort",
+      status: "guarding_fort" as MapSquadStatus,
     })),
   };
   healSquads(state);
@@ -32,7 +32,7 @@ it("Should not heal injuried units in squads not guarding towns", () => {
     ),
     squads: state.squads.update("squad1", (sqd) => ({
       ...sqd,
-      status: "moving",
+      status: "moving" as MapSquadStatus,
     })),
   };
   healSquads(state);

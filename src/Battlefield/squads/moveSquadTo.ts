@@ -14,7 +14,7 @@ export default async function (
 
   const grid = makeWalkableGrid(state);
 
-  const startCell = screenToCellPosition(squad.pos);
+  const startCell = screenToCellPosition(squad.posScreen);
 
   const [, ...path] = getPathTo(grid)(startCell)(target).map(([x, y]) => ({
     x,

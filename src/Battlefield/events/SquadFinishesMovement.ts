@@ -22,15 +22,15 @@ export const onSquadFinishesMovement = (
   stand(chara);
 
   const city = state.cities.find((city) => {
-    const { x, y } = screenToCellPosition(squad.pos);
+    const { x, y } = screenToCellPosition(squad.posScreen);
 
     return city.x === x && city.y === y;
   });
 
-  state.squads = state.squads.update(squad.id, (sqd) => ({
-    ...sqd,
-    status: city ? "guarding_fort" : "standing",
-  }));
+  state.squads = state.squads.setIn(
+    [squad.id, "status"],
+    city ? "guarding_fort" : "standing"
+  );
 
   if (city && city.force !== squad.squad.force) {
     events_.SquadConqueredCity(scene).emit({ squad, city });

@@ -23,7 +23,7 @@ export const renderSquad = (
 
   if (!leader) throw new Error(INVALID_STATE);
 
-  const { x, y } = mapSquad.pos;
+  const { x, y } = mapSquad.posScreen;
 
   const chara = createChara({
     scene: scene,

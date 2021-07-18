@@ -62,10 +62,10 @@ export default async function (
     const winner = getMapSquad(state, sortedSquads.last());
 
     const direction = () => {
-      if (winner.pos.x < loser.pos.x) return "right";
-      else if (winner.pos.x > loser.pos.x) return "left";
-      else if (winner.pos.y < loser.pos.y) return "bottom";
-      else if (winner.pos.y > loser.pos.y) return "top";
+      if (winner.posScreen.x < loser.posScreen.x) return "right";
+      else if (winner.posScreen.x > loser.posScreen.x) return "left";
+      else if (winner.posScreen.y < loser.posScreen.y) return "bottom";
+      else if (winner.posScreen.y > loser.posScreen.y) return "top";
       else return "top";
     };
 

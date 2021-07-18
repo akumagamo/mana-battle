@@ -113,11 +113,14 @@ export const relationsTypes: { [x in RelationTypes]: RelationTypes } = {
   ally: "ally",
 };
 
+export type RelationIndex = Map<string, RelationTypes>;
+export const emptyRelationIndex = Map() as RelationIndex;
+
 export type Force = {
   id: ForceId;
   name: string;
   squads: string[];
-  relations: Map<string, RelationTypes>;
+  relations: RelationIndex;
   initialPosition: string;
 };
 
@@ -127,7 +130,7 @@ export function createForce(
   squads: string[],
   initialPosition: string
 ): Force {
-  return { id, name, squads, initialPosition, relations: Map() };
+  return { id, name, squads, initialPosition, relations: emptyRelationIndex };
 }
 
 export type CityType = "town" | "castle" | "shop";
@@ -161,15 +164,18 @@ export type EnemyInRange = { enemy: string; steps: Vector[] };
 export type MapSquad = {
   id: string;
   squad: SquadRecord;
-  pos: Vector; // Screen or board position?
-  status:
-    | "standing"
-    | "moving"
-    | "defeated"
-    | "retreated"
-    | "sleeping"
-    | "guarding_fort";
+  posScreen: Vector;
+  status: MapSquadStatus;
 };
+
+export type MapSquadStatus =
+  | "standing"
+  | "moving"
+  | "defeated"
+  | "retreated"
+  | "sleeping"
+  | "guarding_fort";
+
 export type MapSquadIndex = Map<string, MapSquad>;
 export const emptyMapSquadIndex = Map() as MapSquadIndex;
 
@@ -177,8 +183,8 @@ export function createMapSquad(squad: SquadRecord): MapSquad {
   return {
     id: squad.id,
     squad,
-    pos: { x: 1, y: 1 },
-    status: "standing",
+    posScreen: { x: 100, y: 100 },
+    status: "standing" as MapSquadStatus,
   };
 }
 

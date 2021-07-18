@@ -117,7 +117,7 @@ export function toMapSquad(squad: SquadRecord, pos: Vector): MapSquad {
   return {
     id: squad.id,
     squad,
-    pos: cellToScreenPosition({ x: pos.x, y: pos.y }),
+    posScreen: cellToScreenPosition({ x: pos.x, y: pos.y }),
     status: "standing",
   };
 }

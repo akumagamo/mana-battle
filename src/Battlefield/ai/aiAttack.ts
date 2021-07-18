@@ -14,7 +14,7 @@ export default function (state: MapState) {
 
       const distances = cities
         .map((city) => {
-          const path = getPathTo(state.cells)(screenToCellPosition(squad.pos))({
+          const path = getPathTo(state.cells)(screenToCellPosition(squad.posScreen))({
             x: city.x,
             y: city.y,
           });
