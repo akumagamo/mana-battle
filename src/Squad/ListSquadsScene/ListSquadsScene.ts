@@ -109,26 +109,37 @@ export class ListSquadsScene extends Phaser.Scene {
     if (!this.uiContainer) return;
 
     const squad = Squad.getSquad(squadId, this.squads);
-    const baseY = 650;
-    const panel_ = panel(0, baseY, SCREEN_WIDTH, 100, this.uiContainer, this);
+
+    const baseX = 20;
+    const baseY = 610;
+    const panel_ = panel(
+      20,
+      baseY,
+      SCREEN_WIDTH - 40,
+      80,
+      this.uiContainer,
+      this
+    );
 
     panel_.setAlpha(0.5);
 
     const leader = Unit.getUnit(squad.leader, this.units).name;
 
-    const leaderTitle = text(20, baseY + 10, `Leader`, this.uiContainer, this);
+    const leaderTitle = text(
+      baseX + 20,
+      baseY + 10,
+      `Leader`,
+      this.uiContainer,
+      this
+    );
     leaderTitle.setFontSize(16);
 
-    text(20, baseY + 40, leader, this.uiContainer, this);
-
-    button(300, baseY + 20, "Edit", this.uiContainer, this, () =>
-      editSquadButtonClicked(this).emit(squad)
-    );
+    text(baseX + 20, baseY + 40, leader, this.uiContainer, this);
 
     const dispatched = this.dispatched.has(squadId);
     const isLastSquad = this.squads.size === 1;
     button(
-      1000,
+      baseX + 300,
       baseY + 20,
       "Disband Squad",
       this.uiContainer,
@@ -139,6 +150,15 @@ export class ListSquadsScene extends Phaser.Scene {
         this.refreshUI(this.getSquads().first());
       },
       dispatched || isLastSquad
+    );
+
+    button(
+      baseX + 1000,
+      baseY + 20,
+      "Edit",
+      this.uiContainer,
+      this,
+      () => editSquadButtonClicked(this).emit(squad)
     );
   }
 
@@ -215,7 +235,7 @@ export class ListSquadsScene extends Phaser.Scene {
 
   renderBoard(squad: Squad.SquadRecord, x: number, y: number) {
     const BOARD_X = 170 + x * 350;
-    const BOARD_Y = 110 + y * 250;
+    const BOARD_Y = 130 + y * 250;
     const { board } = createStaticBoard(
       this,
       squad,
@@ -259,9 +279,11 @@ export class ListSquadsScene extends Phaser.Scene {
   renderControls() {
     if (!this.uiContainer) return;
 
+    text(10, 10, "Organize Squads", this.uiContainer, this);
+
     button(
-      SCREEN_WIDTH - 200,
-      600,
+      SCREEN_WIDTH - 220,
+      10,
       "Confirm",
       this.uiContainer,
       this,
@@ -270,8 +292,8 @@ export class ListSquadsScene extends Phaser.Scene {
     );
 
     button(
-      SCREEN_WIDTH - 400,
-      600,
+      SCREEN_WIDTH - 440,
+      10,
       "Create Squad",
       this.uiContainer,
       this,

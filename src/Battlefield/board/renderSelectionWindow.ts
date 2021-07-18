@@ -21,7 +21,7 @@ export function renderSelectionWindow(
   changeMode(scene, state, { type: "NOTHING_SELECTED" });
   const container = scene.add.container(400, 100);
   state.uiContainer.add(container);
-  panel(0, 0, 200, mapSquads.size * 50 + (city ? 150 : 50), container, scene);
+  panel(0, 0, 220, mapSquads.size * 50 + (city ? 150 : 50), container, scene);
   text(10, 10, "Squads", container, scene);
 
   mapSquads.toList().forEach((sqd, i) => {

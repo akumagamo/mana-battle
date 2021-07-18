@@ -16,7 +16,10 @@ export default (
   const mode = state.uiMode.type;
 
   if (mode === "SQUAD_SELECTED") {
-    button(baseX + 400, baseY, "Formation", state.uiContainer, scene, () => {
+    button(baseX + 200, baseY, "Move", state.uiContainer, scene, () =>
+      MovePlayerSquadButtonClicked(scene).emit({ scene, state, mapSquad })
+    );
+    button(baseX + 420, baseY, "Formation", state.uiContainer, scene, () => {
       changeMode(scene, state, { type: "CHANGING_SQUAD_FORMATION" });
       disableMapInput(state);
 
@@ -41,9 +44,6 @@ export default (
         },
       });
     });
-    button(baseX + 200, baseY, "Move", state.uiContainer, scene, () =>
-      MovePlayerSquadButtonClicked(scene).emit({ scene, state, mapSquad })
-    );
   }
 };
 

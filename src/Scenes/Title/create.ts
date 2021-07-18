@@ -60,8 +60,8 @@ export function create(scene: Phaser.Scene, state: TitleSceneState) {
   changeMusic(scene, state, "title");
 
   if (localStorage.getItem("saves")) {
-    button(SCREEN_WIDTH / 2, 450, "Continue", state.container, scene, () =>
-      scene.scene.start("SaveListScene")
+    button(SCREEN_WIDTH / 2, 450, "Continue Game", state.container, scene, () =>
+      scene.scene.start("SaveListScene"),false,
     );
   }
 

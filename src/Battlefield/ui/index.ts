@@ -26,16 +26,16 @@ export default function ui(
   const baseY = BOTTOM_PANEL_Y + 25;
 
   if (state.uiMode.type !== 'SELECT_SQUAD_MOVE_TARGET') {
-    button(50, 40, 'Organize', uiContainer, scene, () =>
+    button(20, 10, 'Organize', uiContainer, scene, () =>
       OrganizeButtonClicked(scene).emit(scene)
     );
-    button(250, 40, 'Dispatch', uiContainer, scene, () => {
+    button(240, 10, 'Dispatch', uiContainer, scene, () => {
       disableMapInput(state);
       state.isPaused = true;
       dispatchWindow(scene, state);
     });
 
-    button(1100, 50, 'Return to Title', uiContainer, scene, () => {
+    button(SCREEN_WIDTH - 220, 10, 'Return to Title', uiContainer, scene, () => {
       turnOff(scene, state);
       scene.scene.start('TitleScene');
     });
