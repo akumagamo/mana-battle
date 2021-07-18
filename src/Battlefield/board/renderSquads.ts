@@ -1,15 +1,17 @@
-import { getMapSquad, MapSquad, MapState } from '../Model';
-import { INVALID_STATE } from '../../errors';
-import { PLAYER_FORCE } from '../../constants';
-import { CHARA_MAP_SCALE } from '../config';
-import createChara from '../../Chara/createChara';
-import { addInsignea } from '../../Chara/commands/addInsignea';
+import { getChara, getMapSquad, MapSquad, MapState } from "../Model";
+import { INVALID_STATE } from "../../errors";
+import { PLAYER_FORCE } from "../../constants";
+import { CHARA_MAP_SCALE } from "../config";
+import createChara from "../../Chara/createChara";
+import { addInsignea } from "../../Chara/commands/addInsignea";
+import { Chara } from "../../Chara/Model";
+import animateSquadRun from "../squads/animateSquadRun";
 
 export const renderSquad = (
   scene: Phaser.Scene,
   state: MapState,
   mapSquad: MapSquad
-): void => {
+): Chara => {
   const { mapContainer } = state;
   const squadLeader = mapSquad.squad.members.find(
     (mem) => mem.id === mapSquad.squad.leader
@@ -36,6 +38,8 @@ export const renderSquad = (
   mapContainer.add(chara.container);
 
   state.charas.push(chara);
+
+  return chara;
 };
 
 export default (scene: Phaser.Scene, state: MapState): void => {
@@ -46,8 +50,9 @@ export default (scene: Phaser.Scene, state: MapState): void => {
   state.squadsInMovement.forEach(async ({ path }, id) => {
     const squad = getMapSquad(state, id);
 
-    // Update reference
-    // We need a ref for quick updates in the main loop
+    const chara = getChara(state, id);
+    animateSquadRun(chara);
+
     state.squadsInMovement = state.squadsInMovement.set(id, {
       path,
       squad,
