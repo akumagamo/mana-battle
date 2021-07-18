@@ -59,22 +59,18 @@ export function create(scene: Phaser.Scene, state: TitleSceneState) {
 
   changeMusic(scene, state, "title");
 
-  button(20, 650, "Go Fullscreen", state.container, scene, () => {
-    requestFullscreen();
-  });
-
   if (localStorage.getItem("saves")) {
     button(SCREEN_WIDTH / 2, 450, "Continue", state.container, scene, () =>
       scene.scene.start("SaveListScene")
     );
   }
 
-  button(SCREEN_WIDTH / 2, 550, "New Game", state.container, scene, () =>
+  button(SCREEN_WIDTH / 2, 520, "New Game", state.container, scene, () =>
     emit.NewGameButtonClicked({ scene, state })
   );
 
-  button(SCREEN_WIDTH / 2, 620, "Options", state.container, scene, () => {
-    emit.OptionsButtonClicked(scene);
+  button(SCREEN_WIDTH / 2, 590, "Go Fullscreen", state.container, scene, () => {
+    requestFullscreen();
   });
 
   scene.game.events.emit("TitleSceneCreated", scene);
