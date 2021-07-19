@@ -14,7 +14,7 @@ export default function (scene: Phaser.Scene, state: MapState) {
       healSquads(state);
       state.tick = 0;
 
-      //aiAttack(state);
+      aiAttack(state);
     }
   }
 }
