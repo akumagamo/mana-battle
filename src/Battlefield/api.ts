@@ -6,7 +6,7 @@ export const getDistance = (vec1: Vector) => (vec2: Vector) =>
 
 export const getPathTo = (grid: number[][]) => (source: Vector) => (
   target: Vector
-) => {
+): number[][] => {
   const pfGrid = new PF.Grid(grid);
   const finder = new PF.AStarFinder();
 
