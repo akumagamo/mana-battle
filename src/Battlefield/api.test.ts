@@ -35,20 +35,6 @@ test("Make a turn", () => {
   expect(moves).toEqual(expected);
 });
 
-test("Returns an empty path if blocked", () => {
-  const grid = [
-    [0, 1, 1, 1, 1],
-    [0, 1, 0, 0, 0],
-    [0, 1, 0, 1, 0],
-    [1, 0, 0, 1, 0],
-    [1, 1, 1, 1, 1],
-  ];
-
-  const moves = getPathTo(grid)({ x: 0, y: 0 })({ x: 2, y: 2 });
-  const expected = [];
-  expect(moves).toEqual(expected);
-});
-
 test("Get shortest path in moves in a forked path ", () => {
   const grid = [
     [0, 1, 1, 1, 1],

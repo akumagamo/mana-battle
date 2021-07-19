@@ -198,6 +198,17 @@ export type TurnManager = {
 
 export type Step = { target: Vector; steps: Vector[] };
 
+export const walkableTiles = [0, 1, 2];
+
+export const walkableTilesWeights: { type: number; weight: number }[] = [
+  [0, 1],
+  [1, 1.5],
+  [2, 2],
+].reduce(
+  (xs, [k, v]) => xs.concat([{ type: k, weight: v }]),
+  [] as { type: number; weight: number }[]
+);
+
 export const tileMap: { [x in CellNumber]: string } = {
   0: "grass",
   1: "woods",
@@ -217,7 +228,7 @@ export const tileMap: { [x in CellNumber]: string } = {
   12: "beach-b-and-r",
   13: "beach-t-and-r",
   14: "beach-b-and-l",
-  15: "beach-t-and-l", //br
+  15: "beach-t-and-l",
 };
 
 export const translateTiles = (tiles: CellNumber[][]) => {
