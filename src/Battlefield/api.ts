@@ -13,7 +13,6 @@ export const getPathTo = (grid: number[][]) => (source: Vector) => (
     .setStart({ row: source.y, col: source.x })
     .setEnd({ row: target.y, col: target.x });
 
-  console.log(grid);
   const path = pathFindingManager
     .find(grid)
     .map((cell) => [cell.col, cell.row]);

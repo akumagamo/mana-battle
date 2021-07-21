@@ -209,6 +209,11 @@ export const walkableTilesWeights: { type: number; weight: number }[] = [
   [] as { type: number; weight: number }[]
 );
 
+export const walkableTilesWeightsMap = walkableTilesWeights.reduce(
+  (xs, x) => xs.set(x.type, x.weight),
+  Map() as Map<number, number>
+);
+
 export const tileMap: { [x in CellNumber]: string } = {
   0: "grass",
   1: "woods",
