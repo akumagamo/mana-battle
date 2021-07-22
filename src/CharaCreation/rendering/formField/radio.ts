@@ -1,7 +1,7 @@
-import { Container } from '../../../Models';
-import button from '../../../UI/button';
-import { BTN_MARGIN } from '../config';
-import formPanel from '../formPanel';
+import { Container } from "../../../Models";
+import button from "../../../UI/button";
+import { BTN_MARGIN } from "../config";
+import formPanel from "../formPanel";
 
 const classBtnSize = 170;
 export default function createRadio(
@@ -11,7 +11,7 @@ export default function createRadio(
   y: number,
   width: number,
   label: string,
-  prop: 'class' | 'gender',
+  prop: "job" | "gender",
   items: string[],
   labelIndex: { [id: string]: string },
   onUnitUpdated: any
@@ -42,8 +42,8 @@ const render = (
   selected: string,
   onUnitUpdated: any
 ) => {
-  const panel_ = formPanel(scene, container, label, width, 100);
-  const btns = items.map((g, i) =>
+  formPanel(scene, container, label, width, 100);
+  items.forEach((g, i) =>
     renderBtn(
       scene,
       container,

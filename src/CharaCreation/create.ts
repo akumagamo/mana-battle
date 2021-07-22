@@ -43,6 +43,7 @@ export default function (scene: Phaser.Scene) {
 
   scene.game.events.emit("CharaCreationSceneCreated", { scene, state });
 }
+
 function classInput(scene: Phaser.Scene, state: CharaCreationState) {
   createRadio(
     scene,
@@ -51,7 +52,7 @@ function classInput(scene: Phaser.Scene, state: CharaCreationState) {
     550,
     570,
     "Class",
-    "class",
+    "job",
     classes,
     { fighter: "Fighter", archer: "Archer", mage: "Mage" },
     (a: any, b: any) => {
