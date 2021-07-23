@@ -1,7 +1,8 @@
 import { Vector } from "matter";
 import { getPathTo } from "../api";
+import { animateSquadRun } from "../board/animateSquadRun";
 import { screenToCellPosition } from "../board/position";
-import { getMapSquad, MapState } from "../Model";
+import { getChara, getMapSquad, MapState } from "../Model";
 
 export default function (state: MapState, id: string, target: Vector) {
   const squad = getMapSquad(state, id);
@@ -14,6 +15,8 @@ export default function (state: MapState, id: string, target: Vector) {
     x,
     y,
   }));
+
+  animateSquadRun(getChara(state, id));
 
   state.squadsInMovement = state.squadsInMovement.set(id, {
     path,

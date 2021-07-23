@@ -3,7 +3,6 @@ import { getChara, getMapSquad, MapState, Vector } from "../Model";
 import { screenToCellPosition } from "./position";
 import moveSquadTo from "../squads/moveSquadTo";
 import { changeMode } from "../Mode";
-import animateSquadRun from "../squads/animateSquadRun";
 
 export async function issueSquadMoveOrder(
   scene: Phaser.Scene,
@@ -22,7 +21,7 @@ export async function issueSquadMoveOrder(
       moveSquadTo(state, id, { x, y });
       state.squads = state.squads.setIn([id, "status"], "moving");
       const chara = getChara(state, id);
-      animateSquadRun(chara);
+      //animateSquadRun(chara);
 
       changeMode(scene, state, { type: "NOTHING_SELECTED" });
     } else {
