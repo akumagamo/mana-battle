@@ -69,7 +69,9 @@ export const sceneMock = () => {
       graphics: graphicsMock,
       rectangle: graphicsMock,
       zone: containerMock,
-      tween: jest.fn(),
+      tween: jest.fn(({ onComplete }) => {
+        if (onComplete) onComplete();
+      }),
       dom: jest.fn(() => ({
         createFromCache: jest.fn(() => ({
           setPerspective: jest.fn(),

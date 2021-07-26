@@ -1,16 +1,18 @@
 import { GAME_SPEED } from "../../env";
 import { screenToCellPosition } from "../board/position";
 import { cellSize } from "../config";
-import { getChara, getMapSquad, MapState } from "../Model";
+import { getChara, getMapSquad, MapSquad, MapState } from "../Model";
 import moveSquadTo from "./moveSquadTo";
 
 export default async function (scene: Phaser.Scene, state: MapState) {
   // TODO: make this a create parameter, as we don't need to store this for later
   if (state.squadToPush) {
-    state.isPaused = true;
-    const loser = getMapSquad(state, state.squadToPush.loser);
 
-    const { direction } = state.squadToPush;
+    const { loser, direction } = state.squadToPush;
+    state.isPaused = true;
+
+    const pushedSquad = getMapSquad(state, loser);
+
     const dist = cellSize;
     let xPush = 0;
     let yPush = 0;
@@ -19,7 +21,7 @@ export default async function (scene: Phaser.Scene, state: MapState) {
     if (direction === "top") yPush = dist * -1;
     if (direction === "bottom") yPush = dist;
 
-    const chara = getChara(state, loser.id);
+    const chara = getChara(state, pushedSquad.id);
 
     const newPos = {
       x: chara.container.x + xPush,
@@ -42,13 +44,15 @@ export default async function (scene: Phaser.Scene, state: MapState) {
         ...newPos,
         onComplete: () => {
           chara.container.setPosition(newPos.x, newPos.y);
-          state.squads = state.squads.setIn([loser.id, "pos"], newPos);
 
-          if (state.squadsInMovement.has(loser.id)) {
+          const updatedSquad: MapSquad = { ...pushedSquad, posScreen: newPos };
+          state.squads = state.squads.set(pushedSquad.id, updatedSquad);
+
+          if (state.squadsInMovement.has(pushedSquad.id)) {
             moveSquadTo(
               state,
-              loser.id,
-              state.squadsInMovement.get(loser.id)?.path.reverse()[0] || {
+              pushedSquad.id,
+              state.squadsInMovement.get(pushedSquad.id)?.path.reverse()[0] || {
                 x: 0,
                 y: 0,
               }

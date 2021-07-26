@@ -70,7 +70,6 @@ export default async function (
     };
 
     state.squadToPush = {
-      winner: winner.id,
       loser: loser.id,
       direction: direction(),
     };

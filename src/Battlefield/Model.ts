@@ -99,9 +99,8 @@ export type MapState = {
 
   squadsToRemove: Set<string>;
   squadToPush: {
-    winner: string;
     loser: string;
-    direction: string;
+    direction: "right" | "left" | "top" | "bottom";
   } | null;
 };
 
@@ -329,7 +328,7 @@ export type BattleFieldMap = {
 export function getMapSquad(state: MapState, squadId: string): MapSquad {
   const squad = state.squads.get(squadId);
 
-  if (!squad) throw new Error(INVALID_STATE);
+  if (!squad) throw new Error(`${INVALID_STATE} ${squad}`);
   return squad;
 }
 
@@ -360,13 +359,22 @@ export function getSquadLeader(state: MapState, squadId: string): Unit {
 
   const leader = state.units.get(squad.squad.leader);
 
-  if (!leader) throw new Error(INVALID_STATE);
+  if (!leader)
+    throw new Error(
+      `Invalid leader id ${squad.squad.leader} for state ${JSON.stringify(
+        state.units
+      )}`
+    );
+
   return leader;
 }
 export function getChara(state: MapState, squadId: string): Chara {
   const leader = getSquadLeader(state, squadId);
   const chara = state.charas.find((c) => c.id === leader.id);
-  if (!chara) throw new Error(INVALID_STATE);
+  if (!chara)
+    throw new Error(
+      `Invalid chara id ${leader.id} for state ${JSON.stringify(state.charas)}`
+    );
   return chara;
 }
 
