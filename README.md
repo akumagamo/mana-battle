@@ -1,7 +1,7 @@
 ![CI](https://github.com/lfarroco/mana-phaser/workflows/CI/badge.svg)
 
 # Mana Battle
-An HTML5 fantasy strategy RPG 🧙🐉♟️ ⚔️ ✨ 🏰
+A strategic RPG 🧙⚔️🏰
 
 
 # 🎮 Play it
