@@ -2,6 +2,7 @@
   "compilerOptions": {
     "outDir": "./dist/",
     "noImplicitAny": true,
+    "noImplicitThis": true,
     "sourceMap": true,
     "module": "es6",
     "target": "es5",
@@ -10,6 +11,7 @@
     "resolveJsonModule": true,
     "allowJs": true,
     "strict": true,
+    "strictNullChecks": true,
     "pretty": true
   }
 }

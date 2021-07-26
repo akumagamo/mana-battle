@@ -178,6 +178,17 @@ export type MapSquadStatus =
 export type MapSquadIndex = Map<string, MapSquad>;
 export const emptyMapSquadIndex = Map() as MapSquadIndex;
 
+export const updateMapSquad = (squad: MapSquad, index: MapSquadIndex) =>
+  index.update(squad.id, (sqd) => {
+    if (sqd) return squad;
+    else
+      throw new Error(
+        `Tried to issue move order to non-existing squad: 
+            id: ${squad.id},
+            squadIndex: ${JSON.stringify(index, null, 2)}`
+      );
+  });
+
 export function createMapSquad(squad: SquadRecord): MapSquad {
   return {
     id: squad.id,

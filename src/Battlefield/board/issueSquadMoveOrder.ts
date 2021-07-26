@@ -1,5 +1,5 @@
 import { PLAYER_FORCE } from "../../constants";
-import { getChara, getMapSquad, MapState, Vector } from "../Model";
+import { getMapSquad, MapState, Vector } from "../Model";
 import { screenToCellPosition } from "./position";
 import moveSquadTo from "../squads/moveSquadTo";
 import { changeMode } from "../Mode";
@@ -19,10 +19,6 @@ export async function issueSquadMoveOrder(
 
     if ((cell.x !== x || cell.y !== y) && state.cells[y][x] !== 3) {
       moveSquadTo(state, id, { x, y });
-
-      state.squads = state.squads = state.squads.update(id, (squad) => {
-        return { ...squad, status: "moving" };
-      });
 
       changeMode(scene, state, { type: "NOTHING_SELECTED" });
     } else {
