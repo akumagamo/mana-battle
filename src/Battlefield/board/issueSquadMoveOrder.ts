@@ -19,9 +19,10 @@ export async function issueSquadMoveOrder(
 
     if ((cell.x !== x || cell.y !== y) && state.cells[y][x] !== 3) {
       moveSquadTo(state, id, { x, y });
-      state.squads = state.squads.setIn([id, "status"], "moving");
-      const chara = getChara(state, id);
-      //animateSquadRun(chara);
+
+      state.squads = state.squads = state.squads.update(id, (squad) => {
+        return { ...squad, status: "moving" };
+      });
 
       changeMode(scene, state, { type: "NOTHING_SELECTED" });
     } else {

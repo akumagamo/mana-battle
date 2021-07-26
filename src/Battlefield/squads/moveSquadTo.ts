@@ -11,10 +11,12 @@ export default function (state: MapState, id: string, target: Vector) {
 
   const startCell = screenToCellPosition(squad.posScreen);
 
-  const [, ...path] = getPathTo(grid)(startCell)(target).map(([x, y]) => ({
+  const rawPath = getPathTo(grid)(startCell)(target).map(([x, y]) => ({
     x,
     y,
   }));
+
+  const [, ...path] = rawPath;
 
   animateSquadRun(getChara(state, id));
 
