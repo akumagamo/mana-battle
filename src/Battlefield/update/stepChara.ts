@@ -24,12 +24,12 @@ export default function (
     if (targetStep > next.x) squad.posScreen.x = next.x;
     else squad.posScreen.x = targetStep;
 
-    chara.container.scaleX = 1;
+    chara.sprite.scaleX = 1;
   } else if (next.x < squad.posScreen.x) {
     const targetStep = squad.posScreen.x - moveSpeed * GAME_SPEED;
     if (targetStep < next.x) squad.posScreen.x = next.x;
     else squad.posScreen.x = targetStep;
-    chara.container.scaleX = -1;
+    chara.sprite.scaleX = -1;
   } else if (next.y > squad.posScreen.y) {
     const targetStep = squad.posScreen.y + moveSpeed * GAME_SPEED;
     if (targetStep > next.y) squad.posScreen.y = next.y;

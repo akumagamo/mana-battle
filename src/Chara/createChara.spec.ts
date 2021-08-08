@@ -18,7 +18,7 @@ it('Should be rendered at the passed position', () => {
     y: 99,
     unit: createUnit(),
   });
-  expect(chara.container).toMatchObject({x: 100, y: 99, name: '1'});
+  expect(chara.container).toMatchObject({x: 100, y: 99});
 });
 
 it('Should not render a hp bar by default', () => {

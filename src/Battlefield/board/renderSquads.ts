@@ -31,6 +31,8 @@ export const renderSquad = (
     scale: CHARA_MAP_SCALE,
   });
 
+  chara.stand()
+
   addInsignea(chara);
 
   mapContainer.add(chara.container);

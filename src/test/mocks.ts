@@ -35,6 +35,12 @@ export const imageMock = jest.fn(() => ({
   ...gameObjectMock(),
   __type__: "image",
 }));
+export const spriteMock = jest.fn(() => ({
+  ...gameObjectMock(),
+  setTint: jest.fn(),
+  play: jest.fn(),
+  __type__: "sprite",
+}));
 
 export const textMock = jest.fn(() => ({
   setShadow: jest.fn(),
@@ -65,6 +71,7 @@ export const sceneMock = () => {
     add: {
       container: containerMock,
       image: imageMock,
+      sprite: spriteMock,
       text: textMock,
       graphics: graphicsMock,
       rectangle: graphicsMock,
@@ -87,6 +94,7 @@ export const sceneMock = () => {
         fadeOut: jest.fn().mockResolvedValue(null),
       },
     },
+    anims: { create: jest.fn(), generateFrameNumbers: jest.fn() },
     time: {
       addEvent: jest.fn().mockResolvedValue(null),
     },

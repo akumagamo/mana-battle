@@ -30,6 +30,8 @@ const puppeteer = require("puppeteer");
 
         page.goto("http://localhost:3000").then(() => {
           setTimeout(() => {
+
+            page.mouse.click(100,100)
             browser.close();
           }, 10000);
         });
