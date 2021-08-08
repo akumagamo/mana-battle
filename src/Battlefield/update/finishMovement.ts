@@ -1,17 +1,16 @@
-import { Vector } from 'matter';
-import stand from '../../Chara/animations/stand';
-import { PLAYER_FORCE } from '../../constants';
-import { screenToCellPosition } from '../board/position';
+import {Vector} from 'matter';
+import {PLAYER_FORCE} from '../../constants';
+import {screenToCellPosition} from '../board/position';
 import SquadArrivedInfoMessageCompleted from '../events/SquadArrivedInfoMessageCompleted';
 import SquadFinishesMovement from '../events/SquadFinishesMovement';
-import { getChara, MapSquad, MapState } from '../Model';
+import {getChara, MapSquad, MapState} from '../Model';
 import speak from '../rendering/speak';
 
 export default async function (
   scene: Phaser.Scene,
   state: MapState,
   path: Vector[],
-  squad: MapSquad
+  squad: MapSquad,
 ) {
   const [, ...remaining] = path;
 
@@ -21,9 +20,6 @@ export default async function (
       squad,
     });
   } else {
-
     SquadFinishesMovement(scene).emit(squad);
-
-
   }
 }

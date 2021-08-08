@@ -1,6 +1,6 @@
-import { preload } from '../../preload';
-import { initialState } from './Model';
-import { create } from './create';
+import {preload} from '../../preload';
+import {initialState} from './Model';
+import {create} from './create';
 
 export default class TitleScene extends Phaser.Scene {
   constructor() {

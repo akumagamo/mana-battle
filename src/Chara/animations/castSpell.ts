@@ -1,35 +1,20 @@
-import { GAME_SPEED } from "../../env";
-import { Chara } from "../Model";
-import defaultPose from "./defaultPose";
+import {GAME_SPEED} from '../../env';
+import {Chara} from '../Model';
 
 const ATTACK_DURATION = 500;
 
 export default (chara: Chara, onComplete: () => void) => {
-  defaultPose(chara);
+  chara.cast();
 
-  chara.props.scene.tweens.add({
-    targets: chara.mainHandContainer,
-    yoyo: true,
-    x: chara.mainHandContainer?.x || 0 + (chara.props.front ? -5 : 5),
-    y: chara.mainHandContainer?.y || 0 - 5,
-    duration: ATTACK_DURATION / GAME_SPEED,
-    ease: "ExpoOut",
-    onComplete: () => {
+  chara.scene.time.addEvent({
+    delay: ATTACK_DURATION / GAME_SPEED,
+    callback: () => {
       onComplete();
     },
   });
 
-  chara.props.scene.tweens.add({
-    targets: chara.offHandContainer,
-    yoyo: true,
-    rotation: chara.props.front ? -1.2 : 0.5,
-    x: chara.offHandContainer?.x || 0 + (chara.props.front ? 5 : -5),
-    Y: chara.offHandContainer?.y || 0 - 5,
-    duration: ATTACK_DURATION / GAME_SPEED,
-    ease: "ExpoOut",
-  });
-
+  // TODO: refactor to Sound.play.fireball()
   if (process.env.SOUND_ENABLED) {
-    chara.scene.sound.add("fireball").play();
+    chara.scene.sound.add('fireball').play();
   }
 };

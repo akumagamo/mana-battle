@@ -9,12 +9,4 @@ export type CharaCreationState = {
   chara: Chara;
 };
 
-const unit = createUnit('new_chara');
-
-export const initialUnit = {
-  ...unit,
-  style: {
-    ...unit.style,
-    displayHat: false,
-  },
-};
+export const initialUnit =  createUnit('new_chara');

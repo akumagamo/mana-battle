@@ -1,25 +1,17 @@
-import { HAIR_COLORS, SKIN_COLORS } from "../Chara/animations/constants";
-import { maleNames } from "../constants/names";
-import { randomItem } from "../utils";
-import {
-  Elem,
-  Gender,
-  HAIR_STYLES,
-  Movement,
-  Unit,
-  UnitJobs as UnitJob,
-} from "./Model";
-import { baseEquips } from "./Jobs/Jobs";
-import { PLAYER_FORCE } from "../constants";
+import {maleNames} from '../constants/names';
+import {randomItem} from '../utils';
+import {Elem, Gender, Movement, Unit, UnitJobs as UnitJob} from './Model';
+import {baseEquips} from './Jobs/Jobs';
+import {PLAYER_FORCE} from '../constants';
 
 export default function createUnit(
-  id = "1",
-  job = "fighter" as UnitJob,
+  id = '1',
+  job = 'fighter' as UnitJob,
   lvl = 1,
-  overrides = {}
+  overrides = {},
 ): Unit {
   const baseStats: {
-    [job in UnitJob]: { hp: number; str: number; dex: number; int: number };
+    [job in UnitJob]: {hp: number; str: number; dex: number; int: number};
   } = {
     fighter: {
       hp: 80,
@@ -47,17 +39,11 @@ export default function createUnit(
     job: job,
     equips: baseEquips[job],
     lvl,
-    movement: "plain" as Movement,
-    elem: "neutral" as Elem,
-    gender: randomItem(["male", "female"] as Gender[]),
+    movement: 'plain' as Movement,
+    elem: 'neutral' as Elem,
+    gender: randomItem(['male', 'female'] as Gender[]),
     exp: 0,
     force: PLAYER_FORCE,
-    style: {
-      skinColor: randomItem(SKIN_COLORS),
-      hairColor: randomItem(HAIR_COLORS),
-      hair: randomItem(HAIR_STYLES),
-      displayHat: randomItem([true, false]),
-    },
     ...baseStats[job],
     currentHp: baseStats[job].hp,
     ...overrides,

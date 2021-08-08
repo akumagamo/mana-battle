@@ -28,16 +28,16 @@ it("should set the chara container to the squad position", () => {
 });
 
 it("should flip the character left when moving left", () => {
-  chara.innerWrapper.scaleX = 1;
+  chara.sprite.scaleX = 1;
   stepChara(state, cellToScreenPosition({ x: 3, y: 3 }), squad, chara);
 
-  expect(chara.innerWrapper.scaleX).toEqual(-1);
+  expect(chara.sprite.scaleX).toEqual(-1);
 });
 
 it("should flip the character right when moving right", () => {
-  chara.innerWrapper.scaleX = -1;
+  chara.sprite.scaleX = -1;
   stepChara(state, cellToScreenPosition({ x: 5, y: 3 }), squad, chara);
-  expect(chara.innerWrapper.scaleX).toEqual(1);
+  expect(chara.sprite.scaleX).toEqual(1);
 });
 it("should not step beyond target - right", () => {
   const next = nextStep();

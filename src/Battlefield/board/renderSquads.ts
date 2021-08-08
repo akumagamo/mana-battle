@@ -1,20 +1,18 @@
-import { getChara, getMapSquad, MapSquad, MapState } from "../Model";
-import { INVALID_STATE } from "../../errors";
-import { PLAYER_FORCE } from "../../constants";
-import { CHARA_MAP_SCALE } from "../config";
-import createChara from "../../Chara/createChara";
-import { addInsignea } from "../../Chara/commands/addInsignea";
-import { Chara } from "../../Chara/Model";
-import animateSquadRun from "../squads/animateSquadRun";
+import {getChara, getMapSquad, MapSquad, MapState} from '../Model';
+import {INVALID_STATE} from '../../errors';
+import {CHARA_MAP_SCALE} from '../config';
+import createChara from '../../Chara/createChara';
+import {addInsignea} from '../../Chara/commands/addInsignea';
+import {Chara} from '../../Chara/Model';
 
 export const renderSquad = (
   scene: Phaser.Scene,
   state: MapState,
-  mapSquad: MapSquad
+  mapSquad: MapSquad,
 ): Chara => {
-  const { mapContainer } = state;
+  const {mapContainer} = state;
   const squadLeader = mapSquad.squad.members.find(
-    (mem) => mem.id === mapSquad.squad.leader
+    (mem) => mem.id === mapSquad.squad.leader,
   );
 
   if (!squadLeader) throw new Error(INVALID_STATE);
@@ -23,7 +21,7 @@ export const renderSquad = (
 
   if (!leader) throw new Error(INVALID_STATE);
 
-  const { x, y } = mapSquad.posScreen;
+  const {x, y} = mapSquad.posScreen;
 
   const chara = createChara({
     scene: scene,
@@ -44,14 +42,14 @@ export const renderSquad = (
 
 export default (scene: Phaser.Scene, state: MapState): void => {
   state.dispatchedSquads.forEach((id) =>
-    renderSquad(scene, state, getMapSquad(state, id))
+    renderSquad(scene, state, getMapSquad(state, id)),
   );
 
-  state.squadsInMovement.forEach(async ({ path }, id) => {
+  state.squadsInMovement.forEach(async ({path}, id) => {
     const squad = getMapSquad(state, id);
 
     const chara = getChara(state, id);
-    animateSquadRun(chara);
+    chara.run();
 
     state.squadsInMovement = state.squadsInMovement.set(id, {
       path,

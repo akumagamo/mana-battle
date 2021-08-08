@@ -1,14 +1,8 @@
 import text from '../../UI/text';
-import { Chara } from '../Model';
+import {Chara} from '../Model';
 
 export async function displayLevelUp(chara: Chara) {
-  const lvlUp = text(
-    -100,
-    -100,
-    'Level up!',
-    chara.container,
-    chara.props.scene
-  );
+  const lvlUp = text(-100, -100, 'Level up!', chara.container, chara.scene);
   lvlUp.setScale(1.5);
   lvlUp.setShadow(0, 0, '#000', 2);
   lvlUp.setStroke('#000000', 2);
@@ -16,7 +10,7 @@ export async function displayLevelUp(chara: Chara) {
   chara.container.add(lvlUp);
 
   return new Promise<void>((resolve) => {
-    chara.props.scene.tweens.add({
+    chara.scene.tweens.add({
       targets: lvlUp,
       y: lvlUp.y - 100,
       alpha: 0,

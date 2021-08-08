@@ -1,19 +1,17 @@
-import { INVALID_STATE } from "../../errors";
-import { getDistance } from "../../utils";
-import { cellSize } from "../config";
-import { getChara, getMapSquad, MapState } from "../Model";
+import {INVALID_STATE} from '../../errors';
+import {getDistance} from '../../utils';
+import {cellSize} from '../config';
+import {getChara, getMapSquad, MapState} from '../Model';
 
 export function checkCollision(state: MapState) {
   return (sqd: string) => {
     const current = getChara(state, sqd);
 
-    if (!current) throw new Error(INVALID_STATE);
-
     // TODO: only enemies
     // how: have indexes per team
     return state.charas
       .filter((c) => {
-        const squad = state.unitSquadIndex.get(c.props.unit.id);
+        const squad = state.unitSquadIndex.get(c.id);
 
         if (!squad) throw new Error(INVALID_STATE);
 

@@ -1,9 +1,9 @@
-import { Scene } from "phaser";
-import createChara from "../Chara/createChara";
-import { Container } from "../Models";
-import { Unit } from "../Unit/Model";
-import panel from "./panel";
-import text from "./text";
+import {Scene} from 'phaser';
+import createChara from '../Chara/createChara';
+import {Container} from '../Models';
+import {Unit} from '../Unit/Model';
+import panel from './panel';
+import text from './text';
 
 /**
  * Be careful calling this after Phaser.Scene's CLICK_SQUAD, as refreshing
@@ -16,7 +16,7 @@ export default (
   y: number,
   text_: string,
   container: Container,
-  scene: Scene
+  scene: Scene,
 ) => {
   const container_ = scene.add.container(x, y);
   container.add(container_);
@@ -28,8 +28,6 @@ export default (
     unit,
     x: 70,
     y: 70,
-    headOnly: true,
-    animated: false,
   });
 
   text(150, 30, unit.name, container_, scene);
@@ -38,6 +36,5 @@ export default (
 
   container_.add([portrait.container]);
 
-  //TODO: return function that destroys the component and removes the portrait scene
   return container_;
 };

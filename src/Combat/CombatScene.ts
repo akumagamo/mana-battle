@@ -22,12 +22,6 @@ import {
 import panel from "../UI/panel";
 import { Scene } from "phaser";
 import hpBar from "../Chara/ui/hpBar";
-import defaultPose from "../Chara/animations/defaultPose";
-import run from "../Chara/animations/run";
-import stand from "../Chara/animations/stand";
-import bowAttack from "../Chara/animations/bowAttack";
-import slash from "../Chara/animations/slash";
-import flinch from "../Chara/animations/flinch";
 import createChara from "../Chara/createChara";
 import { Board } from "../Board/Model";
 import createStaticBoard from "../Board/createBoard";
@@ -174,8 +168,9 @@ export default class CombatScene extends Phaser.Scene {
             y: y,
             scale: COMBAT_CHARA_SCALE,
             front: isTopSquad,
-            showWeapon: true,
           });
+
+          chara.stand()
 
           this.charas.push(chara);
         });
@@ -355,7 +350,7 @@ export default class CombatScene extends Phaser.Scene {
   // UNIT METHODS
 
   getChara(id: string) {
-    const chara = this.charas.find((u) => u.props.unit.id === id);
+    const chara = this.charas.find((chara) => chara.unit.id === id);
 
     if (!chara) throw new Error(INVALID_STATE);
     return chara;
@@ -365,14 +360,13 @@ export default class CombatScene extends Phaser.Scene {
     const chara = this.getChara(sourceId);
     const target = this.getChara(targetId);
 
-    defaultPose(chara);
-    run(chara);
+    chara.run()
 
-    const targetSquadId = this.unitSquadIndex.get(target.props.unit.id);
+    const targetSquadId = this.unitSquadIndex.get(target.unit.id);
 
     if (!targetSquadId) throw new Error(INVALID_STATE);
 
-    const targetUnitId = target.props.unit.id;
+    const targetUnitId = target.unit.id;
 
     const targetIsTop = this.top === targetSquadId;
 
@@ -417,7 +411,7 @@ export default class CombatScene extends Phaser.Scene {
 
   async retreatUnits() {
     return this.charas.map((chara) => {
-      run(chara);
+      chara.run()
 
       const squad = Squad.getUnitSquad(
         chara.id,
@@ -462,7 +456,7 @@ export default class CombatScene extends Phaser.Scene {
     const target = this.getChara(targetId);
 
     return new Promise<void>((resolve) => {
-      slash(source, resolve);
+      source.cast()
       this.damageUnit(target, damage, updatedTarget, targetId);
     });
   }
@@ -473,9 +467,9 @@ export default class CombatScene extends Phaser.Scene {
     updatedTarget: Unit.Unit,
     targetId: string
   ) {
-    if (chara.props.showHpBar) hpBar(chara, damage);
+    if (chara.showHpBar) hpBar(chara, damage);
 
-    flinch(chara, updatedTarget.currentHp === 0);
+    chara.hit()
 
     displayDamage(chara, damage);
 
@@ -488,7 +482,7 @@ export default class CombatScene extends Phaser.Scene {
   }
 
   updateMinisquadHP(id: string, hp: number) {
-    const chara = this.miniSquadCharas.find((c) => c.props.unit.id === id);
+    const chara = this.miniSquadCharas.find((c) => c.unit.id === id);
     if (chara) hpBar(chara, hp);
   }
 
@@ -511,10 +505,8 @@ export default class CombatScene extends Phaser.Scene {
 
     arrow.rotation = 0.5;
 
-    if (!source.props.front) arrow.scaleX = -1;
-
     return new Promise<void>((resolve) => {
-      bowAttack(source, resolve);
+      source.cast()
       this.add.tween({
         targets: arrow,
         x: target.container?.x,
@@ -543,8 +535,6 @@ export default class CombatScene extends Phaser.Scene {
 
     fb.rotation = 1.9;
 
-    if (source.props.front) fb.rotation = -1;
-
     return new Promise<void>((resolve) => {
       castSpell(source, resolve);
       this.add.tween({
@@ -562,8 +552,8 @@ export default class CombatScene extends Phaser.Scene {
 
   returnToPosition(id: string) {
     const chara = this.getChara(id);
-    defaultPose(chara);
-    run(chara);
+
+    chara.run()
 
     const squad = Squad.getUnitSquad(
       chara.id,
@@ -584,7 +574,7 @@ export default class CombatScene extends Phaser.Scene {
       y: y,
       duration: WALK_DURATION / GAME_SPEED,
       onComplete: () => {
-        stand(chara);
+        chara.stand()
         onComplete();
       },
     });

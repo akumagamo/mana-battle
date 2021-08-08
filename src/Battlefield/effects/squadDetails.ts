@@ -48,7 +48,7 @@ export default (
   onBoardUnitClicked(board, (chara) => {
     charaStats.removeAll(true);
 
-    detailsBar(chara.props.unit);
+    detailsBar(chara.unit);
   });
 
   const tile = board.tiles.find(

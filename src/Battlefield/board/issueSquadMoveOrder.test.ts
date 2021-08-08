@@ -6,18 +6,15 @@ import { CPU_FORCE, PLAYER_FORCE } from "../../constants";
 import createChara from "../../Chara/createChara";
 import { createUnit } from "../../Unit/Model";
 import moveSquadTo from "../squads/moveSquadTo";
-import animateSquadRun from "../squads/animateSquadRun";
 
 jest.mock("../Mode");
 jest.mock("../squads/moveSquadTo");
-jest.mock("../squads/animateSquadRun");
 
 const scene = sceneMock();
 
 let state = map();
 
 beforeEach(() => {
-  (animateSquadRun as jest.Mock).mockClear();
   (moveSquadTo as jest.Mock).mockClear();
   (changeMode as jest.Mock).mockClear();
 });

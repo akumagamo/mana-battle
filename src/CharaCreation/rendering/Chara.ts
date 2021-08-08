@@ -1,5 +1,5 @@
-import createChara from "../../Chara/createChara";
-import {Unit} from "../../Unit/Model";
+import createChara from '../../Chara/createChara';
+import {Unit} from '../../Unit/Model';
 
 export default (scene: Phaser.Scene, unit: Unit) =>
   createChara({
@@ -8,5 +8,4 @@ export default (scene: Phaser.Scene, unit: Unit) =>
     x: 250,
     y: 250,
     scale: 3,
-    showWeapon: false,
   });

@@ -1,4 +1,3 @@
-import stand from "../../Chara/animations/stand";
 import { CPU_FORCE, PLAYER_FORCE } from "../../constants";
 import { createEvent } from "../../utils";
 import { screenToCellPosition } from "../board/position";
@@ -19,7 +18,7 @@ export const onSquadFinishesMovement = (
   state.squadsInMovement = state.squadsInMovement.delete(squad.id);
 
   const chara = getChara(state, squad.id);
-  stand(chara);
+  chara.stand()
 
   const city = state.cities.find((city) => {
     const { x, y } = screenToCellPosition(squad.posScreen);

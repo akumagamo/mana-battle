@@ -1,14 +1,13 @@
-import tint from '../Chara/animations/tint';
 import createChara from '../Chara/createChara';
-import { Unit } from '../Unit/Model';
+import {Unit} from '../Unit/Model';
 import getUnitPositionOnScreen from './getUnitPositionOnScreen';
-import { Board } from './Model';
+import {Board} from './Model';
 
 export default (board: Board, unit: Unit) => {
   const member = board.squad.members.get(unit.id);
 
-  if(!member) return;
-  const { x, y } = getUnitPositionOnScreen(member);
+  if (!member) return;
+  const {x, y} = getUnitPositionOnScreen(member);
 
   const chara = createChara({
     scene: board.scene,
@@ -23,7 +22,7 @@ export default (board: Board, unit: Unit) => {
 
   board.container.add(chara.container);
 
-  if (chara.props.unit.currentHp < 1) tint(chara, 222222);
+  if (chara.unit.currentHp < 1) chara.tint(222222);
 
   return chara;
 };

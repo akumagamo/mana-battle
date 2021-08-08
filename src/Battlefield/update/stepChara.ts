@@ -1,14 +1,14 @@
-import { Chara } from "../../Chara/Model";
-import { GAME_SPEED } from "../../env";
-import { screenToCellPosition } from "../board/position";
-import { MOVE_SPEED } from "../config";
-import { MapSquad, MapState, walkableTilesWeightsMap } from "../Model";
+import {Chara} from '../../Chara/Model';
+import {GAME_SPEED} from '../../env';
+import {screenToCellPosition} from '../board/position';
+import {MOVE_SPEED} from '../config';
+import {MapSquad, MapState, walkableTilesWeightsMap} from '../Model';
 
 export default function (
   state: MapState,
-  next: { x: number; y: number },
+  next: {x: number; y: number},
   squad: MapSquad,
-  chara: Chara
+  chara: Chara,
 ): void {
   const currentCell = screenToCellPosition(squad.posScreen);
 
@@ -24,12 +24,12 @@ export default function (
     if (targetStep > next.x) squad.posScreen.x = next.x;
     else squad.posScreen.x = targetStep;
 
-    chara.innerWrapper.scaleX = 1;
+    chara.container.scaleX = 1;
   } else if (next.x < squad.posScreen.x) {
     const targetStep = squad.posScreen.x - moveSpeed * GAME_SPEED;
     if (targetStep < next.x) squad.posScreen.x = next.x;
     else squad.posScreen.x = targetStep;
-    chara.innerWrapper.scaleX = -1;
+    chara.container.scaleX = -1;
   } else if (next.y > squad.posScreen.y) {
     const targetStep = squad.posScreen.y + moveSpeed * GAME_SPEED;
     if (targetStep > next.y) squad.posScreen.y = next.y;

@@ -1,14 +1,14 @@
-import { Container } from "../Models";
-import { Unit } from "./Model";
-import { ItemSlot } from "../Item/Model";
-import { ItemDetailWindowScene } from "../Item/ItemDetailWindowScene";
-import text from "../UI/text";
-import button from "../UI/button";
-import panel from "../UI/panel";
-import { Chara } from "../Chara/Model";
-import createChara from "../Chara/createChara";
-import { JOBS } from "./Jobs/Jobs";
-import { getUnitAttacks } from "./Skills/Skills";
+import {Container} from '../Models';
+import {Unit} from './Model';
+import {ItemSlot} from '../Item/Model';
+import {ItemDetailWindowScene} from '../Item/ItemDetailWindowScene';
+import text from '../UI/text';
+import button from '../UI/button';
+import panel from '../UI/panel';
+import {Chara} from '../Chara/Model';
+import createChara from '../Chara/createChara';
+import {JOBS} from './Jobs/Jobs';
+import {getUnitAttacks} from './Skills/Skills';
 
 export class UnitDetailsBarScene extends Phaser.Scene {
   colWidth = 150;
@@ -19,18 +19,18 @@ export class UnitDetailsBarScene extends Phaser.Scene {
   onHatToggle: ((u: Unit) => void) | null = null;
 
   constructor(public showToggleHat = false, public allowReplaceItems = true) {
-    super("UnitDetailsBarScene");
+    super('UnitDetailsBarScene');
   }
 
   create() {
     this.itemDetail = new ItemDetailWindowScene(this.allowReplaceItems);
-    this.scene.add("item-detail", this.itemDetail, true);
+    this.scene.add('item-detail', this.itemDetail, true);
   }
 
   destroy(parentScene: Phaser.Scene) {
     this.container?.destroy();
-    parentScene.scene.remove("ItemDetailWindowScene");
-    parentScene.scene.remove("UnitDetailsBarScene");
+    parentScene.scene.remove('ItemDetailWindowScene');
+    parentScene.scene.remove('UnitDetailsBarScene');
   }
 
   clearChildren() {
@@ -48,7 +48,6 @@ export class UnitDetailsBarScene extends Phaser.Scene {
 
     this.unitStats(unit);
     this.unitItems(unit);
-    this.unitControls(unit);
   }
 
   write = (x: number, y: number, str: string | number) =>
@@ -56,14 +55,14 @@ export class UnitDetailsBarScene extends Phaser.Scene {
 
   col = (x: number, y: number, strs: (string | number)[]) =>
     strs.forEach((str, index) =>
-      this.write(x, y + this.rowHeight * index, str)
+      this.write(x, y + this.rowHeight * index, str),
     );
 
   row = (x: number, y: number, strs: (string | number)[]) =>
     strs.forEach((str, index) => this.write(x + this.colWidth * index, y, str));
 
   unitStats(unit: Unit) {
-    const { str, int, dex, lvl, exp, currentHp, hp } = unit;
+    const {str, int, dex, lvl, exp, currentHp, hp} = unit;
 
     const baseX = 20;
     const baseY = 20;
@@ -73,20 +72,19 @@ export class UnitDetailsBarScene extends Phaser.Scene {
       JOBS[unit.job].name,
       `Lvl ${lvl}`,
       `Exp ${exp}`,
-      "",
-      "",
-      "",
+      '',
+      '',
+      '',
       `${currentHp} / ${hp} HP`,
     ]);
 
-    this.scene.remove("pic");
+    this.scene.remove('pic');
     const pic = createChara({
       scene: this,
       unit,
       x: baseX + 80,
       y: baseY + 130,
       scale: 1.3,
-      headOnly: true,
     });
 
     this.container?.add(pic.container);
@@ -160,15 +158,4 @@ export class UnitDetailsBarScene extends Phaser.Scene {
     // item(baseX + boxSize + textWidth, baseY + boxSize, "ornament");
   }
 
-  unitControls(unit: Unit) {
-    if (this.container && this.showToggleHat)
-      button(600, 20, "Toggle Hat", this.container, this, () => {
-        // api.saveUnitIntoDB({
-        //   ...unit,
-        //   style: { ...unit.style, displayHat: !unit.style.displayHat },
-        // });
-
-        if (this.onHatToggle) this.onHatToggle(unit);
-      });
-  }
 }

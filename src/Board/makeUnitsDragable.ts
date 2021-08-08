@@ -1,20 +1,20 @@
-import onEnableDrag from "../Chara/events/onEnableDrag";
-import { Chara } from "../Chara/Model";
-import { SquadRecord } from "../Squad/Model";
-import { Unit } from "../Unit/Model";
-import changeUnitPositionInBoard from "./changeUnitPositionInBoard";
-import onUnitDrag from "./events/onUnitDrag";
-import { Board } from "./Model";
+import onEnableDrag from '../Chara/events/onEnableDrag';
+import {Chara} from '../Chara/Model';
+import {SquadRecord} from '../Squad/Model';
+import {Unit} from '../Unit/Model';
+import changeUnitPositionInBoard from './changeUnitPositionInBoard';
+import onUnitDrag from './events/onUnitDrag';
+import {Board} from './Model';
 
 export default (
   board: Board,
   onSquadUpdated: (
     squad: SquadRecord,
     added: string[],
-    removed: string[]
+    removed: string[],
   ) => void,
   onDragStart?: (unit: Unit, x: number, y: number, chara: Chara) => void,
-  onDragEnd?: (chara: Chara) => (x: number, y: number) => void
+  onDragEnd?: (chara: Chara) => (x: number, y: number) => void,
 ) => {
   board.unitList.forEach((chara) => {
     makeUnitDragable(chara, board, onDragStart, onDragEnd, onSquadUpdated);
@@ -28,8 +28,8 @@ export function makeUnitDragable(
   onSquadUpdated?: (
     squad: SquadRecord,
     added: string[],
-    removed: string[]
-  ) => void
+    removed: string[],
+  ) => void,
 ) {
   onEnableDrag(
     chara,
@@ -41,14 +41,10 @@ export function makeUnitDragable(
     },
     (c) => (x, y) => {
       if (onDragEnd && onSquadUpdated) {
-        changeUnitPositionInBoard(
-          board,
-          { unit: c.props.unit, x, y },
-          onSquadUpdated
-        );
+        changeUnitPositionInBoard(board, {unit: c.unit, x, y}, onSquadUpdated);
 
         onDragEnd(c)(x, y);
       }
-    }
+    },
   );
 }

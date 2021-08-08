@@ -1,10 +1,10 @@
-import { Text, Image } from '../Models';
-import { Chara } from '../Chara/Model';
-import { Unit, UnitIndex } from './Model';
-import { UnitDetailsBarScene } from './UnitDetailsBarScene';
+import {Text, Image} from '../Models';
+import {Chara} from '../Chara/Model';
+import {Unit, UnitIndex} from './Model';
+import {UnitDetailsBarScene} from './UnitDetailsBarScene';
 import button from '../UI/button';
 import menu from '../Backgrounds/menu';
-import { List } from 'immutable';
+import {List} from 'immutable';
 import onClick from '../Chara/events/onClick';
 import createChara from '../Chara/createChara';
 
@@ -64,13 +64,13 @@ export class ListUnitsScene extends Phaser.Scene {
     const rows = this.formatList(units, List());
 
     rows.forEach((row, y) =>
-      row.forEach((col, x) => this.renderUnit(col, x, y))
+      row.forEach((col, x) => this.renderUnit(col, x, y)),
     );
   }
 
   formatList(
     units: UnitIndex,
-    accumulator: List<List<Unit>>
+    accumulator: List<List<Unit>>,
   ): List<List<Unit>> {
     const cols = 10;
     if (units.size <= cols) {
@@ -79,7 +79,7 @@ export class ListUnitsScene extends Phaser.Scene {
       const slice = units.slice(0, cols);
       return this.formatList(
         units.slice(cols, units.size),
-        accumulator.push(slice.toList())
+        accumulator.push(slice.toList()),
       );
     }
   }
@@ -105,12 +105,12 @@ export class ListUnitsScene extends Phaser.Scene {
     tile.setInteractive();
     tile.on('pointerdown', () => this.selectUnit(unit.id));
 
-    this.units.push({ tile, chara });
+    this.units.push({tile, chara});
   }
 
   selectUnit(id: string) {
     this.units.forEach((u) => u.tile.clearTint());
-    const listUnit = this.units.find((u) => u.chara.props.unit.id === id);
+    const listUnit = this.units.find((u) => u.chara.id === id);
 
     if (listUnit) {
       listUnit.tile.setTint(0x333333);
@@ -122,7 +122,7 @@ export class ListUnitsScene extends Phaser.Scene {
   renderUnitDetails(chara: Chara) {
     if (!this.detailsBar) return;
 
-    this.detailsBar.render(chara.props.unit);
+    this.detailsBar.render(chara.unit);
     this.detailsBar.onHatToggle = (unit: Unit) => {
       this.removeUnitList();
       this.renderUnitsList(this.getUnits());
@@ -137,7 +137,7 @@ export class ListUnitsScene extends Phaser.Scene {
   }
   removeUnitList() {
     this.units.forEach((listUnit) => {
-      this.scene.remove(`list-chara-${listUnit.chara.props.unit.id}`);
+      this.scene.remove(`list-chara-${listUnit.chara.id}`);
       listUnit.tile.destroy();
     });
     this.units = [];

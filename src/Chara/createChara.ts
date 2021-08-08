@@ -1,10 +1,9 @@
-import { Unit } from '../Unit/Model';
-import initial from './animations/initial';
-import stand from './animations/stand';
-import { Chara } from './Model';
-import hpBar from './ui/hpBar';
-import * as selectChara from './commands/selectChara';
-import * as deselectChara from './commands/deselectChara';
+import { Unit } from "../Unit/Model";
+import { Chara } from "./Model";
+import hpBar from "./ui/hpBar";
+import * as selectChara from "./commands/selectChara";
+import * as deselectChara from "./commands/deselectChara";
+import animations from "./animations/animations";
 
 export default (props: {
   scene: Phaser.Scene;
@@ -14,108 +13,60 @@ export default (props: {
   scale?: number;
   front?: boolean;
   animated?: boolean;
-  headOnly?: boolean;
   showHpBar?: boolean;
-  showWeapon?: boolean;
 }): Chara => {
-  const {
-    scene,
-    unit,
-    x = 0,
-    y = 0,
-    scale = 1,
-    front = true,
-    animated = true,
-    headOnly = false,
-    showHpBar = false,
-    showWeapon = false,
-  } = props;
-  //the unit has two wrappers to allow multiple tweens at once
+  const { scene, unit, x = 0, y = 0, scale = 1, showHpBar = false } = props;
+
   const container = scene.add.container(x, y);
-  container.name = unit.id;
+  container.setSize(100, 75);
+  const sprite = scene.add.sprite(0, 0, `sprite_${unit.job}`);
+  sprite.setScale(scale);
 
-  const innerWrapper = scene.add.container();
-  container.add(innerWrapper);
-
-  container.setDepth(y);
-  const container_width = 100;
-  const container_height = 170;
-  container.setSize(container_width, container_height);
-  container.setScale(scale);
+  const hpBarContainer = scene.add.container();
+  container.add([sprite, hpBarContainer]);
 
   const chara: Chara = {
-    id: unit.id,
-    props: {
-      ...props,
-      x,
-      y,
-      scale,
-      front,
-      animated,
-      headOnly,
-      showHpBar,
-      showWeapon,
-    },
     scene,
+    sprite,
+    id: unit.id,
+    unit,
     container,
-    innerWrapper,
-    hpBarContainer: scene.add.container(),
+    x,
+    y,
+    scale,
+    showHpBar,
+    hpBarContainer,
 
-    hair: null,
-    head: null,
-    trunk: null,
-    leftHand: null,
-    rightHand: null,
-    leftFoot: null,
-    rightFoot: null,
-
-    mainHandContainer: null,
-    offHandContainer: null,
-
-    rightHandEquip: null,
-    leftHandEquip: null,
-    hat: null,
-    selectedCharaIndicator: null,
+    stand: () => {
+      sprite.play("stand");
+    },
+    run: () => {
+      sprite.play("run");
+    },
+    cast: () => {
+      sprite.play("cast");
+    },
+    hit: () => {
+      sprite.play("hit");
+    },
+    die: () => {
+      sprite.play("die");
+    },
+    tint: (value: number) => {
+      sprite.setTint(value);
+    },
     destroy: () => {
+      sprite.destroy();
       container.destroy();
-    }, //todo: make this an external function. check other destroy fns
+    },
+    selectedCharaIndicator: null,
   };
-
-  initial(chara, headOnly);
 
   if (showHpBar) {
     hpBar(chara, unit.currentHp);
   }
 
-  if (animated) stand(chara);
-
-  // DEBUG DRAG CONTAINER
-  //var rect = new Phaser.Geom.Rectangle(
-  //  (-1 * container_width) / 2,
-  //  (-1 * container_height) / 2,
-  //  container_width,
-  //  container_height,
-  //);
-  //
-  //var graphics = chara.scene.add.graphics({fillStyle: {color: 0x0000ff}});
-  //graphics.alpha = 0.5;
-  //
-  //graphics.fillRectShape(rect);
-  //chara.container.add(graphics);
-  //
-  // DEBUG ORIGIN
-  // var origin = new Phaser.Geom.Rectangle(
-  //   0,
-  //   0,
-  //   20,
-  //   20
-  // );
-
-  // var originGraphic = chara.scene.add.graphics({ fillStyle: { color: 0xff0000 } });
-  // originGraphic.alpha = 1;
-
-  // originGraphic.fillRectShape(origin);
-  // chara.container.add(originGraphic);
+  animations(scene)
 
   selectChara.subscribe(chara);
   deselectChara.subscribe(chara);

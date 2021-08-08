@@ -1,13 +1,12 @@
-import { Container } from '../../Models';
-import tint from '../animations/tint';
-import { CHARA_INACTIVE_COLOR } from '../colors';
-import { Chara } from '../Model';
+import {Container} from '../../Models';
+import {CHARA_INACTIVE_COLOR} from '../colors';
+import {Chara} from '../Model';
 
 const createHpBar = (
   scene: Phaser.Scene,
   parent: Container,
   hpAmount: number,
-  maxHp: number
+  maxHp: number,
 ) => {
   const x = -50;
   const y = -40;
@@ -42,7 +41,7 @@ export default function (chara: Chara, hpAmount: number) {
   if (chara.hpBarContainer) chara.hpBarContainer.destroy();
 
   if (hpAmount < 1) {
-    tint(chara, CHARA_INACTIVE_COLOR);
+    chara.tint(CHARA_INACTIVE_COLOR);
     return;
   }
 
@@ -50,6 +49,6 @@ export default function (chara: Chara, hpAmount: number) {
     chara.scene,
     chara.container,
     hpAmount,
-    chara.props.unit.hp
+    chara.unit.hp,
   );
 }
