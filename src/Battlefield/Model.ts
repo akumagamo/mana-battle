@@ -63,7 +63,7 @@ export type MapState = {
   charas: Chara[];
   forces: Force[];
   cities: City[];
-  squads: MapSquadIndex;
+  squads: MapSquadIndex; // TODO: this should change to just squadIndex - so that we can use regular util fns
   units: UnitIndex;
   unitSquadIndex: UnitSquadIndex;
   timeOfDay: number;

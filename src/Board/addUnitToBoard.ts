@@ -14,8 +14,7 @@ export default (board: Board, unit: Unit) => {
     unit,
     x: x * board.scale,
     y: y * board.scale,
-    scale: board.scale,
-    front: board.front,
+    scale: board.scale * 3,
     animated: false,
     showHpBar: true,
   });

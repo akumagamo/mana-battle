@@ -11,7 +11,6 @@ export default (props: {
   x?: number;
   y?: number;
   scale?: number;
-  front?: boolean;
   animated?: boolean;
   showHpBar?: boolean;
 }): Chara => {

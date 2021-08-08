@@ -167,7 +167,6 @@ export default class CombatScene extends Phaser.Scene {
             x: x,
             y: y,
             scale: COMBAT_CHARA_SCALE,
-            front: isTopSquad,
           });
 
           chara.stand()
