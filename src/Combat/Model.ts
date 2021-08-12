@@ -1,24 +1,11 @@
-export interface Team {
-  grid: {
-    [x: number]: {[y: number]: string};
-  };
-  members: {
-    [id: string]: TeamMember;
-  };
-}
-export interface TeamMember {
-  hp: number;
-  initiative: number;
-  x: number;
-  y: number;
-}
+import { List } from "immutable";
+import { SquadIndex } from "../Squad/Model";
+import { Unit, UnitIndex } from "../Unit/Model";
 
-export interface InitiativeList {
-  [order:number]:string
-}
-export interface Combat {
-  teamA: Team;
-  teamB: Team;
-  initiativeList: InitiativeList
-  totalUnits: number;
-}
+export type CombatCreateParams = {
+  left: string; // TODO: change to Squad
+  right: string;
+  squads: SquadIndex;
+  units: UnitIndex;
+  onCombatFinish: (cmd: List<Unit>, squadDamage: Map<string, number>) => void;
+};

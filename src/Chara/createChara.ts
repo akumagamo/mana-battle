@@ -46,7 +46,7 @@ export default (props: {
       sprite.play("cast");
     },
     hit: () => {
-      sprite.play("hit");
+      sprite.play("hit").chain("stand");
     },
     die: () => {
       sprite.play("die");
@@ -65,7 +65,7 @@ export default (props: {
     hpBar(chara, unit.currentHp);
   }
 
-  animations(scene)
+  animations(scene);
 
   selectChara.subscribe(chara);
   deselectChara.subscribe(chara);

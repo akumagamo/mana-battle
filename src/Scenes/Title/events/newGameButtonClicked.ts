@@ -18,11 +18,11 @@ export async function handleNewGameButtonClicked({
     scene.tweens.add({
       targets: state.music,
       volume: 0,
-      duration: 1000,
+      duration: 500 / GAME_SPEED,
     });
   }
 
-  await fadeOut(scene, 1000 / GAME_SPEED);
+  await fadeOut(scene, 500 / GAME_SPEED);
 
   turnOff(scene, state);
   startCharaCreationScene(scene);
