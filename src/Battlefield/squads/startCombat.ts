@@ -37,11 +37,14 @@ export default async function (
       left: squadA.id,
       right: squadB.id,
       ...state,
-      squads: state.squads.map((s) => s.squad),
+      squads: state.squads
+        .map((s) => s.squad)
+        .filter((s) => [squadA.id, squadB.id].includes(s.id)),
+      units: getSquadUnits(state, squadA.id).merge(
+        getSquadUnits(state, squadB.id)
+      ),
       onCombatFinish: () => {},
     },
     scene
   );
-
-  //attack(scene, state, squadA, squadB);
 }

@@ -1,16 +1,25 @@
 import createChara from "../Chara/createChara";
-import { Chara } from "../Chara/Model";
+import { emptyIndex } from "../Chara/Model";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
 import { createUnitSquadIndex, getMember, getSquad } from "../Squad/Model";
 import { getUnit } from "../Unit/Model";
-import { CombatCreateParams } from "./Model";
+import {
+  memberToBoardPosition,
+  placeUnitOnBoard,
+  renderPieceOnCell,
+} from "./combatBoard";
+import execute from "./execute";
+import { CombatBoardState, CombatCreateParams } from "./Model";
+import { runCombat } from "./turns";
 
 export default async (data: CombatCreateParams, scene: Phaser.Scene) => {
-  const state = {
-    squads: data.squads,
+  const state: CombatBoardState = {
+    left: data.left,
+    scene,
+    squadIndex: data.squads,
     unitIndex: data.units,
     unitSquadIndex: createUnitSquadIndex(data.squads),
-    charas: [] as Chara[],
+    charaIndex: emptyIndex,
   };
 
   if (process.env.SOUND_ENABLED) {
@@ -37,23 +46,23 @@ export default async (data: CombatCreateParams, scene: Phaser.Scene) => {
 
         if (unit.currentHp < 1) return;
 
-        const pos = getMember(member.id, squad);
-        const bX = isLeftSquad ? 210 : 1080;
-        const bY = 120;
+        const position = placeUnitOnBoard(isLeftSquad)(squad)(member.id);
+
         const chara = createChara({
           scene: scene,
           unit,
-          x: bX + pos.x * (110 * (isLeftSquad ? 1 : -1)),
-          y: bY + pos.y * 80,
+          ...position,
           scale: 2,
         });
         chara.stand();
 
         if (!isLeftSquad) chara.container.scaleX = chara.container.scaleX * -1;
 
-        state.charas.push(chara);
+        state.charaIndex = state.charaIndex.set(chara.id, chara);
       });
   });
+  const commands = runCombat(state);
+  execute(commands, state);
 
   //this.turn();
 };

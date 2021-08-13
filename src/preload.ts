@@ -10,6 +10,11 @@ export function preload(this: Phaser.Scene) {
       frameHeight: 75,
     })
   );
+  this.load.spritesheet("fire", `${PUBLIC_URL}/fire.svg`, {
+    frameWidth: 50,
+    frameHeight: 117,
+    endFrame: 6,
+  });
   ["backgrounds/sunset", "tile", "board"].forEach((str) =>
     this.load.image(str, PUBLIC_URL + "/" + str + ".svg")
   );

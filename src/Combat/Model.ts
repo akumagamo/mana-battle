@@ -1,5 +1,6 @@
 import { List } from "immutable";
-import { SquadIndex } from "../Squad/Model";
+import { CharaIndex } from "../Chara/Model";
+import { SquadIndex, UnitSquadIndex } from "../Squad/Model";
 import { Unit, UnitIndex } from "../Unit/Model";
 
 export type CombatCreateParams = {
@@ -8,4 +9,13 @@ export type CombatCreateParams = {
   squads: SquadIndex;
   units: UnitIndex;
   onCombatFinish: (cmd: List<Unit>, squadDamage: Map<string, number>) => void;
+};
+
+export type CombatBoardState = {
+  scene: Phaser.Scene;
+  left: string;
+  squadIndex: SquadIndex;
+  unitIndex: UnitIndex;
+  unitSquadIndex: UnitSquadIndex;
+  charaIndex: CharaIndex;
 };

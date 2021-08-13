@@ -21,14 +21,14 @@ test("Should sort by initiave correctly", () => {
 });
 
 test("Combat should have the expected outcome", () => {
-  const units = Map({
+  const unitIndex = Map({
     "0": createUnit("0"),
     "1": createUnit("1"),
     "2": createUnit("2"),
     "3": createUnit("3"),
   });
 
-  const squads = Map({
+  const squadIndex = Map({
     s1: createSquad({
       id: "s1",
       leader: "0",
@@ -49,9 +49,9 @@ test("Combat should have the expected outcome", () => {
     }),
   });
 
-  const unitSquadIndex = createUnitSquadIndex(squads);
+  const unitSquadIndex = createUnitSquadIndex(squadIndex);
 
-  const res = runCombat(squads, units, unitSquadIndex);
+  const res = runCombat({squadIndex, unitIndex, unitSquadIndex});
   equals(res.length, 25);
 
   const [last] = res.reverse();

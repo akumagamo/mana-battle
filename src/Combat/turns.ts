@@ -82,11 +82,15 @@ export type Command =
   | Return
   | EndCombat;
 
-export const runCombat = (
-  squadIndex: Squad.SquadIndex,
-  unitIndex: Unit.UnitIndex,
-  unitSquadIndex: Squad.UnitSquadIndex
-): Command[] => {
+export const runCombat = ({
+  squadIndex,
+  unitIndex,
+  unitSquadIndex,
+}: {
+  squadIndex: Squad.SquadIndex;
+  unitIndex: Unit.UnitIndex;
+  unitSquadIndex: Squad.UnitSquadIndex;
+}): Command[] => {
   const remainingAttacksIndex: RemainingAttacksIndex = unitIndex
     .map((unit) => ({
       id: unit.id,

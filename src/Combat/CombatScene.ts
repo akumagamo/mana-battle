@@ -2,7 +2,7 @@ import { Chara } from "../Chara/Model";
 import { cartesianToIsometricBattle } from "../utils/isometric";
 import { INVALID_STATE } from "../errors";
 import * as Unit from "../Unit/Model";
-import { Command, runCombat, XPInfo } from "./turns";
+import { Command, XPInfo } from "./turns";
 import plains from "../Backgrounds/plains";
 import { Container } from "../Models";
 import fireball from "../Chara/animations/spells/fireball";
@@ -255,12 +255,12 @@ export default class CombatScene extends Phaser.Scene {
   // COMBAT FLOW METHODS
 
   turn() {
-    const commands = runCombat(
-      this.squads,
-      this.unitIndex,
-      this.unitSquadIndex
-    );
-    this.execute(commands);
+    // const commands = runCombat(
+    //   this.squads,
+    //   this.unitIndex,
+    //   this.unitSquadIndex
+    // );
+    // this.execute(commands);
   }
 
   async execute(commands: Command[]) {
