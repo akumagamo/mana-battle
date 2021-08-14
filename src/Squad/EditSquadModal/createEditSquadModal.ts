@@ -74,6 +74,7 @@ export default function ({
     y: number,
     chara: Chara
   ) => {
+    chara.sprite.setScale(2);
     handleUnitDrag(unitList, unit, x, y, chara, () => {
       onDragFromUnitList(board, x, y);
     });

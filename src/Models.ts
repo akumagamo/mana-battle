@@ -1,31 +1,31 @@
 /** Actual coordinate in screen of pixel or pointer position */
 export type Point2D = {
-  x: number;
-  y: number;
-};
+    x: number
+    y: number
+}
 
-export type CenterX = number;
-export type CenterY = number;
-export type TileWidth = number;
-export type TileHeight = number;
+export type CenterX = number
+export type CenterY = number
+export type TileWidth = number
+export type TileHeight = number
 
 export type BoardPiece = {
-  x: 1 | 2 | 3;
-  Y: 1 | 2 | 3;
-};
+    x: 1 | 2 | 3
+    Y: 1 | 2 | 3
+}
 
-export type Pointer = Phaser.Input.Pointer;
-export type Image = Phaser.GameObjects.Image;
-export type Container = Phaser.GameObjects.Container;
-export type Text = Phaser.GameObjects.Text;
-export type Tween = Phaser.Tweens.Tween;
-export type Graphics = Phaser.GameObjects.Graphics;
+export type Pointer = Phaser.Input.Pointer
+export type Image = Phaser.GameObjects.Image
+export type Container = Phaser.GameObjects.Container
+export type Text = Phaser.GameObjects.Text
+export type Tween = Phaser.Tweens.Tween
+export type Graphics = Phaser.GameObjects.Graphics
 
 export type Options = {
-  soundEnabled: boolean;
-  musicEnabled: boolean;
-};
+    soundEnabled: boolean
+    musicEnabled: boolean
+}
 
 export type EventEmitter =
-  | Phaser.Events.EventEmitter
-  | Phaser.GameObjects.GameObject;
+    | Phaser.Events.EventEmitter
+    | Phaser.GameObjects.GameObject

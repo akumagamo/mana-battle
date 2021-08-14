@@ -1,20 +1,20 @@
-import aiAttack from "./ai/aiAttack";
-import { healSquads } from "./events/healSquadsTick";
-import { MapState } from "./Model";
-import moveSquads from "./update/moveSquads";
+import aiAttack from "./ai/aiAttack"
+import { healSquads } from "./events/healSquadsTick"
+import { MapState } from "./Model"
+import moveSquads from "./update/moveSquads"
 
-export default function (scene: Phaser.Scene, state: MapState) {
-  if (!state.isPaused) {
-    moveSquads(scene, state);
+export default function(scene: Phaser.Scene, state: MapState) {
+    if (!state.isPaused) {
+        moveSquads(scene, state)
 
-    state.timeOfDay += 1;
-    state.tick += 1;
+        state.timeOfDay += 1
+        state.tick += 1
 
-    if (state.tick === 60) {
-      healSquads(state);
-      state.tick = 0;
+        if (state.tick === 60) {
+            healSquads(state)
+            state.tick = 0
 
-      aiAttack(state);
+            aiAttack(state)
+        }
     }
-  }
 }

@@ -1,2 +1,1 @@
-
-it.todo('should render the passed title')
+it.todo("should render the passed title")

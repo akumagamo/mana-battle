@@ -1,40 +1,40 @@
-import { Unit } from "../Unit/Model";
-import { Container, Image } from "../Models";
-import { Map } from "immutable";
-import { INVALID_STATE } from "../errors";
+import { Unit } from "../Unit/Model"
+import { Container, Image } from "../Models"
+import { Map } from "immutable"
+import { INVALID_STATE } from "../errors"
 
 export type Chara = {
-  scene: Phaser.Scene;
-  id: string;
-  unit: Unit;
-  container: Container;
-  x: number;
-  y: number;
-  scale: number;
-  showHpBar: boolean;
-  hpBarContainer: Container;
+    scene: Phaser.Scene
+    id: string
+    unit: Unit
+    container: Container
+    x: number
+    y: number
+    scale: number
+    showHpBar: boolean
+    hpBarContainer: Container
 
-  sprite: Phaser.GameObjects.Sprite;
+    sprite: Phaser.GameObjects.Sprite
 
-  stand: () => void;
-  hit: () => void;
-  cast: () => void;
-  run: () => void;
-  die: () => void;
+    stand: () => void
+    hit: () => void
+    cast: () => void
+    run: () => void
+    die: () => void
 
-  tint: (value: number) => void;
-  destroy: () => void;
+    tint: (value: number) => void
+    destroy: () => void
 
-  selectedCharaIndicator: Image | null;
-};
+    selectedCharaIndicator: Image | null
+}
 
-export type CharaIndex = Map<string, Chara>;
-export const emptyIndex = Map() as CharaIndex;
+export type CharaIndex = Map<string, Chara>
+export const emptyIndex = Map() as CharaIndex
 
 export const getChara = (id: string, index: CharaIndex): Chara => {
-  const chara = index.get(id);
+    const chara = index.get(id)
 
-  if (!chara) throw new Error(INVALID_STATE);
+    if (!chara) throw new Error(INVALID_STATE)
 
-  return chara;
-};
+    return chara
+}

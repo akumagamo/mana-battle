@@ -1,3 +1,3 @@
 export function getDOMElementById(id: string) {
-  return document.getElementById(id);
+    return document.getElementById(id)
 }

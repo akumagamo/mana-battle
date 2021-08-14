@@ -1,1 +1,1 @@
-export const CHARA_INACTIVE_COLOR = 222222;
+export const CHARA_INACTIVE_COLOR = 222222

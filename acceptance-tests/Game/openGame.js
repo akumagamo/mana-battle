@@ -1,5 +1,5 @@
-const { wait } = require("../utils");
+const { wait } = require("../utils")
 
-module.exports = async (page) => {
-  await page.goto("http://localhost:3000");
-};
+module.exports = async page => {
+    await page.goto("http://localhost:3000")
+}

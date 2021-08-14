@@ -1,1 +1,1 @@
-test.todo('Obtains actual stat value');
+test.todo("Obtains actual stat value")

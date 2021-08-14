@@ -1,51 +1,51 @@
-import {maleNames} from '../constants/names';
-import {randomItem} from '../utils';
-import {Elem, Gender, Movement, Unit, UnitJobs as UnitJob} from './Model';
-import {baseEquips} from './Jobs/Jobs';
-import {PLAYER_FORCE} from '../constants';
+import { maleNames } from "../constants/names"
+import { randomItem } from "../utils"
+import { Elem, Gender, Movement, Unit, UnitJobs as UnitJob } from "./Model"
+import { baseEquips } from "./Jobs/Jobs"
+import { PLAYER_FORCE } from "../constants"
 
 export default function createUnit(
-  id = '1',
-  job = 'fighter' as UnitJob,
-  lvl = 1,
-  overrides = {},
+    id = "1",
+    job = "fighter" as UnitJob,
+    lvl = 1,
+    overrides = {}
 ): Unit {
-  const baseStats: {
-    [job in UnitJob]: {hp: number; str: number; dex: number; int: number};
-  } = {
-    fighter: {
-      hp: 80,
-      str: 18,
-      dex: 15,
-      int: 11,
-    },
-    mage: {
-      hp: 60,
-      str: 10,
-      dex: 12,
-      int: 20,
-    },
-    archer: {
-      hp: 70,
-      str: 13,
-      dex: 18,
-      int: 12,
-    },
-  };
+    const baseStats: {
+        [job in UnitJob]: { hp: number; str: number; dex: number; int: number }
+    } = {
+        fighter: {
+            hp: 80,
+            str: 18,
+            dex: 15,
+            int: 11,
+        },
+        mage: {
+            hp: 60,
+            str: 10,
+            dex: 12,
+            int: 20,
+        },
+        archer: {
+            hp: 70,
+            str: 13,
+            dex: 18,
+            int: 12,
+        },
+    }
 
-  return {
-    name: randomItem(maleNames),
-    id,
-    job: job,
-    equips: baseEquips[job],
-    lvl,
-    movement: 'plain' as Movement,
-    elem: 'neutral' as Elem,
-    gender: randomItem(['male', 'female'] as Gender[]),
-    exp: 0,
-    force: PLAYER_FORCE,
-    ...baseStats[job],
-    currentHp: baseStats[job].hp,
-    ...overrides,
-  };
+    return {
+        name: randomItem(maleNames),
+        id,
+        job: job,
+        equips: baseEquips[job],
+        lvl,
+        movement: "plain" as Movement,
+        elem: "neutral" as Elem,
+        gender: randomItem(["male", "female"] as Gender[]),
+        exp: 0,
+        force: PLAYER_FORCE,
+        ...baseStats[job],
+        currentHp: baseStats[job].hp,
+        ...overrides,
+    }
 }

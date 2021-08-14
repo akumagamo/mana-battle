@@ -1,6 +1,6 @@
 export function idfy(str: string): string {
-  return str
-    .toLowerCase()
-    .split(' ')
-    .join('_');
+    return str
+        .toLowerCase()
+        .split(" ")
+        .join("_")
 }

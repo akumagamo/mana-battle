@@ -1,4 +1,4 @@
-import { sceneMock } from '../test/mocks';
-import create from './create';
+import { sceneMock } from "../test/mocks"
+import create from "./create"
 
-it('should run without crashing', () => create(sceneMock()));
+it("should run without crashing", () => create(sceneMock()))

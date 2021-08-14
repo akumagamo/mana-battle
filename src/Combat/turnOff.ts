@@ -1,5 +1,5 @@
-import { CombatBoardState } from "./Model";
+import { CombatBoardState } from "./Model"
 
-export default function (state: CombatBoardState) {
-  state.charaIndex.map((c) => c.destroy());
+export default function(state: CombatBoardState) {
+    state.charaIndex.map(c => c.destroy())
 }

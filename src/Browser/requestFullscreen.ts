@@ -1,3 +1,3 @@
 export function requestFullscreen() {
-  window.document.body.requestFullscreen();
+    window.document.body.requestFullscreen()
 }

@@ -1,4 +1,4 @@
-import { tileWidth, tileHeight, centerX, centerY } from '../constants';
+import { tileWidth, tileHeight, centerX, centerY } from "../constants"
 
 /**
  *
@@ -9,10 +9,10 @@ import { tileWidth, tileHeight, centerX, centerY } from '../constants';
  */
 
 export function cartesianToIsometric(x: number, y: number) {
-  return {
-    x: (x - y) * tileWidth,
-    y: (x + y) * tileHeight,
-  };
+    return {
+        x: (x - y) * tileWidth,
+        y: (x + y) * tileHeight,
+    }
 }
 
 /**
@@ -23,24 +23,24 @@ export function cartesianToIsometric(x: number, y: number) {
  * @param y
  */
 export function cartesianToIsometricBattle(
-  isTopSquad: boolean,
-  x: number,
-  y: number
+    isTopSquad: boolean,
+    x: number,
+    y: number
 ) {
-  const TOP_SQUAD_OFFSET_X = 350;
-  const TOP_SQUAD_OFFSET_Y = 50;
+    const TOP_SQUAD_OFFSET_X = 350
+    const TOP_SQUAD_OFFSET_Y = 50
 
-  const BOTTOM_SQUAD_OFFSET_X = 900;
-  const BOTTOM_SQUAD_OFFSET_Y = 350;
+    const BOTTOM_SQUAD_OFFSET_X = 900
+    const BOTTOM_SQUAD_OFFSET_Y = 350
 
-  var tx = (x - y) * tileWidth;
-  var ty = ((x + y) * tileHeight) / 2;
+    var tx = (x - y) * tileWidth
+    var ty = ((x + y) * tileHeight) / 2
 
-  const offsetX = isTopSquad ? TOP_SQUAD_OFFSET_X : BOTTOM_SQUAD_OFFSET_X;
-  const offsetY = isTopSquad ? TOP_SQUAD_OFFSET_Y : BOTTOM_SQUAD_OFFSET_Y;
+    const offsetX = isTopSquad ? TOP_SQUAD_OFFSET_X : BOTTOM_SQUAD_OFFSET_X
+    const offsetY = isTopSquad ? TOP_SQUAD_OFFSET_Y : BOTTOM_SQUAD_OFFSET_Y
 
-  return {
-    x: tx + offsetX,
-    y: ty + offsetY,
-  };
+    return {
+        x: tx + offsetX,
+        y: ty + offsetY,
+    }
 }
