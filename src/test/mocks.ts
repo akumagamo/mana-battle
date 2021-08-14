@@ -94,7 +94,11 @@ export const sceneMock = () => {
                 fadeOut: jest.fn().mockResolvedValue(null),
             },
         },
-        anims: { create: jest.fn(), generateFrameNumbers: jest.fn() },
+        anims: {
+            create: jest.fn(),
+            generateFrameNumbers: jest.fn(),
+            exists: jest.fn(),
+        },
         time: {
             addEvent: jest.fn().mockResolvedValue(null),
         },
