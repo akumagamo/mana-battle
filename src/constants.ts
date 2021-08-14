@@ -21,7 +21,4 @@ export const SCENES = {
     CHARA_CREATION_SCENE: "CharaCreationScene",
 }
 
-export const lipsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras id velit at 
-lectus ullamcorper ultricies.  Nulla placerat posuere metus eget consectetur.
-Sed velit mauris, fringilla eu magna vitae, volutpat consectetur augue.
-`
+export const lipsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`
