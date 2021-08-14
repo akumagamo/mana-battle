@@ -21,58 +21,6 @@ import { checkCollision } from "./update/checkCollision";
 export default async (scene: Phaser.Scene, state: MapState) => {
   subscribe(scene, state);
 
-  const combatCallback = (
-    units: UnitIndex,
-    squadDamage: Map<string, number>
-  ) => {
-    let squadsTotalHP = units.reduce((xs, unit) => {
-      const sqds = state.squads.map((s) => s.squad);
-      let sqdId = getUnitSquad(unit.id, sqds, createUnitSquadIndex(sqds)).id;
-
-      if (!xs[sqdId]) {
-        xs[sqdId] = 0;
-      }
-
-      xs[sqdId] += unit.currentHp;
-
-      return xs;
-    }, {} as { [x: string]: number });
-
-    state.units = state.units.merge(units);
-
-    console.log(`updated units`, state.units);
-    Map(squadsTotalHP)
-      .filter((v) => v === 0)
-      .keySeq()
-      .forEach((target) => markSquadForRemoval(state, target));
-
-    const sortedSquads = squadDamage.sort().keySeq();
-
-    const loser = getMapSquad(state, sortedSquads.first());
-
-    const winner = getMapSquad(state, sortedSquads.last());
-
-    const direction = () => {
-      if (winner.posScreen.x < loser.posScreen.x) return "right";
-      else if (winner.posScreen.x > loser.posScreen.x) return "left";
-      else if (winner.posScreen.y < loser.posScreen.y) return "bottom";
-      else if (winner.posScreen.y > loser.posScreen.y) return "top";
-      else return "top";
-    };
-
-    state.squadToPush = {
-      loser: loser.id,
-      direction: direction(),
-    };
-  };
-
-  scene.events.on(
-    "CombatFinished",
-    (units: UnitIndex, squadDamage: Map<string, number>) => {
-      combatCallback(units, squadDamage);
-    }
-  );
-
   scene.events.on("PushLosingSquads", async () => {
     await pushSquad(scene, state);
     state.isPaused = false;

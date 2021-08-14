@@ -13,6 +13,7 @@ import * as SquadFinishesMovement from "./SquadFinishesMovement";
 import * as SquadConqueredCity from "./SquadConqueredCity";
 import * as PlayerWins from "./PlayerWins";
 import * as PlayerLoses from "./PlayerLoses";
+import * as CombatEnded from "./CombatEnded";
 
 /** This is a function to avoid accessing the `default` property before initialization -
  * which can lead to a webpack error*/
@@ -33,6 +34,7 @@ const events = () => ({
   [SquadConqueredCity.key]: SquadConqueredCity.default,
   [PlayerWins.key]: PlayerWins.default,
   [PlayerLoses.key]: PlayerLoses.default,
+  [CombatEnded.key]: CombatEnded.default,
 });
 
 export default events;

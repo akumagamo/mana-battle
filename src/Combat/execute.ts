@@ -1,3 +1,4 @@
+import CombatEnded from "../Battlefield/events/CombatEnded";
 import fireball from "./animations/fireball";
 import moveUnit from "./animations/moveUnit";
 import returnToPosition from "./animations/returnToPosition";
@@ -62,7 +63,10 @@ export default async function execute(
     // await this.displayExperienceGain(cmd.xpInfo);
     step();
   } else if (cmd.type === "END_COMBAT") {
-    state.scene.events.emit("CombatFinished", cmd.units, cmd.squadDamage);
+    CombatEnded(state.scene).emit({
+      units: cmd.units,
+      squadDamage: cmd.squadDamage,
+    });
     turnOff(state);
   } else if (cmd.type === "VICTORY") {
     state.scene.events.emit("CombatFinished", state);

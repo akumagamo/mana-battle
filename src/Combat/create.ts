@@ -59,7 +59,7 @@ export default async (data: CombatCreateParams, scene: Phaser.Scene) => {
       });
   });
 
-  scene.events.on("CombatFinished", () => {
+  scene.events.on("CombatEnded", () => {
     board.destroy();
   });
 

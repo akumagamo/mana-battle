@@ -13,6 +13,7 @@ import { onSquadFinishesMovement } from "./events/SquadFinishesMovement";
 import { onSquadConquersCity } from "./events/SquadConqueredCity";
 import { onPlayerWins } from "./events/PlayerWins";
 import { onPlayerLoses } from "./events/PlayerLoses";
+import { combatEnded } from "./events/CombatEnded";
 
 export default function (scene: Phaser.Scene, state: MapState) {
   const index = events();
@@ -50,4 +51,5 @@ export default function (scene: Phaser.Scene, state: MapState) {
   index.SquadConqueredCity(scene).on(onSquadConquersCity(scene, state));
   index.PlayerWins(scene).on(onPlayerWins);
   index.PlayerLoses(scene).on(onPlayerLoses);
+  index.CombatEnded(scene).on(combatEnded(state));
 }

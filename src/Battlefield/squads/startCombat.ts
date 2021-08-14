@@ -31,7 +31,7 @@ export default async function (
 
   await delay(scene, 1000 / GAME_SPEED);
 
-  scene.events.on("CombatFinished", (res: CombatBoardState) => {
+  scene.events.on("CombatEnded", () => {
     bg.destroy();
 
     scene.events.emit("PushLosingSquads");
