@@ -1,3 +1,4 @@
+import CombatEnded from "../Battlefield/events/CombatEnded";
 import createChara from "../Chara/createChara";
 import { emptyIndex } from "../Chara/Model";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
@@ -59,7 +60,7 @@ export default async (data: CombatCreateParams, scene: Phaser.Scene) => {
       });
   });
 
-  scene.events.on("CombatEnded", () => {
+  CombatEnded(scene).once(() => {
     board.destroy();
   });
 

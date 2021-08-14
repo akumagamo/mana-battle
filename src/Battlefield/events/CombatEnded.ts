@@ -4,6 +4,7 @@ import { UnitIndex } from "../../Unit/Model";
 import { createEvent } from "../../utils";
 import { getMapSquad, MapState } from "../Model";
 import markSquadForRemoval from "../squads/markSquadForRemoval";
+import pushSquad from "../squads/pushSquad";
 
 export const key = "CombatEnded";
 
@@ -13,7 +14,7 @@ export default (scene: Phaser.Scene) =>
     key
   );
 
-export const combatEnded = (state: MapState) => ({
+export const combatEnded = (scene: Phaser.Scene, state: MapState) => async ({
   units,
   squadDamage,
 }: {
@@ -58,4 +59,7 @@ export const combatEnded = (state: MapState) => ({
     loser: loser.id,
     direction: direction(),
   };
+
+  await pushSquad(scene, state);
+  state.isPaused = false;
 };

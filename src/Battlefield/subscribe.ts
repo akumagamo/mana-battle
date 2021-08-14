@@ -51,5 +51,5 @@ export default function (scene: Phaser.Scene, state: MapState) {
   index.SquadConqueredCity(scene).on(onSquadConquersCity(scene, state));
   index.PlayerWins(scene).on(onPlayerWins);
   index.PlayerLoses(scene).on(onPlayerLoses);
-  index.CombatEnded(scene).on(combatEnded(state));
+  index.CombatEnded(scene).on(combatEnded(scene, state));
 }
