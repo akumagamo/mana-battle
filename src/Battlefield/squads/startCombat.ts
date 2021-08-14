@@ -1,13 +1,12 @@
-import createChara from "../../Chara/createChara";
 import create from "../../Combat/create";
+import { CombatBoardState } from "../../Combat/Model";
 import { PLAYER_FORCE, SCREEN_WIDTH, SCREEN_HEIGHT } from "../../constants";
 import { GAME_SPEED } from "../../env";
 import { INVALID_STATE } from "../../errors";
 import { delay } from "../../Scenes/utils";
-import { getMember } from "../../Squad/Model";
 import panel from "../../UI/panel";
 import { disableMapInput } from "../board/input";
-import { MapSquad, getSquadUnits, getSquadLeader, MapState } from "../Model";
+import { MapSquad, getSquadUnits, MapState } from "../Model";
 import { destroyUI } from "../ui";
 
 export default async function (
@@ -32,6 +31,12 @@ export default async function (
 
   await delay(scene, 1000 / GAME_SPEED);
 
+  scene.events.on("CombatFinished", (res: CombatBoardState) => {
+    bg.destroy();
+
+    scene.events.emit("PushLosingSquads");
+  });
+
   create(
     {
       left: squadA.id,
@@ -43,7 +48,9 @@ export default async function (
       units: getSquadUnits(state, squadA.id).merge(
         getSquadUnits(state, squadB.id)
       ),
-      onCombatFinish: () => {},
+      onCombatFinish: () => {
+        bg.destroy();
+      },
     },
     scene
   );

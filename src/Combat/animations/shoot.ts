@@ -6,6 +6,7 @@ import damageUnit from "./damageUnit";
 export default async function shoot(
   sourceId: string,
   targetId: string,
+  newHp: number,
   damage: number,
   { scene, charaIndex }: { scene: Phaser.Scene; charaIndex: CharaIndex }
 ) {
@@ -26,7 +27,7 @@ export default async function shoot(
     y: target.container?.y,
     duration: 250 / GAME_SPEED,
     onComplete: () => {
-      damageUnit(target, damage);
+      damageUnit(target, newHp, damage);
       arrow.destroy();
     },
   });

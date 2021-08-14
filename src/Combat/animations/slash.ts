@@ -6,6 +6,7 @@ import damageUnit from "./damageUnit";
 export default async function slash(
   sourceId: string,
   targetId: string,
+  newHp: number,
   damage: number,
   { scene, charaIndex }: { scene: Phaser.Scene; charaIndex: CharaIndex }
 ) {
@@ -13,7 +14,7 @@ export default async function slash(
   const target = getChara(targetId, charaIndex);
 
   source.cast();
-  damageUnit(target, damage);
+  damageUnit(target, newHp, damage);
 
   await delay(scene, 1000 / GAME_SPEED);
 }

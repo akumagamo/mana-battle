@@ -7,13 +7,18 @@ import { delay } from "../../Scenes/utils";
 export default async function (
   sourceId: string,
   targetId: string,
+  newHp: number,
   damage: number,
   { scene, charaIndex }: { scene: Phaser.Scene; charaIndex: CharaIndex }
 ) {
   const source = getChara(sourceId, charaIndex);
   const target = getChara(targetId, charaIndex);
 
-  const fireballSprite = fireball(scene, source.container.x, source.container.y);
+  const fireballSprite = fireball(
+    scene,
+    source.container.x,
+    source.container.y
+  );
 
   fireballSprite.rotation = 1.9;
 
@@ -28,7 +33,7 @@ export default async function (
     duration: 700 / GAME_SPEED,
     onComplete: () => {
       fireballSprite.destroy();
-      damageUnit(target, damage);
+      damageUnit(target, newHp, damage);
     },
   });
 

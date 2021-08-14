@@ -4,6 +4,8 @@ import returnToPosition from "./animations/returnToPosition";
 import shoot from "./animations/shoot";
 import slash from "./animations/slash";
 import { CombatBoardState } from "./Model";
+import { runTurn } from "./runTurn";
+import turnOff from "./turnOff";
 import { Command } from "./turns";
 
 export default async function execute(
@@ -19,36 +21,52 @@ export default async function execute(
     else execute(next_, state);
   };
 
-  console.log(cmd);
-
   if (cmd.type === "MOVE") {
     await moveUnit(cmd.source, cmd.target, state);
   } else if (cmd.type === "SLASH") {
     state.unitIndex = state.unitIndex.set(cmd.target, cmd.updatedTarget);
-    await slash(cmd.source, cmd.target, cmd.damage, state);
+    await slash(
+      cmd.source,
+      cmd.target,
+      cmd.updatedTarget.currentHp,
+      cmd.damage,
+      state
+    );
   } else if (cmd.type === "SHOOT") {
     state.unitIndex = state.unitIndex.set(cmd.target, cmd.updatedTarget);
-    await shoot(cmd.source, cmd.target, cmd.damage, state);
+    await shoot(
+      cmd.source,
+      cmd.target,
+      cmd.updatedTarget.currentHp,
+      cmd.damage,
+      state
+    );
   } else if (cmd.type === "FIREBALL") {
     state.unitIndex = state.unitIndex.set(cmd.target, cmd.updatedTarget);
-    await fireball(cmd.source, cmd.target, cmd.damage, state);
+    await fireball(
+      cmd.source,
+      cmd.target,
+      cmd.updatedTarget.currentHp,
+      cmd.damage,
+      state
+    );
   } else if (cmd.type === "RETURN") {
     await returnToPosition(cmd.target, state);
   } else if (cmd.type === "END_TURN") {
-    // this.currentTurn = this.currentTurn + 1;
-    // this.turn();
+    state.currentTurn = state.currentTurn + 1;
+    runTurn(state);
   } else if (cmd.type === "RESTART_TURNS") {
-    // this.currentTurn = 0;
-    // this.turn();
+    state.currentTurn = 0;
+    runTurn(state);
   } else if (cmd.type === "DISPLAY_XP") {
     // await this.displayExperienceGain(cmd.xpInfo);
-    // step();
+    step();
   } else if (cmd.type === "END_COMBAT") {
-    // await this.combatEnd(cmd.units, cmd.squadDamage);
-    // this.turnOff();
+    state.scene.events.emit("CombatFinished", cmd.units, cmd.squadDamage);
+    turnOff(state);
   } else if (cmd.type === "VICTORY") {
-    // await this.combatEnd(cmd.units, Map() as Map<string, number>);
-    // this.turnOff();
+    state.scene.events.emit("CombatFinished", state);
+    turnOff(state);
   } else console.error(`Unknown command:`, cmd);
 
   step();

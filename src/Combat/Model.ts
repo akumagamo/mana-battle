@@ -12,6 +12,7 @@ export type CombatCreateParams = {
 };
 
 export type CombatBoardState = {
+  currentTurn: number;
   scene: Phaser.Scene;
   left: string;
   squadIndex: SquadIndex;

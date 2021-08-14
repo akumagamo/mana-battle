@@ -17,7 +17,6 @@ export const renderPieceOnCell = ({ x, y }: { x: number; y: number }) => {
   const bX = 210;
   const bY = 120;
 
-  console.log(x, y);
   return {
     x: bX + x * 110,
     y: bY + y * 80,

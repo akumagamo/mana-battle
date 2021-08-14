@@ -1,19 +1,15 @@
 import createChara from "../Chara/createChara";
 import { emptyIndex } from "../Chara/Model";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
-import { createUnitSquadIndex, getMember, getSquad } from "../Squad/Model";
+import { createUnitSquadIndex, getSquad } from "../Squad/Model";
 import { getUnit } from "../Unit/Model";
-import {
-  memberToBoardPosition,
-  placeUnitOnBoard,
-  renderPieceOnCell,
-} from "./combatBoard";
-import execute from "./execute";
+import { placeUnitOnBoard } from "./combatBoard";
 import { CombatBoardState, CombatCreateParams } from "./Model";
-import { runCombat } from "./turns";
+import { runTurn } from "./runTurn";
 
 export default async (data: CombatCreateParams, scene: Phaser.Scene) => {
   const state: CombatBoardState = {
+    currentTurn: 0,
     left: data.left,
     scene,
     squadIndex: data.squads,
@@ -53,16 +49,19 @@ export default async (data: CombatCreateParams, scene: Phaser.Scene) => {
           unit,
           ...position,
           scale: 2,
+          showHpBar: true,
         });
         chara.stand();
 
-        if (!isLeftSquad) chara.container.scaleX = chara.container.scaleX * -1;
+        if (!isLeftSquad) chara.sprite.scaleX = chara.sprite.scaleX * -1; // TODO: chara.flip
 
         state.charaIndex = state.charaIndex.set(chara.id, chara);
       });
   });
-  const commands = runCombat(state);
-  execute(commands, state);
 
-  //this.turn();
+  scene.events.on("CombatFinished", () => {
+    board.destroy();
+  });
+
+  runTurn(state);
 };
