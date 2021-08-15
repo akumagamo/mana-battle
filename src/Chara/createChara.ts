@@ -19,7 +19,7 @@ export default (props: {
     const container = scene.add.container(x, y)
     container.setSize(100, 75)
     const sprite = scene.add.sprite(0, 0, `sprite_${unit.job}`)
-    sprite.setScale(scale)
+    container.setScale(scale)
 
     const hpBarContainer = scene.add.container()
     container.add([sprite, hpBarContainer])

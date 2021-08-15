@@ -15,7 +15,7 @@ export default (board: Board, unit: Unit): Chara => {
         unit,
         x: x * board.scale,
         y: y * board.scale,
-        scale: 0.4, //board.scale * 2,
+        scale: board.scale * 2,
         animated: false,
         showHpBar: true,
     })
