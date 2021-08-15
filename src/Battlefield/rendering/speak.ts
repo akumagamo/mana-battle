@@ -1,6 +1,6 @@
 import { GAME_SPEED } from "../../env";
 import speech from "../../UI/speech";
-import SquadArrivedInfoMessageClosed from "../events/SquadArrivedInfoMessageClosed";
+import SquadArrivedInfoMessageClosed from "../events/CloseSquadArrivedInfoMessage";
 import { getSquadLeader, MapSquad, MapState } from "../Model";
 
 export default function (

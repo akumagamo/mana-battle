@@ -1,55 +1,61 @@
-import events from "./events"
-import { handleMovePlayerSquadButtonClicked } from "./ui/playerSquad"
-import { handleCloseSquadArrivedInfoMessage } from "./events/SquadArrivedInfoMessageClosed"
+import CloseSquadArrivedInfoMessage, {
+    handleCloseSquadArrivedInfoMessage,
+} from "./events/CloseSquadArrivedInfoMessage"
 import { organizeButtonClicked } from "./ui/organizeButtonClicked"
 import turnOff from "./turnOff"
 import returnButtonClicked from "../Squad/ListSquadsScene/events/returnButtonClicked"
-import { handleCellClick } from "./events/CellClicked"
+import CellClicked, { handleCellClick } from "./events/CellClicked"
 import { getChara, MapState } from "./Model"
 import * as selectChara from "../Chara/commands/selectChara"
 import deselectAllEntities from "./commands/deselectAllEntities"
 import cellRightClicked from "./board/cellRightClicked"
-import { onSquadFinishesMovement } from "./events/SquadFinishesMovement"
-import { onSquadConquersCity } from "./events/SquadConqueredCity"
-import { onPlayerWins } from "./events/PlayerWins"
-import { onPlayerLoses } from "./events/PlayerLoses"
-import { combatEnded } from "./events/CombatEnded"
+import SquadFinishesMovement, {
+    onSquadFinishesMovement,
+} from "./events/SquadFinishesMovement"
+import SquadConqueredCity, {
+    onSquadConquersCity,
+} from "./events/SquadConqueredCity"
+import PlayerWins, { onPlayerWins } from "./events/PlayerWins"
+import PlayerLoses, { onPlayerLoses } from "./events/PlayerLoses"
+import CombatEnded, { combatEnded } from "./events/CombatEnded"
+import MovePlayerSquadButtonClicked, {
+    handleMovePlayerSquadButtonClicked,
+} from "./events/MovePlayerSquadButtonClicked"
+import OrganizeButtonClicked from "./events/OrganizeButtonClicked"
+import SquadClicked from "./events/SquadClicked"
+import RightButtonClickedOnCell from "./events/RightButtonClickedOnCell"
 
-export default function(scene: Phaser.Scene, state: MapState) {
-    const index = events()
+export default function (scene: Phaser.Scene, state: MapState) {
+    CellClicked(scene).on((c) => handleCellClick(c))
 
-    index.CellClicked(scene).on(c => handleCellClick(c))
+    MovePlayerSquadButtonClicked(scene).on(handleMovePlayerSquadButtonClicked)
 
-    index
-        .MovePlayerSquadButonClicked(scene)
-        .on(handleMovePlayerSquadButtonClicked)
-
-    index.CloseSquadArrivedInfoMessage(scene).on(container => {
+    CloseSquadArrivedInfoMessage(scene).on((container) => {
         handleCloseSquadArrivedInfoMessage(container)
     })
 
-    index.OrganizeButtonClicked(scene).on(() =>
+    OrganizeButtonClicked(scene).on(() =>
         organizeButtonClicked(
             {
                 turnOff: () => turnOff(scene, state),
                 state,
                 scene,
             },
-            listScene => returnButtonClicked(scene, state)(listScene)
+            (listScene) => returnButtonClicked(scene, state)(listScene)
         )
     )
 
-    index.SquadClicked(scene).on(mapSquad => {
+    SquadClicked(scene).on((mapSquad) => {
         deselectAllEntities(state)
 
         const chara = getChara(state, mapSquad.id)
         selectChara.emit(chara)
     })
 
-    index.RightButtonClickedOnCell(scene).on(cellRightClicked)
-    index.SquadFinishesMovement(scene).on(onSquadFinishesMovement(scene, state))
-    index.SquadConqueredCity(scene).on(onSquadConquersCity(scene, state))
-    index.PlayerWins(scene).on(onPlayerWins)
-    index.PlayerLoses(scene).on(onPlayerLoses)
-    index.CombatEnded(scene).on(combatEnded(scene, state))
+    RightButtonClickedOnCell(scene).on(cellRightClicked)
+    SquadFinishesMovement(scene).on(onSquadFinishesMovement(scene, state))
+    SquadConqueredCity(scene).on(onSquadConquersCity(scene, state))
+    PlayerWins(scene).on(onPlayerWins)
+    PlayerLoses(scene).on(onPlayerLoses)
+    CombatEnded(scene).on(combatEnded(scene, state))
 }
