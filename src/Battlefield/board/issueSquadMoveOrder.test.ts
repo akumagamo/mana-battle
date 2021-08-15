@@ -26,11 +26,7 @@ it("should issue move order if the player squad is issued move order to a moveab
   issueSquadMoveOrder(scene, state, { x: 3, y: 3 }, "squad1");
 
   expect(moveSquadTo).toBeCalled();
-  expect(changeMode).toBeCalledWith(
-    expect.anything(),
-    expect.anything(),
-    expect.objectContaining({ type: "NOTHING_SELECTED" })
-  );
+  
 });
 
 it("should not issue move order if squad is not a player squad", () => {
@@ -38,7 +34,6 @@ it("should not issue move order if squad is not a player squad", () => {
   issueSquadMoveOrder(scene, state, { x: 3, y: 3 }, "squad1");
 
   expect(moveSquadTo).not.toBeCalled();
-  expect(changeMode).not.toBeCalled();
 });
 
 it("should not issue move order if targeted a non-moveable cell (water)", () => {
@@ -46,9 +41,4 @@ it("should not issue move order if targeted a non-moveable cell (water)", () => 
   issueSquadMoveOrder(scene, state, { x: 0, y: 0 }, "squad1");
 
   expect(moveSquadTo).not.toBeCalled();
-  expect(changeMode).toBeCalledWith(
-    expect.anything(),
-    expect.anything(),
-    expect.objectContaining({ type: "SQUAD_SELECTED", id: "squad1" })
-  );
 });
