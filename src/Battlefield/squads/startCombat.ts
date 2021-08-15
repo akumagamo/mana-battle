@@ -52,8 +52,7 @@ export default async function (
                 .filter((s) => [squadA.id, squadB.id].includes(s.id)),
             units: getSquadUnits(state, squadA.id).merge(
                 getSquadUnits(state, squadB.id)
-            ),
-            onCombatFinish: () => {}, // TODO: remove
+            )
         },
         scene
     )

@@ -7,7 +7,6 @@ export type CombatCreateParams = {
     right: string
     squads: SquadIndex
     units: UnitIndex
-    onCombatFinish: () => void
 }
 
 export type CombatBoardState = {

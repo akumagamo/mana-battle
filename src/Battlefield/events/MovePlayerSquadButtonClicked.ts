@@ -19,10 +19,10 @@ export function handleMovePlayerSquadButtonClicked({
     state: MapState
     mapSquad: MapSquad
 }) {
+    state.isPaused = true
     changeMode(scene, state, {
         type: "SELECT_SQUAD_MOVE_TARGET",
         id: mapSquad.id,
         start: mapSquad.posScreen,
     })
-    state.isPaused = true
 }
