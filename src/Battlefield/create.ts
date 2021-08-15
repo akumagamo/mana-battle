@@ -46,7 +46,7 @@ export default async (scene: Phaser.Scene, state: MapState) => {
     makeWorldDraggable(scene, state)
     setWorldBounds(state)
 
-    await Promise.all(state.squadsToRemove.map((id) => destroySquad(state, id)))
+    await Promise.all(state.squadsToRemove.map(id => destroySquad(state, id)))
     state.squadsToRemove = Set()
 
     // if (!scene.hasShownVictoryCondition) {
