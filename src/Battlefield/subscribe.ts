@@ -25,12 +25,12 @@ import OrganizeButtonClicked from "./events/OrganizeButtonClicked"
 import SquadClicked from "./events/SquadClicked"
 import RightButtonClickedOnCell from "./events/RightButtonClickedOnCell"
 
-export default function (scene: Phaser.Scene, state: MapState) {
-    CellClicked(scene).on((c) => handleCellClick(c))
+export default function(scene: Phaser.Scene, state: MapState) {
+    CellClicked(scene).on(c => handleCellClick(c))
 
     MovePlayerSquadButtonClicked(scene).on(handleMovePlayerSquadButtonClicked)
 
-    CloseSquadArrivedInfoMessage(scene).on((container) => {
+    CloseSquadArrivedInfoMessage(scene).on(container => {
         handleCloseSquadArrivedInfoMessage(container)
     })
 
@@ -41,11 +41,11 @@ export default function (scene: Phaser.Scene, state: MapState) {
                 state,
                 scene,
             },
-            (listScene) => returnButtonClicked(scene, state)(listScene)
+            listScene => returnButtonClicked(scene, state)(listScene)
         )
     )
 
-    SquadClicked(scene).on((mapSquad) => {
+    SquadClicked(scene).on(mapSquad => {
         deselectAllEntities(state)
 
         const chara = getChara(state, mapSquad.id)
