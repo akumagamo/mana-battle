@@ -38,15 +38,3 @@ it("should not be paused after creation", () => {
 
     expect(state.isPaused).toBeFalsy()
 })
-
-it("should communicate the game that the scene has started", async () => {
-    const scene = sceneMock()
-    const state = map()
-
-    await create(scene, state)
-
-    expect(scene.game.events.emit).toBeCalledWith(
-        "BattlefieldSceneCreated",
-        expect.any(Object)
-    )
-})

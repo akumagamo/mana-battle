@@ -46,7 +46,7 @@ export default async (scene: Phaser.Scene, state: MapState) => {
     makeWorldDraggable(scene, state)
     setWorldBounds(state)
 
-    await Promise.all(state.squadsToRemove.map(id => destroySquad(state, id)))
+    await Promise.all(state.squadsToRemove.map((id) => destroySquad(state, id)))
     state.squadsToRemove = Set()
 
     // if (!scene.hasShownVictoryCondition) {
@@ -76,6 +76,4 @@ export default async (scene: Phaser.Scene, state: MapState) => {
     state.isPaused = false
 
     refreshUI(scene, state)
-
-    scene.game.events.emit("BattlefieldSceneCreated", { scene, state })
 }

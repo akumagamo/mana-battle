@@ -9,7 +9,7 @@ import createFormField from "./rendering/formField/select"
 import nameInput from "./rendering/nameInput"
 import refreshChara from "./rendering/refreshChara"
 
-export default function(scene: Phaser.Scene) {
+export default function (scene: Phaser.Scene) {
     if (process.env.SOUND_ENABLED) {
         scene.sound.stopAll()
         const music = scene.sound.add("jshaw_dream_of_first_flight")
@@ -30,8 +30,6 @@ export default function(scene: Phaser.Scene) {
     classInput(scene, state)
 
     confirmButton(scene, state)
-
-    scene.game.events.emit("CharaCreationSceneCreated", { scene, state })
 }
 
 function classInput(scene: Phaser.Scene, state: CharaCreationState) {
