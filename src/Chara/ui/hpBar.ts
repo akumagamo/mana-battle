@@ -63,11 +63,6 @@ const createHpBar = (
 export default function (chara: Chara, hpAmount: number) {
     if (chara.hpBarContainer) chara.hpBarContainer.destroy()
 
-    if (hpAmount < 1) {
-        chara.tint(CHARA_INACTIVE_COLOR)
-        return
-    }
-
     chara.hpBarContainer = createHpBar(
         chara.scene,
         chara.container,

@@ -4,7 +4,7 @@ import { GAME_SPEED } from "../../env"
 import { INVALID_STATE } from "../../errors"
 import { delay } from "../../Scenes/utils"
 import panel from "../../UI/panel"
-import { disableMapInput } from "../board/input"
+import { disableMapInput, enableMapInput } from "../board/input"
 import CombatEnded from "../events/CombatEnded"
 import { MapSquad, getSquadUnits, MapState } from "../Model"
 import { destroyUI, refreshUI } from "../ui"
@@ -38,7 +38,7 @@ export default async function (
 
     CombatEnded(scene).once(() => {
         bg.destroy()
-        refreshUI(scene, state)
+        enableMapInput(scene, state)
     })
     await delay(scene, 1000 / GAME_SPEED)
 
@@ -53,9 +53,7 @@ export default async function (
             units: getSquadUnits(state, squadA.id).merge(
                 getSquadUnits(state, squadB.id)
             ),
-            onCombatFinish: () => {
-                bg.destroy()
-            },
+            onCombatFinish: () => {}, // TODO: remove
         },
         scene
     )

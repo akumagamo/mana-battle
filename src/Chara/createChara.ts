@@ -55,7 +55,6 @@ export default (props: {
             sprite.setTint(value)
         },
         destroy: () => {
-            sprite.destroy()
             container.destroy()
         },
         selectedCharaIndicator: null,
