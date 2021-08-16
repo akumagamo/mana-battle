@@ -73,3 +73,17 @@ it('Should listen to the "deselectChara" event', () => {
         expect.any(Function)
     )
 })
+
+it("Should destroy the hp bar when character dies", () => {
+    const scene = sceneMock() as any
+
+    const chara = createChara({
+        scene: scene,
+        unit: createUnit(),
+        showHpBar: true,
+    })
+
+    chara.die()
+
+    expect(chara.hpBarContainer.destroy).toHaveBeenCalled()
+})

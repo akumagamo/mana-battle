@@ -50,6 +50,7 @@ export default (props: {
         },
         die: () => {
             sprite.play("die")
+            chara.hpBarContainer.destroy()
         },
         tint: (value: number) => {
             sprite.setTint(value)
