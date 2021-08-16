@@ -31,12 +31,12 @@ export default async (data: CombatCreateParams, scene: Phaser.Scene) => {
 
     board.alpha = 0.8
 
-    combatants.forEach((id) => {
+    combatants.forEach(id => {
         const squad = getSquad(id, data.squads)
 
         const isLeftSquad = id === data.left
 
-        squad.members.forEach((member) => {
+        squad.members.forEach(member => {
             const unit = getUnit(member.id, data.units)
 
             if (unit.currentHp < 1) return
