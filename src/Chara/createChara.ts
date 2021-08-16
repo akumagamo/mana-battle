@@ -36,6 +36,10 @@ export default (props: {
         showHpBar,
         hpBarContainer,
 
+        flip: () => {
+            sprite.toggleFlipX()
+        },
+
         stand: () => {
             sprite.play("stand")
         },

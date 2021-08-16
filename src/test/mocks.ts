@@ -9,6 +9,7 @@ export const eventsMock = () => ({
 })
 export const gameObjectMock = () => ({
     ...eventsMock(),
+    toggleFlipX: jest.fn(),
     setDepth: jest.fn(),
     setSize: jest.fn(),
     setScale: jest.fn(),

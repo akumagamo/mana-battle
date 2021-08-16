@@ -31,33 +31,33 @@ export default async (data: CombatCreateParams, scene: Phaser.Scene) => {
 
     board.alpha = 0.8
 
-    combatants.forEach(id => {
+    combatants.forEach((id) => {
         const squad = getSquad(id, data.squads)
 
         const isLeftSquad = id === data.left
 
-        squad.members
-            .sort((a, b) => a.y - b.y)
-            .forEach(member => {
-                const unit = getUnit(member.id, data.units)
+        squad.members.forEach((member) => {
+            const unit = getUnit(member.id, data.units)
 
-                if (unit.currentHp < 1) return
+            if (unit.currentHp < 1) return
 
-                const position = placeUnitOnBoard(isLeftSquad)(squad)(member.id)
+            const position = placeUnitOnBoard(isLeftSquad)(squad)(member.id)
 
-                const chara = createChara({
-                    scene: scene,
-                    unit,
-                    ...position,
-                    scale: 2,
-                    showHpBar: true,
-                })
-                chara.stand()
-
-                if (!isLeftSquad) chara.sprite.scaleX = chara.sprite.scaleX * -1 // TODO: chara.flip
-
-                state.charaIndex = state.charaIndex.set(chara.id, chara)
+            const chara = createChara({
+                scene: scene,
+                unit,
+                ...position,
+                scale: 2,
+                showHpBar: true,
             })
+            chara.sprite.setDepth(member.y)
+
+            if (!isLeftSquad) chara.flip()
+
+            chara.stand()
+
+            state.charaIndex = state.charaIndex.set(chara.id, chara)
+        })
     })
 
     CombatEnded(scene).once(() => {
@@ -65,4 +65,6 @@ export default async (data: CombatCreateParams, scene: Phaser.Scene) => {
     })
 
     runTurn(state)
+
+    return state
 }

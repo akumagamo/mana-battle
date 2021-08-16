@@ -16,6 +16,8 @@ export type Chara = {
 
     sprite: Phaser.GameObjects.Sprite
 
+    flip: () => void
+
     stand: () => void
     hit: () => void
     cast: () => void

@@ -23,7 +23,6 @@ export function displayDamage(chara: Chara, damage: number) {
     dmg.setScale(2)
     dmg.setAlign("center")
     dmg.setFontStyle("bold")
-    dmg.setDepth(Infinity)
 
     chara.scene.tweens.add({
         targets: dmg,
