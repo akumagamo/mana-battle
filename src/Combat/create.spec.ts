@@ -31,11 +31,11 @@ it("characters on the left side should not be flipped", async () => {
     const state = await mount(props)
 
     state.squadIndex
-        .filter((sqd) => sqd.id === props.left.id)
-        .forEach((sqd) => {
+        .filter(sqd => sqd.id === props.left.id)
+        .forEach(sqd => {
             sqd.members
-                .map((m) => getChara(m.id, state.charaIndex))
-                .forEach((chara) =>
+                .map(m => getChara(m.id, state.charaIndex))
+                .forEach(chara =>
                     expect(chara.sprite.toggleFlipX).not.toHaveBeenCalled()
                 )
         })
@@ -46,11 +46,11 @@ it("characters on the right side should be flipped", async () => {
     const state = await mount(props)
 
     state.squadIndex
-        .filter((sqd) => sqd.id === props.right.id)
-        .forEach((sqd) => {
+        .filter(sqd => sqd.id === props.right.id)
+        .forEach(sqd => {
             sqd.members
-                .map((m) => getChara(m.id, state.charaIndex))
-                .forEach((chara) =>
+                .map(m => getChara(m.id, state.charaIndex))
+                .forEach(chara =>
                     expect(chara.sprite.toggleFlipX).toHaveBeenCalled()
                 )
         })
@@ -62,7 +62,7 @@ const defaultProps = () => {
     return {
         left: (testMap.squads.first() as MapSquad).squad,
         right: (testMap.squads.last() as MapSquad).squad,
-        squads: testMap.squads.map((s) => s.squad),
+        squads: testMap.squads.map(s => s.squad),
         units: testMap.units,
     }
 }
