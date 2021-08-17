@@ -46,7 +46,7 @@ export default async (scene: Phaser.Scene, state: MapState) => {
     makeWorldDraggable(scene, state)
     setWorldBounds(state)
 
-    await Promise.all(state.squadsToRemove.map(id => destroySquad(state, id)))
+    await Promise.all(state.squadsToRemove.map((id) => destroySquad(state, id)))
     state.squadsToRemove = Set()
 
     // if (!scene.hasShownVictoryCondition) {
@@ -59,14 +59,17 @@ export default async (scene: Phaser.Scene, state: MapState) => {
     if (state.squadToPush) {
         const collided = checkCollision(state)(state.squadToPush.loser)
         if (collided) {
-            const sqd = state.unitSquadIndex.get(collided.id)
-            if (sqd)
-                startCombat(
-                    scene,
-                    state,
-                    getMapSquad(state, state.squadToPush.loser),
-                    getMapSquad(state, sqd)
-                )
+            startCombat(
+                scene,
+                state,
+                state.squads
+                    .filter((squad) =>
+                        [collided.id, state.squadToPush?.loser].includes(
+                            squad.id
+                        )
+                    )
+                    .map((s) => s.squad)
+            )
         }
 
         state.squadToPush = null
