@@ -1,4 +1,4 @@
-![CI](https://github.com/lfarroco/mana-phaser/workflows/CI/badge.svg)
+[![Build](https://github.com/lfarroco/mana-battle/actions/workflows/build.yml/badge.svg)](https://github.com/lfarroco/mana-battle/actions/workflows/build.yml)
 
 # Mana Battle
 A strategic RPG 🧙⚔️🏰
