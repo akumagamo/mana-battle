@@ -14,12 +14,14 @@ it("should render all living units", async () => {
 })
 it("should not render dead units", async () => {
     const props = defaultProps()
+
+    const first = props.units.first() as Unit
     const state = await mount({
         ...props,
-        units: props.units.update((props.units.first() as Unit).id, x => ({
-            ...x,
+        units: props.units.set(first.id, {
+            ...first,
             currentHp: 0,
-        })),
+        }),
     })
     expect(state.charaIndex.size).toEqual(state.unitIndex.size - 1)
 })
@@ -29,11 +31,11 @@ it("characters on the left side should not be flipped", async () => {
     const state = await mount(props)
 
     state.squadIndex
-        .filter(sqd => sqd.id === props.left)
-        .forEach(sqd => {
+        .filter((sqd) => sqd.id === props.left.id)
+        .forEach((sqd) => {
             sqd.members
-                .map(m => getChara(m.id, state.charaIndex))
-                .forEach(chara =>
+                .map((m) => getChara(m.id, state.charaIndex))
+                .forEach((chara) =>
                     expect(chara.sprite.toggleFlipX).not.toHaveBeenCalled()
                 )
         })
@@ -44,11 +46,11 @@ it("characters on the right side should be flipped", async () => {
     const state = await mount(props)
 
     state.squadIndex
-        .filter(sqd => sqd.id === props.right)
-        .forEach(sqd => {
+        .filter((sqd) => sqd.id === props.right.id)
+        .forEach((sqd) => {
             sqd.members
-                .map(m => getChara(m.id, state.charaIndex))
-                .forEach(chara =>
+                .map((m) => getChara(m.id, state.charaIndex))
+                .forEach((chara) =>
                     expect(chara.sprite.toggleFlipX).toHaveBeenCalled()
                 )
         })
@@ -58,9 +60,9 @@ const defaultProps = () => {
     const testMap = map()
 
     return {
-        left: (testMap.squads.first() as MapSquad).id,
-        right: (testMap.squads.last() as MapSquad).id,
-        squads: testMap.squads.map(s => s.squad),
+        left: (testMap.squads.first() as MapSquad).squad,
+        right: (testMap.squads.last() as MapSquad).squad,
+        squads: testMap.squads.map((s) => s.squad),
         units: testMap.units,
     }
 }

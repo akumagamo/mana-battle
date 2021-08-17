@@ -11,7 +11,7 @@ import { runTurn } from "./runTurn"
 export default async (data: CombatCreateParams, scene: Phaser.Scene) => {
     const state: CombatBoardState = {
         currentTurn: 0,
-        left: data.left,
+        left: data.left.id,
         scene,
         squadIndex: data.squads,
         unitIndex: data.units,
@@ -31,12 +31,10 @@ export default async (data: CombatCreateParams, scene: Phaser.Scene) => {
 
     board.alpha = 0.8
 
-    combatants.forEach(id => {
-        const squad = getSquad(id, data.squads)
+    combatants.forEach((squad) => {
+        const isLeftSquad = squad.id === data.left.id
 
-        const isLeftSquad = id === data.left
-
-        squad.members.forEach(member => {
+        squad.members.forEach((member) => {
             const unit = getUnit(member.id, data.units)
 
             if (unit.currentHp < 1) return

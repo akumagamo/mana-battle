@@ -1,10 +1,10 @@
 import { CharaIndex } from "../Chara/Model"
-import { SquadIndex, UnitSquadIndex } from "../Squad/Model"
+import { SquadIndex, SquadRecord, UnitSquadIndex } from "../Squad/Model"
 import { UnitIndex } from "../Unit/Model"
 
 export type CombatCreateParams = {
-    left: string // TODO: change to Squad
-    right: string
+    left: SquadRecord
+    right: SquadRecord
     squads: SquadIndex
     units: UnitIndex
 }

@@ -1,47 +1,46 @@
-
 name: Build
 
 on:
-  push:
-    branches: [ master ]
+    push:
+        branches: [master]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+    build:
+        runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v2
+        steps:
+            - uses: actions/checkout@v2
 
-    - name: Install deps
-      run: yarn
+            - name: Install deps
+              run: yarn
 
-    - name: Test
-      run: yarn test
+            - name: Test
+              run: yarn test
 
-    - name: Build
-      run: yarn deploy
-      env:
-        NODE_ENV: 'production'
-        
-    - name: Copy Assets
-      run: cp -r assets/ dist/assets/
+            - name: Build
+              run: yarn deploy
+              env:
+                  NODE_ENV: "production"
 
-    - name: Copy index
-      run: cp src/index.html dist/index.html
+            - name: Copy Assets
+              run: cp -r assets/ dist/assets/
 
-    - name: Create dist for bundle
-      run: mkdir dist/dist/
+            - name: Copy index
+              run: cp src/index.html dist/index.html
 
-    - name: Copy bunble
-      run: mv dist/bundle.js dist/dist/bundle.js
+            - name: Create dist for bundle
+              run: mkdir dist/dist/
 
-    - name: Copy bunble
-      run: mv dist/bundle.js.LICENSE.txt dist/dist/bundle.js.LICENSE.txt
-    
-    - name: Deploy
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-        external_repository: lfarroco/mana_public
-        publish_branch: gh-pages
-        publish_dir: ./dist
+            - name: Copy bundle
+              run: mv dist/bundle.js dist/dist/bundle.js
+
+            - name: Copy license
+              run: mv dist/bundle.js.LICENSE.txt dist/dist/bundle.js.LICENSE.txt
+
+            - name: Deploy
+              uses: peaceiris/actions-gh-pages@v3
+              with:
+                  deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+                  external_repository: lfarroco/mana_public
+                  publish_branch: gh-pages
+                  publish_dir: ./dist
