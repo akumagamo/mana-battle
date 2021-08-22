@@ -28,23 +28,15 @@ export function create(scene: Phaser.Scene, state: TitleSceneState) {
             450,
             "Continue Game",
             state.container,
-            scene,
             () => scene.scene.start("SaveListScene"),
             false
         )
     }
-    button(SCREEN_WIDTH / 2, 520, "New Game", state.container, scene, () =>
+    button(SCREEN_WIDTH / 2, 520, "New Game", state.container, () =>
         emit.NewGameButtonClicked({ scene, state })
     )
 
-    button(
-        SCREEN_WIDTH / 2,
-        590,
-        "Go Fullscreen",
-        state.container,
-        scene,
-        () => {
-            requestFullscreen()
-        }
-    )
+    button(SCREEN_WIDTH / 2, 590, "Go Fullscreen", state.container, () => {
+        requestFullscreen()
+    })
 }

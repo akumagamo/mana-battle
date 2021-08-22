@@ -118,7 +118,6 @@ export class ListSquadsScene extends Phaser.Scene {
       SCREEN_WIDTH - 40,
       80,
       this.uiContainer,
-      this
     );
 
     panel_.setAlpha(0.5);
@@ -130,11 +129,10 @@ export class ListSquadsScene extends Phaser.Scene {
       baseY + 10,
       `Leader`,
       this.uiContainer,
-      this
     );
     leaderTitle.setFontSize(16);
 
-    text(baseX + 20, baseY + 40, leader, this.uiContainer, this);
+    text(baseX + 20, baseY + 40, leader, this.uiContainer);
 
     const dispatched = this.dispatched.has(squadId);
     const isLastSquad = this.squads.size === 1;
@@ -143,7 +141,6 @@ export class ListSquadsScene extends Phaser.Scene {
       baseY + 20,
       "Disband Squad",
       this.uiContainer,
-      this,
       () => {
         this.onDisbandSquad(squadId);
         this.refreshBoards();
@@ -157,7 +154,6 @@ export class ListSquadsScene extends Phaser.Scene {
       baseY + 20,
       "Edit",
       this.uiContainer,
-      this,
       () => editSquadButtonClicked(this).emit(squad)
     );
   }
@@ -279,14 +275,13 @@ export class ListSquadsScene extends Phaser.Scene {
   renderControls() {
     if (!this.uiContainer) return;
 
-    text(10, 10, "Organize Squads", this.uiContainer, this);
+    text(10, 10, "Organize Squads", this.uiContainer);
 
     button(
       SCREEN_WIDTH - 220,
       10,
       "Confirm",
       this.uiContainer,
-      this,
       this.handleOnConfirmButtonClicked.bind(this),
       !this.inputEnabled
     );
@@ -296,7 +291,6 @@ export class ListSquadsScene extends Phaser.Scene {
       10,
       "Create Squad",
       this.uiContainer,
-      this,
       () => {
         createSquadButtonClicked(this).emit(null);
       },

@@ -21,7 +21,7 @@ export default (
     const container_ = scene.add.container(x, y)
     container.add(container_)
 
-    panel(0, 0, 550, 140, container_, scene)
+    panel(0, 0, 550, 140, container_)
 
     const portrait = createChara({
         scene: scene,
@@ -30,9 +30,9 @@ export default (
         y: 70,
     })
 
-    text(150, 30, unit.name, container_, scene)
+    text(150, 30, unit.name, container_)
 
-    text(150, 70, text_, container_, scene)
+    text(150, 70, text_, container_)
 
     container_.add([portrait.container])
 

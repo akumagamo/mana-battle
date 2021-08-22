@@ -11,7 +11,7 @@ export default class OptionsScene extends Phaser.Scene {
     create() {
         const container = this.add.container(300, 100)
 
-        button(10, 400, "Return", container, this, () => {
+        button(10, 400, "Return", container, () => {
             container.destroy()
 
             this.scene.transition({
@@ -21,7 +21,7 @@ export default class OptionsScene extends Phaser.Scene {
             })
         })
 
-        panel(0, 0, 400, 300, container, this)
+        panel(0, 0, 400, 300, container)
 
         // text(10, 10, 'Sound Enabled', container, this)
         // button(310, 10, 'Toggle', container, this, ()=>setSoundEnabled( !getOptions().soundEnabled ))

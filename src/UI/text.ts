@@ -13,9 +13,9 @@ export default (
     x: number,
     y: number,
     str: string | number,
-    container: Container,
-    scene: Scene
+    container: Container
 ) => {
+    const { scene } = container
     const text = scene.add.text(
         x,
         y,

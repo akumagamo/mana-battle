@@ -9,7 +9,7 @@ export function create(scene: Phaser.Scene) {
 
     // background with books and candles
 
-    text(100, 100, "Continue Game", container, scene)
+    text(100, 100, "Continue Game", container )
 
     const saves = JSON.parse(
         localStorage.getItem("saves") || "[]"
@@ -21,7 +21,6 @@ export function create(scene: Phaser.Scene) {
             200 + i * 60,
             `${save.hero.name} - ${new Date(save.date).toDateString()}`,
             container,
-            scene,
             () => {
                 scene.children.removeAll()
                 let unit = save.hero
@@ -37,7 +36,6 @@ export function create(scene: Phaser.Scene) {
         SCREEN_HEIGHT - 60,
         "Return to title",
         container,
-        scene,
         () => {
             scene.children.removeAll()
             scene.scene.start("TitleScene")

@@ -12,7 +12,7 @@ export default function(
     onClose: () => void
 ) {
     const container = scene.add.container()
-    panel(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, container, scene)
+    panel(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, container)
     let details: Container | null = null
 
     units.toList().forEach((unit, iter) => {
@@ -25,7 +25,7 @@ export default function(
         })
     })
 
-    button(1100, 300, "Close", container, scene, () => {
+    button(1100, 300, "Close", container, () => {
         container.destroy()
         onClose()
     })

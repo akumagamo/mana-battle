@@ -1,28 +1,22 @@
-import text from '../../UI/text';
-import { Chara } from '../Model';
+import text from "../../UI/text"
+import { Chara } from "../Model"
 
 export function displayExperience(chara: Chara, experience: number) {
-  const xp = text(
-    -50,
-    -100,
-    `${experience.toString()} xp`,
-    chara.container,
-    chara.scene
-  );
-  xp.setScale(1.5);
-  xp.setShadow(0, 0, '#000', 2);
-  xp.setStroke('#000000', 2);
+    const xp = text(-50, -100, `${experience.toString()} xp`, chara.container)
+    xp.setScale(1.5)
+    xp.setShadow(0, 0, "#000", 2)
+    xp.setStroke("#000000", 2)
 
-  return new Promise<void>((resolve) => {
-    chara.scene.tweens.add({
-      targets: xp,
-      y: -120,
-      alpha: 0,
-      duration: 1000,
-      onComplete: () => {
-        xp.destroy();
-        resolve();
-      },
-    });
-  });
+    return new Promise<void>((resolve) => {
+        chara.scene.tweens.add({
+            targets: xp,
+            y: -120,
+            alpha: 0,
+            duration: 1000,
+            onComplete: () => {
+                xp.destroy()
+                resolve()
+            },
+        })
+    })
 }

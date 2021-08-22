@@ -5,7 +5,6 @@ import { CharaCreationState } from '../Model';
 
 
 export default function (
-  scene: Phaser.Scene,
   container: Container,
   label: string,
   width: number,
@@ -17,9 +16,8 @@ export default function (
     width,
     height,
     container,
-    scene
   ).setAlpha(0.6);
-  const text_ = text(10, 10, label, container, scene);
+  const text_ = text(10, 10, label, container);
 
   return {
     destroy: () => {

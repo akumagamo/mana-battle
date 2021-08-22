@@ -16,7 +16,6 @@ export function displayDamage(chara: Chara, damage: number) {
         chara.container.y + TEXT_DAMAGE_POSITION_Y,
         damage.toString(),
         container,
-        chara.scene
     )
     dmg.setShadow(2, 2, "#000")
     dmg.setStroke(TEXT_DAMAGE_STROKE_COLOR, TEXT_DAMAGE_STROKE_WIDTH)

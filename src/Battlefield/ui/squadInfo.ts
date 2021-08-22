@@ -19,10 +19,10 @@ export async function squadInfo(
 
     const leader = getSquadLeader(state, id)
 
-    text(320, baseY, leader.name, uiContainer, scene)
+    text(320, baseY, leader.name, uiContainer)
 
     if (mapSquad.squad.force !== PLAYER_FORCE) {
-        button(430, baseY, "Squad Details", state.uiContainer, scene, () => {
+        button(430, baseY, "Squad Details", state.uiContainer, () => {
             viewSquadDetails(scene, state, id)
         })
     }

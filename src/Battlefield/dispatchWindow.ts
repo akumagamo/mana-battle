@@ -32,14 +32,13 @@ export default (scene: Phaser.Scene, state: MapState) => {
 
     const padding = 40
 
-    panel(x, y, width, height, container, scene)
+    panel(x, y, width, height, container)
 
     const title = text(
         SCREEN_WIDTH / 2,
         y + 20,
         "Select squad to dispatch",
-        container,
-        scene
+        container
     )
     title.setOrigin(0.5)
     title.setFontSize(24)
@@ -55,7 +54,7 @@ export default (scene: Phaser.Scene, state: MapState) => {
     })
 
     let squadsToRender = getForceSquads(state, PLAYER_FORCE).filter(
-        mapSquad =>
+        (mapSquad) =>
             mapSquad.status !== "defeated" &&
             !state.dispatchedSquads.has(mapSquad.squad.id)
     )
@@ -67,7 +66,6 @@ export default (scene: Phaser.Scene, state: MapState) => {
             y + 60 + 70 * i,
             leader.name,
             container,
-            scene,
             () => handleDispatchSquad(container, scene, state, mapSquad),
             false,
             width - padding * 2

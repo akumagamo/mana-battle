@@ -20,7 +20,6 @@ export default function (
     text_.width + 40,
     text_.height + 40,
     container,
-    scene
   );
 
   container.add(text_);

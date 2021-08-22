@@ -25,28 +25,21 @@ export default function ui(
     const baseY = BOTTOM_PANEL_Y + 25
     const { uiContainer } = state
 
+    const btn = (x: number, y: number, label: string, callback: () => void) =>
+        button(x, y, label, uiContainer, callback)
+
     if (state.uiMode.type !== "SELECT_SQUAD_MOVE_TARGET") {
-        button(20, 10, "Organize", uiContainer, scene, () =>
-            OrganizeButtonClicked(scene).emit(scene)
-        )
-        button(240, 10, "Dispatch", uiContainer, scene, () => {
+        btn(20, 10, "Organize", () => OrganizeButtonClicked(scene).emit(scene))
+        btn(240, 10, "Dispatch", () => {
             disableMapInput(state)
             destroyUI(state)
             state.isPaused = true
             dispatchWindow(scene, state)
         })
-
-        button(
-            SCREEN_WIDTH - 220,
-            10,
-            "Return to Title",
-            uiContainer,
-            scene,
-            () => {
-                turnOff(scene, state)
-                scene.scene.start("TitleScene")
-            }
-        )
+        btn(SCREEN_WIDTH - 220, 10, "Return to Title", () => {
+            turnOff(scene, state)
+            scene.scene.start("TitleScene")
+        })
     }
 
     if (state.uiMode.type !== "SELECT_SQUAD_MOVE_TARGET") {
@@ -55,33 +48,18 @@ export default function ui(
             BOTTOM_PANEL_Y,
             BOTTOM_PANEL_WIDTH,
             BOTTOM_PANEL_HEIGHT,
-            uiContainer,
-            scene
+            uiContainer
         )
         if (state.isPaused)
-            button(
-                SCREEN_WIDTH - 200,
-                SCREEN_HEIGHT - 200,
-                "|> Unpause",
-                uiContainer,
-                scene,
-                () => {
-                    state.isPaused = false
-                    refreshUI(scene, state)
-                }
-            )
+            btn(SCREEN_WIDTH - 200, SCREEN_HEIGHT - 200, "|> Unpause", () => {
+                state.isPaused = false
+                refreshUI(scene, state)
+            })
         else
-            button(
-                SCREEN_WIDTH - 200,
-                SCREEN_HEIGHT - 200,
-                "|| Pause",
-                uiContainer,
-                scene,
-                () => {
-                    state.isPaused = true
-                    refreshUI(scene, state)
-                }
-            )
+            btn(SCREEN_WIDTH - 200, SCREEN_HEIGHT - 200, "|| Pause", () => {
+                state.isPaused = true
+                refreshUI(scene, state)
+            })
     }
 
     if (state.uiMode.type === "NOTHING_SELECTED") return Promise.resolve()
@@ -90,31 +68,23 @@ export default function ui(
         case "SQUAD_SELECTED":
             return squadInfo(scene, state, uiContainer, baseY, state.uiMode.id)
         case "CITY_SELECTED":
-            return city(scene, state, uiContainer, baseY, state.uiMode.id)
+            return city(state, uiContainer, baseY, state.uiMode.id)
         case "SELECT_SQUAD_MOVE_TARGET":
             return new Promise(() => {
-                panel(SCREEN_WIDTH / 2, 15, 220, 50, uiContainer, scene)
+                panel(SCREEN_WIDTH / 2, 15, 220, 50, uiContainer)
                 text(
                     SCREEN_WIDTH / 2 + 10,
                     24,
                     "Select Destination",
-                    uiContainer,
-                    scene
+                    uiContainer
                 )
-                button(
-                    SCREEN_WIDTH - 200,
-                    SCREEN_HEIGHT - 200,
-                    "Cancel",
-                    uiContainer,
-                    scene,
-                    () => {
-                        if (state.uiMode.type === "SELECT_SQUAD_MOVE_TARGET")
-                            changeMode(scene, state, {
-                                type: "SQUAD_SELECTED",
-                                id: state.uiMode.id,
-                            })
-                    }
-                )
+                btn(SCREEN_WIDTH - 200, SCREEN_HEIGHT - 200, "Cancel", () => {
+                    if (state.uiMode.type === "SELECT_SQUAD_MOVE_TARGET")
+                        changeMode(scene, state, {
+                            type: "SQUAD_SELECTED",
+                            id: state.uiMode.id,
+                        })
+                })
             })
         default:
             return Promise.resolve()

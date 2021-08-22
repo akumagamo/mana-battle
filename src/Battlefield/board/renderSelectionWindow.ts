@@ -22,8 +22,8 @@ export function renderSelectionWindow(
     changeMode(scene, state, { type: "NOTHING_SELECTED" })
     const container = scene.add.container(400, 100)
     state.uiContainer.add(container)
-    panel(0, 0, 220, mapSquads.size * 50 + (city ? 150 : 50), container, scene)
-    text(10, 10, "Squads", container, scene)
+    panel(0, 0, 220, mapSquads.size * 50 + (city ? 150 : 50), container)
+    text(10, 10, "Squads", container)
 
     mapSquads.toList().forEach((sqd, i) => {
         button(
@@ -31,7 +31,6 @@ export function renderSelectionWindow(
             50 + i * 50,
             getSquadLeader(state, sqd.id).name,
             container,
-            scene,
             () => {
                 selectSquad(sqd)
                 container.destroy()
@@ -42,20 +41,13 @@ export function renderSelectionWindow(
     })
 
     if (city) {
-        text(10, mapSquads.size * 50 + 50, "City", container, scene)
-        button(
-            10,
-            mapSquads.size * 50 + 100,
-            city.name,
-            container,
-            scene,
-            () => {
-                selectCityCommand(scene, state, city)
-                container.destroy()
-                enableMapInput(scene, state)
-                state.isPaused = false
-                refreshUI(scene, state)
-            }
-        )
+        text(10, mapSquads.size * 50 + 50, "City", container)
+        button(10, mapSquads.size * 50 + 100, city.name, container, () => {
+            selectCityCommand(scene, state, city)
+            container.destroy()
+            enableMapInput(scene, state)
+            state.isPaused = false
+            refreshUI(scene, state)
+        })
     }
 }

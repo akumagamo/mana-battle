@@ -12,7 +12,7 @@ export default class WorldScene extends Phaser.Scene {
         this.cameras.main.setBackgroundColor("#000000")
         const container = this.add.container(300, 100)
 
-        button(10, 400, "Battalion", container, this, () => {
+        button(10, 400, "Battalion", container, () => {
             this.cameras.main.fadeOut(1000 / GAME_SPEED, 0, 0, 0)
 
             this.scene.transition({
@@ -23,7 +23,7 @@ export default class WorldScene extends Phaser.Scene {
             })
         })
 
-        button(210, 400, "Items", container, this, () => {
+        button(210, 400, "Items", container, () => {
             container.destroy()
 
             this.scene.transition({

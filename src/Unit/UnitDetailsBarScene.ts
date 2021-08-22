@@ -44,14 +44,14 @@ export class UnitDetailsBarScene extends Phaser.Scene {
         if (!this.container) return
         this.clearChildren()
 
-        panel(0, 0, 1200, 220, this.container, this)
+        panel(0, 0, 1200, 220, this.container)
 
         this.unitStats(unit)
         this.unitItems(unit)
     }
 
     write = (x: number, y: number, str: string | number) =>
-        this.container ? text(x, y, str, this.container, this) : null
+        this.container ? text(x, y, str, this.container ) : null
 
     col = (x: number, y: number, strs: (string | number)[]) =>
         strs.forEach((str, index) =>

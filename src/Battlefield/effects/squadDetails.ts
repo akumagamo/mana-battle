@@ -51,7 +51,7 @@ export default (
 
     if (defaultUnit) detailsBar(defaultUnit)
 
-    button(1050, 480, "Close", container, scene, () => {
+    button(1050, 480, "Close", container, () => {
         charaStats.destroy()
         backdrop_.destroy()
         container.destroy()

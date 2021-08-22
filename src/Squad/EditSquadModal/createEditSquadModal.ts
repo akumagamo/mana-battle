@@ -128,14 +128,7 @@ export default function ({
         onClose
     )
 
-    const panel_ = panel(
-        0,
-        0,
-        SCREEN_WIDTH,
-        SCREEN_HEIGHT,
-        container,
-        board.scene
-    )
+    const panel_ = panel(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, container)
     container.sendToBack(panel_)
 
     onBoardUnitClicked(board, (c) => {
@@ -145,14 +138,17 @@ export default function ({
             container,
             getUnit(c.id, units)
         )
+
+        const remove = button(
+            300,
+            SCREEN_HEIGHT - 100,
+            "Remove form Squad",
+            container,
+            () => {}
+        )
     })
-    button(
-        SCREEN_WIDTH - 210,
-        SCREEN_HEIGHT - 50,
-        "Confirm",
-        container,
-        board.scene,
-        () => onCloseEvent.emit(null)
+    button(SCREEN_WIDTH - 210, SCREEN_HEIGHT - 50, "Confirm", container, () =>
+        onCloseEvent.emit(null)
     )
 
     board.scene.events.emit("EditSquadModalOpened", { board, unitList })

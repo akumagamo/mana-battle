@@ -6,22 +6,25 @@ const defaultTextColor = "#ffffff"
 const activeFill = 0x222222
 const activeTextColor = "#ffffff"
 
+// TODO: refactor: accept event key to fire
+// IDEA: create "eventButton" component
+// Or accept and event object (to help with typing)
 export default (
     x: number,
     y: number,
     label: string,
     container: Container,
-    scene: Scene,
     onClick: () => void,
     disabled = false,
     width = 200,
     height = 40,
     active?: boolean
 ) => {
+    const { scene } = container
     const w = width ? width : 170
     const h = height ? height : 40
 
-    const text_ = text(x + w / 2, y + h / 2, label, container, scene)
+    const text_ = text(x + w / 2, y + h / 2, label, container)
     text_.setOrigin(0.5)
     text_.setShadow(2, 2, "#000")
     text_.setColor("#fff")
@@ -92,7 +95,7 @@ export default (
 
     const elems = [text_, btn, clickZone, border]
 
-    return { btn, destroy: () => elems.map(e => e.destroy()) }
+    return { btn, destroy: () => elems.map((e) => e.destroy()) }
 }
 
 export const setActive = (btn: Phaser.GameObjects.Graphics) => {

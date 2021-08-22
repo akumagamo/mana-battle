@@ -33,7 +33,6 @@ export default async function (
         SCREEN_WIDTH,
         SCREEN_HEIGHT,
         state.uiContainer,
-        scene
     )
     bg.setAlpha(0.4)
 

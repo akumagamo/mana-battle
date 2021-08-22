@@ -6,9 +6,9 @@ export default (
     y: number,
     width: number,
     height: number,
-    container: Container,
-    scene: Scene
+    container: Container
 ) => {
+    const { scene } = container
     var rect = scene.add.rectangle(x, y, width, height)
     var graphics = scene.add.graphics({
         fillStyle: { color: 0x000000 },
