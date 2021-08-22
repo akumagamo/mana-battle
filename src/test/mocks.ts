@@ -21,16 +21,21 @@ export const gameObjectMock = () => ({
     setPosition: jest.fn(),
     setAlpha: jest.fn(),
     setName: jest.fn(),
+    scene: sceneMock(),
     getBounds: () => ({ width: 111, height: 111 }),
 })
-export const containerMock = (jest.fn((x?: number, y?: number) => ({
-    x,
-    y,
-    add: jest.fn(),
-    removeAll: jest.fn(),
-    ...gameObjectMock(),
-    __type__: "container",
-})) as unknown) as () => Container
+export const containerMock = jest.fn(
+    (x = 0, y = 0): Container =>
+        (({
+            x,
+            y,
+            add: jest.fn(),
+            removeAll: jest.fn(),
+            ...gameObjectMock(),
+            __type__: "container",
+        } as unknown) as Container)
+)
+
 export const imageMock = jest.fn(() => ({
     setTint: jest.fn(),
     ...gameObjectMock(),
@@ -66,7 +71,7 @@ export const tweensMock = {
     killTweensOf: jest.fn(),
 }
 
-export const sceneMock = () => {
+export const sceneMock = (): Phaser.Scene => {
     return ({
         __type__: "scene",
         add: {

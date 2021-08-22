@@ -51,7 +51,7 @@ export class UnitDetailsBarScene extends Phaser.Scene {
     }
 
     write = (x: number, y: number, str: string | number) =>
-        this.container ? text(x, y, str, this.container ) : null
+        this.container ? text(x, y, str, this.container) : null
 
     col = (x: number, y: number, strs: (string | number)[]) =>
         strs.forEach((str, index) =>

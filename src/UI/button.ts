@@ -95,7 +95,7 @@ export default (
 
     const elems = [text_, btn, clickZone, border]
 
-    return { btn, destroy: () => elems.map((e) => e.destroy()) }
+    return { btn, destroy: () => elems.map(e => e.destroy()) }
 }
 
 export const setActive = (btn: Phaser.GameObjects.Graphics) => {

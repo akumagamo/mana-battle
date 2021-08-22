@@ -20,7 +20,7 @@ const write = (container: Container) => (
     str: string | number
 ) => text(x, y, str, container)
 
-export default function (x: number, y: number, parent: Container, unit: Unit) {
+export default function(x: number, y: number, parent: Container, unit: Unit) {
     parent.getByName(key)?.destroy()
 
     const container = parent.scene.add.container()

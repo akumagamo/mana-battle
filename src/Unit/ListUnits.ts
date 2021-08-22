@@ -109,8 +109,8 @@ export class ListUnitsScene extends Phaser.Scene {
     }
 
     selectUnit(id: string) {
-        this.units.forEach((u) => u.tile.clearTint())
-        const listUnit = this.units.find((u) => u.chara.id === id)
+        this.units.forEach(u => u.tile.clearTint())
+        const listUnit = this.units.find(u => u.chara.id === id)
 
         if (listUnit) {
             listUnit.tile.setTint(0x333333)
@@ -136,7 +136,7 @@ export class ListUnitsScene extends Phaser.Scene {
         this.renderUnitsList(this.getUnits())
     }
     removeUnitList() {
-        this.units.forEach((listUnit) => {
+        this.units.forEach(listUnit => {
             this.scene.remove(`list-chara-${listUnit.chara.id}`)
             listUnit.tile.destroy()
         })
