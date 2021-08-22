@@ -1,89 +1,74 @@
-import { Scene } from "phaser";
-import { MapSquad } from "../Model";
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../constants";
-import { Container } from "../../Models";
-import button from "../../UI/button";
-import { Unit, UnitIndex } from "../../Unit/Model";
-import SmallUnitDetailsBar from "../../Unit/SmallUnitDetailsBar";
-import { findMember } from "../../Squad/Model";
-import onBoardUnitClicked from "../../Board/events/onBoardUnitClicked";
-import createStaticBoard from "../../Board/createBoard";
-import highlightTile from "../../Board/highlightTile";
-import { INVALID_STATE } from "../../errors";
+import { MapSquad } from "../Model"
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../constants"
+import { Container } from "../../Models"
+import button from "../../UI/button"
+import { Unit, UnitIndex } from "../../Unit/Model"
+import SmallUnitDetailsBar from "../../Unit/SmallUnitDetailsBar"
+import { getLeader } from "../../Squad/Model"
+import onBoardUnitClicked from "../../Board/events/onBoardUnitClicked"
+import createStaticBoard from "../../Board/createBoard"
+import highlightTile from "../../Board/highlightTile"
 
 export default (
-  scene: Phaser.Scene,
-  mapSquad: MapSquad,
-  units: UnitIndex,
-  onClose: () => void
+    scene: Phaser.Scene,
+    mapSquad: MapSquad,
+    units: UnitIndex,
+    onClose: () => void
 ) => {
-  const leader = findMember(
-    (m) => m.id === mapSquad.squad.leader,
-    mapSquad.squad
-  );
+    const leader = getLeader(mapSquad.squad)
 
-  if (!leader) throw new Error(INVALID_STATE);
+    let charaStats = scene.add.container()
 
-  let charaStats = scene.add.container(0, 0);
+    const backdrop_ = backdrop(scene)
 
-  const backdrop_ = backdrop(scene);
+    const container = scene.add.container()
 
-  const container = scene.add.container();
+    const detailsBar = renderUnitDetailsBar(container)
 
-  let details: Container | null = null;
+    const { board } = createStaticBoard(
+        scene,
+        mapSquad.squad,
+        units,
+        SCREEN_WIDTH / 2,
+        SCREEN_HEIGHT / 3,
+        0.7
+    )
 
-  const detailsBar = renderUnitDetailsBar(scene, details, container);
+    container.add(board.container)
 
-  const { board } = createStaticBoard(
-    scene,
-    mapSquad.squad,
-    units,
-    SCREEN_WIDTH / 2,
-    SCREEN_HEIGHT / 3,
-    0.7
-  );
+    onBoardUnitClicked(board, (chara) => {
+        charaStats.removeAll(true)
 
-  container.add(board.container);
+        detailsBar(chara.unit)
+    })
 
-  onBoardUnitClicked(board, (chara) => {
-    charaStats.removeAll(true);
+    const tile = board.tiles.find(
+        (t) => t.boardX === leader.x && t.boardY === leader.y
+    )
+    if (tile) highlightTile(board, tile)
 
-    detailsBar(chara.unit);
-  });
+    const defaultUnit = units.find((u) => u.id === leader.id)
 
-  const tile = board.tiles.find(
-    (t) => t.boardX === leader.x && t.boardY === leader.y
-  );
-  if(tile) highlightTile(board, tile);
+    if (defaultUnit) detailsBar(defaultUnit)
 
-  const defaultUnit = units.find((u) => u.id === leader.id);
+    button(1050, 480, "Close", container, scene, () => {
+        charaStats.destroy()
+        backdrop_.destroy()
+        container.destroy()
 
-  if(defaultUnit) detailsBar(defaultUnit);
-
-  button(1050, 480, "Close", container, scene, () => {
-    charaStats.destroy();
-    backdrop_.destroy();
-    container.destroy();
-
-    onClose();
-  });
-};
-
-function backdrop(scene: Phaser.Scene) {
-  const backdrop = scene.add.graphics();
-  backdrop.fillStyle(0x000000, 0.5);
-  backdrop.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-  return backdrop;
+        onClose()
+    })
 }
 
-function renderUnitDetailsBar(
-  scene: Scene,
-  details: Container | null,
-  parent: Container
-) {
-  return function (unit: Unit) {
-    details?.destroy();
-    details = SmallUnitDetailsBar(330, 480, scene, unit);
-    parent.add(details);
-  };
+function backdrop(scene: Phaser.Scene) {
+    const backdrop = scene.add.graphics()
+    backdrop.fillStyle(0x000000, 0.5)
+    backdrop.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+    return backdrop
+}
+
+function renderUnitDetailsBar(parent: Container) {
+    return function (unit: Unit) {
+        SmallUnitDetailsBar(330, 480, parent, unit)
+    }
 }

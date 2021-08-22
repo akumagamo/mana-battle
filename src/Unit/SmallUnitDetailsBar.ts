@@ -4,6 +4,7 @@ import text from "../UI/text"
 import panel from "../UI/panel"
 import { JOBS } from "./Jobs/Jobs"
 
+const key = "SmallUnitDetailsBar"
 const colWidth = 130
 
 const row = (container: Container, scene: Phaser.Scene) => (
@@ -20,12 +21,19 @@ const write = (container: Container, scene: Phaser.Scene) => (
     y: number,
     str: string | number
 ) => text(x, y, str, container, scene)
-export default function(x: number, y: number, scene: Phaser.Scene, unit: Unit) {
-    const container = scene.add.container()
 
-    panel(x, y, 5 * colWidth, 50, container, scene)
+export default function (x: number, y: number, parent: Container, unit: Unit) {
+    parent.getByName(key)?.destroy()
 
-    unitStats(x, y, container, scene, unit)
+    const container = parent.scene.add.container()
+
+    container.setName(key)
+
+    panel(x, y, 5 * colWidth, 50, container, parent.scene)
+
+    unitStats(x, y, container, parent.scene, unit)
+
+    parent.add(container)
 
     return container
 }

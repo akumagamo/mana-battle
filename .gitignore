@@ -21,8 +21,9 @@ yarn.lock
 package-lock.json
 .DS_Store
 *.swp
-assets/.DS_Store
+.DS_Store
 test/screens/
 coverage/
 *.log
 *.apk
+.psc-ide-port
