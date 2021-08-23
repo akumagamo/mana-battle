@@ -1,11 +1,15 @@
 import { initiativeList, runCombat } from "./turns"
 import createUnit from "../../Unit/createUnit"
-import { createSquad, createUnitSquadIndex, makeMember } from "../../Squad/Model"
+import {
+    createSquad,
+    createUnitSquadIndex,
+    makeMember,
+} from "../../Squad/Model"
 import { List, Map } from "immutable"
 import { equals } from "../../test/utils"
 
-jest.mock("../utils/random")
-jest.mock("../Unit/mods")
+jest.mock("../../utils/random")
+jest.mock("../../Unit/mods")
 
 test("Should sort by initiave correctly", () => {
     const units = Map({

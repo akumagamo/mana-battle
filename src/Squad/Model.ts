@@ -65,7 +65,7 @@ export const isUnitInSquad = (
 export const unitsWithoutSquad = (
     unitSquadIndex: UnitSquadIndex,
     unitIndex: UnitIndex
-) => unitIndex.filter((u) => !unitSquadIndex.get(u.id))
+) => unitIndex.filter(u => !unitSquadIndex.get(u.id))
 
 export const createSquad = Record(
     {
@@ -113,7 +113,7 @@ export const changeLeader = (id: string, squad: SquadRecord) =>
 
 export const mapSquadMembers = (fn: (s: MemberRecord) => MemberRecord) => (
     index: SquadIndex
-) => index.map((squad) => squad.set("members", squad.members.map(fn)))
+) => index.map(squad => squad.set("members", squad.members.map(fn)))
 
 export const filterMembersFromSquad = (fn: (s: MemberRecord) => boolean) => (
     squad: SquadRecord
@@ -126,7 +126,7 @@ export const filterMembers = (fn: (s: MemberRecord) => boolean) => (
 export const mapMembers = (fn: (s: MemberRecord) => MemberRecord) => (
     squadId: string
 ) => (index: SquadIndex) =>
-    index.map((squad) =>
+    index.map(squad =>
         squad.id === squadId
             ? squad.set("members", squad.members.map(fn))
             : squad
@@ -141,11 +141,11 @@ export const getAllUnits = (index: SquadIndex): List<MemberRecord> =>
 
 export const getUnitsFromSquad = (id: string) => (
     index: SquadIndex
-): List<MemberRecord> => getAllUnits(index.filter((s) => s.id === id))
+): List<MemberRecord> => getAllUnits(index.filter(s => s.id === id))
 
 export const rejectUnitsFromSquad = (id: string) => (
     index: SquadIndex
-): List<MemberRecord> => getAllUnits(index.filter((s) => s.id !== id))
+): List<MemberRecord> => getAllUnits(index.filter(s => s.id !== id))
 
 export const getMember = (unitId: string, squad: SquadRecord): MemberRecord => {
     const member = squad.members.get(unitId)
@@ -164,7 +164,7 @@ export const getSquadUnits = (
     unitSquadIndex: UnitSquadIndex
 ): UnitIndex =>
     unitSquadIndex
-        .filter((sqd) => sqd === squadId)
+        .filter(sqd => sqd === squadId)
         .map((_v, k) => getUnit(k, units))
 
 export const getSquadMember = (
@@ -213,7 +213,7 @@ export const changeSquadMemberPosition = (
 
 export const getMemberByPosition = ({ x, y }: { x: number; y: number }) => (
     sqd: SquadRecord
-) => sqd.members.find((m) => m.x === x && m.y === y)
+) => sqd.members.find(m => m.x === x && m.y === y)
 
 export const addMember = (
     unit: Unit,
@@ -226,7 +226,7 @@ export const addMember = (
 
     if (memberToRemove) {
         const updatedSquad = filterMembersFromSquad(
-            (m) => m.id !== memberToRemove.id
+            m => m.id !== memberToRemove.id
         )(squad)
 
         return {

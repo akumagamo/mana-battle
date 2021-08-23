@@ -143,7 +143,7 @@ const equipKeys: ItemSlot[] = ["mainHand", "offHand", "chest", "ornament"]
 export function getActualStat(stat: Stat, items: ItemMap, unit: Unit) {
     const value = unit[stat]
 
-    const values = equipKeys.map((equip) =>
+    const values = equipKeys.map(equip =>
         getItemModifier({ unit, stat, items, slot: equip })
     )
 
@@ -159,4 +159,4 @@ export const getAliveUnits = (index: UnitIndex) => index.filter(isAlive)
 export const unitsWithoutSquad = (
     unitMap: UnitIndex,
     unitSquadIndex: UnitSquadIndex
-) => unitMap.filter((unit) => !unitSquadIndex.get(unit.id))
+) => unitMap.filter(unit => !unitSquadIndex.get(unit.id))
