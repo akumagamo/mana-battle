@@ -1,16 +1,19 @@
-import { TitleSceneState } from './Model';
+import { TitleSceneState } from "./Model"
 
 export function changeMusic(
-  scene: Phaser.Scene,
-  state: TitleSceneState,
-  key: string
+    scene: Phaser.Scene,
+    state: TitleSceneState,
+    key: string
 ) {
-  if (!process.env.SOUND_ENABLED) return;
+    if (!process.env.SOUND_ENABLED) return
 
-  if (state.music) state.music.destroy();
+    if (state.music) state.music.destroy()
 
-  //    if (getOptions().musicEnabled) {
-  state.music = scene.sound.add(key);
-  state.music.play();
-  //   }
+    //    if (getOptions().musicEnabled) {
+    state.music = scene.sound.add(key)
+
+    //@ts-ignore
+    state.music.setVolume(0.1)
+    state.music.play()
+    //   }
 }

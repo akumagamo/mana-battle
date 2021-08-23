@@ -16,7 +16,6 @@ export function renderSelectionWindow(
     city: City | undefined,
     selectSquad: (squad: MapSquad) => void
 ) {
-    state.isPaused = true
     disableMapInput(state)
     deselectAllEntities(state)
     changeMode(scene, state, { type: "NOTHING_SELECTED" })
@@ -35,7 +34,6 @@ export function renderSelectionWindow(
                 selectSquad(sqd)
                 container.destroy()
                 enableMapInput(scene, state)
-                state.isPaused = false
             }
         )
     })
@@ -46,7 +44,6 @@ export function renderSelectionWindow(
             selectCityCommand(scene, state, city)
             container.destroy()
             enableMapInput(scene, state)
-            state.isPaused = false
             refreshUI(scene, state)
         })
     }

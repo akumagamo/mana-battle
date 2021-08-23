@@ -54,7 +54,7 @@ export default (scene: Phaser.Scene, state: MapState) => {
     })
 
     let squadsToRender = getForceSquads(state, PLAYER_FORCE).filter(
-        mapSquad =>
+        (mapSquad) =>
             mapSquad.status !== "defeated" &&
             !state.dispatchedSquads.has(mapSquad.squad.id)
     )
@@ -89,7 +89,6 @@ export const handleDispatchSquad = async (
 
     dispatchSquad(scene, state, mapSquad.squad)
     enableMapInput(scene, state)
-    state.isPaused = false
     changeMode(scene, state, { type: "SQUAD_SELECTED", id: mapSquad.squad.id })
 
     let squad = getMapSquad(state, mapSquad.squad.id)

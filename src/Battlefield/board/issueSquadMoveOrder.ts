@@ -13,8 +13,6 @@ export async function issueSquadMoveOrder(
     const squad = getMapSquad(state, id)
 
     if (squad && squad.squad.force === PLAYER_FORCE) {
-        state.isPaused = false
-
         const cell = screenToCellPosition(squad.posScreen)
 
         if ((cell.x !== x || cell.y !== y) && state.cells[y][x] !== 3)

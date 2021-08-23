@@ -33,7 +33,6 @@ export default function ui(
         btn(240, 10, "Dispatch", () => {
             disableMapInput(state)
             destroyUI(state)
-            state.isPaused = true
             dispatchWindow(scene, state)
         })
         btn(SCREEN_WIDTH - 220, 10, "Return to Title", () => {

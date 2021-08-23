@@ -51,14 +51,12 @@ export function viewSquadDetails(
     const mapSquad = getMapSquad(state, id)
     disableMapInput(state)
     destroyUI(state)
-    state.isPaused = true
     squadDetails(
         scene,
         mapSquad,
         state.units.filter((u) => mapSquad.squad.members.has(u.id)),
         () => {
             enableMapInput(scene, state)
-            state.isPaused = false
             refreshUI(scene, state)
         }
     )
