@@ -1,8 +1,8 @@
 import { initiativeList, runCombat } from "./turns"
-import createUnit from "../Unit/createUnit"
-import { createSquad, createUnitSquadIndex, makeMember } from "../Squad/Model"
+import createUnit from "../../Unit/createUnit"
+import { createSquad, createUnitSquadIndex, makeMember } from "../../Squad/Model"
 import { List, Map } from "immutable"
-import { equals } from "../test/utils"
+import { equals } from "../../test/utils"
 
 jest.mock("../utils/random")
 jest.mock("../Unit/mods")

@@ -6,7 +6,7 @@ import { createUnitSquadIndex, getSquad } from "../Squad/Model"
 import { getUnit } from "../Unit/Model"
 import { placeUnitOnBoard } from "./combatBoard"
 import { CombatBoardState, CombatCreateParams } from "./Model"
-import { runTurn } from "./runTurn"
+import { runTurn } from "./Turn/runTurn"
 
 export default async (data: CombatCreateParams, scene: Phaser.Scene) => {
     const state: CombatBoardState = {

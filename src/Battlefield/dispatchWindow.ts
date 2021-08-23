@@ -54,7 +54,7 @@ export default (scene: Phaser.Scene, state: MapState) => {
     })
 
     let squadsToRender = getForceSquads(state, PLAYER_FORCE).filter(
-        (mapSquad) =>
+        mapSquad =>
             mapSquad.status !== "defeated" &&
             !state.dispatchedSquads.has(mapSquad.squad.id)
     )

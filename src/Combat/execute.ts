@@ -5,21 +5,20 @@ import returnToPosition from "./animations/returnToPosition"
 import shoot from "./animations/shoot"
 import slash from "./animations/slash"
 import { CombatBoardState } from "./Model"
-import { runTurn } from "./runTurn"
-import turnOff from "./turnOff"
-import { Command } from "./turns"
+import { TurnCommand } from "./Turn/Model"
+import { runTurn } from "./Turn/runTurn"
+import turnOff from "./Turn/turnOff"
 
 export default async function execute(
-    commands: Command[],
+    commands: TurnCommand[],
     state: CombatBoardState
 ) {
-    const cmd = commands[0]
+    const [cmd] = commands
 
     const step = () => {
         const [, ...next_] = commands
 
-        if (next_.length === 0) console.log(`finish!`)
-        else execute(next_, state)
+        if (next_.length !== 0) execute(next_, state)
     }
 
     if (cmd.type === "MOVE") {
@@ -67,9 +66,6 @@ export default async function execute(
             units: cmd.units,
             squadDamage: cmd.squadDamage,
         })
-        turnOff(state)
-    } else if (cmd.type === "VICTORY") {
-        state.scene.events.emit("CombatFinished", state)
         turnOff(state)
     } else console.error(`Unknown command:`, cmd)
 

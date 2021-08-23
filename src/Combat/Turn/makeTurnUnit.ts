@@ -1,6 +1,6 @@
-import * as Squad from "../Squad/Model"
-import { Unit } from "../Unit/Model"
-import { getUnitAttack } from "../Unit/Skills/Skills"
+import * as Squad from "../../Squad/Model"
+import { Unit } from "../../Unit/Model"
+import { getUnitAttack } from "../../Unit/Skills/Skills"
 
 export function makeTurnUnit(
     squadIndex: Squad.SquadIndex,
