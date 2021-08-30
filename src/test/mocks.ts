@@ -44,7 +44,7 @@ export const imageMock = jest.fn(() => ({
 export const spriteMock = jest.fn(() => ({
     ...gameObjectMock(),
     setTint: jest.fn(),
-    play: jest.fn(),
+    play: jest.fn().mockReturnThis(),
     __type__: "sprite",
 }))
 
@@ -103,6 +103,7 @@ export const sceneMock = (): Phaser.Scene => {
         anims: {
             create: jest.fn(),
             generateFrameNumbers: jest.fn(),
+            generateFrameNames: jest.fn(),
             exists: jest.fn(),
         },
         time: {

@@ -1,6 +1,7 @@
 import * as Unit from "../../Unit/Model"
 import * as Squad from "../../Squad/Model"
 import { List, Map } from "immutable"
+import { random } from "../../utils/random"
 
 export type TurnCommand =
     | Move
@@ -68,7 +69,22 @@ export type TurnState = {
     squadDamage: Map<string, number>
 }
 
-/** Unit that is guaranteed to be in a squad */
-export type UnitInSquad = Unit.Unit & { squad: string }
-
 export type RemainingAttacksIndex = { [id: string]: number }
+
+export function noAttacksRemaining(
+    units: Unit.UnitIndex,
+    remainingAttacks: RemainingAttacksIndex
+) {
+    return Unit.getAliveUnits(units).every((u) => remainingAttacks[u.id] < 1)
+}
+
+const sortInitiative = (unit: Unit.Unit) => {
+    return random(1, 6) + unit.dex
+}
+
+export const createInitiativeList = (units: Unit.UnitIndex): List<string> =>
+    units
+        .toList()
+        .sortBy(sortInitiative)
+        .reverse()
+        .map((u) => u.id)

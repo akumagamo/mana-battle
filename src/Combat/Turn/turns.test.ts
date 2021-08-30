@@ -1,4 +1,4 @@
-import { initiativeList, runCombat } from "./turns"
+import { runCombat } from "./turns"
 import createUnit from "../../Unit/createUnit"
 import {
     createSquad,
@@ -7,6 +7,7 @@ import {
 } from "../../Squad/Model"
 import { List, Map } from "immutable"
 import { equals } from "../../test/utils"
+import { createInitiativeList } from "./Model"
 
 jest.mock("../../utils/random")
 jest.mock("../../Unit/mods")
@@ -19,7 +20,7 @@ test("Should sort by initiave correctly", () => {
         "3": { ...createUnit("3"), dex: 8 },
     })
 
-    const sorted = initiativeList(units)
+    const sorted = createInitiativeList(units)
 
     equals(sorted, List(["0", "3", "2", "1"]))
 })
