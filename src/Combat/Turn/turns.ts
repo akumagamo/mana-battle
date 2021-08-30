@@ -10,22 +10,15 @@ import {
     RemainingAttacksIndex,
     TurnState,
     TurnCommand,
+    noAttacksRemaining,
+    createInitiativeList,
 } from "./Model"
 import { slash } from "./skills/slash"
 import { shoot } from "./skills/shoot"
 import { fireball } from "./skills/fireball"
+import { calcXp } from "./calcXp"
 
-const sortInitiative = (unit: Unit.Unit) => {
-    return random(1, 6) + unit.dex
-}
-
-export const initiativeList = (units: Unit.UnitIndex): List<string> =>
-    units
-        .toList()
-        .sort((a, b) => sortInitiative(b) - sortInitiative(a))
-        .map((u) => u.id)
-
-const displayXPCmd = (xpInfo: List<XPInfo>): DisplayXP => ({
+export const displayXPCmd = (xpInfo: List<XPInfo>): DisplayXP => ({
     type: "DISPLAY_XP",
     xpInfo,
 })
@@ -50,13 +43,11 @@ export const runCombat = ({
             {} as RemainingAttacksIndex
         )
 
-    const initiative = initiativeList(unitIndex)
-
     const initialTurnState: TurnState = {
         unitIndex: unitIndex,
         squadIndex: squadIndex,
         unitSquadIndex: Squad.createUnitSquadIndex(squadIndex),
-        initiative,
+        initiative: createInitiativeList(unitIndex),
         remainingAttacksIndex,
         turn: 0,
         squadDamage: squadIndex.map(() => 0),
@@ -143,71 +134,4 @@ export const runTurn = (
     } else {
         return runTurn({ ...turnState, turn: nextTurn }, turnCommands)
     }
-}
-
-function calcXp(
-    squadIndex: Squad.SquadIndex,
-    units: Unit.UnitIndex,
-    unitSquadIndex: Squad.UnitSquadIndex
-) {
-    const squadXp = squadIndex.map((squad) => {
-        const enemyUnits = Squad.getSquadUnits(squad.id, units, unitSquadIndex)
-
-        const deadEnemies = enemyUnits
-            .map((u) => (u.currentHp < 1 ? 1 : 0))
-            .reduce((xs, x) => xs + x, 0)
-
-        const xpAmount = deadEnemies * 40
-
-        return { squadId: squad.id, xpAmount }
-    })
-
-    const MAX_XP = 100
-
-    const unitsWithXp = units.map((unit) => {
-        const unitSquad = Squad.getUnitSquad(
-            unit.id,
-            squadIndex,
-            unitSquadIndex
-        )
-
-        const xp = squadXp.get(unitSquad.id)
-        if (!xp) throw new Error(INVALID_STATE)
-
-        const { xpAmount } = xp
-
-        if (xpAmount < 1) return { xp: 0, lvls: 0, unit }
-
-        const newXp = unit.exp + xpAmount
-
-        const lvls = Math.floor(newXp / MAX_XP)
-
-        return {
-            unit: {
-                ...unit,
-                lvl: unit.lvl + lvls,
-                xp: newXp,
-            },
-
-            xp: xpAmount,
-            lvls,
-        }
-    })
-
-    const xps = unitsWithXp
-        .filter(({ xp, lvls }) => xp > 0 || lvls > 0)
-        .map(({ unit, xp, lvls }) => ({ id: unit.id, xp, lvls }))
-        .toList()
-
-    return {
-        unitsWithXp,
-        cmds: xps.size > 0 ? [displayXPCmd(xps)] : [],
-    }
-}
-
-function noAttacksRemaining(
-    units: Unit.UnitIndex,
-    remainingAttacks: RemainingAttacksIndex
-) {
-    return Unit.getAliveUnits(units).every((u) => remainingAttacks[u.id] < 1)
 }
