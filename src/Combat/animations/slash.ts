@@ -15,9 +15,9 @@ export default async function slash(
 
     source.cast()
 
-    await delay(scene, 333 / GAME_SPEED)
+    await delay(scene, 500 / GAME_SPEED)
 
     damageUnit(target, newHp, damage)
 
-    await delay(scene, 666 / GAME_SPEED)
+    await delay(scene, 200 / GAME_SPEED)
 }
