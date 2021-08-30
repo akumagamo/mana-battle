@@ -4,7 +4,13 @@ import { progressBar } from "./progressBar"
 import { classes } from "./Unit/Jobs/Jobs"
 
 export function preload(this: Phaser.Scene) {
-    classes.forEach(key =>
+    this.load.atlas(
+        "fighter_atlas",
+        "assets/texture-atlas/fighter.png",
+        "assets/texture-atlas/fighter.json"
+    )
+
+    classes.forEach((key) =>
         this.load.spritesheet(
             "sprite_" + key,
             PUBLIC_URL + `/sprites/${key}.png`,
@@ -19,7 +25,7 @@ export function preload(this: Phaser.Scene) {
         frameHeight: 117,
         endFrame: 6,
     })
-    ;["backgrounds/sunset", "tile", "board"].forEach(str =>
+    ;["backgrounds/sunset", "tile", "board"].forEach((str) =>
         this.load.image(str, PUBLIC_URL + "/" + str + ".svg")
     )
     const ui = [
