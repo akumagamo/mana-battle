@@ -1,5 +1,4 @@
 import { Container } from "../Models"
-import { Scene } from "phaser"
 
 export default (
     x: number,
@@ -17,6 +16,7 @@ export default (
             color: 0xaaaaaa,
         },
     })
+
 
     graphics.setAlpha(0.8)
 

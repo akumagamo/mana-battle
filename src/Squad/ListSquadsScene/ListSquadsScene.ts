@@ -20,8 +20,6 @@ import createSquadButtonClicked from "./events/createSquadButtonClicked"
 import editSquadButtonClicked from "./events/editSquadButtonClicked"
 import * as Pure from "../../Pure/output/Main"
 
-console.log(Pure)
-
 type CreateParams = {
     squads: Squad.SquadIndex
     units: Unit.UnitIndex
@@ -62,6 +60,13 @@ export class ListSquadsScene extends Phaser.Scene {
         confirmButtonClicked(this).on(
             this.handleOnConfirmButtonClicked.bind(this)
         )
+
+        this.events.on("disband_squad", (squadId: string) => {
+            this.onDisbandSquad(squadId)
+            this.refreshBoards()
+            this.refreshUI(this.getSquads().first())
+        })
+
         this.cameras.main.fadeIn(1000 / GAME_SPEED)
 
         this.squads = squads
@@ -143,12 +148,7 @@ export class ListSquadsScene extends Phaser.Scene {
             "Disband Squad",
             this.uiContainer,
             () => {
-                Pure.confirmModal(this.uiContainer)(() => {
-                    console.log(`hello`)
-                })()
-                this.onDisbandSquad(squadId)
-                this.refreshBoards()
-                this.refreshUI(this.getSquads().first())
+                Pure.confirmModal(this.uiContainer)(squadId)()
             },
             dispatched || isLastSquad
         )
@@ -378,6 +378,7 @@ export class ListSquadsScene extends Phaser.Scene {
         this.uiContainer?.destroy()
         this.scene.stop(key)
         events.forEach((k) => this.events.off(k))
+        this.events.off("disband_squad")
     }
 
     onDisbandSquad: (id: string) => void = (id: string) => {
