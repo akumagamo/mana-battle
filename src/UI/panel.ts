@@ -17,7 +17,6 @@ export default (
         },
     })
 
-
     graphics.setAlpha(0.8)
 
     graphics.strokeRectShape((rect as unknown) as Phaser.Geom.Rectangle)
