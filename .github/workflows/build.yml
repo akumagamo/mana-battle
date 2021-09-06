@@ -11,6 +11,12 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
+            - name: Install PureScript
+              run: npm install -g purescript spago
+
+            - name: Compile PureScript
+              run: cd src/Pure && spago build
+
             - name: Install deps
               run: yarn
 

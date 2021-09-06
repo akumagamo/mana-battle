@@ -33,6 +33,7 @@ export function preload(this: Phaser.Scene) {
         "panel",
         "announcement_bg",
         "button_move",
+        "button",
         "button_attack",
         "close_btn",
         "ping",

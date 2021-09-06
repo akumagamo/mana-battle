@@ -61,7 +61,7 @@ export class ListSquadsScene extends Phaser.Scene {
             this.handleOnConfirmButtonClicked.bind(this)
         )
 
-        this.events.on("disband_squad", (squadId: string) => {
+        this.events.on("DISBAND_SQUAD", (squadId: string) => {
             this.onDisbandSquad(squadId)
             this.refreshBoards()
             this.refreshUI(this.getSquads().first())
@@ -148,7 +148,10 @@ export class ListSquadsScene extends Phaser.Scene {
             "Disband Squad",
             this.uiContainer,
             () => {
-                Pure.confirmModal(this.uiContainer)(squadId)()
+                Pure.confirmModal(this.uiContainer)({
+                    key: "DISBAND_SQUAD",
+                    data: squadId,
+                })()
             },
             dispatched || isLastSquad
         )
@@ -378,7 +381,7 @@ export class ListSquadsScene extends Phaser.Scene {
         this.uiContainer?.destroy()
         this.scene.stop(key)
         events.forEach((k) => this.events.off(k))
-        this.events.off("disband_squad")
+        this.events.off("DISBAND_SQUAD")
     }
 
     onDisbandSquad: (id: string) => void = (id: string) => {

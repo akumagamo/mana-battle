@@ -4,13 +4,14 @@ import Prelude
 import Effect (Effect)
 import Graphics.Phaser.Container as Container
 import Graphics.Phaser.ForeignTypes as PhaserModels
-import Graphics.Phaser.GameObject (Vector, Dimensions, getScene)
-import Graphics.Phaser.Graphics as Graphics
+import Graphics.Phaser.GameObject (Dimensions, getScene)
+import Graphics.Phaser.GameObject as GO
+import Graphics.Phaser.Image as Image
 
-create :: Vector -> Dimensions -> PhaserModels.PhaserContainer -> Effect PhaserModels.PhaserContainer
-create position size container =
-  getScene container
-    >>= Graphics.create
-    >>= Graphics.fillStyle "0x000000" 0.9
-    >>= Graphics.fillRect position size
-    >>= flip Container.addChild container
+create :: Dimensions -> PhaserModels.PhaserContainer -> Effect PhaserModels.PhaserContainer
+create size container = do
+  scene <- getScene container
+  background <-
+    Image.create "panel" { x: 0.0, y: 0.0 } scene
+      >>= GO.setSize size
+  Container.addChild background container
