@@ -11,11 +11,12 @@ const TEXT_DAMAGE_FADE_OUT_Y_DISTANCE = -20
 
 export function displayDamage(chara: Chara, damage: number) {
     const container = chara.scene.add.container()
+    container.setDepth(Infinity)
     const dmg = text(
         chara.container.x + TEXT_DAMAGE_POSITION_X,
         chara.container.y + TEXT_DAMAGE_POSITION_Y,
         damage.toString(),
-        container,
+        container
     )
     dmg.setShadow(2, 2, "#000")
     dmg.setStroke(TEXT_DAMAGE_STROKE_COLOR, TEXT_DAMAGE_STROKE_WIDTH)
