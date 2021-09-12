@@ -31,10 +31,10 @@ export default async (data: CombatCreateParams, scene: Phaser.Scene) => {
 
     board.alpha = 0.8
 
-    combatants.forEach((squad) => {
+    combatants.forEach(squad => {
         const isLeftSquad = squad.id === data.left.id
 
-        squad.members.forEach((member) => {
+        squad.members.forEach(member => {
             const unit = getUnit(member.id, data.units)
 
             if (unit.currentHp < 1) return
@@ -57,7 +57,7 @@ export default async (data: CombatCreateParams, scene: Phaser.Scene) => {
         })
     })
 
-    const charasContainer = depthSort(scene, state);
+    const charasContainer = depthSort(scene, state)
 
     CombatEnded(scene).once(() => {
         charasContainer.destroy()
@@ -72,8 +72,7 @@ export default async (data: CombatCreateParams, scene: Phaser.Scene) => {
 function depthSort(scene: Phaser.Scene, state: CombatBoardState) {
     const charasContainer = scene.add.container()
 
-    state.charaIndex
-        .forEach((c) => c.container.setDepth(c.container.y))
+    state.charaIndex.forEach(c => c.container.setDepth(c.container.y))
 
     return charasContainer
 }

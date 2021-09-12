@@ -41,6 +41,10 @@ export function preload(this: Phaser.Scene) {
     ui.forEach((id: string) => {
         this.load.image(id, `${PUBLIC_URL}/ui/${id}.svg`)
     })
+    const uiPng = ["github"]
+    uiPng.forEach((id: string) => {
+        this.load.image(id, `${PUBLIC_URL}/ui/${id}.png`)
+    })
 
     const itemIcons = [
         "amulet",

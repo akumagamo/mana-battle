@@ -39,4 +39,12 @@ export function create(scene: Phaser.Scene, state: TitleSceneState) {
     button(SCREEN_WIDTH / 2, 590, "Go Fullscreen", state.container, () => {
         requestFullscreen()
     })
+
+    const github = scene.add.image(0, 0, "github")
+    github.setDisplaySize(64, 64)
+
+    github.setPosition(SCREEN_WIDTH - 64 + 20, SCREEN_HEIGHT - 64 - 20)
+    github.setInteractive().on("pointerdown", () => {
+        window.location.href = "https://github.com/lfarroco/mana-phaser"
+    })
 }
