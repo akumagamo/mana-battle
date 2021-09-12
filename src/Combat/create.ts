@@ -2,7 +2,7 @@ import CombatEnded from "../Battlefield/events/CombatEnded"
 import createChara from "../Chara/createChara"
 import { emptyIndex } from "../Chara/Model"
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants"
-import { createUnitSquadIndex, getSquad } from "../Squad/Model"
+import { createUnitSquadIndex } from "../Squad/Model"
 import { getUnit } from "../Unit/Model"
 import { placeUnitOnBoard } from "./combatBoard"
 import { CombatBoardState, CombatCreateParams } from "./Model"
@@ -31,10 +31,10 @@ export default async (data: CombatCreateParams, scene: Phaser.Scene) => {
 
     board.alpha = 0.8
 
-    combatants.forEach(squad => {
+    combatants.forEach((squad) => {
         const isLeftSquad = squad.id === data.left.id
 
-        squad.members.forEach(member => {
+        squad.members.forEach((member) => {
             const unit = getUnit(member.id, data.units)
 
             if (unit.currentHp < 1) return
@@ -48,7 +48,6 @@ export default async (data: CombatCreateParams, scene: Phaser.Scene) => {
                 scale: 2,
                 showHpBar: true,
             })
-            chara.sprite.setDepth(member.y)
 
             if (!isLeftSquad) chara.flip()
 
@@ -58,11 +57,23 @@ export default async (data: CombatCreateParams, scene: Phaser.Scene) => {
         })
     })
 
+    const charasContainer = depthSort(scene, state);
+
     CombatEnded(scene).once(() => {
+        charasContainer.destroy()
         board.destroy()
     })
 
     runTurn(state)
 
     return state
+}
+
+function depthSort(scene: Phaser.Scene, state: CombatBoardState) {
+    const charasContainer = scene.add.container()
+
+    state.charaIndex
+        .forEach((c) => c.container.setDepth(c.container.y))
+
+    return charasContainer
 }

@@ -14,12 +14,12 @@ export const memberToBoardPosition = (isLeftSquad: boolean) => ({
 }
 
 export const renderPieceOnCell = ({ x, y }: { x: number; y: number }) => {
-    const bX = 210
-    const bY = 120
+    const boardX = 210
+    const boardY = 120
 
     return {
-        x: bX + x * 110,
-        y: bY + y * 80,
+        x: boardX + x * 110,
+        y: boardY + y * 80,
     }
 }
 
