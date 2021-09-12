@@ -1,14 +1,18 @@
+const webpack = require("webpack")
 const { merge } = require("webpack-merge")
 const common = require("./webpack.common.js")
-const path = require("path")
-const webpack = require("webpack")
+var path = require("path")
+const CopyPlugin = require("copy-webpack-plugin")
+
+const dir = (name) => path.join(__dirname, name)
 
 module.exports = merge(common, {
     mode: "development",
-    devtool: "source-map",
+    devtool: "inline-source-map",
     devServer: {
-        publicPath: "/dist",
-        contentBase: ["./", path.join(__dirname, "dist")],
+        static: {
+            directory: dir("dist"),
+        },
         compress: true,
         port: 3000,
         hot: true,
@@ -17,6 +21,9 @@ module.exports = merge(common, {
         new webpack.EnvironmentPlugin({
             SOUND_ENABLED: false,
             SPEED: 1,
+        }),
+        new CopyPlugin({
+            patterns: [{ from: dir("assets"), to: dir("dist/assets") }],
         }),
     ],
 })
