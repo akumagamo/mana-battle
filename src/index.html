@@ -2,15 +2,25 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <title>Mana Tactics</title>
+        <title>Mana Battle</title>
         <meta
             name="viewport"
-            content="width=device-width, initial-scale=1, user-scalable=no"
+            content="width=device-width,initial-scale=1,user-scalable=no"
         />
         <meta name="HandheldFriendly" content="True" />
         <meta name="MobileOptimized" content="320" />
         <meta http-equiv="cleartype" content="on" />
         <meta name="format-detection" content="telephone=no" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <meta name="color-scheme" content="light dark" />
+        <meta
+            http-equiv="Content-Security-Policy"
+            content="
+       default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval';
+       style-src 'self' 'unsafe-inline'; media-src *;
+       img-src 'self' blob: data:;
+       "
+        />
         <style>
             html,
             body {
@@ -22,6 +32,6 @@
     </head>
     <body>
         <div id="content"></div>
-        <script src="dist/bundle.js"></script>
+        <script src="bundle.js"></script>
     </body>
 </html>

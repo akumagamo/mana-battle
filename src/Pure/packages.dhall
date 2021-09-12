@@ -107,5 +107,5 @@ in  upstream
       ,repo = 
           "https://github.com/lfarroco/purescript-phaser.git"
       ,version =
-          "v0.2.0"
+          "main"
       }

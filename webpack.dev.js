@@ -4,7 +4,7 @@ const common = require("./webpack.common.js")
 var path = require("path")
 const CopyPlugin = require("copy-webpack-plugin")
 
-const dir = (name) => path.join(__dirname, name)
+const dir = name => path.join(__dirname, name)
 
 module.exports = merge(common, {
     mode: "development",
