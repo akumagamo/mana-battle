@@ -1,34 +1,25 @@
-import { MapState, tileMap, translateTiles } from '../Model';
-import { cellToScreenPosition } from './position';
-import { cellSize } from '../config';
+import { MapState } from "../Model"
 
 export default (scene: Phaser.Scene, state: MapState) => {
-  const { mapContainer } = state;
-  translateTiles(state.cells).forEach((arr, col) =>
-    arr.forEach((n, row) => {
-      const { x, y } = cellToScreenPosition({ x: row, y: col });
+    const { mapContainer } = state
 
-      const tile = scene.add.image(x, y, `tiles/${tileMap[n]}`);
+    const map = scene.make.tilemap({ key: "maps/map1" })
+    var tileset1 = map.addTilesetImage("World Tileset", "tiles/tiles")
+    var layer1 = map.createLayer("Tile Layer 1", [tileset1])
 
-      tile.setInteractive();
+    var cities = map.createFromObjects("Cities", { key: "tiles/town" })
 
-      mapContainer.add(tile);
+    //@ts-ignore
+    cities.forEach((c) => c.setScale(0.5))
 
-      scene.input.setDraggable(tile);
+    cities.forEach((c) => {
+        //@ts-ignore
+        c.setTint(0xff88aa)
 
-      tile.displayWidth = cellSize;
-      tile.displayHeight = cellSize;
-
-      const mapTile = {
-        x: row,
-        y: col,
-        type: n,
-        tile: tile,
-      };
-      state.tiles.push(mapTile);
-
-      if (!state.tileIndex[col]) state.tileIndex[col] = [];
-      state.tileIndex[col][row] = mapTile;
+        //@ts-ignore
+        c.setPosition(c.x - 128, c.y + 24 )
     })
-  );
-};
+
+    mapContainer.add(layer1)
+    mapContainer.add(cities)
+}

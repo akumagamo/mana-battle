@@ -15,7 +15,6 @@ export function enableMapInput(scene: Phaser.Scene, state: MapState) {
   enableCellClick(state);
 
   clearAllTileEvents(state);
-  state.tiles.forEach((tile) => makeInteractive(scene, state, tile));
 
   refreshUI(scene, state);
 }

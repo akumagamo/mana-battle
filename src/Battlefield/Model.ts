@@ -59,6 +59,7 @@ export type MapState = {
     mapContainer: Container
     missionContainer: Container
     uiContainer: Container
+    layer: Phaser.Tilemaps.TilemapLayer
     cells: CellNumber[][]
     charas: Chara[]
     forces: Force[]
@@ -179,7 +180,7 @@ export type MapSquadIndex = Map<string, MapSquad>
 export const emptyMapSquadIndex = Map() as MapSquadIndex
 
 export const updateMapSquad = (squad: MapSquad, index: MapSquadIndex) =>
-    index.update(squad.id, sqd => {
+    index.update(squad.id, (sqd) => {
         if (sqd) return squad
         else
             throw new Error(
@@ -348,26 +349,26 @@ export function getMapSquad(state: MapState, squadId: string): MapSquad {
 }
 
 export function getCity(state: MapState, id: string): City {
-    const city = state.cities.find(c => c.id === id)
+    const city = state.cities.find((c) => c.id === id)
     if (!city) throw new Error(INVALID_STATE)
     return city
 }
 export function getForceUnits(state: MapState, force: string) {
-    return state.units.filter(u => u.force === force)
+    return state.units.filter((u) => u.force === force)
 }
 export function getSquadUnits(state: MapState, squadId: string): UnitIndex {
     const squad = getMapSquad(state, squadId)
 
-    return squad.squad.members.map(m => getUnit(m.id, state.units))
+    return squad.squad.members.map((m) => getUnit(m.id, state.units))
 }
 export function getForceSquads(state: MapState, force: string) {
-    return state.squads.filter(u => u.squad.force === force)
+    return state.squads.filter((u) => u.squad.force === force)
 }
 export function getForceCities(state: MapState, force: string) {
-    return state.cities.filter(c => c.force === force)
+    return state.cities.filter((c) => c.force === force)
 }
 export function getForce(state: MapState, id: string) {
-    return state.forces.find(f => f.id === id)
+    return state.forces.find((f) => f.id === id)
 }
 export function getSquadLeader(state: MapState, squadId: string): Unit {
     const squad = getMapSquad(state, squadId)
@@ -385,7 +386,7 @@ export function getSquadLeader(state: MapState, squadId: string): Unit {
 }
 export function getChara(state: MapState, squadId: string): Chara {
     const leader = getSquadLeader(state, squadId)
-    const chara = state.charas.find(c => c.id === leader.id)
+    const chara = state.charas.find((c) => c.id === leader.id)
     if (!chara)
         throw new Error(
             `Invalid chara id ${leader.id} for state ${JSON.stringify(
@@ -404,6 +405,7 @@ export const initialBattlefieldState = {
     forces: [],
     cities: [],
     charas: [],
+    layer: {} as Phaser.Tilemaps.TilemapLayer,
     mapContainer: {} as Container,
     missionContainer: {} as Container,
     uiContainer: {} as Container,

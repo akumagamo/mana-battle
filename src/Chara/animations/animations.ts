@@ -1,4 +1,5 @@
 import { GAME_SPEED } from "../../env"
+import { UNIT_JOBS } from "../../Unit/Model"
 
 export default (scene: Phaser.Scene) => {
     loadAnimation(scene, "stand", [0, 1, 2])
@@ -13,10 +14,12 @@ export default (scene: Phaser.Scene) => {
 
     loadAnimation(scene, "fireball", [0, 1, 2, 3, 4, 5, 6], false, 12, "fire")
 
-    loadAtlasAnimation("fighter_atlas", "fighter_stand", scene)
-    loadAtlasAnimation("fighter_atlas", "fighter_run", scene)
-    loadAtlasAnimation("fighter_atlas", "fighter_cast", scene, true)
-    loadAtlasAnimation("fighter_atlas", "fighter_hit", scene, false, 0)
+    UNIT_JOBS.forEach((job) => {
+        loadAtlasAnimation(`${job}_atlas`, `${job}_stand`, scene)
+        loadAtlasAnimation(`${job}_atlas`, `${job}_run`, scene)
+        loadAtlasAnimation(`${job}_atlas`, `${job}_cast`, scene, true)
+        loadAtlasAnimation(`${job}_atlas`, `${job}_hit`, scene, false, 0)
+    })
 }
 
 function loadAnimation(

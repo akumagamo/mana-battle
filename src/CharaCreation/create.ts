@@ -1,5 +1,5 @@
 import { GAME_SPEED } from "../env"
-import { classes } from "../Unit/Jobs/Jobs"
+import { UNIT_JOBS } from "../Unit/Model"
 import { CharaCreationState, initialUnit } from "./Model"
 import background from "./rendering/background"
 import Chara from "./rendering/Chara"
@@ -9,7 +9,7 @@ import createFormField from "./rendering/formField/select"
 import nameInput from "./rendering/nameInput"
 import refreshChara from "./rendering/refreshChara"
 
-export default function(scene: Phaser.Scene) {
+export default function (scene: Phaser.Scene) {
     if (process.env.SOUND_ENABLED) {
         scene.sound.stopAll()
         const music = scene.sound.add("jshaw_dream_of_first_flight")
@@ -41,7 +41,7 @@ function classInput(scene: Phaser.Scene, state: CharaCreationState) {
         570,
         "Class",
         "job",
-        classes,
+        UNIT_JOBS,
         { fighter: "Fighter", archer: "Archer", mage: "Mage" },
         (a: any, b: any) => {
             state.unit = { ...state.unit, [a]: b }

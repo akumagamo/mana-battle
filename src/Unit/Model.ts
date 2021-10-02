@@ -55,6 +55,14 @@ export type Elem =
 
 export type UnitJobs = "fighter" | "mage" | "archer"
 
+const jobIndex: { [x in UnitJobs]: UnitJobs } = {
+    fighter: "fighter",
+    mage: "mage",
+    archer: "archer",
+}
+
+export const UNIT_JOBS: UnitJobs[] = Object.values(jobIndex)
+
 export type Movement = "plain" | "mountain" | "sky" | "forest"
 
 export const update = (unit: Unit) => (index: UnitIndex) =>
@@ -143,7 +151,7 @@ const equipKeys: ItemSlot[] = ["mainHand", "offHand", "chest", "ornament"]
 export function getActualStat(stat: Stat, items: ItemMap, unit: Unit) {
     const value = unit[stat]
 
-    const values = equipKeys.map(equip =>
+    const values = equipKeys.map((equip) =>
         getItemModifier({ unit, stat, items, slot: equip })
     )
 
@@ -159,4 +167,4 @@ export const getAliveUnits = (index: UnitIndex) => index.filter(isAlive)
 export const unitsWithoutSquad = (
     unitMap: UnitIndex,
     unitSquadIndex: UnitSquadIndex
-) => unitMap.filter(unit => !unitSquadIndex.get(unit.id))
+) => unitMap.filter((unit) => !unitSquadIndex.get(unit.id))

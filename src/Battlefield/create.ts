@@ -7,7 +7,7 @@ import renderSquads from "./board/renderSquads"
 import renderStructures from "./board/renderStructures"
 import { makeWorldDraggable, setWorldBounds } from "./dragging"
 import destroySquad from "./events/destroySquad"
-import { getMapSquad, MapState } from "./Model"
+import { MapState } from "./Model"
 import pushSquad from "./squads/pushSquad"
 import startCombat from "./squads/startCombat"
 import subscribe from "./subscribe"
@@ -46,7 +46,7 @@ export default async (scene: Phaser.Scene, state: MapState) => {
     makeWorldDraggable(scene, state)
     setWorldBounds(state)
 
-    await Promise.all(state.squadsToRemove.map(id => destroySquad(state, id)))
+    await Promise.all(state.squadsToRemove.map((id) => destroySquad(state, id)))
     state.squadsToRemove = Set()
 
     // if (!scene.hasShownVictoryCondition) {
@@ -63,12 +63,12 @@ export default async (scene: Phaser.Scene, state: MapState) => {
                 scene,
                 state,
                 state.squads
-                    .filter(squad =>
+                    .filter((squad) =>
                         [collided.id, state.squadToPush?.loser].includes(
                             squad.id
                         )
                     )
-                    .map(s => s.squad)
+                    .map((s) => s.squad)
             )
         }
 

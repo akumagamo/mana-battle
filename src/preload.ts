@@ -1,30 +1,36 @@
 import preloadCharaAssets from "./Chara/preloadCharaAssets"
 import { PUBLIC_URL } from "./constants"
 import { progressBar } from "./progressBar"
-import { classes } from "./Unit/Jobs/Jobs"
+import { UNIT_JOBS } from "./Unit/Model"
 
 export function preload(this: Phaser.Scene) {
-    this.load.atlas(
-        "fighter_atlas",
-        "assets/texture-atlas/fighter.png",
-        "assets/texture-atlas/fighter.json"
-    )
+    UNIT_JOBS.forEach((job) => {
+        this.load.atlas(
+            `${job}_atlas`,
+            `assets/texture-atlas/${job}.png`,
+            `assets/texture-atlas/${job}.json`
+        )
 
-    classes.forEach((key) =>
         this.load.spritesheet(
-            "sprite_" + key,
-            PUBLIC_URL + `/sprites/${key}.png`,
+            "sprite_" + job,
+            PUBLIC_URL + `/sprites/${job}.png`,
             {
                 frameWidth: 100,
                 frameHeight: 75,
             }
         )
-    )
+    })
     this.load.spritesheet("fire", `${PUBLIC_URL}/fire.svg`, {
         frameWidth: 50,
         frameHeight: 117,
         endFrame: 6,
     })
+    ;["tiles/tiles"].forEach((str) =>
+        this.load.image(str, PUBLIC_URL + "/" + str + ".png")
+    )
+    ;["maps/map1"].forEach((str) =>
+        this.load.tilemapTiledJSON(str, PUBLIC_URL + "/" + str + ".json")
+    )
     ;["backgrounds/sunset", "tile", "board"].forEach((str) =>
         this.load.image(str, PUBLIC_URL + "/" + str + ".svg")
     )
