@@ -1,4 +1,4 @@
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../constants"
+import { SCREEN_WIDTH, SCREEN_HEIGHT, tileWidth } from "../constants"
 import { Image, Pointer } from "../Models"
 import { delay } from "../Scenes/utils"
 import { disableCellClick, enableCellClick } from "./board/input"
@@ -23,6 +23,29 @@ export function makeWorldDraggable(scene: Phaser.Scene, state: MapState) {
     state.mapContainer.setInteractive()
     scene.input.setDraggable(state.mapContainer)
 
+    scene.cameras.main.setBounds(
+        state.layer.width / -2,
+        0,
+        state.layer.width,
+        state.layer.height
+    )
+    scene.input.on(
+        Phaser.Input.Events.POINTER_DOWN,
+        (pointer: Phaser.Input.Pointer) => {
+            const { worldX, worldY } = pointer
+
+            const tile = state.layer.getTileAtWorldXY(
+                worldX - tileWidth / 2,
+                worldY
+            )
+            if (!tile) return
+            scene.cameras.main.setScroll(
+                tile.pixelX - SCREEN_WIDTH / 2,
+                tile.pixelY - SCREEN_HEIGHT / 2
+            )
+        }
+    )
+
     scene.input.on(
         "drag",
         (
@@ -45,25 +68,7 @@ export function makeWorldDraggable(scene: Phaser.Scene, state: MapState) {
                 y: scene.cameras.main.scrollY + delta.y,
             }
 
-            console.log(next)
-
-            if (
-                next.x < 2000 &&
-                next.x > -2000 &&
-                next.y < 2000 &&
-                next.y > -2000
-            ) {
-                scene.cameras.main.setScroll(next.x, next.y)
-            }
-            //else {
-            //     // Movement bound to one or two corners
-            //     const gx =
-            //         mx > x.max ? x.max : mx < x.min ? x.min : state.mapX - dx
-            //     const gy =
-            //         my > y.max ? y.max : my < y.min ? y.min : state.mapY - dy
-
-            //     state.mapContainer.setPosition(gx, gy)
-            // }
+            scene.cameras.main.setScroll(next.x, next.y)
         }
     )
 

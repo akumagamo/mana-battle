@@ -42,7 +42,7 @@
         "astarjs": "^1.1.0",
         "copy-webpack-plugin": "^9.0.1",
         "immutable": "^4.0.0-rc.12",
-        "phaser": "3.55.2",
+        "phaser": "^3.55.2",
         "puppeteer": "^10.0.0",
         "webpack": "^5.52.1",
         "webpack-cli": "^4.8.0",

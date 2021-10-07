@@ -7,17 +7,32 @@ export default (scene: Phaser.Scene, state: MapState) => {
     var tileset1 = map.addTilesetImage("World Tileset", "tiles/tiles")
     var layer1 = map.createLayer("Tile Layer 1", [tileset1])
 
-    var cities = map.createFromObjects("Cities", { key: "tiles/town" })
+    state.layer = layer1
 
-    //@ts-ignore
-    cities.forEach((c) => c.setScale(0.5))
+    var cities = map.createFromObjects("Cities", { key: "tiles/town" })
 
     cities.forEach((c) => {
         //@ts-ignore
-        c.setTint(0xff88aa)
+        c.setScale(0.5)
 
-        //@ts-ignore
-        c.setPosition(c.x - 128, c.y + 24 )
+        ////@ts-ignore
+        //const x = c.x - c.y
+
+        ////@ts-ignore
+        //const y = (c.x + x.y) / 2
+
+        ////@ts-ignore
+        //c.x = x
+
+        ////@ts-ignore
+        //c.y = y
+    })
+
+    cities.forEach((c) => {
+        c.setInteractive()
+        c.on("pointerdown", () => {
+            console.log(c)
+        })
     })
 
     mapContainer.add(layer1)
