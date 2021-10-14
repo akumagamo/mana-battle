@@ -18,7 +18,7 @@ import { events } from "./events"
 import confirmButtonClicked from "./events/confirmButtonClicked"
 import createSquadButtonClicked from "./events/createSquadButtonClicked"
 import editSquadButtonClicked from "./events/editSquadButtonClicked"
-import * as Pure from "../../Pure/output/Main"
+import Pure from "../../../output/Main"
 
 type CreateParams = {
     squads: Squad.SquadIndex

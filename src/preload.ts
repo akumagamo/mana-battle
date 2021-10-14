@@ -25,13 +25,13 @@ export function preload(this: Phaser.Scene) {
         frameHeight: 117,
         endFrame: 6,
     })
-    ;["tiles/tiles"].forEach((str) =>
+    ;["map/kenney_tileset"].forEach((str) =>
         this.load.image(str, PUBLIC_URL + "/" + str + ".png")
     )
-    ;["maps/map1"].forEach((str) =>
+    ;["maps/map"].forEach((str) =>
         this.load.tilemapTiledJSON(str, PUBLIC_URL + "/" + str + ".json")
     )
-    ;["backgrounds/sunset", "tile", "board"].forEach((str) =>
+    ;["backgrounds/sunset", "board"].forEach((str) =>
         this.load.image(str, PUBLIC_URL + "/" + str + ".svg")
     )
     const ui = [
@@ -50,28 +50,6 @@ export function preload(this: Phaser.Scene) {
     const uiPng = ["github"]
     uiPng.forEach((id: string) => {
         this.load.image(id, `${PUBLIC_URL}/ui/${id}.png`)
-    })
-
-    const itemIcons = [
-        "amulet",
-        "iron_armor",
-        "iron_shield",
-        "iron_sword",
-        "steel_armor",
-        "steel_shield",
-        "steel_sword",
-        "leather_armor",
-        "baldar_armor",
-        "baldar_shield",
-        "baldar_sword",
-        "oaken_staff",
-        "iron_spear",
-        "bow",
-        "robe",
-    ]
-
-    itemIcons.forEach((id: string) => {
-        this.load.image(id, `${PUBLIC_URL}/items/${id}.png`)
     })
 
     if (process.env.SOUND_ENABLED) {

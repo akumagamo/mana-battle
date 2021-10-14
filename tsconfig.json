@@ -12,6 +12,9 @@
         "allowJs": true,
         "strict": true,
         "strictNullChecks": true,
-        "pretty": true
+        "pretty": true,
+        "paths": {
+            "@Pure/*": ["./output/Pure/*"]
+        }
     }
 }

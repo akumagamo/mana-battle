@@ -1,6 +1,6 @@
 import { PUBLIC_URL } from "../constants"
 
-export default function(this: Phaser.Scene) {
+export default function (this: Phaser.Scene) {
     if (process.env.SOUND_ENABLED) {
         const mp3s = ["map1"]
         mp3s.forEach((id: string) => {
@@ -13,19 +13,6 @@ export default function(this: Phaser.Scene) {
         "tiles/mountain",
         "tiles/castle",
         "tiles/water",
-        "tiles/beach-r",
-        "tiles/beach-l",
-        "tiles/beach-t",
-        "tiles/beach-b",
-        "tiles/beach-tr",
-        "tiles/beach-tl",
-        "tiles/beach-br",
-        "tiles/beach-bl",
-
-        "tiles/beach-b-and-r",
-        "tiles/beach-t-and-r",
-        "tiles/beach-b-and-l",
-        "tiles/beach-t-and-l",
     ]
     tiles.forEach((id: string) => {
         this.load.image(id, `${PUBLIC_URL}/${id}.svg`)

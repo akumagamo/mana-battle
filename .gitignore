@@ -1,6 +1,7 @@
 node_modules/
 dist/
 build/
+.spago/
 .vscode/
 .idea
 *.log src_old

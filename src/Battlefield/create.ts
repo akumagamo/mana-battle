@@ -44,7 +44,7 @@ export default async (scene: Phaser.Scene, state: MapState) => {
     await fadeIn(scene, 1000 / GAME_SPEED)
 
     makeWorldDraggable(scene, state)
-    setWorldBounds(state)
+    //setWorldBounds(state)
 
     await Promise.all(state.squadsToRemove.map((id) => destroySquad(state, id)))
     state.squadsToRemove = Set()

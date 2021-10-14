@@ -23,28 +23,22 @@ export function makeWorldDraggable(scene: Phaser.Scene, state: MapState) {
     state.mapContainer.setInteractive()
     scene.input.setDraggable(state.mapContainer)
 
-    scene.cameras.main.setBounds(
-        state.layer.width / -2,
-        0,
-        state.layer.width,
-        state.layer.height
-    )
-    scene.input.on(
-        Phaser.Input.Events.POINTER_DOWN,
-        (pointer: Phaser.Input.Pointer) => {
-            const { worldX, worldY } = pointer
+    // scene.input.on(
+    //     Phaser.Input.Events.POINTER_DOWN,
+    //     (pointer: Phaser.Input.Pointer) => {
+    //         const { worldX, worldY } = pointer
 
-            const tile = state.layer.getTileAtWorldXY(
-                worldX - tileWidth / 2,
-                worldY
-            )
-            if (!tile) return
-            scene.cameras.main.setScroll(
-                tile.pixelX - SCREEN_WIDTH / 2,
-                tile.pixelY - SCREEN_HEIGHT / 2
-            )
-        }
-    )
+    //         const tile = state.layer.getTileAtWorldXY(
+    //             worldX - tileWidth / 2,
+    //             worldY
+    //         )
+    //         if (!tile) return
+    //         scene.cameras.main.setScroll(
+    //             tile.pixelX - SCREEN_WIDTH / 2,
+    //             tile.pixelY - SCREEN_HEIGHT / 2
+    //         )
+    //     }
+    // )
 
     scene.input.on(
         "drag",
