@@ -1,14 +1,15 @@
-{ "columns":17,
- "image":"..\/map\/kenney_tileset.png",
- "imageheight":768,
- "imagewidth":1088,
- "margin":0,
- "name":"kenney",
- "spacing":0,
- "tilecount":204,
- "tiledversion":"1.7.2",
- "tileheight":64,
- "tilewidth":64,
- "type":"tileset",
- "version":"1.6"
+{
+    "columns": 17,
+    "image": "../map/kenney_tileset.png",
+    "imageheight": 768,
+    "imagewidth": 1088,
+    "margin": 0,
+    "name": "kenney",
+    "spacing": 0,
+    "tilecount": 204,
+    "tiledversion": "1.7.2",
+    "tileheight": 64,
+    "tilewidth": 64,
+    "type": "tileset",
+    "version": "1.6"
 }

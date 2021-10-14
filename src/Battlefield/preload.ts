@@ -1,6 +1,6 @@
 import { PUBLIC_URL } from "../constants"
 
-export default function (this: Phaser.Scene) {
+export default function(this: Phaser.Scene) {
     if (process.env.SOUND_ENABLED) {
         const mp3s = ["map1"]
         mp3s.forEach((id: string) => {
