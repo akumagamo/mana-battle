@@ -1,0 +1,1405 @@
+{
+	"textures": [
+		{
+			"image": "animations",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1407,
+				"h": 1315
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "attack_down_0003.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 20,
+						"y": 27,
+						"w": 193,
+						"h": 174
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 193,
+						"h": 174
+					}
+				},
+				{
+					"filename": "attack_down_0002.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 39,
+						"y": 17,
+						"w": 174,
+						"h": 184
+					},
+					"frame": {
+						"x": 0,
+						"y": 174,
+						"w": 174,
+						"h": 184
+					}
+				},
+				{
+					"filename": "attack_up_0003.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 38,
+						"w": 192,
+						"h": 165
+					},
+					"frame": {
+						"x": 174,
+						"y": 174,
+						"w": 192,
+						"h": 165
+					}
+				},
+				{
+					"filename": "attack_down_0004.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 7,
+						"y": 49,
+						"w": 205,
+						"h": 153
+					},
+					"frame": {
+						"x": 174,
+						"y": 339,
+						"w": 205,
+						"h": 153
+					}
+				},
+				{
+					"filename": "attack_up_0004.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 37,
+						"w": 189,
+						"h": 165
+					},
+					"frame": {
+						"x": 193,
+						"y": 0,
+						"w": 189,
+						"h": 165
+					}
+				},
+				{
+					"filename": "attack_up_0002.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 44,
+						"w": 190,
+						"h": 159
+					},
+					"frame": {
+						"x": 366,
+						"y": 165,
+						"w": 190,
+						"h": 159
+					}
+				},
+				{
+					"filename": "attack_down_0001.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 56,
+						"y": 12,
+						"w": 158,
+						"h": 189
+					},
+					"frame": {
+						"x": 0,
+						"y": 358,
+						"w": 158,
+						"h": 189
+					}
+				},
+				{
+					"filename": "attack_down_0005.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 6,
+						"y": 58,
+						"w": 204,
+						"h": 144
+					},
+					"frame": {
+						"x": 158,
+						"y": 492,
+						"w": 204,
+						"h": 144
+					}
+				},
+				{
+					"filename": "attack_down_0007.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 46,
+						"y": 67,
+						"w": 165,
+						"h": 175
+					},
+					"frame": {
+						"x": 362,
+						"y": 492,
+						"w": 165,
+						"h": 175
+					}
+				},
+				{
+					"filename": "attack_up_0005.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 82,
+						"y": 38,
+						"w": 174,
+						"h": 164
+					},
+					"frame": {
+						"x": 382,
+						"y": 0,
+						"w": 174,
+						"h": 164
+					}
+				},
+				{
+					"filename": "attack_down_0006.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 62,
+						"w": 194,
+						"h": 145
+					},
+					"frame": {
+						"x": 379,
+						"y": 324,
+						"w": 194,
+						"h": 145
+					}
+				},
+				{
+					"filename": "attack_up_0001.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 81,
+						"y": 50,
+						"w": 181,
+						"h": 152
+					},
+					"frame": {
+						"x": 527,
+						"y": 469,
+						"w": 181,
+						"h": 152
+					}
+				},
+				{
+					"filename": "stand_up_0007.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 82,
+						"y": 46,
+						"w": 175,
+						"h": 153
+					},
+					"frame": {
+						"x": 556,
+						"y": 0,
+						"w": 175,
+						"h": 153
+					}
+				},
+				{
+					"filename": "stand_up_0009.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 83,
+						"y": 46,
+						"w": 175,
+						"h": 153
+					},
+					"frame": {
+						"x": 556,
+						"y": 153,
+						"w": 175,
+						"h": 153
+					}
+				},
+				{
+					"filename": "stand_up_0010.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 83,
+						"y": 46,
+						"w": 175,
+						"h": 153
+					},
+					"frame": {
+						"x": 573,
+						"y": 306,
+						"w": 175,
+						"h": 153
+					}
+				},
+				{
+					"filename": "stand_up_0011.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 83,
+						"y": 46,
+						"w": 175,
+						"h": 153
+					},
+					"frame": {
+						"x": 527,
+						"y": 621,
+						"w": 175,
+						"h": 153
+					}
+				},
+				{
+					"filename": "stand_up_0006.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 82,
+						"y": 46,
+						"w": 174,
+						"h": 153
+					},
+					"frame": {
+						"x": 0,
+						"y": 636,
+						"w": 174,
+						"h": 153
+					}
+				},
+				{
+					"filename": "stand_up_0008.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 83,
+						"y": 46,
+						"w": 174,
+						"h": 153
+					},
+					"frame": {
+						"x": 174,
+						"y": 636,
+						"w": 174,
+						"h": 153
+					}
+				},
+				{
+					"filename": "stand_up_0005.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 82,
+						"y": 47,
+						"w": 173,
+						"h": 152
+					},
+					"frame": {
+						"x": 348,
+						"y": 667,
+						"w": 173,
+						"h": 152
+					}
+				},
+				{
+					"filename": "stand_up_0004.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 82,
+						"y": 47,
+						"w": 172,
+						"h": 152
+					},
+					"frame": {
+						"x": 702,
+						"y": 621,
+						"w": 172,
+						"h": 152
+					}
+				},
+				{
+					"filename": "stand_up_0003.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 82,
+						"y": 49,
+						"w": 171,
+						"h": 150
+					},
+					"frame": {
+						"x": 708,
+						"y": 459,
+						"w": 171,
+						"h": 150
+					}
+				},
+				{
+					"filename": "attack_down_0008.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 91,
+						"y": 71,
+						"w": 125,
+						"h": 205
+					},
+					"frame": {
+						"x": 731,
+						"y": 0,
+						"w": 125,
+						"h": 205
+					}
+				},
+				{
+					"filename": "stand_up_0001.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 82,
+						"y": 49,
+						"w": 169,
+						"h": 150
+					},
+					"frame": {
+						"x": 748,
+						"y": 205,
+						"w": 169,
+						"h": 150
+					}
+				},
+				{
+					"filename": "stand_up_0002.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 82,
+						"y": 49,
+						"w": 169,
+						"h": 150
+					},
+					"frame": {
+						"x": 702,
+						"y": 773,
+						"w": 169,
+						"h": 150
+					}
+				},
+				{
+					"filename": "march_up_0010.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 88,
+						"y": 27,
+						"w": 142,
+						"h": 168
+					},
+					"frame": {
+						"x": 521,
+						"y": 774,
+						"w": 142,
+						"h": 168
+					}
+				},
+				{
+					"filename": "march_up_0009.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 88,
+						"y": 27,
+						"w": 142,
+						"h": 167
+					},
+					"frame": {
+						"x": 0,
+						"y": 789,
+						"w": 142,
+						"h": 167
+					}
+				},
+				{
+					"filename": "march_up_0011.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 88,
+						"y": 26,
+						"w": 142,
+						"h": 167
+					},
+					"frame": {
+						"x": 142,
+						"y": 789,
+						"w": 142,
+						"h": 167
+					}
+				},
+				{
+					"filename": "attack_up_0006.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 84,
+						"y": 45,
+						"w": 149,
+						"h": 157
+					},
+					"frame": {
+						"x": 284,
+						"y": 819,
+						"w": 149,
+						"h": 157
+					}
+				},
+				{
+					"filename": "march_down_0011.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 78,
+						"y": 12,
+						"w": 124,
+						"h": 187
+					},
+					"frame": {
+						"x": 856,
+						"y": 0,
+						"w": 124,
+						"h": 187
+					}
+				},
+				{
+					"filename": "march_up_0008.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 89,
+						"y": 29,
+						"w": 140,
+						"h": 165
+					},
+					"frame": {
+						"x": 871,
+						"y": 773,
+						"w": 140,
+						"h": 165
+					}
+				},
+				{
+					"filename": "march_down_0010.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 78,
+						"y": 13,
+						"w": 124,
+						"h": 185
+					},
+					"frame": {
+						"x": 879,
+						"y": 355,
+						"w": 124,
+						"h": 185
+					}
+				},
+				{
+					"filename": "march_down_0009.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 78,
+						"y": 13,
+						"w": 124,
+						"h": 183
+					},
+					"frame": {
+						"x": 879,
+						"y": 540,
+						"w": 124,
+						"h": 183
+					}
+				},
+				{
+					"filename": "march_up_0007.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 90,
+						"y": 32,
+						"w": 139,
+						"h": 163
+					},
+					"frame": {
+						"x": 663,
+						"y": 923,
+						"w": 139,
+						"h": 163
+					}
+				},
+				{
+					"filename": "stand_down_0001.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 61,
+						"y": 53,
+						"w": 153,
+						"h": 148
+					},
+					"frame": {
+						"x": 433,
+						"y": 942,
+						"w": 153,
+						"h": 148
+					}
+				},
+				{
+					"filename": "stand_down_0002.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 61,
+						"y": 53,
+						"w": 153,
+						"h": 148
+					},
+					"frame": {
+						"x": 802,
+						"y": 938,
+						"w": 153,
+						"h": 148
+					}
+				},
+				{
+					"filename": "stand_down_0003.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 63,
+						"y": 52,
+						"w": 151,
+						"h": 149
+					},
+					"frame": {
+						"x": 0,
+						"y": 956,
+						"w": 151,
+						"h": 149
+					}
+				},
+				{
+					"filename": "stand_down_0004.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 65,
+						"y": 51,
+						"w": 149,
+						"h": 151
+					},
+					"frame": {
+						"x": 151,
+						"y": 976,
+						"w": 149,
+						"h": 151
+					}
+				},
+				{
+					"filename": "stand_down_0005.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 67,
+						"y": 49,
+						"w": 147,
+						"h": 153
+					},
+					"frame": {
+						"x": 917,
+						"y": 187,
+						"w": 147,
+						"h": 153
+					}
+				},
+				{
+					"filename": "stand_down_0006.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 70,
+						"y": 47,
+						"w": 144,
+						"h": 155
+					},
+					"frame": {
+						"x": 980,
+						"y": 0,
+						"w": 144,
+						"h": 155
+					}
+				},
+				{
+					"filename": "attack_down_0010.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 120,
+						"y": 77,
+						"w": 100,
+						"h": 223
+					},
+					"frame": {
+						"x": 955,
+						"y": 938,
+						"w": 100,
+						"h": 223
+					}
+				},
+				{
+					"filename": "attack_down_0009.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 118,
+						"y": 74,
+						"w": 101,
+						"h": 220
+					},
+					"frame": {
+						"x": 1003,
+						"y": 340,
+						"w": 101,
+						"h": 220
+					}
+				},
+				{
+					"filename": "march_down_0002.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 77,
+						"y": 29,
+						"w": 122,
+						"h": 182
+					},
+					"frame": {
+						"x": 1064,
+						"y": 155,
+						"w": 122,
+						"h": 182
+					}
+				},
+				{
+					"filename": "stand_down_0007.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 45,
+						"w": 141,
+						"h": 157
+					},
+					"frame": {
+						"x": 1003,
+						"y": 560,
+						"w": 141,
+						"h": 157
+					}
+				},
+				{
+					"filename": "march_down_0008.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 77,
+						"y": 15,
+						"w": 125,
+						"h": 177
+					},
+					"frame": {
+						"x": 300,
+						"y": 976,
+						"w": 125,
+						"h": 177
+					}
+				},
+				{
+					"filename": "stand_down_0008.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 73,
+						"y": 44,
+						"w": 140,
+						"h": 158
+					},
+					"frame": {
+						"x": 1011,
+						"y": 717,
+						"w": 140,
+						"h": 158
+					}
+				},
+				{
+					"filename": "stand_down_0009.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 73,
+						"y": 43,
+						"w": 140,
+						"h": 158
+					},
+					"frame": {
+						"x": 1055,
+						"y": 875,
+						"w": 140,
+						"h": 158
+					}
+				},
+				{
+					"filename": "stand_down_0010.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 74,
+						"y": 43,
+						"w": 140,
+						"h": 158
+					},
+					"frame": {
+						"x": 0,
+						"y": 1105,
+						"w": 140,
+						"h": 158
+					}
+				},
+				{
+					"filename": "stand_down_0011.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 74,
+						"y": 43,
+						"w": 140,
+						"h": 158
+					},
+					"frame": {
+						"x": 140,
+						"y": 1127,
+						"w": 140,
+						"h": 158
+					}
+				},
+				{
+					"filename": "march_down_0001.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 31,
+						"w": 122,
+						"h": 181
+					},
+					"frame": {
+						"x": 1055,
+						"y": 1033,
+						"w": 122,
+						"h": 181
+					}
+				},
+				{
+					"filename": "march_down_0003.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 77,
+						"y": 27,
+						"w": 123,
+						"h": 179
+					},
+					"frame": {
+						"x": 586,
+						"y": 1086,
+						"w": 123,
+						"h": 179
+					}
+				},
+				{
+					"filename": "march_up_0006.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 90,
+						"y": 35,
+						"w": 138,
+						"h": 159
+					},
+					"frame": {
+						"x": 425,
+						"y": 1090,
+						"w": 138,
+						"h": 159
+					}
+				},
+				{
+					"filename": "march_up_0005.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 91,
+						"y": 38,
+						"w": 136,
+						"h": 160
+					},
+					"frame": {
+						"x": 280,
+						"y": 1153,
+						"w": 136,
+						"h": 160
+					}
+				},
+				{
+					"filename": "march_down_0004.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 25,
+						"w": 124,
+						"h": 175
+					},
+					"frame": {
+						"x": 709,
+						"y": 1086,
+						"w": 124,
+						"h": 175
+					}
+				},
+				{
+					"filename": "attack_down_0011.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 122,
+						"y": 79,
+						"w": 98,
+						"h": 221
+					},
+					"frame": {
+						"x": 833,
+						"y": 1086,
+						"w": 98,
+						"h": 221
+					}
+				},
+				{
+					"filename": "march_down_0005.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 22,
+						"w": 125,
+						"h": 173
+					},
+					"frame": {
+						"x": 1177,
+						"y": 1033,
+						"w": 125,
+						"h": 173
+					}
+				},
+				{
+					"filename": "march_down_0006.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 20,
+						"w": 125,
+						"h": 171
+					},
+					"frame": {
+						"x": 1104,
+						"y": 337,
+						"w": 125,
+						"h": 171
+					}
+				},
+				{
+					"filename": "march_down_0007.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 77,
+						"y": 17,
+						"w": 125,
+						"h": 171
+					},
+					"frame": {
+						"x": 1144,
+						"y": 508,
+						"w": 125,
+						"h": 171
+					}
+				},
+				{
+					"filename": "march_up_0004.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 91,
+						"y": 41,
+						"w": 135,
+						"h": 157
+					},
+					"frame": {
+						"x": 1151,
+						"y": 679,
+						"w": 135,
+						"h": 157
+					}
+				},
+				{
+					"filename": "march_up_0003.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 92,
+						"y": 44,
+						"w": 132,
+						"h": 155
+					},
+					"frame": {
+						"x": 1124,
+						"y": 0,
+						"w": 132,
+						"h": 155
+					}
+				},
+				{
+					"filename": "march_up_0002.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 92,
+						"y": 46,
+						"w": 131,
+						"h": 155
+					},
+					"frame": {
+						"x": 1186,
+						"y": 155,
+						"w": 131,
+						"h": 155
+					}
+				},
+				{
+					"filename": "march_up_0001.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 93,
+						"y": 48,
+						"w": 128,
+						"h": 153
+					},
+					"frame": {
+						"x": 1195,
+						"y": 836,
+						"w": 128,
+						"h": 153
+					}
+				},
+				{
+					"filename": "attack_up_0007.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 86,
+						"y": 48,
+						"w": 119,
+						"h": 154
+					},
+					"frame": {
+						"x": 931,
+						"y": 1161,
+						"w": 119,
+						"h": 154
+					}
+				},
+				{
+					"filename": "attack_up_0009.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 85,
+						"y": 50,
+						"w": 90,
+						"h": 152
+					},
+					"frame": {
+						"x": 1229,
+						"y": 310,
+						"w": 90,
+						"h": 152
+					}
+				},
+				{
+					"filename": "attack_up_0010.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 84,
+						"y": 50,
+						"w": 90,
+						"h": 152
+					},
+					"frame": {
+						"x": 1256,
+						"y": 0,
+						"w": 90,
+						"h": 152
+					}
+				},
+				{
+					"filename": "attack_up_0011.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 84,
+						"y": 51,
+						"w": 90,
+						"h": 151
+					},
+					"frame": {
+						"x": 1317,
+						"y": 152,
+						"w": 90,
+						"h": 151
+					}
+				},
+				{
+					"filename": "attack_up_0008.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 88,
+						"y": 49,
+						"w": 88,
+						"h": 153
+					},
+					"frame": {
+						"x": 1269,
+						"y": 462,
+						"w": 88,
+						"h": 153
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "http://free-tex-packer.com",
+		"version": "0.6.7"
+	}
+}

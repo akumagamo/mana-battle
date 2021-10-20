@@ -1,0 +1,59 @@
+{
+    "id": "soldier",
+    "animations": {
+        "attack_down": {
+            "prefix": "attack_down_",
+            "start": 1,
+            "end": 11,
+            "zeroPad": 4,
+            "suffix": ".png",
+            "repeat": -1,
+            "yoyo": true
+        },
+        "march_down": {
+            "prefix": "march_down_",
+            "start": 1,
+            "end": 11,
+            "zeroPad": 4,
+            "suffix": ".png",
+            "repeat": -1,
+            "yoyo": true
+        },
+        "stand_down": {
+            "prefix": "stand_down_",
+            "start": 1,
+            "end": 11,
+            "zeroPad": 4,
+            "suffix": ".png",
+            "repeat": -1,
+            "yoyo": true
+        },
+        "attack_up": {
+            "prefix": "attack_up_",
+            "start": 1,
+            "end": 11,
+            "zeroPad": 4,
+            "suffix": ".png",
+            "repeat": -1,
+            "yoyo": true
+        },
+        "march_up": {
+            "prefix": "march_up_",
+            "start": 1,
+            "end": 11,
+            "zeroPad": 4,
+            "suffix": ".png",
+            "repeat": -1,
+            "yoyo": true
+        },
+        "stand_up": {
+            "prefix": "stand_up_",
+            "start": 1,
+            "end": 11,
+            "zeroPad": 4,
+            "suffix": ".png",
+            "repeat": -1,
+            "yoyo": true
+        }
+    }
+}
