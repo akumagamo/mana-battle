@@ -1,25 +1,18 @@
 import preloadCharaAssets from "./Chara/preloadCharaAssets"
 import { PUBLIC_URL } from "./constants"
 import { progressBar } from "./progressBar"
-import { UNIT_JOBS } from "./Unit/Model"
 
+const jobs = ["soldier"]
 export function preload(this: Phaser.Scene) {
-    UNIT_JOBS.forEach((job) => {
+    jobs.forEach((job) => {
+        this.load.json(`${job}-data`, `${PUBLIC_URL}/jobs/${job}/data.json`)
         this.load.atlas(
             `${job}_atlas`,
-            `assets/texture-atlas/${job}.png`,
-            `assets/texture-atlas/${job}.json`
-        )
-
-        this.load.spritesheet(
-            "sprite_" + job,
-            PUBLIC_URL + `/sprites/${job}.png`,
-            {
-                frameWidth: 100,
-                frameHeight: 75,
-            }
+            `assets/jobs/${job}/animations.png`,
+            `assets/jobs/${job}/animations.json`
         )
     })
+
     this.load.spritesheet("fire", `${PUBLIC_URL}/fire.svg`, {
         frameWidth: 50,
         frameHeight: 117,

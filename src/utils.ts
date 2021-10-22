@@ -33,3 +33,4 @@ export const createEvent = <ARGS>(
         emitter.emit(key, args)
     },
 })
+

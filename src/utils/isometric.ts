@@ -1,17 +1,14 @@
 import { tileWidth, tileHeight, centerX, centerY } from "../constants"
 
-/**
- *
- * Converts board coordinates to a x,y position on a isometric scene
- * considering an origin point
- * @param x
- * @param y
- */
+const ISOMETRIC_CELL_WIDTH = 128
+const ISOMETRIC_CELL_HEIGHT = 64
+
+/** Converts board coordinates to a x,y position on a isometric scene */
 
 export function cartesianToIsometric(x: number, y: number) {
     return {
-        x: (x - y) * tileWidth,
-        y: (x + y) * tileHeight,
+        x: (x - y) * ISOMETRIC_CELL_WIDTH,
+        y: (x + y) * ISOMETRIC_CELL_HEIGHT,
     }
 }
 
@@ -19,8 +16,6 @@ export function cartesianToIsometric(x: number, y: number) {
  * On the battle screen we want a little more depth into the scene, so that
  * we can cram more units in to screen and make facing the other team
  * more dramatic :O
- * @param x
- * @param y
  */
 export function cartesianToIsometricBattle(
     isTopSquad: boolean,
