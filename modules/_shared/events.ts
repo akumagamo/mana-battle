@@ -1,6 +1,12 @@
 import EventEmitter from "events"
 
-export const createHandler = <ARGS>(emitter: EventEmitter, key: string) => ({
+export const createHandler = <ARGS>(
+    emitter:
+        | Phaser.Events.EventEmitter
+        | Phaser.GameObjects.GameObject
+        | EventEmitter,
+    key: string
+) => ({
     on: (callback: (args: ARGS) => void) => {
         emitter.on(key, callback)
     },

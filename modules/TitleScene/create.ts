@@ -1,46 +1,36 @@
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../_shared/constants"
+import { GAME_SPEED } from "../../src/env"
+import { fadeIn } from "../../src/UI/Transition"
 import button from "../UI/button"
-import events from "./events/_index"
+import {
+    CENTER_X,
+    CENTER_Y,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+} from "../_shared/constants"
+import { subscribe, emit } from "./events/_index"
 
-export const create = (scene: Phaser.Scene) => {
-    const emitter = events.emit(scene)
+export const create = async (scene: Phaser.Scene) => {
+    const emitter = emit(scene)
 
-    events.subscribe(scene)
+    subscribe(scene)
 
-    renderBackground(scene)
+    createBackground(scene)
 
-    // if (localStorage.getItem("saves")) {
-    //     button(
-    //         SCREEN_WIDTH / 2,
-    //         450,
-    //         "Continue Game",
-    //         state.container,
-    //         () => scene.scene.start("SaveListScene"),
-    //         false
-    //     )
-    // }
+    createNewGameButton(scene, emitter.NewGameButtonClicked)
 
-    renderNewGameButton(scene, emitter.NewGameButtonClicked)
+    createGithubIcon(scene)
 
-    renderGoFullScreenButton(scene)
-
-    renderGithubIcon(scene)
+    await fadeIn(scene, 500 / GAME_SPEED)
 }
 
-function renderNewGameButton(
+function createNewGameButton(
     scene: Phaser.Scene,
-    callback: (args: Phaser.Scene) => void
+    callback: (scene: Phaser.Scene) => void
 ) {
-    button(scene)(SCREEN_WIDTH / 2, 520, "New Game", () => callback(scene))
+    button(scene)(CENTER_X, CENTER_Y, "New Game", () => callback(scene))
 }
 
-function renderGoFullScreenButton(scene: Phaser.Scene) {
-    button(scene)(SCREEN_WIDTH / 2, 610, "Go Fullscreen", () => {
-        //requestFullscreen()
-    })
-}
-
-function renderGithubIcon(scene: Phaser.Scene) {
+function createGithubIcon(scene: Phaser.Scene) {
     const github = scene.add.image(0, 0, "github")
     github.setDisplaySize(64, 64)
 
@@ -50,7 +40,7 @@ function renderGithubIcon(scene: Phaser.Scene) {
     })
 }
 
-function renderBackground(scene: Phaser.Scene) {
+function createBackground(scene: Phaser.Scene) {
     const bg = scene.add.image(0, 0, "backgrounds/sunset")
     bg.setOrigin(0, 0)
     bg.displayWidth = SCREEN_WIDTH

@@ -21,14 +21,8 @@ export const listen = (emitter: EventEmitter) => {
     listenToUpdateState(emitter)
 }
 
-export const startScene = (
-    emitter: EventEmitter,
-    id: string,
-    effect: () => void
-) => {
-    const newState = { ...state, scene: createScene(createSceneId(id)) }
-    createHandler<State>(emitter, "UPDATE_STATE").emit(newState)
-    effect()
+export const startScene = (id: string, effect: (id: string) => void) => {
+    effect(id)
 }
 
 function listenToUpdateState(emitter: EventEmitter) {

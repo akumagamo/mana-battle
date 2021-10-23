@@ -2,6 +2,7 @@ import Phaser from "phaser"
 import { listen, startScene } from "./app"
 import events from "events"
 import TitleScene from "../TitleScene/phaser"
+import MapScene from "../Map/phaser"
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../_shared/constants"
 
 const eventEmitter = new events.EventEmitter()
@@ -29,9 +30,10 @@ export const main = () => {
 
     // TODO: use a core scene to load shared assets
     game.scene.add(TitleScene.key, TitleScene)
+    game.scene.add(MapScene.key, MapScene)
 
-    startScene(eventEmitter, TitleScene.key, () => {
-        game.scene.start(TitleScene.key)
+    startScene(TitleScene.key, (id) => {
+        game.scene.start(id)
     })
 
     if (process.env.NODE_ENV === "development") {
