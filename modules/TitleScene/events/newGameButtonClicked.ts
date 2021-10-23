@@ -1,16 +1,19 @@
 import { fadeOut } from "../../../src/UI/Transition"
 import { GAME_SPEED } from "../../_shared/env"
-import { createHandler } from "../../_shared/events"
+import { createEventKey, createHandler } from "../../_shared/events"
 import MapScene from "../../Map/phaser"
+import TitleScene from "../phaser"
 
-export const key = "NewGameButtonClicked"
+//TODO: use value object
+export const key = createEventKey("_NewGameButtonClicked")
 
 async function handleNewGameButtonClicked(scene: Phaser.Scene): Promise<void> {
     await fadeOut(scene, 500 / GAME_SPEED)
-    scene.scene.stop()
 
-    scene.scene.start(MapScene.key)
-    // changescene
+    scene.scene.manager.add(MapScene.key, MapScene)
+    scene.scene.manager.start(MapScene.key)
+
+    scene.scene.remove(TitleScene.key)
 }
 
 export const handler = (scene: Phaser.Scene) =>
