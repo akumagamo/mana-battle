@@ -37,7 +37,7 @@ export const main = () => {
     // TODO: use a core scene to load shared assets
     game.scene.add(TitleScene.key, TitleScene)
 
-    startScene(TitleScene.key, (id) => {
+    startScene(TitleScene.key, id => {
         game.scene.start(id)
     })
 

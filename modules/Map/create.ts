@@ -10,16 +10,13 @@ export const create = async (scene: Phaser.Scene) => {
     let bg = map.createLayer("bg", [tileset])
     const path = map.createLayer("elevations", [tileset])
     map.createLayer("doodads", [tileset])
-
     map.setCollisionByProperty({ collides: true })
 
-    //    state.layer = bg
-
     scene.cameras.main.setBounds(0, 0, bg.width, bg.height)
-
-    //check dragDistanceThreshold
     bg.setInteractive()
     scene.input.setDraggable(bg)
+    scene.input.dragTimeThreshold = 200
+    scene.input.dragDistanceThreshold = 10
 
     scene.input.on("drag", (pointer: any) => {
         const [deltaX, deltaY] = [
@@ -34,20 +31,50 @@ export const create = async (scene: Phaser.Scene) => {
 
         scene.cameras.main.setScroll(next.x, next.y)
     })
+    ;[
+        [100, 100],
+        [200, 200],
+    ].forEach(([x, y]) => {
+        const unit = createUnit(x, y, scene, selectMovementForUnit)
 
-    const unit = scene.physics.add.sprite(100, 100, "button")
+        function selectMovementForUnit() {
+            console.log(`select target for `, unit)
+            selectMovement(unit, path, bg, scene)
+        }
+    })
+
+    fadeIn(scene, 500)
+}
+
+function createUnit(
+    x: number,
+    y: number,
+    scene: Phaser.Scene,
+    selectMovementForUnit: () => void
+) {
+    const unit = scene.physics.add.sprite(x, y, "button")
+    unit.setDataEnabled()
     unit.setSize(50, 100)
     unit.setDisplaySize(50, 100)
     unit.body.onCollide = true
+    unit.setInteractive()
+    unit.on("pointerup", selectMovementForUnit)
+    return unit
+}
 
-    //scene.cameras.main.startFollow(unit)
-
-    const adjustSpeed = () => {
+const CLICK_THRESHOLD = 5
+function selectMovement(
+    unit: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
+    path: Phaser.Tilemaps.TilemapLayer,
+    bg: Phaser.Tilemaps.TilemapLayer,
+    scene: Phaser.Scene
+) {
+    clearEvents()
+    function adjustSpeed() {
         const pos = unit.getBottomCenter()
         const tile = path.getTileAtWorldXY(pos.x, pos.y)
         if (tile) {
             const ang = unit.body.angle
-            //console.log(Math.cos(ang), Math.sin(ang))
             unit.body.setMaxVelocity(tile.properties.speed)
             // if (unit.body.velocity.x !== 0 || unit.body.velocity.y !== 0)
             unit.setVelocity(
@@ -57,34 +84,40 @@ export const create = async (scene: Phaser.Scene) => {
         }
     }
 
-    let target: { x: number; y: number }
-
     bg.on("pointerup", assignMoveOrder)
-    let distance = 0
 
-    function checkArrival() {
-        distance = Phaser.Math.Distance.BetweenPoints(unit, target)
-
-        if (distance <= 4) {
-            unit.body.reset(target.x, target.y)
-            unit.body.velocity.reset()
-            scene.events.off("update", checkArrival)
-            scene.physics.world.off(
-                Phaser.Physics.Arcade.Events.WORLD_STEP,
-                adjustSpeed
-            )
-        }
-    }
-    function assignMoveOrder(pointer: Phaser.Input.Pointer) {
+    function clearEvents() {
         scene.events.off("update", checkArrival)
         scene.physics.world.off(
             Phaser.Physics.Arcade.Events.WORLD_STEP,
             adjustSpeed
         )
-        console.log(`click!`, pointer)
+        bg.off("pointerup")
+    }
 
-        target = { x: pointer.worldX * 1, y: pointer.worldY * 1 }
+    function checkArrival() {
+        const target = unit.data.get("target") as Phaser.Math.Vector2
+        const distance = Phaser.Math.Distance.BetweenPoints(unit, target)
 
+        if (distance <= 10) {
+            unit.body.velocity.reset()
+            clearEvents()
+        }
+    }
+    function assignMoveOrder(pointer: Phaser.Input.Pointer) {
+        const userDraggedInsteadOfClicking =
+            Phaser.Math.Distance.Between(
+                pointer.upX,
+                pointer.upY,
+                pointer.downX,
+                pointer.downY
+            ) > CLICK_THRESHOLD
+        if (userDraggedInsteadOfClicking) return
+
+        clearEvents()
+
+        const target = { x: pointer.worldX, y: pointer.worldY }
+        unit.data.set("target", target)
         const tile = path.getTileAtWorldXY(target.x, target.y)
         scene.physics.moveToObject(
             unit,
@@ -97,6 +130,4 @@ export const create = async (scene: Phaser.Scene) => {
             adjustSpeed
         )
     }
-
-    fadeIn(scene, 500)
 }
