@@ -1,3 +1,4 @@
+import EventEmitter from "events"
 import { Map } from "immutable"
 import { Vector } from "./Battlefield/Model"
 
@@ -20,7 +21,7 @@ export type EventFactory<ARGS> = {
 }
 
 export const createEvent = <ARGS>(
-    emitter: Phaser.Events.EventEmitter | Phaser.GameObjects.GameObject,
+    emitter: Phaser.Events.EventEmitter | Phaser.GameObjects.GameObject | EventEmitter,
     key: string
 ): EventFactory<ARGS> => ({
     on: (callback: (args: ARGS) => void) => {

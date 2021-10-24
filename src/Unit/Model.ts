@@ -3,7 +3,6 @@ import { sum } from "../utils/math"
 import { MapSquad, Vector } from "../Battlefield/Model"
 import { SquadRecord, UnitSquadIndex } from "../Squad/Model"
 import { Map } from "immutable"
-import { cellToScreenPosition } from "../Battlefield/board/position"
 import { CPU_FORCE } from "../constants"
 import { INVALID_STATE } from "../errors"
 
@@ -116,7 +115,7 @@ export function toMapSquad(squad: SquadRecord, pos: Vector): MapSquad {
     return {
         id: squad.id,
         squad,
-        posScreen: cellToScreenPosition({ x: pos.x, y: pos.y }),
+        posScreen: { x: pos.x, y: pos.y },
         status: "standing",
     }
 }
@@ -151,7 +150,7 @@ const equipKeys: ItemSlot[] = ["mainHand", "offHand", "chest", "ornament"]
 export function getActualStat(stat: Stat, items: ItemMap, unit: Unit) {
     const value = unit[stat]
 
-    const values = equipKeys.map(equip =>
+    const values = equipKeys.map((equip) =>
         getItemModifier({ unit, stat, items, slot: equip })
     )
 
@@ -167,4 +166,4 @@ export const getAliveUnits = (index: UnitIndex) => index.filter(isAlive)
 export const unitsWithoutSquad = (
     unitMap: UnitIndex,
     unitSquadIndex: UnitSquadIndex
-) => unitMap.filter(unit => !unitSquadIndex.get(unit.id))
+) => unitMap.filter((unit) => !unitSquadIndex.get(unit.id))
