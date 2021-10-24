@@ -99,7 +99,7 @@ function selectMovement(
         const target = unit.data.get("target") as Phaser.Math.Vector2
         const distance = Phaser.Math.Distance.BetweenPoints(unit, target)
 
-        if (distance <= 10) {
+        if (distance <= 5) {
             unit.body.velocity.reset()
             clearEvents()
         }
