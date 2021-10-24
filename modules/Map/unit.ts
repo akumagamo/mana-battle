@@ -3,7 +3,7 @@ const UNIT_HEIGHT = 100
 const UNIT_DATA_TARGET = "target"
 const CLICK_THRESHOLD = 5
 
-export function renderUnit(
+export function createUnit(
     scene: Phaser.Scene,
     map: Phaser.Tilemaps.TilemapLayer,
     x: number,
@@ -13,6 +13,7 @@ export function renderUnit(
     unit.setDataEnabled()
     unit.setSize(UNIT_WIDTH, UNIT_HEIGHT)
     unit.setDisplaySize(UNIT_WIDTH, UNIT_HEIGHT)
+    unit.body.setSize(UNIT_WIDTH * 4, UNIT_HEIGHT)
     createUnitEvents(scene, map, unit)
     return unit
 }

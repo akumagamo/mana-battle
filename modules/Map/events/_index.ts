@@ -1,24 +1,12 @@
-import * as NewGameButtonClicked from "./newGameButtonClicked"
+import * as CheckCollision from "./checkCollision"
 
-export const events = [NewGameButtonClicked]
+export const events = [CheckCollision]
 
 export const subscribe = (scene: Phaser.Scene) => {
     events.forEach((ev) => ev.subscribe(scene))
-
-//     const clearListeners = () => {
-//         events.forEach((ev) => {
-//             scene.events.off(ev.key)
-//         })
-
-//         scene.events.off("shutdown", clearListeners)
-//     }
-
-//     scene.events.on("shutdown", clearListeners)
 }
 
-export const emit = (scene: Phaser.Scene) => ({
-    NewGameButtonClicked: NewGameButtonClicked.handler(scene).emit,
-})
+export const emit = (_scene: Phaser.Scene) => ({})
 
 export default {
     subscribe,

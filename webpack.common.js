@@ -2,7 +2,7 @@ const path = require("path")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 
 module.exports = {
-    entry: "./src/index.ts",
+    entry: "./modules/Browser/index.ts",
     module: {
         rules: [
             {
@@ -20,7 +20,9 @@ module.exports = {
             },
         ],
     },
-    plugins: [new HtmlWebpackPlugin({ template: "./src/index.html" })],
+    plugins: [
+        new HtmlWebpackPlugin({ template: "./modules/Browser/index.html" }),
+    ],
     resolve: {
         extensions: [".tsx", ".ts", ".js"],
     },

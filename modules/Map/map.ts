@@ -1,6 +1,7 @@
-import { DRAG_TIME_THRESHOLD, DRAG_DISTANCE_THRESHOLD } from "./create"
+const DRAG_TIME_THRESHOLD = 200
+const DRAG_DISTANCE_THRESHOLD = 10
 
-export function renderMap(scene: Phaser.Scene) {
+export function createMap(scene: Phaser.Scene) {
     const map = scene.make.tilemap({ key: "maps/map" })
     const tileset = map.addTilesetImage("kenney", "map/kenney_tileset")
     map.createLayer("bg", [tileset])
@@ -12,7 +13,8 @@ export function renderMap(scene: Phaser.Scene) {
 
     return layer
 }
-export function makeMapDraggable(
+
+function makeMapDraggable(
     scene: Phaser.Scene,
     layer: Phaser.Tilemaps.TilemapLayer
 ) {
