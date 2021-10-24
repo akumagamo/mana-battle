@@ -1,4 +1,3 @@
-import preloadCharaAssets from "./Chara/preloadCharaAssets"
 import { PUBLIC_URL } from "./constants"
 import { progressBar } from "./progressBar"
 
@@ -61,8 +60,6 @@ export function preload(this: Phaser.Scene) {
     this.load.html("nameform", "assets/chara-creation/input.html")
 
     this.load.image("arrow", `${PUBLIC_URL}/arrow.svg`)
-
-    preloadCharaAssets(this)
 
     progressBar(this)
 }

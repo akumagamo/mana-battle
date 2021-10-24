@@ -1,6 +1,5 @@
 import EventEmitter from "events"
 import { Map } from "immutable"
-import { Vector } from "./Battlefield/Model"
 
 export const indexById = (xs: Map<string, { id: string }>, x: { id: string }) =>
     xs.set(x.id, x)
@@ -11,7 +10,10 @@ export function randomItem<T>(items: Array<T>): T {
     return items[Math.floor(Math.random() * items.length)]
 }
 
-export function getDistance(a: Vector, b: Vector) {
+export function getDistance(
+    a: { x: number; y: number },
+    b: { x: number; y: number }
+) {
     return Math.abs(a.x - b.x) + Math.abs(a.y - b.y)
 }
 export type EventFactory<ARGS> = {
@@ -21,7 +23,10 @@ export type EventFactory<ARGS> = {
 }
 
 export const createEvent = <ARGS>(
-    emitter: Phaser.Events.EventEmitter | Phaser.GameObjects.GameObject | EventEmitter,
+    emitter:
+        | Phaser.Events.EventEmitter
+        | Phaser.GameObjects.GameObject
+        | EventEmitter,
     key: string
 ): EventFactory<ARGS> => ({
     on: (callback: (args: ARGS) => void) => {
@@ -34,4 +39,3 @@ export const createEvent = <ARGS>(
         emitter.emit(key, args)
     },
 })
-
