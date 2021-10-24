@@ -4,9 +4,6 @@ import text from "./text"
 const defaultTextColor = "#ffffff"
 const activeTextColor = "#ffffff"
 
-// TODO: refactor: accept event key to fire
-// IDEA: create "eventButton" component
-// Or accept and event object (to help with typing)
 export default (scene: Scene) => (
     x: number,
     y: number,

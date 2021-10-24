@@ -1,3 +1,3 @@
-import { main } from "../Game/phaser"
+import { main } from "../Game/phaser/main"
 
 main()

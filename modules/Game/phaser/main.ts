@@ -1,8 +1,8 @@
 import Phaser from "phaser"
-import { listen, startScene } from "./app"
 import events from "events"
-import TitleScene from "../TitleScene/phaser"
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../_shared/constants"
+import TitleScene from "../../TitleScene/phaser"
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../_shared/constants"
+import { startScene, listenToUpdateState } from "../app"
 
 const eventEmitter = new events.EventEmitter()
 
@@ -22,8 +22,7 @@ const config: Phaser.Types.Core.GameConfig = {
     physics: {
         default: "arcade",
         arcade: {
-            //gravity: { y: 100 },
-            debug: true,
+            debug: process.env.NODE_ENV === "development",
         },
     },
 }
@@ -32,13 +31,13 @@ export const main = () => {
     const game = new Phaser.Game(config)
     game.scale.lockOrientation(Phaser.Scale.PORTRAIT)
 
-    listen(eventEmitter)
+    listenToUpdateState(eventEmitter)
 
     // TODO: use a core scene to load shared assets
     game.scene.add(TitleScene.key, TitleScene)
 
-    startScene(TitleScene.key, id => {
-        game.scene.start(id)
+    startScene(TitleScene.key, (id) => {
+        game.scene.start(id, eventEmitter)
     })
 
     if (process.env.NODE_ENV === "development") {
