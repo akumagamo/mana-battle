@@ -1,28 +1,74 @@
 import { fadeIn } from "../../src/UI/Transition"
-import { subscribe, emit } from "./events/_index"
+import { subscribe } from "./events/_index"
+
+const coords = [
+    [100, 100],
+    [200, 200],
+]
+
+const CLICK_THRESHOLD = 5
+const UNIT_WIDTH = 50
+const UNIT_HEIGHT = 100
+const DRAG_TIME_THRESHOLD = 200
+const DRAG_DISTANCE_THRESHOLD = 10
 
 export const create = async (scene: Phaser.Scene) => {
-    const emitter = emit(scene)
-
     subscribe(scene)
+
+    const map = renderMap(scene)
+
+    makeMapDraggable(scene, map)
+
+    coords.forEach(([x, y]) => {
+        renderUnit(scene, map, x, y)
+    })
+
+    fadeIn(scene, 500)
+}
+
+function renderMap(scene: Phaser.Scene) {
     const map = scene.make.tilemap({ key: "maps/map" })
-    let tileset = map.addTilesetImage("kenney", "map/kenney_tileset")
-    let bg = map.createLayer("bg", [tileset])
-    const path = map.createLayer("elevations", [tileset])
+    const tileset = map.addTilesetImage("kenney", "map/kenney_tileset")
+    map.createLayer("bg", [tileset])
+    const layer = map.createLayer("elevations", [tileset])
     map.createLayer("doodads", [tileset])
     map.setCollisionByProperty({ collides: true })
+    return layer
+}
 
-    scene.cameras.main.setBounds(0, 0, bg.width, bg.height)
-    bg.setInteractive()
-    scene.input.setDraggable(bg)
-    scene.input.dragTimeThreshold = 200
-    scene.input.dragDistanceThreshold = 10
+function renderUnit(
+    scene: Phaser.Scene,
+    map: Phaser.Tilemaps.TilemapLayer,
+    x: number,
+    y: number
+) {
+    function selectMovementForUnit() {
+        console.log(`select target for `, unit)
+        selectMovement(unit, map, scene)
+    }
+    const unit = scene.physics.add.sprite(x, y, "button")
+    unit.setDataEnabled()
+    unit.setSize(UNIT_WIDTH, UNIT_HEIGHT)
+    unit.setDisplaySize(UNIT_WIDTH, UNIT_HEIGHT)
+    unit.body.onCollide = true
+    unit.setInteractive()
+    unit.on("pointerup", selectMovementForUnit)
+    return unit
+}
+
+function makeMapDraggable(
+    scene: Phaser.Scene,
+    layer: Phaser.Tilemaps.TilemapLayer
+) {
+    scene.cameras.main.setBounds(0, 0, layer.width, layer.height)
+    layer.setInteractive()
+    scene.input.setDraggable(layer)
+    scene.input.dragTimeThreshold = DRAG_TIME_THRESHOLD
+    scene.input.dragDistanceThreshold = DRAG_DISTANCE_THRESHOLD
 
     scene.input.on("drag", (pointer: any) => {
-        const [deltaX, deltaY] = [
-            pointer.prevPosition.x - pointer.x,
-            pointer.prevPosition.y - pointer.y,
-        ]
+        const deltaX = pointer.prevPosition.x - pointer.x
+        const deltaY = pointer.prevPosition.y - pointer.y
 
         const next = {
             x: scene.cameras.main.scrollX + deltaX,
@@ -31,48 +77,19 @@ export const create = async (scene: Phaser.Scene) => {
 
         scene.cameras.main.setScroll(next.x, next.y)
     })
-    ;[
-        [100, 100],
-        [200, 200],
-    ].forEach(([x, y]) => {
-        const unit = createUnit(x, y, scene, selectMovementForUnit)
-
-        function selectMovementForUnit() {
-            console.log(`select target for `, unit)
-            selectMovement(unit, path, bg, scene)
-        }
-    })
-
-    fadeIn(scene, 500)
 }
 
-function createUnit(
-    x: number,
-    y: number,
-    scene: Phaser.Scene,
-    selectMovementForUnit: () => void
-) {
-    const unit = scene.physics.add.sprite(x, y, "button")
-    unit.setDataEnabled()
-    unit.setSize(50, 100)
-    unit.setDisplaySize(50, 100)
-    unit.body.onCollide = true
-    unit.setInteractive()
-    unit.on("pointerup", selectMovementForUnit)
-    return unit
-}
-
-const CLICK_THRESHOLD = 5
 function selectMovement(
     unit: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
-    path: Phaser.Tilemaps.TilemapLayer,
-    bg: Phaser.Tilemaps.TilemapLayer,
+    layer: Phaser.Tilemaps.TilemapLayer,
     scene: Phaser.Scene
 ) {
     clearEvents()
+    layer.on("pointerup", assignMoveOrder)
+
     function adjustSpeed() {
         const pos = unit.getBottomCenter()
-        const tile = path.getTileAtWorldXY(pos.x, pos.y)
+        const tile = layer.getTileAtWorldXY(pos.x, pos.y)
         if (tile) {
             const ang = unit.body.angle
             unit.body.setMaxVelocity(tile.properties.speed)
@@ -84,22 +101,20 @@ function selectMovement(
         }
     }
 
-    bg.on("pointerup", assignMoveOrder)
-
     function clearEvents() {
         scene.events.off("update", checkArrival)
         scene.physics.world.off(
             Phaser.Physics.Arcade.Events.WORLD_STEP,
             adjustSpeed
         )
-        bg.off("pointerup")
+        layer.off("pointerup")
     }
 
     function checkArrival() {
         const target = unit.data.get("target") as Phaser.Math.Vector2
         const distance = Phaser.Math.Distance.BetweenPoints(unit, target)
 
-        if (distance <= 5) {
+        if (distance <= 10) {
             unit.body.velocity.reset()
             clearEvents()
         }
@@ -118,7 +133,7 @@ function selectMovement(
 
         const target = { x: pointer.worldX, y: pointer.worldY }
         unit.data.set("target", target)
-        const tile = path.getTileAtWorldXY(target.x, target.y)
+        const tile = layer.getTileAtWorldXY(target.x, target.y)
         scene.physics.moveToObject(
             unit,
             { x: pointer.worldX, y: pointer.worldY },
