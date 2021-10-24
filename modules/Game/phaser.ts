@@ -19,6 +19,13 @@ const config: Phaser.Types.Core.GameConfig = {
         createContainer: true,
     },
     parent: "content",
+    physics: {
+        default: "arcade",
+        arcade: {
+            //gravity: { y: 100 },
+            debug: true,
+        },
+    },
 }
 
 export const main = () => {
@@ -30,7 +37,7 @@ export const main = () => {
     // TODO: use a core scene to load shared assets
     game.scene.add(TitleScene.key, TitleScene)
 
-    startScene(TitleScene.key, id => {
+    startScene(TitleScene.key, (id) => {
         game.scene.start(id)
     })
 
