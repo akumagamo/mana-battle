@@ -4,7 +4,7 @@ export const key = "CombatScene"
 
 export default {
     key,
-    create: function (this: Phaser.Scene, units: []) {
-        create(this, units)
+    create: function (this: Phaser.Scene) {
+        create(this)
     },
 }

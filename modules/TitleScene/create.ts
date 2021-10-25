@@ -1,5 +1,5 @@
 import { GAME_SPEED } from "../../src/env"
-import { fadeIn } from "../../src/UI/Transition"
+import { fadeIn } from "../UI/Transition"
 import createBackground from "./createBackground"
 import createGithubIcon from "./createGithubIcon"
 import createNewGameButton from "./newGameButton"

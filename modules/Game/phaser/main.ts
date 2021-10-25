@@ -27,7 +27,6 @@ const config: Phaser.Types.Core.GameConfig = {
 export const main = () => {
     const game = new Phaser.Game(config)
     game.scale.lockOrientation(Phaser.Scale.PORTRAIT)
-
     if (process.env.NODE_ENV === "development") {
         // @ts-ignore
         window.game = game
