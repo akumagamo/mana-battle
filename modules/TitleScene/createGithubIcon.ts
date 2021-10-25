@@ -1,6 +1,6 @@
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../_shared/constants"
 
-export default function (scene: Phaser.Scene) {
+export default function(scene: Phaser.Scene) {
     const github = scene.add.image(0, 0, "github")
     github.setDisplaySize(64, 64)
 

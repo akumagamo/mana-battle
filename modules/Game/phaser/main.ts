@@ -1,10 +1,6 @@
 import Phaser from "phaser"
-import events from "events"
 import TitleScene from "../../TitleScene/phaser"
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../_shared/constants"
-import { startScene, listenToUpdateState } from "../app"
-
-const eventEmitter = new events.EventEmitter()
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -18,6 +14,7 @@ const config: Phaser.Types.Core.GameConfig = {
     dom: {
         createContainer: true,
     },
+    scene: TitleScene,
     parent: "content",
     physics: {
         default: "arcade",
@@ -30,15 +27,6 @@ const config: Phaser.Types.Core.GameConfig = {
 export const main = () => {
     const game = new Phaser.Game(config)
     game.scale.lockOrientation(Phaser.Scale.PORTRAIT)
-
-    listenToUpdateState(eventEmitter)
-
-    // TODO: use a core scene to load shared assets
-    game.scene.add(TitleScene.key, TitleScene)
-
-    startScene(TitleScene.key, (id) => {
-        game.scene.start(id, eventEmitter)
-    })
 
     if (process.env.NODE_ENV === "development") {
         // @ts-ignore

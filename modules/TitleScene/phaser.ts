@@ -1,13 +1,14 @@
-import EventEmitter from "events"
 import { create } from "./create"
 import preload from "./preload"
 
+export const key = "TitleScene"
+
 export default {
-    key: "TitleScene",
+    key,
     preload: function (this: Phaser.Scene) {
         preload(this)
     },
-    create: function (this: Phaser.Scene, emitter: EventEmitter) {
-        create(this, emitter)
+    create: function (this: Phaser.Scene) {
+        create(this)
     },
 }
