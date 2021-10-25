@@ -1,4 +1,3 @@
-import { GAME_SPEED } from "../../src/env"
 import { fadeIn } from "../UI/Transition"
 import createBackground from "./createBackground"
 import createGithubIcon from "./createGithubIcon"
@@ -11,5 +10,5 @@ export const create = async (scene: Phaser.Scene) => {
 
     createGithubIcon(scene)
 
-    await fadeIn(scene, 500 / GAME_SPEED)
+    await fadeIn(scene, 500)
 }

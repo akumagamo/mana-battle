@@ -1,7 +1,6 @@
 import text from "../UI/text"
 import MapScene from "../MapScene/phaser"
 import CombatScene from "./phaser"
-import { cartesianToIsometric } from "../../src/utils/isometric"
 import { JobPluginExternalData } from "../_shared/plugins/job"
 import {
     CENTER_X,
@@ -10,6 +9,7 @@ import {
     SCREEN_WIDTH,
 } from "../_shared/constants"
 import { fadeIn, fadeOut } from "../UI/Transition"
+import { cartesianToIsometric } from "../_shared/utils"
 
 // IDEA: inject UI module to reduce coupling
 export const create = async (scene: Phaser.Scene) => {
