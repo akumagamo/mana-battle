@@ -5,10 +5,10 @@ export const key = "TitleScene"
 
 export default {
     key,
-    preload: function (this: Phaser.Scene) {
+    preload: function(this: Phaser.Scene) {
         preload(this)
     },
-    create: function (this: Phaser.Scene) {
+    create: function(this: Phaser.Scene) {
         create(this)
     },
 }
