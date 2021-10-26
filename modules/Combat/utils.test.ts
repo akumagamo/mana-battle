@@ -6,6 +6,7 @@ export const defaultUnit: Unit = {
     id: "",
     name: "",
     speed: 0,
+    job: "",
     x: 0,
     y: 0,
 }
