@@ -1,3 +1,5 @@
+import unitClicked from "./events/unitClicked"
+
 const UNIT_WIDTH = 50
 const UNIT_HEIGHT = 100
 
@@ -16,14 +18,13 @@ export function createUnit(
     return unit
 }
 
-export function createUnitEvents(
+function createUnitEvents(
     scene: Phaser.Scene,
     map: Phaser.Tilemaps.TilemapLayer,
     unit: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 ) {
     unit.body.onCollide = true // this might be unecessary
     unit.setInteractive()
-    unit.on(Phaser.Input.Events.POINTER_UP, () =>
-        scene.events.emit("UNIT_CLICKED", unit, map, scene)
-    )
+
+    unit.on(Phaser.Input.Events.POINTER_UP, () => unitClicked(unit, map, scene))
 }
