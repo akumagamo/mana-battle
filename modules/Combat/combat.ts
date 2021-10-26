@@ -5,7 +5,6 @@ import { sortByInitiative } from "./utils"
 export default (squadA: Squad, squadB: Squad) => {
     const units = sortByInitiative(squadA, squadB)
 
-
     return units.reduce(
         ({ units, actions }, unit) => {
             const skill = getUnitSkill(unit)
@@ -43,8 +42,6 @@ const rowMap: { [x: number]: RowPosition } = {
 const skills: { [x: string]: Skill } = {
     slash: { id: "slash", damage: 22 },
 }
-
-
 
 function getUnitSkill(unit: Unit) {
     const job = jobs[unit.id]

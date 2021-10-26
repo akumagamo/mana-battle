@@ -18,12 +18,12 @@ export function createArena(squadA: Squad, squadB: Squad) {
         (xs, x) =>
             xs.set(
                 x,
-                Map(extendedCoords.map((n) => [n, "~"])) as Map<number, string>
+                Map(extendedCoords.map(n => [n, "~"])) as Map<number, string>
             ),
         Map() as Grid
     )
 
-    const invertedSquadB = squadB.map((unit) => ({
+    const invertedSquadB = squadB.map(unit => ({
         ...unit,
         x: transpose(invert(unit.x)),
         y: invert(unit.y),
@@ -51,9 +51,9 @@ export function printArena(arena: Arena) {
     return (
         "\n" +
         arena.grid
-            .map((col) =>
+            .map(col =>
                 col
-                    .map((id) => `${id}`)
+                    .map(id => `${id}`)
                     .toList()
                     .join(" ")
             )
