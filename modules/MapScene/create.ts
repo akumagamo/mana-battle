@@ -1,5 +1,6 @@
 import { fadeIn } from "../UI/Transition"
-import checkCollision from "./events/checkCollision"
+import checkUnitOverlap from "./events/checkUnitOverlap"
+import unitClicked from "./events/unitClicked"
 import { createMap } from "./map"
 import { createUnit } from "./unit"
 
@@ -13,7 +14,9 @@ export const create = async (scene: Phaser.Scene) => {
 
     scene.data.set("units", units)
 
-    checkCollision(scene)
+    scene.events.on("UNIT_CLICKED", unitClicked)
+
+    checkUnitOverlap(scene)
 
     fadeIn(scene, 500)
 }
