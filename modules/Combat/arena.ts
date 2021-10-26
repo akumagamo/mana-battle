@@ -18,23 +18,23 @@ export function createArena(squadA: Squad, squadB: Squad) {
         (xs, x) =>
             xs.set(
                 x,
-                Map(extendedCoords.map(n => [n, "~"])) as Map<number, string>
+                Map(extendedCoords.map((n) => [n, "~"])) as Map<number, string>
             ),
         Map() as Grid
     )
 
-    const invertedSquadB = squadB.map(unit => ({
+    const invertedSquadB = squadB.units.map((unit) => ({
         ...unit,
         x: transpose(invert(unit.x)),
         y: invert(unit.y),
     }))
 
-    const squadArena = squadA
+    const squadArena = squadA.units
         .merge(invertedSquadB)
         .reduce((xs, x) => xs.setIn([x.y, x.x], x.id), Map() as Grid)
 
     return {
-        units: squadA.merge(invertedSquadB),
+        units: squadA.units.merge(invertedSquadB),
         grid: arena.mergeDeep(squadArena),
     }
 
@@ -51,12 +51,7 @@ export function printArena(arena: Arena) {
     return (
         "\n" +
         arena.grid
-            .map(col =>
-                col
-                    .map(id => `${id}`)
-                    .toList()
-                    .join(" ")
-            )
+            .map((col) => col.toList().join(" "))
             .toList()
             .join("\n") +
         "\n"

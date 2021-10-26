@@ -26,6 +26,9 @@ export type Unit = {
     x: number
     y: number
     job: string
+    squad: string
 }
 
-export type Squad = Map<string, Unit>
+export type UnitCollection = Map<string, Unit>
+
+export type Squad = { id: string; units: UnitCollection }
