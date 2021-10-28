@@ -25,13 +25,13 @@ a ~ ~ ~ f ~ ~
 })
 
 it("should have the same x/y values in the unit as in the grid", () => {
-    arena.units.forEach((unit) => {
+    arena.units.forEach(unit => {
         expect(unit.id).toEqual(arena.grid.getIn([unit.y, unit.x]))
     })
 })
 
 it("should place all units in the `units` prop", () => {
-    squadA.units.merge(squadB.units).forEach((unit) => {
+    squadA.units.merge(squadB.units).forEach(unit => {
         expect(arena.units.get(unit.id)?.id).toEqual(unit.id)
     })
 })

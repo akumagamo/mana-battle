@@ -1,23 +1,42 @@
-import { Map } from "immutable"
+import { Arena, createArena } from "./arena"
 import { Job, RowPosition, Skill, Squad, Unit } from "./Model"
 import { sortByInitiative } from "./utils"
 
 export default (squadA: Squad, squadB: Squad) => {
-    const units = sortByInitiative(squadA, squadB)
+    const units = sortByInitiative(squadA.units.merge(squadB.units))
+
+    const arena = createArena(squadA, squadB)
 
     return units.reduce(
         ({ units, actions }, unit) => {
             const skill = getUnitSkill(unit)
 
-            const target = getUnitTarget(unit, arena)
+            const target = getTargetUnit(unit, arena)
 
-            console.log(skill, target)
+            const updatedActions = actions.concat([
+                {
+                    unit: unit.id,
+                    skill: skill.id,
+                    target: target.id,
+                },
+            ])
 
-            return { units, actions }
+            const updatedUnits = units.map((unit_) => {
+                if (unit_.id === target.id) {
+                    //replace with bounded number
+                    const nextHp = unit_.hp - skill.damage
+                    const hp = nextHp < 0 ? 0 : nextHp
+                    return { ...unit_, hp }
+                } else {
+                    return unit_
+                }
+            })
+
+            return { units: updatedUnits, actions: updatedActions }
         },
         {
             units,
-            actions: [],
+            actions: [] as { unit: string; skill: string; target: string }[],
         }
     )
 }
@@ -44,10 +63,15 @@ const skills: { [x: string]: Skill } = {
 }
 
 function getUnitSkill(unit: Unit) {
-    const job = jobs[unit.id]
+    const job = jobs[unit.job]
     const row = rowMap[unit.x]
 
     const skillId = job.skills[row].id
 
     return skills[skillId]
+}
+
+function getTargetUnit(unit: Unit, arena: Arena) {
+    const enemies = arena.units.filter((u) => u.squad !== unit.squad)
+    return enemies.first() as Unit
 }

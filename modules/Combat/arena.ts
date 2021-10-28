@@ -3,7 +3,7 @@ import { Squad, Unit } from "./Model"
 
 type Grid = Map<number, Map<number, string>>
 
-type Arena = {
+export type Arena = {
     units: Map<string, Unit>
     grid: Grid
 }
@@ -18,12 +18,12 @@ export function createArena(squadA: Squad, squadB: Squad) {
         (xs, x) =>
             xs.set(
                 x,
-                Map(extendedCoords.map((n) => [n, "~"])) as Map<number, string>
+                Map(extendedCoords.map(n => [n, "~"])) as Map<number, string>
             ),
         Map() as Grid
     )
 
-    const invertedSquadB = squadB.units.map((unit) => ({
+    const invertedSquadB = squadB.units.map(unit => ({
         ...unit,
         x: transpose(invert(unit.x)),
         y: invert(unit.y),
@@ -51,7 +51,7 @@ export function printArena(arena: Arena) {
     return (
         "\n" +
         arena.grid
-            .map((col) => col.toList().join(" "))
+            .map(col => col.toList().join(" "))
             .toList()
             .join("\n") +
         "\n"

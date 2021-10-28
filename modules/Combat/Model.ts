@@ -27,7 +27,21 @@ export type Unit = {
     y: number
     job: string
     squad: string
+    hp: number
+    maxHp: number
 }
+
+export const createUnit = (id: string, squad: string): Unit => ({
+    id,
+    name: "",
+    speed: 1,
+    x: 0,
+    y: 0,
+    job: "fighter",
+    squad,
+    hp: 50,
+    maxHp: 50,
+})
 
 export type UnitCollection = Map<string, Unit>
 

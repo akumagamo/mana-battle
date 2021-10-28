@@ -7,6 +7,7 @@ export const defaultUnit: Unit = {
     name: "",
     speed: 0,
     job: "",
+    squad: "",
     x: 0,
     y: 0,
 }
@@ -19,10 +20,9 @@ const makeUnit = (id: string, speed: number): Unit => ({
 
 it("should sort by ascending order", () => {
     const result = sortByInitiative(
-        Map({ "1": makeUnit("1", 1) }),
-        Map({ "2": makeUnit("2", 10) })
+        Map({ "1": makeUnit("1", 1), "2": makeUnit("2", 10) })
     )
-        .keySeq()
+        .map(item => item.id)
         .toJS()
 
     expect(result).toEqual(["2", "1"])
