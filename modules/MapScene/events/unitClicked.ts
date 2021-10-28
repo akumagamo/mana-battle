@@ -21,10 +21,7 @@ export default function (
 
     function clearEvents() {
         scene.events.off(Phaser.Scenes.Events.UPDATE, checkArrival)
-        scene.physics.world.off(
-            Phaser.Physics.Arcade.Events.WORLD_STEP,
-            adjustSpeed
-        )
+        scene.physics.world.off(Phaser.Scenes.Events.UPDATE, adjustSpeed)
         layer.off(Phaser.Input.Events.POINTER_UP)
     }
 
@@ -58,9 +55,6 @@ export default function (
             tile.properties.speed
         )
         scene.events.on(Phaser.Scenes.Events.UPDATE, checkArrival)
-        scene.physics.world.on(
-            Phaser.Physics.Arcade.Events.WORLD_STEP,
-            adjustSpeed
-        )
+        scene.physics.world.on(Phaser.Scenes.Events.UPDATE, adjustSpeed)
     }
 }
