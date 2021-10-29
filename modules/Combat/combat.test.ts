@@ -22,10 +22,10 @@ const createSquad = (id: string, numberOfUnits: number): Squad => ({
         ),
 })
 
-const squadA: Squad = createSquad("a", 2)
-const squadB: Squad = createSquad("b", 2)
-
-it("should generate an action for each unit, if all are alive", () => {
+it(`should generate an action for each unit, if all of them stay alive during
+    the turn's course`, () => {
+    const squadA: Squad = createSquad("a", 2)
+    const squadB: Squad = createSquad("b", 2)
     const combat_ = combat(squadA, squadB)
 
     const allUnits = squadA.units.merge(squadB.units)
@@ -35,8 +35,8 @@ it("should generate an action for each unit, if all are alive", () => {
     })
 })
 
-it("should update the unit's HPs", () => {
-    // Each squad has a single member, so each unit should be targeted once
+it(`should record reduced HPs for attacked units (each squad with a
+    single member, each being a fighter)`, () => {
     const a = createSquad("a", 1)
     const b = createSquad("b", 1)
     const combat_ = combat(a, b)

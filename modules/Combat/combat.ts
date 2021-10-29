@@ -21,7 +21,7 @@ export default (squadA: Squad, squadB: Squad) => {
                 },
             ])
 
-            const updatedUnits = units.map((unit_) => {
+            const updatedUnits = units.map(unit_ => {
                 if (unit_.id === target.id) {
                     //replace with bounded number
                     const nextHp = unit_.hp - skill.damage
@@ -72,6 +72,6 @@ function getUnitSkill(unit: Unit) {
 }
 
 function getTargetUnit(unit: Unit, arena: Arena) {
-    const enemies = arena.units.filter((u) => u.squad !== unit.squad)
+    const enemies = arena.units.filter(u => u.squad !== unit.squad)
     return enemies.first() as Unit
 }
