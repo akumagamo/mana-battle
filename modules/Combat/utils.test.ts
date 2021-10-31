@@ -1,16 +1,8 @@
 import { Map } from "immutable"
-import { Unit } from "./Model"
+import { createUnit, Unit } from "./Model"
 import { sortByInitiative } from "./utils"
 
-export const defaultUnit: Unit = {
-    id: "",
-    name: "",
-    speed: 0,
-    job: "",
-    squad: "",
-    x: 0,
-    y: 0,
-}
+export const defaultUnit: Unit = createUnit("", "")
 
 const makeUnit = (id: string, speed: number): Unit => ({
     ...defaultUnit,
@@ -22,7 +14,7 @@ it("should sort by ascending order", () => {
     const result = sortByInitiative(
         Map({ "1": makeUnit("1", 1), "2": makeUnit("2", 10) })
     )
-        .map(item => item.id)
+        .map((item) => item.id)
         .toJS()
 
     expect(result).toEqual(["2", "1"])

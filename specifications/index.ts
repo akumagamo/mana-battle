@@ -25,17 +25,8 @@ import * as DSL from "./DSL"
     await DSL.openGame(page)
     await page.waitForTimeout(3000)
 
-    const renderedButton = await page.evaluate(() => {
-        //@ts-ignore
-        const btn: Phaser.GameObjects.Container | null = //@ts-ignore
-        (game as Phaser.Game).scene
-            .getScene("TitleScene")
-            .children.getByName("New Game")
-
-        return btn && btn.visible && btn.type === "Container"
-    })
-
-    if (!renderedButton) throw new Error("New Game button not rendered")
+    await buttonIsRendered(page, "TitleScene", "New Game")
+    await buttonIsRendered(page, "TitleScene", "Credits")
 
     // should see the "game start" option
 
@@ -92,3 +83,39 @@ import * as DSL from "./DSL"
 
     await browser.close()
 })()
+
+async function buttonIsRendered(
+    page: puppeteer.Page,
+    scene: string,
+    label: string
+) {
+    const ok = await page.evaluate(
+        ({ scene, label }) => {
+            //@ts-ignore
+            const btn: Phaser.GameObjects.Container | null = //@ts-ignore
+            (game as Phaser.Game).scene
+                .getScene(scene)
+                .children.getByName(label)
+
+            if (!btn) return false
+
+            const { x, y } = btn.getBounds()
+
+            // Check that button is inside screen
+            return (
+                btn.visible &&
+                btn.type === "Container" &&
+                x < window.innerWidth &&
+                y < window.innerHeight
+            )
+        },
+        { scene, label }
+    )
+
+    if (!ok)
+        throw new Error(
+            `Button with label ${label} not rendered on scene ${scene}`
+        )
+    else
+        console.log(`Button with label ${label} was rendered on scene ${scene}`)
+}

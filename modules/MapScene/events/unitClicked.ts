@@ -12,7 +12,9 @@ export default function (
     function adjustSpeed() {
         const pos = sprite.getBottomCenter()
         const tile = layer.getTileAtWorldXY(pos.x, pos.y)
-        if (tile) {
+        const isMoving =
+            sprite.body.velocity.x !== 0 || sprite.body.velocity.y !== 0
+        if (tile && isMoving) {
             const { angle } = sprite.body
             const { speed } = tile.properties
             sprite.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed)
@@ -21,7 +23,7 @@ export default function (
 
     function clearEvents() {
         scene.events.off(Phaser.Scenes.Events.UPDATE, checkArrival)
-        scene.physics.world.off(Phaser.Scenes.Events.UPDATE, adjustSpeed)
+        scene.events.off(Phaser.Scenes.Events.UPDATE, adjustSpeed)
         layer.off(Phaser.Input.Events.POINTER_UP)
     }
 
@@ -55,6 +57,6 @@ export default function (
             tile.properties.speed
         )
         scene.events.on(Phaser.Scenes.Events.UPDATE, checkArrival)
-        scene.physics.world.on(Phaser.Scenes.Events.UPDATE, adjustSpeed)
+        scene.events.on(Phaser.Scenes.Events.UPDATE, adjustSpeed)
     }
 }
