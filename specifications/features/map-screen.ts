@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer"
-import * as game from "./dsl"
+import * as game from "../dsl"
 
 // When the Map scene starts
 // It should present a map
@@ -30,7 +30,7 @@ import * as game from "./dsl"
 //  It should present details about that unit
 
 export default async (page: puppeteer.Page) => {
-    console.log(`Feature 02 - Map Screen`)
+    console.log(`Feature: Map Screen`)
     await openMapScene(page)
     await game.currentScreenIs(page, "MapScene")
 }

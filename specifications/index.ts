@@ -1,6 +1,7 @@
 import puppeteer from "puppeteer"
-import titleScreenSpecs from "./01-title-screen"
-import mapScreenSpecs from "./02-map-screen"
+import titleScreenSpecs from "./features/title-screen"
+import mapScreenSpecs from "./features/map-screen"
+import mapListScreenSpecs from "./features/map-list-screen"
 ;(async () => {
     const browser = await puppeteer.launch({
         headless: true,
@@ -27,19 +28,9 @@ import mapScreenSpecs from "./02-map-screen"
 
     await mapScreenSpecs(page)
 
-    console.log(`Tests finished`)
+    await mapListScreenSpecs(page)
 
-    // When the Map List scene starts
-    // It must list all maps
-    // It must present a cursor, and select the first item by default
-    // It must present a "Select Map" option
-    // When selecting a map in the list, the cursor should move to it
-    // And the map's information should be displayed
-    //
-    // When "Select Map" is selected
-    // It should switch to the Map Scene
-    //
-    
+    console.log(`Tests finished`)
 
     await browser.close()
 })()

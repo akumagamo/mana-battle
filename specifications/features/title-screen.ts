@@ -1,8 +1,8 @@
 import puppeteer from "puppeteer"
-import * as game from "./dsl"
+import * as game from "../dsl"
 
 export default async (page: puppeteer.Page) => {
-    console.log(`Feature 01 - Title Screen`)
+    console.log(`Feature: Title Screen`)
 
     await game.openGame(page)
     await game.currentScreenIs(page, "TitleScene")
