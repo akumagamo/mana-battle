@@ -10,11 +10,7 @@ import { Scene } from "phaser"
 
 let metrics: Phaser.Types.GameObjects.Text.TextMetrics | undefined = undefined
 
-export default (scene: Scene) => (
-    x: number,
-    y: number,
-    str: string | number
-) => {
+export default (scene: Scene) => (x: number, y: number, str: string | number) => {
     const text = scene.add.text(
         x,
         y,

@@ -4,7 +4,7 @@
         "noImplicitAny": true,
         "noImplicitThis": true,
         "sourceMap": true,
-        "module": "es6",
+        "module": "ES6",
         "target": "es5",
         "moduleResolution": "node",
         "allowSyntheticDefaultImports": true,
@@ -12,9 +12,6 @@
         "allowJs": true,
         "strict": true,
         "strictNullChecks": true,
-        "pretty": true,
-        "paths": {
-            "@Pure/*": ["./output/Pure/*"]
-        }
+        "pretty": true
     }
 }

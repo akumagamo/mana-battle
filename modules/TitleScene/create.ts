@@ -13,5 +13,7 @@ export const create = async (scene: Phaser.Scene) => {
 
     createGithubIcon(scene)
 
+    scene.game.events.emit("TitleSceneCreated")
+
     await fadeIn(scene, 500)
 }

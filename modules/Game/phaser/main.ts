@@ -28,7 +28,6 @@ export const main = () => {
     const game = new Phaser.Game(config)
     game.scale.lockOrientation(Phaser.Scale.PORTRAIT)
     if (process.env.NODE_ENV === "development") {
-      console.log(`exposing game...`)
         // @ts-ignore
         window.game = game
     }

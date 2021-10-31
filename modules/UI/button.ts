@@ -39,7 +39,6 @@ export default (scene: Scene) =>
                 //if (process.env.SOUND_ENABLED) scene.sound.add("click1").play()
                 onClick()
             })
-
             .on("pointerover", () => {
                 if (disabled) return
                 bg.setTint(0xeeeeee)

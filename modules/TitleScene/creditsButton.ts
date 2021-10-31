@@ -7,6 +7,16 @@ export default (scene: Phaser.Scene) => {
     )
 }
 
-async function buttonClicked(_scene: Phaser.Scene) {
-    console.log(`credits`)
+async function buttonClicked(scene: Phaser.Scene) {
+    ;[
+        "Game Credits",
+        "============",
+        "Game Design & Programming",
+        "Leonardo Farroco",
+        "",
+        "Music",
+        "Johnatan Shaw",
+    ].forEach((line, i) => {
+        UI.text(scene)(CENTER_Y, 200 + i * 50, line)
+    })
 }

@@ -15,5 +15,7 @@ export const create = async (scene: Phaser.Scene) => {
 
     checkUnitOverlap(scene)
 
+    scene.game.events.emit("MapSceneCreated")
+
     fadeIn(scene, 500)
 }
