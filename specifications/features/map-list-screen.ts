@@ -1,18 +1,34 @@
 import puppeteer from "puppeteer"
 import * as game from "../dsl"
 
-// When the Map List scene starts
-// It must list all maps
-// It must present a cursor, and select the first item by default
-// It must present a "Select Map" option
-// When selecting a map in the list, the cursor should move to it
-// And the map's information should be displayed
-//
-// When "Select Map" is selected
-// It should switch to the Map Scene
-//
 export default async (page: puppeteer.Page) => {
-    console.log("Feature: Map List Screen")
-
+    console.log(`
+==================================
+     Feature: Map List Screen
+==================================
+`)
+    console.log("Scenario: Initial Elements")
     await game.openGame(page)
+
+    // await openMapListScreen(page)
+    // await listsAllMaps()
+    // await firstItemInListIsSelected()
+    // await cursorIsAtFirstItem()
+    // await selectedItemHasInfoDisplayed()
+    // await buttonIsRendered(page, "MapListScreen", "Select Map")
+    // await buttonIsRendered(page, "MapListScreen", "Return")
+    //
+    console.log("Scenario: Item Selection")
+    //
+    // await allItemsCanBeSelected()
+    //
+    console.log("Scenario: Selecting Map")
+    //
+    // await clickButton(page, "MapListScreen", "Select Map")
+    // await nextScreenShouldBe(page, "MapScene")
+    //
+    console.log("Scenario: Selecting Return")
+    //
+    // await clickButton(page, "MapListScreen", "Return")
+    // await nextScreenShouldBe(page, "TitleScene")
 }

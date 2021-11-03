@@ -1,8 +1,5 @@
 import puppeteer from "puppeteer"
-import titleScreenSpecs from "./features/title-screen"
-import mapScreenSpecs from "./features/map-screen"
-import mapListScreenSpecs from "./features/map-list-screen"
-;(async () => {
+export default async () => {
     const browser = await puppeteer.launch({
         headless: true,
         dumpio: false,
@@ -22,15 +19,7 @@ import mapListScreenSpecs from "./features/map-list-screen"
         }).then(() => browser.close())
     })
 
-    console.log(`Starting tests`)
+    return page
 
-    await titleScreenSpecs(page)
-
-    await mapScreenSpecs(page)
-
-    await mapListScreenSpecs(page)
-
-    console.log(`Tests finished`)
-
-    await browser.close()
-})()
+    //    await browser.close()
+}
