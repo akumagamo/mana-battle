@@ -23,7 +23,7 @@ async function buttonClicked(scene: Phaser.Scene) {
         "> Game Design & Programming",
         "Leonardo Farroco",
         "> Music",
-        "Johnatan Shaw",
+        "Jonathan Shaw",
     ].map((line, i) =>
         UI.text(scene)(CENTER_Y, 200 + i * 50, line)
             .setAlign("center")

@@ -171,3 +171,26 @@ export const openMapScene = async (page: puppeteer.Page) => {
     await clickButton(page, "TitleScene", "New Game")
     await nextScreenShouldBe(page, "MapScene")
 }
+
+export const createBrowser = async () => {
+    const browser = await puppeteer.launch({
+        headless: true,
+        dumpio: false,
+        defaultViewport: {
+            width: 1280,
+            height: 720,
+        },
+    })
+
+    const page = await browser.newPage()
+
+    page.on("pageerror", ({ message }: { message: string }) => {
+        console.log(message)
+
+        page.screenshot({
+            path: "screens/" + new Date().getTime() + ".png",
+        }).then(() => browser.close())
+    })
+
+    return page
+}
