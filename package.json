@@ -31,7 +31,7 @@
         "@types/node": "^16.0.0",
         "@types/puppeteer": "^5.4.4",
         "babel-jest": "^27.0.2",
-        "babel-loader": "8.2.2",
+        "babel-loader": "8.2.3",
         "babel-node": "^0.0.1-security",
         "browser-sync": "^2.18.13",
         "csvtojson": "^2.0.10",
