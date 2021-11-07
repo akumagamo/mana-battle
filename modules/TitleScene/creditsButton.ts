@@ -36,13 +36,13 @@ async function buttonClicked(scene: Phaser.Scene) {
         "Close Credits",
         () => {
             scene.data
-                .get("creditsWindow")
+                .get("Credits Window")
                 .forEach((el: GameObjects.GameObject) => el.destroy())
-            scene.data.remove("closeCreditsBtn")
+            scene.data.remove("Close Credits Button")
         }
     )
 
     const elements = [...text, closeCreditsBtn, panel]
 
-    scene.data.set("creditsWindow", elements)
+    scene.data.set("Credits Window", elements)
 }

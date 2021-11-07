@@ -10,31 +10,28 @@ Feature: Map Screen
     Then Screen presents all cities
     Then Game is unpaused
 
-  Scenario: Friendly Squad Selection
+  Scenario: Squad Selection
     Given User has nothing selected
-    When User selects a friendly squad
+    When User selects a <Squad Type>
     Then Game is paused
-    Then Option "View Squad Details" is visible
-    Then Option "Move Squad" is visible
+    Then the option View Squad Details is <View Squad Details>
+    Then the option View Move Squad is <Move Squad>
 
-  Scenario: Enemy Squad Selection
-    Given User has nothing selected
-    When User selects an enemy squad
-    Then Game is paused
-    Then Option "View Squad Details" is visible
-    Then Option "Move Squad" is not visible
+    Examples:
+      | Squad Type | View Squad Details  | Move Squad |
+      | allied     | visible             | visible    |
+      | enemy      | visible             | hidden     |
 
-  Scenario: Open Friendly Squad Details
+  Scenario: Open Squad Details
     Given User has nothing selected
-    When User selects a friendly squad
+    When User selects a <Squad Type>
     When User selects option "View Squad Details"
     Then Modal "View Squad Details" is visible
 
-  Scenario: Open Enemy Squad Details
-    Given User has nothing selected
-    When User selects an enemy squad
-    When User selects option "View Squad Details"
-    Then Modal "View Squad Details" is visible
+    Examples:
+      | Squad Type |
+      | allied     |
+      | enemy      |
 
   Scenario: Squad Movement
     Given User has nothing selected
@@ -44,29 +41,9 @@ Feature: Map Screen
     Then Game is unpaused
     Then Unit moves to that location
 
-  Scenario: Squad Movement on Plains terrain
-    Given User issued a move order to a squad over "plains" terrain
-    When Squad walks over "plains" terrain
-    Then Squad move speed is 100
-
-  Scenario: Squad Movement on Mountain terrain
-    Given User issued a move order to a squad over "mountain" terrain
-    When Squad walks over "mountain" terrain
-    Then Squad move speed is 20
-
-  Scenario: Squad Movement on Forest terrain
-    Given User issued a move order to a squad over "forest" terrain
-    When Squad walks over "forest" terrain
-    Then Squad move speed is 40
-
-  Scenario: Squad Collision (friendly on enemies)
+  Scenario: Squad Collision (friendly on enemy)
     Given User issued a move order to a squad
     When Squad collides with enemy
-    Then The "Enemy Encountered" modal is displayed
-
-  Scenario: Squad Collision (enemy on friendly)
-    Given An enemy squad walks toward a friendly unit
-    When Enemy squad collides with friendly squad
     Then The "Enemy Encountered" modal is displayed
 
   Scenario: Squad Collision (enemy on friendly)

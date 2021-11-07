@@ -1,13 +1,13 @@
 import CombatScene from "../../CombatScene/phaser"
 import { fadeOut } from "../../UI/Transition"
-import MapScene from "../phaser"
+import MapScreen from "../phaser"
 export default function checkCollision(scene: Phaser.Scene) {
     scene.events.on(Phaser.Scenes.Events.UPDATE, check, scene)
 }
 function check(this: Phaser.Scene) {
     const scene = this
     const units = scene.data.get(
-        "units"
+        "Map Screen Squads"
     ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[]
 
     scene.physics.overlap([units[0]], [units[1]], async () => {
@@ -18,6 +18,6 @@ function check(this: Phaser.Scene) {
 
         scene.scene.add(CombatScene.key, CombatScene)
         scene.scene.start(CombatScene.key)
-        scene.scene.remove(MapScene.key)
+        scene.scene.remove(MapScreen.key)
     })
 }

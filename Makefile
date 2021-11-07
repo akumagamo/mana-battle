@@ -1,6 +1,6 @@
 
 
-generate-apk:
+needs-update-generate-apk:
 	rm -rf  deploy/web-bundle
 	mkdir deploy/web-bundle
 	cp index.html deploy/web-bundle/index.html

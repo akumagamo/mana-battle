@@ -1,21 +1,31 @@
 import { fadeIn } from "../UI/Transition"
 import checkUnitOverlap from "./events/checkUnitOverlap"
 import { createMap } from "./map"
+import { createInitialState } from "./Model"
 import { createUnit } from "./unit"
 
-// IDEA: inject UI module to reduce coupling
 export const create = async (scene: Phaser.Scene) => {
     const map = createMap(scene)
 
-    const coords: number[][] = scene.game.registry.get("MapSceneCoords")
+    scene.data.set("has created map", true)
 
-    const units = coords.map(([x, y]) => createUnit(scene, map, x, y))
+    const coords: number[][] = scene.game.registry.get("Map Screen Coords")
+    const units = coords.map(([x, y, id]) =>
+        createUnit(scene, map, x, y, id.toString())
+    )
+    scene.data.set(
+        "dispatchedSquads",
+        coords.map(([, , id]) => id)
+    )
+    scene.data.set("cities", [])
 
-    scene.data.set("units", units)
+    scene.data.set("Map Screen Squads", units)
 
     checkUnitOverlap(scene)
 
-    scene.game.events.emit("MapSceneCreated")
+    createInitialState(scene)
 
     fadeIn(scene, 500)
+
+    scene.game.events.emit("Map Screen Created")
 }

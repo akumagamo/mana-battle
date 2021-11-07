@@ -7,6 +7,22 @@ declare global {
     }
 }
 
+/** Returns data from a scene. It must be serializable, otherwise it
+ * will return  undefined */
+export const getData = async (
+    page: puppeteer.Page,
+    sceneName: string,
+    key: string
+) => {
+    return await page.evaluate(
+        ({ sceneName, key }) => {
+            const scene = window.game.scene.getScene(sceneName)
+
+            return scene.data.get(key)
+        },
+        { sceneName, key }
+    )
+}
 export const currentScreenIs = async (
     page: puppeteer.Page,
     sceneName: string
@@ -156,7 +172,7 @@ export async function nextScreenShouldBe(page: puppeteer.Page, screen: string) {
     await page.evaluate(
         ({ screen }) => {
             return new Promise<void>((resolve) => {
-                window.game.events.once(screen + "Created", () => {
+                window.game.events.once(`${screen} Created`, () => {
                     resolve()
                 })
             })

@@ -7,7 +7,8 @@ export function createUnit(
     scene: Phaser.Scene,
     map: Phaser.Tilemaps.TilemapLayer,
     x: number,
-    y: number
+    y: number,
+    id: string
 ) {
     const unit = scene.physics.add.sprite(x, y, "button")
     unit.setDataEnabled()
@@ -15,6 +16,7 @@ export function createUnit(
     unit.setDisplaySize(UNIT_WIDTH, UNIT_HEIGHT)
     unit.body.setSize(UNIT_WIDTH * 4, UNIT_HEIGHT)
     createUnitEvents(scene, map, unit)
+    unit.setName(`squad-${id}`)
     return unit
 }
 

@@ -8,7 +8,7 @@ Feature: Automatic formations
     Then I should see a "Automatc Formation" switch with value <Target Value>
 
     Examples:
-    | Initial value | Target value |
+    | Initial Value | Target Value |
     | on            | off          |
     | off           | on           |
 
@@ -21,7 +21,4 @@ Feature: Automatic formations
     Given I am viewing details for an allied squad with auto formation
     When I remove one of the squad units
     Then the squad formation should be recalculated
-
-
-
 
