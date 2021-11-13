@@ -1,7 +1,12 @@
 module.exports = {
     launch: {
         dumpio: true,
-        headless: true,
+        headless: false,
         //process.env.HEADLESS !== "false",
+    },
+    server: {
+        command: "yarn start",
+        port: 3000,
+        launchTimeout: 40000,
     },
 }

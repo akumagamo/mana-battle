@@ -1,30 +1,23 @@
 import { fadeIn } from "../UI/Transition"
-import checkUnitOverlap from "./events/checkUnitOverlap"
+import checkSquadOverlap from "./events/checkSquadOverlap"
 import { createMap } from "./map"
-import { createInitialState } from "./Model"
-import { createUnit } from "./unit"
+import { createInitialState, getState } from "./Model"
+import { createSquad } from "./squad"
+import MapSceneUI from "./UI/phaser"
 
 export const create = async (scene: Phaser.Scene) => {
+    scene.scene.add(MapSceneUI.key, MapSceneUI)
+    scene.scene.run(MapSceneUI.key)
+
     const map = createMap(scene)
 
+    // TODO: find another way of checking if a tilemap exists
     scene.data.set("has created map", true)
 
-    const coords: number[][] = scene.game.registry.get("Map Screen Coords")
-    const units = coords.map(([x, y, id]) =>
-        createUnit(scene, map, x, y, id.toString())
-    )
-    scene.data.set(
-        "dispatchedSquads",
-        coords.map(([, , id]) => id)
-    )
-    scene.data.set("cities", [])
-
-    scene.data.set("Map Screen Squads", units)
-
-    checkUnitOverlap(scene)
+    checkSquadOverlap(scene)
 
     createInitialState(scene)
-
+    getState(scene).squads.forEach(createSquad(scene, map))
     fadeIn(scene, 500)
 
     scene.game.events.emit("Map Screen Created")

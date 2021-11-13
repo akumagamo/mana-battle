@@ -6,6 +6,8 @@ export default function (
     layer: Phaser.Tilemaps.TilemapLayer,
     scene: Phaser.Scene
 ) {
+    scene.scene.get("Map Screen UI").events.emit("Squad Selected", sprite.name)
+
     clearEvents()
     layer.on(Phaser.Input.Events.POINTER_UP, movementOrderAssigned)
 
