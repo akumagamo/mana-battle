@@ -86,7 +86,7 @@ export async function clickButton(
 
     if (!clicked)
         throw new Error(
-            `Button with label ${label} on scene ${scene} couldn't be clicked.`
+            `Button with label "${label}" on scene "${scene}" couldn't be clicked.`
         )
 }
 
@@ -119,7 +119,7 @@ export async function buttonIsRendered(
 
     if (!ok)
         throw new Error(
-            `Button with label ${label} not rendered on scene ${scene}`
+            `Button with label "${label}" not rendered on scene "${scene}"`
         )
 }
 export async function textIsVisible(
@@ -142,7 +142,7 @@ export async function textIsVisible(
 
     if (!isVisible)
         throw new Error(
-            `Text with label ${label} on scene ${scene} is not present.`
+            `Text with label "${label}" on scene "${scene}" is not present.`
         )
 }
 export async function textIsNotVisible(

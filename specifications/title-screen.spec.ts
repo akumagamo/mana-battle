@@ -48,18 +48,11 @@ describe("Title Screen", () => {
         })
     })
 
-    // test("Start a New Game", ({ given, when, then }) => {
-    //     given("I have started the game", () => {})
+    test("Starting a New Game", () => {
+        test("When I choose the 'New Game' option", async () =>
+            await game.clickButton(page, "Title Screen", "New Game"))
 
-    //     when(
-    //         /^I choose the "(.*)" option$/,
-    //         async (optionName) =>
-    //             await game.clickButton(page, "Title Screen", optionName)
-    //     )
-
-    //     then(
-    //         "The next screen should be the Map Screen",
-    //         async () => await game.nextScreenShouldBe(page, "Map Screen")
-    //     )
-    // })
+        test("Then the next screen should be the 'Map Screen'", async () =>
+            await game.nextScreenShouldBe(page, "Map Screen"))
+    })
 })
