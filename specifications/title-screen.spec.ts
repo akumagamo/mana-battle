@@ -26,21 +26,21 @@ describe("Title Screen", () => {
         )
     })
 
-    describe("Viewing Credits", ({ given, when, then }) => {
-        test('When I choose the "Credits" option', async (btnName) => {
-            await game.clickButton(page, "Title Screen", btnName)
+    describe("Viewing Credits", () => {
+        test('When I choose the "Credits" option', async () => {
+            await game.clickButton(page, "Title Screen", "Credits")
         })
 
         test("Then I should see the Credits ", async () => {
             await game.textIsVisible(page, "Title Screen", "Game Credits")
         })
 
-        test('Then I should see a "Close Credits" option', async (btnName) => {
-            await game.buttonIsRendered(page, "Title Screen", btnName)
+        test('Then I should see a "Close Credits" option', async () => {
+            await game.buttonIsRendered(page, "Title Screen", "Close Credits")
         })
 
-        test('When I select the "Close Credits" option', async (btnName) => {
-            await game.clickButton(page, "Title Screen", btnName)
+        test('When I select the "Close Credits" option', async () => {
+            await game.clickButton(page, "Title Screen", "Close Credits")
         })
 
         test("I should no longer see the Credits", async () => {
