@@ -23,6 +23,7 @@ export const getData = async (
         { sceneName, key }
     )
 }
+
 export const currentScreenIs = async (
     page: puppeteer.Page,
     sceneName: string
