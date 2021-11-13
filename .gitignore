@@ -19,7 +19,6 @@ dump/
 *.bak*
 *.old*
 higherVolume/
-yarn.lock
 package-lock.json
 .DS_Store
 *.swp
