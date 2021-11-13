@@ -32,6 +32,7 @@ describe("Title Screen", () => {
         })
 
         test("Then I should see the Credits ", async () => {
+            await page.waitForTimeout(100)
             await game.textIsVisible(page, "Title Screen", "Game Credits")
         })
 
