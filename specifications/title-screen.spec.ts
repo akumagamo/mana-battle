@@ -21,14 +21,14 @@ describe("Title Screen", () => {
         it.each([["New Game"], ["Credits"]])(
             'I should seen an option called "%s"',
             async (btnName) => {
-                await game.buttonIsRendered(page, "Title Screen", btnName)
+                await buttonIsVisible(btnName)
             }
         )
     })
 
     describe("Viewing Credits", () => {
         test('When I choose the "Credits" option', async () => {
-            await game.clickButton(page, "Title Screen", "Credits")
+            await click("Credits")
         })
 
         test("Then I should see the Credits ", async () => {
@@ -36,7 +36,7 @@ describe("Title Screen", () => {
         })
 
         test('Then I should see a "Close Credits" option', async () => {
-            await game.buttonIsRendered(page, "Title Screen", "Close Credits")
+            await buttonIsVisible("Close Credits")
         })
 
         test('When I select the "Close Credits" option', async () => {
@@ -48,11 +48,15 @@ describe("Title Screen", () => {
         })
     })
 
-    test("Starting a New Game", () => {
+    describe("Starting a New Game", () => {
         test("When I choose the 'New Game' option", async () =>
-            await game.clickButton(page, "Title Screen", "New Game"))
-
+            await click("New Game"))
         test("Then the next screen should be the 'Map Screen'", async () =>
             await game.nextScreenShouldBe(page, "Map Screen"))
     })
 })
+
+const click = (label: string) => game.clickButton(page, "Title Screen", label)
+
+const buttonIsVisible = (label: string) =>
+    game.buttonIsRendered(page, "Title Screen", label)
