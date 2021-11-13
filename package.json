@@ -67,6 +67,9 @@
         "*.{js,ts,css,md}": "prettier --write"
     },
     "jest": {
-        "preset": "jest-puppeteer"
+        "preset": "jest-puppeteer",
+        "setupFilesAfterEnv": [
+            "./setupTests.js"
+        ]
     }
 }
