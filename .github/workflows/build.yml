@@ -11,12 +11,6 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Install PureScript
-              run: npm install -g purescript spago
-
-            - name: Compile PureScript
-              run: cd src/Pure && spago build
-
             - name: Install deps
               run: yarn
 
@@ -32,7 +26,7 @@ jobs:
               run: cp -r assets/ dist/assets/
 
             - name: Copy index
-              run: cp src/index.html dist/index.html
+              run: cp module/Browser/index.html dist/index.html
 
             - name: Create dist for bundle
               run: mkdir dist/dist/
