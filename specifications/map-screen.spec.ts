@@ -1,88 +1,77 @@
 import * as game from "./dsl"
 import "expect-puppeteer"
 
-//const feature = loadFeature("./specifications/features/map-screen.feature")
+jest.setTimeout(30000)
 
-jest.setTimeout(40000)
+beforeAll(async () => {
+    await page.goto("http://localhost:3000")
+})
 
-describe("Map Screen", async () => {
-    beforeAll(async () => {
-        await page.goto("http://localhost:3000")
-    })
-    beforeEach(async () => {
-        await page.reload()
-        await game.nextScreenShouldBe(page, "Title Screen")
-        await game.clickButton(page, "Title Screen", "New Game")
-        await game.nextScreenShouldBe(page, "Map Screen")
-    })
-
+describe("Map Screen", () => {
     describe("Map Creation", () => {
-        it("User has opened Map Screen", async () => {
+        openMapScreen()
+
+        test("I should be in the Map Screen", async () => {
             await game.currentScreenIs(page, "Map Screen")
         })
+
+        test("I have nothing selected", async () => {
+            const selectedUnit = await game.getData(
+                page,
+                "Map Screen",
+                "selectedUnit"
+            )
+            expect(selectedUnit).toBeUndefined()
+        })
+
+        test("Screen presents a map", async () => {
+            const types = await page.evaluate(() => {
+                return window.game.scene
+                    .getScene("Map Screen")
+                    .children.list.map((child) => child.type)
+            })
+
+            expect(types).toContain("TilemapLayer")
+        })
+
+        // test("Screen presents all dispatched squads", async () => {
+        //     return true
+        //     await page.evaluate(async () => {
+        //         const scene = window.game.scene.getScene("Map Screen")
+        //         const dispatchedSquads: string[] =
+        //             scene.data.get("dispatchedSquads")
+
+        //         const allRendered = dispatchedSquads.every((id) =>
+        //             scene.children.getByName(`squad-${id}`)
+        //         )
+
+        //         if (!allRendered)
+        //             throw new Error(
+        //                 "Not all dispatched squads have been rendered"
+        //             )
+        //     })
+        // })
+
+        //     then("Screen presents all cities", async () => {
+        //         await page.evaluate(() => {
+        //             const scene = window.game.scene.getScene("Map Screen")
+        //             const cities: string[] = scene.data.get("cities")
+        //             const allRendered = cities.every((id) =>
+        //                 scene.children.getByName(`city-${id}`)
+        //             )
+        //             if (!allRendered)
+        //                 throw new Error("Not all cities squads have been rendered")
+        //         })
+        //     })
+
+        //     then("Game is unpaused", async () => {
+        //         await page.evaluate(() => {
+        //             const scene = window.game.scene.getScene("Map Screen")
+        //             if (scene.physics.world.isPaused)
+        //                 throw new Error("Game is paused")
+        //         })
+        //     })
     })
-    // it("Map Creation", async ({ given, then }) => {
-    //     given("User has opened Map Screen", async () => {
-    //         await game.currentScreenIs(page, "Map Screen")
-    //     })
-
-    //     given("User has nothing selected", async () => {
-    //         const selectedUnit = await game.getData(
-    //             page,
-    //             "Map Screen",
-    //             "selectedUnit"
-    //         )
-    //         expect(selectedUnit).toBeUndefined()
-    //     })
-
-    //     then("Screen presents a map", async () => {
-    //         const isMapLoaded = await game.getData(
-    //             page,
-    //             "Map Screen",
-    //             "has created map"
-    //         )
-
-    //         expect(isMapLoaded).toBeTruthy()
-    //     })
-
-    //     then("Screen presents all dispatched squads", async () => {
-    //         return true
-    //         await page.evaluate(async () => {
-    //             const scene = window.game.scene.getScene("Map Screen")
-    //             const dispatchedSquads: string[] =
-    //                 scene.data.get("dispatchedSquads")
-
-    //             const allRendered = dispatchedSquads.every((id) =>
-    //                 scene.children.getByName(`squad-${id}`)
-    //             )
-
-    //             if (!allRendered)
-    //                 throw new Error(
-    //                     "Not all dispatched squads have been rendered"
-    //                 )
-    //         })
-    //     })
-
-    //     then("Screen presents all cities", async () => {
-    //         await page.evaluate(() => {
-    //             const scene = window.game.scene.getScene("Map Screen")
-    //             const cities: string[] = scene.data.get("cities")
-    //             const allRendered = cities.every((id) =>
-    //                 scene.children.getByName(`city-${id}`)
-    //             )
-    //             if (!allRendered)
-    //                 throw new Error("Not all cities squads have been rendered")
-    //         })
-    //     })
-
-    //     then("Game is unpaused", async () => {
-    //         await page.evaluate(() => {
-    //             const scene = window.game.scene.getScene("Map Screen")
-    //             if (scene.physics.world.isPaused)
-    //                 throw new Error("Game is paused")
-    //         })
-    //     })
-    // })
 
     //test("Squad Selection", ({ given, when, then }) => {
     //    given("User has opened Map Screen", async () => {
@@ -251,3 +240,12 @@ describe("Map Screen", async () => {
     //     then(/^The next screen should be "(.*)"$/, (arg0) => {})
     // })
 })
+
+function openMapScreen() {
+    beforeAll(async () => {
+        await page.reload()
+        await game.waitForSceneCreation(page, "Title Screen")
+        await game.clickButton(page, "Title Screen", "New Game")
+        await game.waitForSceneCreation(page, "Map Screen")
+    })
+}
