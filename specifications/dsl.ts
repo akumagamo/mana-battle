@@ -220,3 +220,16 @@ export async function waitForSceneCreation(
         { screen }
     )
 }
+
+export async function setGameData(
+    page: puppeteer.Page,
+    key: string,
+    data: any
+) {
+    await page.evaluate(
+        ({ data }) => {
+            window.game.registry.set(key, data)
+        },
+        { data }
+    )
+}

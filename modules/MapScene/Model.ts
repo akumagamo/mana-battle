@@ -86,7 +86,10 @@ type MapScreenProperties = {
 }
 
 export const createInitialState = (scene: Phaser.Scene) => {
-    const data: MapScreenProperties = scene.game.registry.get("Map Screen Data")
+    const data: MapScreenProperties = scene.game.registry.get(
+        "Map Screen Data"
+    ) || { squads: [], cities: [], units: [] }
+
     const state = {
         cities: Map() as CityIndex,
         squads: data.squads.reduce(

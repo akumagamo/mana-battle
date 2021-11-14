@@ -11,13 +11,12 @@ export const create = async (scene: Phaser.Scene) => {
 
     const map = createMap(scene)
 
-    // TODO: find another way of checking if a tilemap exists
-    scene.data.set("has created map", true)
-
     checkSquadOverlap(scene)
 
     createInitialState(scene)
+
     getState(scene).squads.forEach(createSquad(scene, map))
+
     fadeIn(scene, 500)
 
     scene.game.events.emit("Map Screen Created")

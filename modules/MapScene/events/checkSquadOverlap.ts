@@ -6,9 +6,10 @@ export default function checkCollision(scene: Phaser.Scene) {
 }
 function check(this: Phaser.Scene) {
     const scene = this
-    const squads = scene.data.get(
-        "Map Screen Squads"
-    ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[]
+    const squads =
+        (scene.data.get(
+            "Map Screen Squads"
+        ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[]) || []
 
     if (squads.length > 1)
         scene.physics.overlap([squads[0]], [squads[1]], async () => {

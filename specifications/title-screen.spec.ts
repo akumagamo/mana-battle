@@ -11,13 +11,13 @@ describe("Title Screen", () => {
     describe("Opening the Title Screen", () => {
         openTitleScreen()
 
-        it("I should be in the Title Screen", async () => {
+        test("I should be in the Title Screen", async () => {
             await game.currentScreenIs(page, "Title Screen")
         })
 
         const visibleOptions = [["New Game"], ["Credits"]]
 
-        it.each(visibleOptions)(
+        test.each(visibleOptions)(
             'I should see an option called "%s"',
             async (btnName) => {
                 await optionIsVisible(btnName)
@@ -28,11 +28,11 @@ describe("Title Screen", () => {
     describe("Viewing Credits", () => {
         openTitleScreen()
 
-        it('When I choose the "Credits" option', async () => {
+        test('When I choose the "Credits" option', async () => {
             await choose("Credits")
         })
 
-        it("Then I should see the game credits", async () => {
+        test("Then I should see the game credits", async () => {
             await textIsVisible("Game Credits")
         })
 
@@ -49,13 +49,13 @@ describe("Title Screen", () => {
         })
     })
 
-    // describe("Starting a New Game", () => {
-    //     openTitleScreen()
-    //     test("When I choose the 'New Game' option", async () =>
-    //         await choose("New Game"))
-    //     test("Then the next screen should be the 'Map Screen'", async () =>
-    //         await game.nextScreenShouldBe(page, "Map Screen"))
-    // })
+    describe("Starting a New Game", () => {
+        openTitleScreen()
+        test("When I choose the 'New Game' option", async () =>
+            await choose("New Game"))
+        test("Then the next screen should be the 'Map Screen'", async () =>
+            await game.waitForSceneCreation(page, "Map Screen"))
+    })
 })
 
 const choose = (label: string) => game.clickButton(page, "Title Screen", label)
