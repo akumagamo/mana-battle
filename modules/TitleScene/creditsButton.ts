@@ -14,7 +14,7 @@ export default (scene: Phaser.Scene) => {
 }
 
 async function buttonClicked(scene: Phaser.Scene) {
-    const container = scene.add.container().setName("Credits Window")
+    const group = scene.add.group().setName("Credits Window")
 
     const panel = scene.add
         .image(CENTER_X, CENTER_Y, "panel")
@@ -36,8 +36,8 @@ async function buttonClicked(scene: Phaser.Scene) {
         CENTER_X,
         SCREEN_HEIGHT - 200,
         "Close Credits",
-        () => container.destroy()
+        () => group.destroy(true)
     )
 
-    container.add([panel, ...text, closeCreditsBtn])
+    ;[panel, ...text, closeCreditsBtn].map((el) => group.add(el))
 }

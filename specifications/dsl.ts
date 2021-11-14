@@ -90,10 +90,11 @@ export async function clickButton(
         )
 }
 
-export async function elementShouldExist(
+export async function sceneHasChild(
     page: puppeteer.Page,
     scene: string,
-    name: string
+    name: string,
+    shouldExist: boolean
 ) {
     const exists = await page.evaluate(
         ({ scene, name }) => {
@@ -106,9 +107,13 @@ export async function elementShouldExist(
         { scene, name }
     )
 
-    if (!exists)
+    if (shouldExist && !exists)
         throw new Error(
-            `Element with name "${name}" on scene "${scene}" doesn't exist.`
+            `Element with name "${name}" on scene "${scene}" should exist.`
+        )
+    else if (!shouldExist && exists)
+        throw new Error(
+            `Element with name "${name}" on scene "${scene}" shouldn't exist.`
         )
 }
 
@@ -119,6 +124,7 @@ export async function buttonIsRendered(
 ) {
     const ok = await page.evaluate(
         ({ scene, label }) => {
+            //@ts-ignore
             const btn: Phaser.GameObjects.Container = window.game.scene
                 .getScene(scene)
                 .children.list.find((child) => {
@@ -199,7 +205,10 @@ export async function textIsNotVisible(
             `Text with label ${label} on scene ${scene} is present.`
         )
 }
-export async function nextScreenShouldBe(page: puppeteer.Page, screen: string) {
+export async function waitForSceneCreation(
+    page: puppeteer.Page,
+    screen: string
+) {
     await page.evaluate(
         ({ screen }) => {
             return new Promise<void>((resolve) => {
@@ -210,34 +219,4 @@ export async function nextScreenShouldBe(page: puppeteer.Page, screen: string) {
         },
         { screen }
     )
-}
-
-export const openMapScene = async (page: puppeteer.Page) => {
-    await openGame(page)
-
-    await clickButton(page, "TitleScene", "New Game")
-    await nextScreenShouldBe(page, "MapScene")
-}
-
-export const createBrowser = async () => {
-    const browser = await puppeteer.launch({
-        headless: true,
-        dumpio: false,
-        defaultViewport: {
-            width: 1280,
-            height: 720,
-        },
-    })
-
-    const page = await browser.newPage()
-
-    page.on("pageerror", ({ message }: { message: string }) => {
-        console.log(message)
-
-        page.screenshot({
-            path: "screens/" + new Date().getTime() + ".png",
-        }).then(() => browser.close())
-    })
-
-    return page
 }
