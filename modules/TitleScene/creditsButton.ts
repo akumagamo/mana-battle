@@ -14,6 +14,8 @@ export default (scene: Phaser.Scene) => {
 }
 
 async function buttonClicked(scene: Phaser.Scene) {
+    const container = scene.add.container().setName("Credits Window")
+
     const panel = scene.add
         .image(CENTER_X, CENTER_Y, "panel")
         .setDisplaySize(SCREEN_WIDTH / 1.5, SCREEN_HEIGHT / 1.5)
@@ -34,15 +36,8 @@ async function buttonClicked(scene: Phaser.Scene) {
         CENTER_X,
         SCREEN_HEIGHT - 200,
         "Close Credits",
-        () => {
-            scene.data
-                .get("Credits Window")
-                .forEach((el: GameObjects.GameObject) => el.destroy())
-            scene.data.remove("Close Credits Button")
-        }
+        () => container.destroy()
     )
 
-    const elements = [...text, closeCreditsBtn, panel]
-
-    scene.data.set("Credits Window", elements)
+    container.add([panel, ...text, closeCreditsBtn])
 }

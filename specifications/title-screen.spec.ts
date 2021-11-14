@@ -18,10 +18,12 @@ describe("Title Screen", () => {
             await game.currentScreenIs(page, "Title Screen")
         })
 
-        it.each([["New Game"], ["Credits"]])(
+        const visibleOptions = [["New Game"], ["Credits"]]
+
+        it.each(visibleOptions)(
             'I should seen an option called "%s"',
             async (btnName) => {
-                await buttonIsVisible(btnName)
+                await optionIsVisible(btnName)
             }
         )
     })
@@ -32,20 +34,19 @@ describe("Title Screen", () => {
         })
 
         test("Then I should see the Credits ", async () => {
-            await page.waitForTimeout(100)
-            await game.textIsVisible(page, "Title Screen", "Game Credits")
+            await elementShouldExist("Credits Window")
         })
 
         test('Then I should see a "Close Credits" option', async () => {
-            await buttonIsVisible("Close Credits")
+            await optionIsVisible("Close Credits")
         })
 
         test('When I select the "Close Credits" option', async () => {
-            await game.clickButton(page, "Title Screen", "Close Credits")
+            await click("Close Credits")
         })
 
         test("I should no longer see the Credits", async () => {
-            await game.textIsNotVisible(page, "Title Screen", "Game Credits")
+            await textIsNotVisible("Game Credits")
         })
     })
 
@@ -59,5 +60,14 @@ describe("Title Screen", () => {
 
 const click = (label: string) => game.clickButton(page, "Title Screen", label)
 
-const buttonIsVisible = (label: string) =>
+const optionIsVisible = (label: string) =>
     game.buttonIsRendered(page, "Title Screen", label)
+
+const textIsVisible = (text: string) =>
+    game.textIsVisible(page, "Title Screen", text)
+
+const textIsNotVisible = (text: string) =>
+    game.textIsNotVisible(page, "Title Screen", text)
+
+const elementShouldExist = (name: string) =>
+    game.elementShouldExist(page, "Title Screen", name)

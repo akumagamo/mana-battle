@@ -90,6 +90,28 @@ export async function clickButton(
         )
 }
 
+export async function elementShouldExist(
+    page: puppeteer.Page,
+    scene: string,
+    name: string
+) {
+    const exists = await page.evaluate(
+        ({ scene, name }) => {
+            const element = window.game.scene
+                .getScene(scene)
+                .children.getByName(name)
+
+            return Boolean(element)
+        },
+        { scene, name }
+    )
+
+    if (!exists)
+        throw new Error(
+            `Element with name "${name}" on scene "${scene}" doesn't exist.`
+        )
+}
+
 export async function buttonIsRendered(
     page: puppeteer.Page,
     scene: string,
@@ -97,13 +119,20 @@ export async function buttonIsRendered(
 ) {
     const ok = await page.evaluate(
         ({ scene, label }) => {
-            const btn = window.game.scene
+            const btn: Phaser.GameObjects.Container = window.game.scene
                 .getScene(scene)
-                .children.getByName(label)
+                .children.list.find((child) => {
+                    if (child.name === label) return child
+                    //@ts-ignore
+                    else if (child.children) {
+                        //@ts-ignore
+                        return child.children.getByName(label)
+                    } else return false
+                })
 
             if (!btn) return false
 
-            const { x, y } = (btn as Phaser.GameObjects.Container).getBounds()
+            const { x, y } = btn.getBounds()
 
             // Check that button is inside screen
             return (
@@ -122,6 +151,7 @@ export async function buttonIsRendered(
             `Button with label "${label}" not rendered on scene "${scene}"`
         )
 }
+
 export async function textIsVisible(
     page: puppeteer.Page,
     scene: string,
