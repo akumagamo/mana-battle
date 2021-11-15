@@ -1,6 +1,6 @@
 module.exports = {
     launch: {
-        dumpio: false,
+        dumpio: true,
         headless: true,
         //process.env.HEADLESS !== "false",
     },

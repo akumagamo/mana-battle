@@ -1,5 +1,10 @@
 import * as game from "./dsl"
 import "expect-puppeteer"
+import {
+    setSceneParameters,
+    MapScreenProperties,
+    SquadIndex,
+} from "../modules/MapScene/Model"
 
 jest.setTimeout(30000)
 
@@ -24,7 +29,7 @@ describe("Map Screen", () => {
             expect(selectedUnit).toBeUndefined()
         })
 
-        test("Screen presents a map", async () => {
+        test("I should see a map", async () => {
             const types = await page.evaluate(() => {
                 return window.game.scene
                     .getScene("Map Screen")
@@ -34,23 +39,25 @@ describe("Map Screen", () => {
             expect(types).toContain("TilemapLayer")
         })
 
-        // test("Screen presents all dispatched squads", async () => {
-        //     return true
-        //     await page.evaluate(async () => {
-        //         const scene = window.game.scene.getScene("Map Screen")
-        //         const dispatchedSquads: string[] =
-        //             scene.data.get("dispatchedSquads")
+        test("I should see all dispatched squads", async () => {
+            await page.evaluate(() => {
+                const scene = window.game.scene.getScene("Map Screen")
+                const dispatchedSquads: SquadIndex =
+                    scene.data.get("_state").squads
 
-        //         const allRendered = dispatchedSquads.every((id) =>
-        //             scene.children.getByName(`squad-${id}`)
-        //         )
+                const allRendered = dispatchedSquads.every((squad) => {
+                    console.log(`>>>`, JSON.stringify(squad.id.toJS()))
+                    return scene.children.getByName(
+                        `squad-${squad.id.get("squad")}`
+                    )
+                })
 
-        //         if (!allRendered)
-        //             throw new Error(
-        //                 "Not all dispatched squads have been rendered"
-        //             )
-        //     })
-        // })
+                if (!allRendered)
+                    throw new Error(
+                        "Not all dispatched squads have been rendered"
+                    )
+            })
+        })
 
         //     then("Screen presents all cities", async () => {
         //         await page.evaluate(() => {
@@ -245,6 +252,19 @@ function openMapScreen() {
     beforeAll(async () => {
         await page.reload()
         await game.waitForSceneCreation(page, "Title Screen")
+
+        const params: MapScreenProperties = {
+            squads: [
+                { x: 100, y: 100, id: "a", force: "PLAYER" },
+                { x: 200, y: 200, id: "b", force: "CPU" },
+            ],
+            cities: [{ x: 300, y: 300, id: "c", force: "CPU" }],
+        }
+
+        await page.evaluate((params) => {
+            window.game.registry.set("Map Screen Data", params)
+        }, params)
+
         await game.clickButton(page, "Title Screen", "New Game")
         await game.waitForSceneCreation(page, "Map Screen")
     })

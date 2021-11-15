@@ -12,17 +12,28 @@ type CityId = Identifier<"city">
 type ForceId = Identifier<"force">
 type UnitId = Identifier<"unit">
 
-type SquadIndex = Map<SquadId, Squad>
+export type SquadIndex = Map<SquadId, Squad>
 type UnitIndex = Map<UnitId, Unit>
 type CityIndex = Map<CityId, City>
 
 export type Squad = {
     id: SquadId
     force: ForceId
-    dispatched: boolean
     x: number
     y: number
 }
+
+export const createSquad = (
+    x: number,
+    y: number,
+    force: string,
+    id: string
+): Squad => ({
+    id: createSquadId(id),
+    force: createForceId(force),
+    x,
+    y,
+})
 
 type City = {
     id: CityId
@@ -34,6 +45,11 @@ type Unit = {
     id: UnitId
     name: string
 }
+
+const createUnit = (id: string, name: string): Unit => ({
+    id: createUnitId(id),
+    name,
+})
 
 export const createSquadId = (id: string): SquadId =>
     Map({
@@ -62,33 +78,38 @@ export const getState = (scene: Phaser.Scene) =>
 export type MapSceneState = {
     squads: SquadIndex
     cities: CityIndex
-    units: UnitIndex
 }
 
-type MapScreenProperties = {
+export type MapScreenProperties = {
     squads: {
         x: number
         y: number
         id: string
         force: string
-        dispatched: boolean
-        units: { x: number; y: number; id: string }[]
     }[]
     cities: { x: number; y: number; id: string; force: string }[]
-    units: {
-        x?: number
-        y?: number
-        squad?: string
-        id: string
-        name: string
-        force: string
-    }[]
 }
 
+export const createMapScreenProperties = (
+    squads: [number, number, string][],
+    cities: [number, number, string][]
+): MapScreenProperties => ({
+    squads: squads.map(([x, y, force], index) => ({
+        x,
+        y,
+        force,
+        id: index.toString(),
+    })),
+    cities: cities.map(([x, y, force], index) => ({
+        x,
+        y,
+        force,
+        id: index.toString(),
+    })),
+})
+
 export const createInitialState = (scene: Phaser.Scene) => {
-    const data: MapScreenProperties = scene.game.registry.get(
-        "Map Screen Data"
-    ) || { squads: [], cities: [], units: [] }
+    const data = getSceneParameters(scene)
 
     const state = {
         cities: Map() as CityIndex,
@@ -101,18 +122,23 @@ export const createInitialState = (scene: Phaser.Scene) => {
                 }),
             Map() as SquadIndex
         ),
-        units: data.units.reduce(
-            (xs, x) =>
-                xs.set(createUnitId(x.id), { ...x, id: createUnitId(x.id) }),
-            Map() as UnitIndex
-        ),
     }
     setState(scene, state)
+}
+
+export const setSceneParameters = (
+    scene: Phaser.Scene,
+    params: MapScreenProperties
+) => scene.game.registry.set("Map Screen Data", params)
+
+export const getSceneParameters = (scene: Phaser.Scene) => {
+    const data: MapScreenProperties = scene.game.registry.get(
+        "Map Screen Data"
+    ) || { squads: [], cities: [] }
+    return data
 }
 
 export const getPlayerSquads = (state: MapSceneState) =>
     state.squads.filter((sqd) => sqd.force.equals(createForceId("PLAYER")))
 export const getEnemySquads = (state: MapSceneState) =>
     state.squads.filter((sqd) => sqd.force.equals(createForceId("CPU")))
-export const getSquadUnits = (state: MapSceneState, id: SquadId) =>
-    state.units.filter((unit) => id.equals(unit.id))
