@@ -29,7 +29,7 @@ describe("Map Screen", () => {
             expect(selectedUnit).toBeUndefined()
         })
 
-        test("I should see a map", async () => {
+        test("I should see the map", async () => {
             const types = await page.evaluate(() => {
                 return window.game.scene
                     .getScene("Map Screen")
@@ -42,13 +42,13 @@ describe("Map Screen", () => {
         test("I should see all dispatched squads", async () => {
             await page.evaluate(() => {
                 const scene = window.game.scene.getScene("Map Screen")
-                const dispatchedSquads: SquadIndex =
-                    scene.data.get("_state").squads
+                const squads: SquadIndex = scene.data.get("_state").squads
 
-                const allRendered = dispatchedSquads.every((squad) => {
-                    console.log(`>>>`, JSON.stringify(squad.id.toJS()))
-                    return scene.children.getByName(
-                        `squad-${squad.id.get("squad")}`
+                const allRendered = squads.every((squad) => {
+                    return Boolean(
+                        scene.children.getByName(
+                            `squad-${squad.id.get("squad")}`
+                        )
                     )
                 })
 
@@ -71,13 +71,13 @@ describe("Map Screen", () => {
         //         })
         //     })
 
-        //     then("Game is unpaused", async () => {
-        //         await page.evaluate(() => {
-        //             const scene = window.game.scene.getScene("Map Screen")
-        //             if (scene.physics.world.isPaused)
-        //                 throw new Error("Game is paused")
-        //         })
-        //     })
+        test("Game is unpaused", async () => {
+            await page.evaluate(() => {
+                const scene = window.game.scene.getScene("Map Screen")
+                if (scene.physics.world.isPaused)
+                    throw new Error("Game is paused")
+            })
+        })
     })
 
     //test("Squad Selection", ({ given, when, then }) => {
