@@ -45,12 +45,11 @@ describe("Map Screen", () => {
                 const dispatchedSquads: SquadIndex =
                     scene.data.get("_state").squads
 
-                const allRendered = dispatchedSquads.every((squad) => {
-                    console.log(`>>>`, JSON.stringify(squad.id.toJS()))
-                    return scene.children.getByName(
+                const allRendered = dispatchedSquads.every((squad) => 
+                    Boolean(scene.children.getByName(
                         `squad-${squad.id.get("squad")}`
-                    )
-                })
+                    ))
+                )
 
                 if (!allRendered)
                     throw new Error(
