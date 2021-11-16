@@ -12,9 +12,24 @@ beforeAll(async () => {
     await page.goto("http://localhost:3000")
 })
 
+const defaultSquads = [
+    { x: 100, y: 100, id: "a1", force: "PLAYER" },
+    { x: 200, y: 200, id: "e1", force: "CPU" },
+]
+
+const defaultCities = [
+    { x: 50, y: 50, id: "c1", force: "PLAYER" },
+    { x: 250, y: 250, id: "c2", force: "CPU" },
+]
+
+const defaultParameters: MapScreenProperties = {
+    squads: defaultSquads,
+    cities: defaultCities,
+}
+
 describe("Map Screen", () => {
     describe("Map Creation", () => {
-        openMapScreen()
+        openMapScreen(defaultParameters)
 
         test("I should be in the Map Screen", async () => {
             await game.currentScreenIs(page, "Map Screen")
@@ -248,18 +263,10 @@ describe("Map Screen", () => {
     // })
 })
 
-function openMapScreen() {
+function openMapScreen(params: MapScreenProperties) {
     beforeAll(async () => {
         await page.reload()
         await game.waitForSceneCreation(page, "Title Screen")
-
-        const params: MapScreenProperties = {
-            squads: [
-                { x: 100, y: 100, id: "a", force: "PLAYER" },
-                { x: 200, y: 200, id: "b", force: "CPU" },
-            ],
-            cities: [{ x: 300, y: 300, id: "c", force: "CPU" }],
-        }
 
         await page.evaluate((params) => {
             window.game.registry.set("Map Screen Data", params)
