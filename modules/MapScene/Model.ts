@@ -1,4 +1,4 @@
-import { Map, Set } from "immutable"
+import { Map } from "immutable"
 
 export type Environment = {
     scene: Phaser.Scene
@@ -13,7 +13,6 @@ type ForceId = Identifier<"force">
 type UnitId = Identifier<"unit">
 
 export type SquadIndex = Map<SquadId, Squad>
-type UnitIndex = Map<UnitId, Unit>
 type CityIndex = Map<CityId, City>
 
 export type Squad = {
@@ -41,15 +40,6 @@ type City = {
     x: number
     y: number
 }
-type Unit = {
-    id: UnitId
-    name: string
-}
-
-const createUnit = (id: string, name: string): Unit => ({
-    id: createUnitId(id),
-    name,
-})
 
 export const createSquadId = (id: string): SquadId =>
     Map({
@@ -108,8 +98,7 @@ export const createMapScreenProperties = (
     })),
 })
 
-export const createInitialState = (scene: Phaser.Scene) => {
-    const data = getSceneParameters(scene)
+export const createInitialState = (scene: Phaser.Scene, data:MapScreenProperties) => {
 
     const state = {
         cities: Map() as CityIndex,

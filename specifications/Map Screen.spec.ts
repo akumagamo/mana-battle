@@ -1,12 +1,9 @@
 import * as game from "./dsl"
 import "expect-puppeteer"
 import {
-    setSceneParameters,
     MapScreenProperties,
     SquadIndex,
 } from "../modules/MapScene/Model"
-
-jest.setTimeout(30000)
 
 beforeAll(async () => {
     await page.goto("http://localhost:3000")
@@ -54,7 +51,7 @@ describe("Map Screen", () => {
             expect(types).toContain("TilemapLayer")
         })
 
-        test("I should see all dispatched squads", async () => {
+        test("I should see all squads", async () => {
             await page.evaluate(() => {
                 const scene = window.game.scene.getScene("Map Screen")
                 const squads: SquadIndex = scene.data.get("_state").squads
@@ -67,7 +64,7 @@ describe("Map Screen", () => {
 
                 if (!allRendered)
                     throw new Error(
-                        "Not all dispatched squads have been rendered"
+                        "Not all squads have been rendered"
                     )
             })
         })
@@ -264,13 +261,8 @@ describe("Map Screen", () => {
 function openMapScreen(params: MapScreenProperties) {
     beforeAll(async () => {
         await page.reload()
-        await game.waitForSceneCreation(page, "Title Screen")
-
-        await page.evaluate((params) => {
-            window.game.registry.set("Map Screen Data", params)
-        }, params)
-
-        await game.clickButton(page, "Title Screen", "New Game")
-        await game.waitForSceneCreation(page, "Map Screen")
-    })
+        await game.waitForSceneCreation(page, "Core Screen")
+        await page.evaluate((params)=>{
+          window.game.events.emit('Start Map Screen', params)}, params)
+      })
 }

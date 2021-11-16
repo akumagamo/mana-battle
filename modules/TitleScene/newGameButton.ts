@@ -2,7 +2,6 @@ import { CENTER_X, CENTER_Y } from "../_shared/constants"
 import { GAME_SPEED } from "../_shared/env"
 import TitleScene from "./phaser"
 import UI from "../UI"
-import MapScene from "../MapScene/phaser"
 import { fadeOut } from "../UI/Transition"
 
 export default (scene: Phaser.Scene) => {
@@ -17,8 +16,7 @@ export default (scene: Phaser.Scene) => {
 
 async function buttonClicked(scene: Phaser.Scene) {
     await fadeOut(scene, 500 / GAME_SPEED)
-    scene.scene.add(MapScene.key, MapScene)
 
-    scene.scene.start(MapScene.key)
+    scene.game.events.emit('Start Map Screen', {squads:[], cities:[]})
     scene.scene.remove(TitleScene.key)
 }

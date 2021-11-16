@@ -90,10 +90,6 @@ export default (scene: Phaser.Scene) => {
         })
     }
 
-    scene.load.image("map_select", `${PUBLIC_URL}/scenes/map_select.jpg`)
-
-    scene.load.html("nameform", "assets/chara-creation/input.html")
-
     scene.load.image("arrow", `${PUBLIC_URL}/arrow.svg`)
 
     progressBar(scene)

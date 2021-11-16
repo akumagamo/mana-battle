@@ -1,8 +1,6 @@
 import * as game from "./dsl"
 import "expect-puppeteer"
 
-jest.setTimeout(30000)
-
 beforeAll(async () => {
     await page.goto("http://localhost:3000")
 })
@@ -69,15 +67,12 @@ const textIsVisible = (text: string) =>
 const textIsNotVisible = (text: string) =>
     game.textIsNotVisible(page, "Title Screen", text)
 
-const elementShouldExist = (name: string) =>
-    game.sceneHasChild(page, "Title Screen", name, true)
-
-const elementShouldNotExist = (name: string) =>
-    game.sceneHasChild(page, "Title Screen", name, false)
-
 function openTitleScreen() {
     beforeAll(async () => {
+
         await page.reload()
-        await game.waitForSceneCreation(page, "Title Screen")
+        await game.waitForSceneCreation(page, "Core Screen")
+        await page.evaluate(()=>window.game.events.emit('Start Title Screen'))
+
     })
 }
