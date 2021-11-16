@@ -3,9 +3,11 @@ import "expect-puppeteer"
 
 beforeAll(async () => {
     await page.goto("http://localhost:3000")
+    await game.waitForSceneCreation(page, "Core Screen")
 })
 
 describe("Title Screen", () => {
+
     describe("Opening the Title Screen", () => {
         openTitleScreen()
 
@@ -69,10 +71,9 @@ const textIsNotVisible = (text: string) =>
 
 function openTitleScreen() {
     beforeAll(async () => {
-
-        await page.reload()
-        await game.waitForSceneCreation(page, "Core Screen")
-        await page.evaluate(()=>window.game.events.emit('Start Title Screen'))
-
+      await page.evaluate(()=>{
+        window.game.scene.remove('Title Screen')
+        window.game.events.emit('Start Title Screen')
+      });
     })
 }
