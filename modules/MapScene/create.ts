@@ -7,6 +7,7 @@ import MapSceneUI from "./UI/phaser"
 
 export const create = async (scene: Phaser.Scene, params:MapScreenProperties) => {
 
+    //remove from here (scenes should be decoupled)
     scene.scene.add(MapSceneUI.key, MapSceneUI)
     scene.scene.run(MapSceneUI.key)
 

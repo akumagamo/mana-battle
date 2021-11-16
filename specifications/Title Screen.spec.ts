@@ -55,6 +55,7 @@ describe("Title Screen", () => {
             await choose("New Game"))
         test("Then the next screen should be the 'Map Screen'", async () =>
             await game.waitForSceneCreation(page, "Map Screen"))
+
     })
 })
 

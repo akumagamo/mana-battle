@@ -5,6 +5,7 @@ import creditsButton from "./creditsButton"
 import createNewGameButton from "./newGameButton"
 
 export const create = async (scene: Phaser.Scene) => {
+
     createBackground(scene)
 
     createNewGameButton(scene)
@@ -13,7 +14,7 @@ export const create = async (scene: Phaser.Scene) => {
 
     createGithubIcon(scene)
 
-    scene.game.events.emit("Title Screen Created")
+    fadeIn(scene, 500)
 
-    await fadeIn(scene, 500)
+    scene.game.events.emit("Title Screen Created")
 }

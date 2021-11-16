@@ -260,9 +260,9 @@ describe("Map Screen", () => {
 
 function openMapScreen(params: MapScreenProperties) {
     beforeAll(async () => {
-      await page.evaluate((params)=>{
-        window.game.scene.remove('Map Screen');
-        window.game.events.emit('Start Map Screen', params);
-      }, params);
+        await game.waitForSceneCreation(page, 'Core Screen');
+        await page.evaluate((params)=>{
+          window.game.events.emit('Start Map Screen', params);
+        }, params);
     });
 }
