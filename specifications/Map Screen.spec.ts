@@ -1,268 +1,267 @@
 import * as game from "./dsl"
 import "expect-puppeteer"
 import {
-    MapScreenProperties,
-    SquadIndex,
+  MapScreenProperties,
+  SquadIndex,
+  CityIndex,
+  createMapScreenProperties
 } from "../modules/MapScene/Model"
 
 beforeAll(async () => {
-    await page.goto("http://localhost:3000")
+  await page.goto("http://localhost:3333")
+  await game.waitForSceneCreation(page, "Core Screen")
 })
 
-const defaultSquads = [
-    { x: 100, y: 100, id: "a1", force: "PLAYER" },
-    { x: 200, y: 200, id: "e1", force: "CPU" },
-]
-
-const defaultCities = [
-    { x: 50, y: 50, id: "c1", force: "PLAYER" },
-    { x: 250, y: 250, id: "c2", force: "CPU" },
-]
-
-const defaultParameters: MapScreenProperties = {
-    squads: defaultSquads,
-    cities: defaultCities,
-}
+const defaultParameters = createMapScreenProperties({
+  squads: [
+    [100, 100, "PLAYER"],
+    [200, 200, "CPU"]
+  ],
+  cities: [
+    [50, 50, "PLAYER"],
+    [250, 250, "CPU"],
+  ]
+})
 
 describe("Map Screen", () => {
-    describe("Map Creation", () => {
-        openMapScreen(defaultParameters)
+  describe("Map Creation", () => {
+    openMapScreen(defaultParameters)
 
-        test("I should be in the Map Screen", async () => {
-            await game.currentScreenIs(page, "Map Screen")
-        })
-
-        test("I have nothing selected", async () => {
-            const selectedUnit = await game.getData(
-                page,
-                "Map Screen",
-                "selectedUnit"
-            )
-            expect(selectedUnit).toBeUndefined()
-        })
-
-        test("I should see the map", async () => {
-            const types = await page.evaluate(() => {
-                return window.game.scene
-                    .getScene("Map Screen")
-                    .children.list.map((child) => child.type)
-            })
-
-            expect(types).toContain("TilemapLayer")
-        })
-
-        test("I should see all squads", async () => {
-            await page.evaluate(() => {
-                const scene = window.game.scene.getScene("Map Screen")
-                const squads: SquadIndex = scene.data.get("_state").squads
-
-                const allRendered = squads.every((squad) =>
-                    Boolean(scene.children.getByName(
-                        `squad-${squad.id.get("squad")}`
-                    ))
-                )
-
-                if (!allRendered)
-                    throw new Error(
-                        "Not all squads have been rendered"
-                    )
-            })
-        })
-
-        test("I should see all cities", async () => {
-            await page.evaluate(() => {
-                const scene = window.game.scene.getScene("Map Screen")
-                const cities: CityIndex = scene.data.get("_state").cities
-                const allRendered = cities.every((city) =>
-                    scene.children.getByName(`city-${city.id.get("city")}`)
-                )
-                if (!allRendered)
-                    throw new Error("Not all cities squads have been rendered")
-            })
-        })
-
-        test("Game is unpaused", async () => {
-            await page.evaluate(() => {
-                const scene = window.game.scene.getScene("Map Screen")
-                if (scene.physics.world.isPaused)
-                    throw new Error("Game is paused")
-            })
-        })
+    test("I should be in the Map Screen", async () => {
+      await game.currentScreenIs(page, "Map Screen")
     })
 
-    //test("Squad Selection", ({ given, when, then }) => {
-    //    given("User has opened Map Screen", async () => {
-    //        await game.currentScreenIs(page, "Map Screen")
-    //    })
+    test("I have nothing selected", async () => {
+      const selectedUnit = await game.getData(
+        page,
+        "Map Screen",
+        "selectedUnit"
+      )
+      expect(selectedUnit).toBeUndefined()
+    })
 
-    //    given("Current map has two squads:", async (table) => {
-    //        console.log(`.... table`, table)
-    //        //await game.currentScreenIs(page, "Map Screen")
-    //    })
+    test("I should see the map", async () => {
+      const types = await page.evaluate(() => {
+        return window.game.scene
+          .getScene("Map Screen")
+          .children.list.map((child) => child.type)
+      })
 
-    //    given("User has nothing selected", async () => {
-    //        await page.evaluate(() => {
-    //            const scene = window.game.scene.getScene("Map Screen")
-    //            const screenUI = scene.game.scene.getScene("Map Screen UI")
-    //            const selectedUnitUI =
-    //                screenUI.children.getByName("Selected Unit Info")
-    //            if (selectedUnitUI) throw new Error("There is a selected unit")
-    //        })
-    //    })
+      expect(types).toContain("TilemapLayer")
+    })
 
-    //    when(
-    //        /^User selects a squad (.*):$/,
-    //        async (squadType: "allied" | "enemy") => {
-    //            console.log(`>>>`, squadType)
-    //            return
-    //            if (squadType === "allied") {
-    //                await page.evaluate(() => {
-    //                    const scene = window.game.scene.getScene("Map Screen")
-    //                    const [squadId] = scene.data.get(
-    //                        "Player Squads"
-    //                    ) as string[]
+    test("I should see all squads", async () => {
+      await page.evaluate(() => {
+        const scene = window.game.scene.getScene("Map Screen")
+        const squads: SquadIndex = scene.data.get("_state").squads
 
-    //                    const squad = scene.children.getByName(
-    //                        `squad-${squadId}`
-    //                    )
+        const allRendered = squads.every((squad) =>
+          Boolean(scene.children.getByName(
+            `squad-${squad.id.get("squad")}`
+          ))
+        )
 
-    //                    if (!squad) throw new Error("Squad not created")
-    //                    squad.emit("pointerup")
-    //                })
-    //            } else if (squadType === "enemy") {
-    //                await page.evaluate(() => {
-    //                    const scene = window.game.scene.getScene("Map Screen")
-    //                    const [squadId] = scene.data.get(
-    //                        "Enemy Squads"
-    //                    ) as string[]
+        if (!allRendered)
+          throw new Error(
+            "Not all squads have been rendered"
+          )
+      })
+    })
 
-    //                    const squad = scene.children.getByName(
-    //                        `squad-${squadId}`
-    //                    )
+    test("I should see all cities", async () => {
+      await page.evaluate(() => {
+        const scene = window.game.scene.getScene("Map Screen")
+        const cities: CityIndex = scene.data.get("_state").cities
+        const allRendered = cities.every((city) =>
+          Boolean(scene.children.getByName(`city-${city.id.get("city")}`))
+        )
+        if (!allRendered)
+          throw new Error("Not all cities squads have been rendered")
+      })
+    })
 
-    //                    if (!squad) throw new Error("Squad not created")
-    //                    squad.emit("pointerup")
-    //                })
-    //            } else throw new Error(`Invalid squad type: ${squadType}`)
-    //        }
-    //    )
+    test("Game is unpaused", async () => {
+      await page.evaluate(() => {
+        const scene = window.game.scene.getScene("Map Screen")
+        if (scene.physics.world.isPaused)
+          throw new Error("Game is paused")
+      })
+    })
+  })
 
-    //    then("Game is paused", async () => {
-    //        return true
-    //        await page.evaluate(() => {
-    //            const scene = window.game.scene.getScene("Map Screen")
-    //            if (!scene.physics.world.isPaused)
-    //                throw new Error("Game is not paused")
-    //        })
-    //    })
+  //test("Squad Selection", ({ given, when, then }) => {
+  //    given("User has opened Map Screen", async () => {
+  //        await game.currentScreenIs(page, "Map Screen")
+  //    })
 
-    //    then(
-    //        /^the option View Squad Details is (.*)$/,
-    //        async (visibility: "visible") => {
-    //            return true
-    //            await page.evaluate(() => {
-    //                const scene = window.game.scene.getScene("Map Screen")
-    //                const screenUI = scene.game.scene.getScene("Map Screen UI")
-    //                const button = screenUI.children.getByName(
-    //                    "View Squad Details Button"
-    //                )
-    //                if (!button) throw new Error("Button is not visible")
-    //            })
-    //        }
-    //    )
-    //    then(
-    //        /^the option View Move Squad is (.*)$/,
-    //        async (visibility: "visible" | "hidden") => {
-    //            return true
-    //            if (visibility === "visible") {
-    //                await page.evaluate(() => {
-    //                    const scene = window.game.scene.getScene("Map Screen")
-    //                    const screenUI =
-    //                        scene.game.scene.getScene("Map Screen UI")
-    //                    const button =
-    //                        screenUI.children.getByName("Move Squad Button")
-    //                    if (!button) throw new Error("Button is not visible")
-    //                })
-    //            } else if (visibility === "hidden") {
-    //                await page.evaluate(() => {
-    //                    const scene = window.game.scene.getScene("Map Screen")
-    //                    const screenUI =
-    //                        scene.game.scene.getScene("Map Screen UI")
-    //                    const button =
-    //                        screenUI.children.getByName("Move Squad Button")
-    //                    if (button) throw new Error("Button is not visible")
-    //                })
-    //            } else {
-    //                throw new Error("Invalid visibility")
-    //            }
-    //        }
-    //    )
-    //})
+  //    given("Current map has two squads:", async (table) => {
+  //        console.log(`.... table`, table)
+  //        //await game.currentScreenIs(page, "Map Screen")
+  //    })
 
-    // test("Open Squad Details", ({ given, when, then }) => {
-    //     given("User has opened Map Screen", () => {})
+  //    given("User has nothing selected", async () => {
+  //        await page.evaluate(() => {
+  //            const scene = window.game.scene.getScene("Map Screen")
+  //            const screenUI = scene.game.scene.getScene("Map Screen UI")
+  //            const selectedUnitUI =
+  //                screenUI.children.getByName("Selected Unit Info")
+  //            if (selectedUnitUI) throw new Error("There is a selected unit")
+  //        })
+  //    })
 
-    //     given("User has nothing selected", () => {})
+  //    when(
+  //        /^User selects a squad (.*):$/,
+  //        async (squadType: "allied" | "enemy") => {
+  //            console.log(`>>>`, squadType)
+  //            return
+  //            if (squadType === "allied") {
+  //                await page.evaluate(() => {
+  //                    const scene = window.game.scene.getScene("Map Screen")
+  //                    const [squadId] = scene.data.get(
+  //                        "Player Squads"
+  //                    ) as string[]
 
-    //     when(/^User selects a (.*)$/, (arg0) => {})
+  //                    const squad = scene.children.getByName(
+  //                        `squad-${squadId}`
+  //                    )
 
-    //     when(/^User selects option "(.*)"$/, (arg0) => {})
+  //                    if (!squad) throw new Error("Squad not created")
+  //                    squad.emit("pointerup")
+  //                })
+  //            } else if (squadType === "enemy") {
+  //                await page.evaluate(() => {
+  //                    const scene = window.game.scene.getScene("Map Screen")
+  //                    const [squadId] = scene.data.get(
+  //                        "Enemy Squads"
+  //                    ) as string[]
 
-    //     then(/^Modal "(.*)" is visible$/, (arg0) => {})
-    // })
+  //                    const squad = scene.children.getByName(
+  //                        `squad-${squadId}`
+  //                    )
 
-    // test("Squad Movement", ({ given, when, then }) => {
-    //     given("User has opened Map Screen", () => {})
+  //                    if (!squad) throw new Error("Squad not created")
+  //                    squad.emit("pointerup")
+  //                })
+  //            } else throw new Error(`Invalid squad type: ${squadType}`)
+  //        }
+  //    )
 
-    //     given("User has nothing selected", () => {})
+  //    then("Game is paused", async () => {
+  //        return true
+  //        await page.evaluate(() => {
+  //            const scene = window.game.scene.getScene("Map Screen")
+  //            if (!scene.physics.world.isPaused)
+  //                throw new Error("Game is not paused")
+  //        })
+  //    })
 
-    //     when("User selects a friendly squad", () => {})
+  //    then(
+  //        /^the option View Squad Details is (.*)$/,
+  //        async (visibility: "visible") => {
+  //            return true
+  //            await page.evaluate(() => {
+  //                const scene = window.game.scene.getScene("Map Screen")
+  //                const screenUI = scene.game.scene.getScene("Map Screen UI")
+  //                const button = screenUI.children.getByName(
+  //                    "View Squad Details Button"
+  //                )
+  //                if (!button) throw new Error("Button is not visible")
+  //            })
+  //        }
+  //    )
+  //    then(
+  //        /^the option View Move Squad is (.*)$/,
+  //        async (visibility: "visible" | "hidden") => {
+  //            return true
+  //            if (visibility === "visible") {
+  //                await page.evaluate(() => {
+  //                    const scene = window.game.scene.getScene("Map Screen")
+  //                    const screenUI =
+  //                        scene.game.scene.getScene("Map Screen UI")
+  //                    const button =
+  //                        screenUI.children.getByName("Move Squad Button")
+  //                    if (!button) throw new Error("Button is not visible")
+  //                })
+  //            } else if (visibility === "hidden") {
+  //                await page.evaluate(() => {
+  //                    const scene = window.game.scene.getScene("Map Screen")
+  //                    const screenUI =
+  //                        scene.game.scene.getScene("Map Screen UI")
+  //                    const button =
+  //                        screenUI.children.getByName("Move Squad Button")
+  //                    if (button) throw new Error("Button is not visible")
+  //                })
+  //            } else {
+  //                throw new Error("Invalid visibility")
+  //            }
+  //        }
+  //    )
+  //})
 
-    //     when(/^User selects option "(.*)"$/, (arg0) => {})
+  // test("Open Squad Details", ({ given, when, then }) => {
+  //     given("User has opened Map Screen", () => {})
 
-    //     when("User selects a location in the map", () => {})
+  //     given("User has nothing selected", () => {})
 
-    //     then("Game is unpaused", () => {})
+  //     when(/^User selects a (.*)$/, (arg0) => {})
 
-    //     then("Unit moves to that location", () => {})
-    // })
+  //     when(/^User selects option "(.*)"$/, (arg0) => {})
 
-    // test("Squad Collision (friendly on enemy)", ({ given, when, then }) => {
-    //     given("User has opened Map Screen", () => {})
+  //     then(/^Modal "(.*)" is visible$/, (arg0) => {})
+  // })
 
-    //     given("User issued a move order to a squad", () => {})
+  // test("Squad Movement", ({ given, when, then }) => {
+  //     given("User has opened Map Screen", () => {})
 
-    //     when("Squad collides with enemy", () => {})
+  //     given("User has nothing selected", () => {})
 
-    //     then(/^The "(.*)" modal is displayed$/, (arg0) => {})
-    // })
+  //     when("User selects a friendly squad", () => {})
 
-    // test("Squad Collision (enemy on friendly)", ({ given, when, then }) => {
-    //     given("User has opened Map Screen", () => {})
+  //     when(/^User selects option "(.*)"$/, (arg0) => {})
 
-    //     given("An enemy squad walks toward a friendly unit", () => {})
+  //     when("User selects a location in the map", () => {})
 
-    //     when("Enemy squad collides with friendly squad", () => {})
+  //     then("Game is unpaused", () => {})
 
-    //     then(/^The "(.*)" modal is displayed$/, (arg0) => {})
-    // })
+  //     then("Unit moves to that location", () => {})
+  // })
 
-    // test("Enemy Encountered Modal", ({ given, when, then }) => {
-    //     given("User has opened Map Screen", () => {})
+  // test("Squad Collision (friendly on enemy)", ({ given, when, then }) => {
+  //     given("User has opened Map Screen", () => {})
 
-    //     given(/^The "(.*)" modal is opened$/, (arg0) => {})
+  //     given("User issued a move order to a squad", () => {})
 
-    //     when(/^User selects option "(.*)"$/, (arg0) => {})
+  //     when("Squad collides with enemy", () => {})
 
-    //     then(/^The next screen should be "(.*)"$/, (arg0) => {})
-    // })
+  //     then(/^The "(.*)" modal is displayed$/, (arg0) => {})
+  // })
+
+  // test("Squad Collision (enemy on friendly)", ({ given, when, then }) => {
+  //     given("User has opened Map Screen", () => {})
+
+  //     given("An enemy squad walks toward a friendly unit", () => {})
+
+  //     when("Enemy squad collides with friendly squad", () => {})
+
+  //     then(/^The "(.*)" modal is displayed$/, (arg0) => {})
+  // })
+
+  // test("Enemy Encountered Modal", ({ given, when, then }) => {
+  //     given("User has opened Map Screen", () => {})
+
+  //     given(/^The "(.*)" modal is opened$/, (arg0) => {})
+
+  //     when(/^User selects option "(.*)"$/, (arg0) => {})
+
+  //     then(/^The next screen should be "(.*)"$/, (arg0) => {})
+  // })
 })
 
 function openMapScreen(params: MapScreenProperties) {
-    beforeAll(async () => {
-        await game.waitForSceneCreation(page, 'Core Screen');
-        await page.evaluate((params) => {
-            window.game.events.emit('Start Map Screen', params);
-        }, params);
-    });
+  beforeAll(async () => {
+    await page.evaluate((params) => {
+      window.game.scene.remove('Map Screen')
+      window.game.events.emit('Start Map Screen', params);
+    }, params);
+  });
 }

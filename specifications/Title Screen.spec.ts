@@ -2,7 +2,7 @@ import * as game from "./dsl"
 import "expect-puppeteer"
 
 beforeAll(async () => {
-    await page.goto("http://localhost:3000")
+    await page.goto("http://localhost:3333")
     await game.waitForSceneCreation(page, "Core Screen")
 })
 

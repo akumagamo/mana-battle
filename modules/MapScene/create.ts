@@ -18,9 +18,9 @@ export const create = async (scene: Phaser.Scene, params:MapScreenProperties) =>
 
     const state = createInitialState(scene, params)
 
-    squads.forEach(createSquad(scene, state, map))
+    state.squads.forEach(createSquad(scene, state, map))
 
-    cities.forEach(createCity(scene, state))
+    state.cities.forEach(createCity(scene, state))
 
     fadeIn(scene, 500)
 

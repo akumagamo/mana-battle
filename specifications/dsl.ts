@@ -41,7 +41,7 @@ export const startNewGame = async (page: puppeteer.Page) => {
     await click(1280 / 2, 768 / 2, page)
 }
 export const openGame = async (page: puppeteer.Page) => {
-    await page.goto("http://localhost:3000")
+    await page.goto("http://localhost:3333")
 }
 
 export const click = async (x: number, y: number, page: puppeteer.Page) => {

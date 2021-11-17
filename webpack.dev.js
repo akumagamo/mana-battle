@@ -14,7 +14,7 @@ module.exports = merge(common, {
             directory: dir("dist"),
         },
         compress: true,
-        port: 3000,
+        port: process.env.NODE_ENV === 'test' ? 3333 : 3000,
         hot: true,
     },
     plugins: [
