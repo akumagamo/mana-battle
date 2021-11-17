@@ -56,7 +56,7 @@ describe("Map Screen", () => {
                 const scene = window.game.scene.getScene("Map Screen")
                 const squads: SquadIndex = scene.data.get("_state").squads
 
-                const allRendered = squads.every((squad) => 
+                const allRendered = squads.every((squad) =>
                     Boolean(scene.children.getByName(
                         `squad-${squad.id.get("squad")}`
                     ))
@@ -69,17 +69,17 @@ describe("Map Screen", () => {
             })
         })
 
-        //     then("Screen presents all cities", async () => {
-        //         await page.evaluate(() => {
-        //             const scene = window.game.scene.getScene("Map Screen")
-        //             const cities: string[] = scene.data.get("cities")
-        //             const allRendered = cities.every((id) =>
-        //                 scene.children.getByName(`city-${id}`)
-        //             )
-        //             if (!allRendered)
-        //                 throw new Error("Not all cities squads have been rendered")
-        //         })
-        //     })
+        test("I should see all cities", async () => {
+            await page.evaluate(() => {
+                const scene = window.game.scene.getScene("Map Screen")
+                const cities: CityIndex = scene.data.get("_state").cities
+                const allRendered = cities.every((city) =>
+                    scene.children.getByName(`city-${city.id.get("city")}`)
+                )
+                if (!allRendered)
+                    throw new Error("Not all cities squads have been rendered")
+            })
+        })
 
         test("Game is unpaused", async () => {
             await page.evaluate(() => {
@@ -261,8 +261,8 @@ describe("Map Screen", () => {
 function openMapScreen(params: MapScreenProperties) {
     beforeAll(async () => {
         await game.waitForSceneCreation(page, 'Core Screen');
-        await page.evaluate((params)=>{
-          window.game.events.emit('Start Map Screen', params);
+        await page.evaluate((params) => {
+            window.game.events.emit('Start Map Screen', params);
         }, params);
     });
 }

@@ -1,10 +1,11 @@
 import squadClicked from "./events/squadClicked"
+import { MapSceneState } from "./Model"
 import { Squad } from "./Model"
 const UNIT_WIDTH = 50
 const UNIT_HEIGHT = 100
 
 export const createSquad =
-    (scene: Phaser.Scene, map: Phaser.Tilemaps.TilemapLayer) =>
+    (scene: Phaser.Scene, state:MapSceneState, map: Phaser.Tilemaps.TilemapLayer) =>
     (squad: Squad) => {
         const { x, y, id } = squad
         const sprite = scene.physics.add

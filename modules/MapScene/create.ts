@@ -3,6 +3,7 @@ import checkSquadOverlap from "./events/checkSquadOverlap"
 import { createMap } from "./map"
 import { createInitialState, getState, MapScreenProperties } from "./Model"
 import { createSquad } from "./squad"
+import { createCity } from "./city"
 import MapSceneUI from "./UI/phaser"
 
 export const create = async (scene: Phaser.Scene, params:MapScreenProperties) => {
@@ -15,9 +16,11 @@ export const create = async (scene: Phaser.Scene, params:MapScreenProperties) =>
 
     checkSquadOverlap(scene)
 
-    createInitialState(scene, params)
+    const state = createInitialState(scene, params)
 
-    getState(scene).squads.forEach(createSquad(scene, map))
+    squads.forEach(createSquad(scene, state, map))
+
+    cities.forEach(createCity(scene, state))
 
     fadeIn(scene, 500)
 
