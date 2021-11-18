@@ -5,8 +5,8 @@ module.exports = {
         //process.env.HEADLESS !== "false",
     },
     server: {
-        command: "yarn start",
+        command: "yarn test-server",
         port: 3333,
-        launchTimeout: 40000,
+        launchTimeout: 20000,
     },
 }
