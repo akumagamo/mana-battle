@@ -1,4 +1,4 @@
-import * as game from "./dsl"
+import * as game from "../dsl"
 import "expect-puppeteer"
 
 beforeAll(async () => {

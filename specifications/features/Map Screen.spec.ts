@@ -1,11 +1,11 @@
-import * as game from "./dsl"
+import * as game from "../dsl"
 import "expect-puppeteer"
 import {
     MapScreenProperties,
     SquadIndex,
     CityIndex,
     createMapScreenProperties,
-} from "../modules/MapScene/Model"
+} from "../../modules/MapScene/Model"
 
 beforeAll(async () => {
     await page.goto("http://localhost:3333")
