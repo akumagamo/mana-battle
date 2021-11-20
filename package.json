@@ -55,7 +55,7 @@
     },
     "dependencies": {
         "astarjs": "^1.1.0",
-        "copy-webpack-plugin": "^9.0.1",
+        "copy-webpack-plugin": "^10.0.0",
         "immutable": "^4.0.0-rc.12",
         "phaser": "^3.55.2",
         "puppeteer": "^11.0.0",
