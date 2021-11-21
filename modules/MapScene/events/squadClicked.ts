@@ -9,6 +9,9 @@ export default function (
     scene.scene.get("Map Screen UI").events.emit("Squad Selected", sprite.name)
 
     clearEvents()
+
+    scene.physics.world.pause()
+
     layer.on(Phaser.Input.Events.POINTER_UP, movementOrderAssigned)
 
     function adjustSpeed() {

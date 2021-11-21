@@ -26,6 +26,7 @@ const defaultParameters = createMapScreenProperties({
 })
 
 describe("Map Screen", () => {
+  
   describe("Map Creation", () => {
     openMapScreen(defaultParameters)
     test("I should be in the Map Screen", assertCurrentScreen)
@@ -38,7 +39,6 @@ describe("Map Screen", () => {
 
   describe("Squad Selection", () => {
 
-
     describe.each([["allied"], ["enemy"]] as ForceType[][])(
       "%s squad selection", (forceType) => {
 
@@ -48,7 +48,7 @@ describe("Map Screen", () => {
 
         test('When I select an %s squad', selectSquadOfType(forceType));
 
-        test.skip('Then I should see that the game is paused', assertGameIsPaused);
+        test('Then I should see that the game is paused', assertGameIsPaused);
 
       })
 
