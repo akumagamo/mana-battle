@@ -35,7 +35,7 @@ describe("Map Screen", () => {
     })
 
     describe("Squad Selection", () => {
-        test.skip("User has nothing selected", assertNoEntityIsSelected)
+        test("User has nothing selected", assertNoEntityIsSelected)
 
         test.skip.each(["allied", "enemy"] as ForceType[])(
             "When I select an %s squad",
