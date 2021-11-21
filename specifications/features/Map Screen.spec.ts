@@ -38,24 +38,28 @@ describe("Map Screen", () => {
   })
 
   describe("Squad Selection", () => {
-
-    describe.each([["allied"], ["enemy"]] as ForceType[][])(
-      "%s squad selection", (forceType) => {
+    describe.each`
+      squadType   | canSeeEditOption 
+      ${"allied"} | ${true} 
+      ${"enemy"}  | ${false} 
+    `(
+      "$squadType squad selection", ({ squadType , canSeeEditOption }:{ squadType : ForceType, canSeeEditOption: boolean }) => {
 
         openMapScreen(defaultParameters);
 
         test('When I have no squad selected', assertNoEntityIsSelected);
 
-        test('When I select an %s squad', selectSquadOfType(forceType));
+        test('When I select an %s squad', selectSquadOfType(squadType));
 
         test('Then I should see that the game is paused', assertGameIsPaused);
 
+        test.skip(
+          `the option View Squad Details is${canSeeEditOption ? '' : 'not'} visible`,
+          assertOptionInUIIsNotVisible("View Squad Details Button")
+        )
+
       })
 
-    test.skip(
-      "the option View Squad Details is not visible",
-      assertOptionInUIIsNotVisible("View Squad Details Button")
-    )
     test.skip(
       "The option View Move Squad is visible",
       assertOptionInUIIsVisible("Move Squad Button")
