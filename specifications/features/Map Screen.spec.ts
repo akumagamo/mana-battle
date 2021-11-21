@@ -9,8 +9,10 @@ import {
   Squad
 } from "../../modules/MapScene/Model"
 
+const port = process.env.CI ? 3333 : 3000
+
 beforeAll(async () => {
-  await page.goto("http://localhost:3333")
+  await page.goto(`http://localhost:${port}`)
   await game.waitForSceneCreation(page, "Core Screen")
 })
 
@@ -26,7 +28,7 @@ const defaultParameters = createMapScreenProperties({
 })
 
 describe("Map Screen", () => {
-  
+
   describe("Map Creation", () => {
     openMapScreen(defaultParameters)
     test("I should be in the Map Screen", assertCurrentScreen)
@@ -43,27 +45,30 @@ describe("Map Screen", () => {
       ${"allied"} | ${true} 
       ${"enemy"}  | ${false} 
     `(
-      "$squadType squad selection", ({ squadType , canSeeEditOption }:{ squadType : ForceType, canSeeEditOption: boolean }) => {
+      "$squadType squad selection", (
+        {squadType, canSeeEditOption}: {
+          squadType: ForceType, canSeeEditOption: boolean
+        }) => {
 
-        openMapScreen(defaultParameters);
+      openMapScreen(defaultParameters);
 
-        test('When I have no squad selected', assertNoEntityIsSelected);
+      test('When I have no squad selected', assertNoEntityIsSelected);
 
-        test('When I select an %s squad', selectSquadOfType(squadType));
+      test(`When I select an ${squadType} squad`, selectSquadOfType(squadType));
 
-        test('Then I should see that the game is paused', assertGameIsPaused);
+      test('Then I should see that the game is paused', assertGameIsPaused);
 
-        test.skip(
-          `the option View Squad Details is${canSeeEditOption ? '' : 'not'} visible`,
-          assertOptionInUIIsNotVisible("View Squad Details Button")
-        )
+      test(`Then I should see the View Squad Details option`,
+        assertOptionVisibilityInUI("View Squad Details Button", true)
+      )
 
-      })
+      test.skip(
+        `Then I ${should(canSeeEditOption)} see the View Move Squad option`,
+        assertOptionVisibilityInUI("Move Squad Button", canSeeEditOption)
+      )
 
-    test.skip(
-      "The option View Move Squad is visible",
-      assertOptionInUIIsVisible("Move Squad Button")
-    )
+    })
+
   })
 
   describe("Open Squad Details", () => {
@@ -125,23 +130,26 @@ describe("Map Screen", () => {
   })
 })
 
-function assertOptionInUIIsVisible(option: string) {
-  return async () => {
-    await page.evaluate(() => {
-      const screenUI = window.game.scene.getScene("Map Screen UI")
-      const button = screenUI.children.getByName(option)
-      if (!button) throw new Error("Button is not visible")
-    })
-  }
+function should(condition: boolean) {
+  return condition ? 'should' : "shouldn't"
 }
 
-function assertOptionInUIIsNotVisible(option: string) {
+function is(condition: boolean) {
+  return condition ? 'is' : "isn't"
+}
+
+function assertOptionVisibilityInUI(optionName: string, shouldBeVisible: boolean) {
   return async () => {
-    await page.evaluate(() => {
+    const visible = await page.evaluate(({optionName}) => {
       const screenUI = window.game.scene.getScene("Map Screen UI")
-      const button = screenUI.children.getByName(option)
-      if (!button) throw new Error("Button is not visible")
-    })
+      const button = screenUI.children.getByName(optionName)
+      return Boolean(button)
+    }, {optionName})
+
+    if (visible && !shouldBeVisible)
+      throw new Error(`Button "${optionName}" should not be visible`)
+    else if (!visible && shouldBeVisible)
+      throw new Error(`Button "${optionName}" should be visible`)
   }
 }
 

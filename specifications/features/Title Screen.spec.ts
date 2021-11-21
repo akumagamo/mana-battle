@@ -1,9 +1,11 @@
 import * as game from "../dsl"
 import "expect-puppeteer"
 
+const port = process.env.CI ? 3333 : 3000
+
 beforeAll(async () => {
-    await page.goto("http://localhost:3333")
-    await game.waitForSceneCreation(page, "Core Screen")
+  await page.goto(`http://localhost:${port}`)
+  await game.waitForSceneCreation(page, "Core Screen")
 })
 
 describe("Title Screen", () => {
