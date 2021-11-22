@@ -1,20 +1,16 @@
-import * as game from "../dsl"
+import * as dsl from "../dsl"
 import "expect-puppeteer"
 
-const port = process.env.CI ? 3333 : 3000
-
-beforeAll(async () => {
-  await page.goto(`http://localhost:${port}`)
-  await game.waitForSceneCreation(page, "Core Screen")
+afterAll(async () => {
+    await dsl.removeScene("Title Screen")
 })
 
 describe("Title Screen", () => {
-
     describe("Opening the Title Screen", () => {
         openTitleScreen()
 
         test("I should be in the Title Screen", async () => {
-            await game.currentScreenIs(page, "Title Screen")
+            await dsl.currentScreenIs(page, "Title Screen")
         })
 
         const visibleOptions = [["New Game"], ["Credits"]]
@@ -56,27 +52,28 @@ describe("Title Screen", () => {
         test("When I choose the 'New Game' option", async () =>
             await choose("New Game"))
         test("Then the next screen should be the 'Map Screen'", async () =>
-            await game.waitForSceneCreation(page, "Map Screen"))
-
+            await dsl.waitForSceneCreation(page, "Map Screen"))
     })
 })
 
-const choose = (label: string) => game.clickButton(page, "Title Screen", label)
+const choose = (label: string) => dsl.clickButton(page, "Title Screen", label)
 
 const optionIsVisible = (label: string) =>
-    game.buttonIsRendered(page, "Title Screen", label)
+    dsl.buttonIsRendered(page, "Title Screen", label)
 
 const textIsVisible = (text: string) =>
-    game.textIsVisible(page, "Title Screen", text)
+    dsl.textIsVisible(page, "Title Screen", text)
 
 const textIsNotVisible = (text: string) =>
-    game.textIsNotVisible(page, "Title Screen", text)
+    dsl.textIsNotVisible(page, "Title Screen", text)
+
+
 
 function openTitleScreen() {
     beforeAll(async () => {
-      await page.evaluate(()=>{
-        window.game.scene.remove('Title Screen')
-        window.game.events.emit('Start Title Screen')
-      });
+        await page.evaluate(() => {
+            window.game.scene.remove("Title Screen")
+            window.game.events.emit("Start Title Screen")
+        })
     })
 }

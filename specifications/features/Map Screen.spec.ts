@@ -1,4 +1,4 @@
-import * as game from "../dsl"
+import * as dsl from "../dsl"
 import "expect-puppeteer"
 import {
     MapScreenProperties,
@@ -9,11 +9,9 @@ import {
     Squad,
 } from "../../modules/MapScene/Model"
 
-const port = process.env.CI ? 3333 : 3000
-
-beforeAll(async () => {
-    await page.goto(`http://localhost:${port}`)
-    await game.waitForSceneCreation(page, "Core Screen")
+afterAll(async () => {
+    await dsl.removeScene("Map Screen")
+    await dsl.removeScene("Map Screen UI")
 })
 
 const defaultParameters = createMapScreenProperties({
@@ -235,7 +233,7 @@ async function assertMapIsVisible() {
 }
 
 async function assertNothingSelected() {
-    const selectedUnit = await game.getData(page, "Map Screen", "selectedUnit")
+    const selectedUnit = await dsl.getData(page, "Map Screen", "selectedUnit")
     expect(selectedUnit).toBeUndefined()
 }
 
@@ -260,7 +258,7 @@ function selectSquadOfType(squadType: ForceType) {
     }
 }
 async function assertCurrentScreen() {
-    await game.currentScreenIs(page, "Map Screen")
+    await dsl.currentScreenIs(page, "Map Screen")
 }
 
 async function selectAnySquadFromForce(force: string) {
