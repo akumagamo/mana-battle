@@ -85,115 +85,64 @@ describe("Map Screen", () => {
                 )
             }
         )
+    })
 
-        describe("Squad Selection", () => {
-            describe.each`
-                squadType   | canSeeEditOption
-                ${"allied"} | ${true}
-                ${"enemy"}  | ${false}
-            `(
-                "$squadType squad selection",
-                ({
-                    squadType,
-                    canSeeEditOption,
-                }: {
-                    squadType: ForceType
-                    canSeeEditOption: boolean
-                }) => {
-                    openMapScreen(defaultParameters)
+    describe("Open Squad Details", () => {
+        test.todo("User has opened Map Screen")
 
-                    test(
-                        "When I have no squad selected",
-                        assertNoEntityIsSelected
-                    )
+        test.todo("User has nothing selected")
 
-                    test(
-                        `When I select an ${squadType} squad`,
-                        selectSquadOfType(squadType)
-                    )
+        test.todo("/^User selects a x")
 
-                    test(
-                        "Then I should see that the game is paused",
-                        assertGameIsPaused
-                    )
+        test.todo("/^User selects option x")
 
-                    test(
-                        `Then I should see the View Squad Details option`,
-                        assertOptionVisibilityInUI({
-                            optionName: "View Squad Details Button",
-                            shouldBeVisible: true,
-                        })
-                    )
+        test.todo('/^Modal "(.*)" is visible$/')
+    })
 
-                    const should_ = should(canSeeEditOption)
-                    test.skip(
-                        `Then I ${should_} see the View Move Squad option`,
-                        assertOptionVisibilityInUI({
-                            optionName: "Move Squad Button",
-                            shouldBeVisible: canSeeEditOption,
-                        })
-                    )
-                }
-            )
-        })
+    describe("Squad Movement", () => {
+        test.todo("User has opened Map Screen")
 
-        describe("Open Squad Details", () => {
-            test.todo("User has opened Map Screen")
+        test.todo("User has nothing selected")
 
-            test.todo("User has nothing selected")
+        test.todo("User selects a friendly squad")
 
-            test.todo("/^User selects a x")
+        test.todo('/^User selects option "(.*)"$/')
 
-            test.todo("/^User selects option x")
+        test.todo("User selects a location in the map")
 
-            test.todo('/^Modal "(.*)" is visible$/')
-        })
+        test.todo("Game is unpaused")
 
-        describe("Squad Movement", () => {
-            test.todo("User has opened Map Screen")
+        test.todo("Unit moves to that location")
+    })
 
-            test.todo("User has nothing selected")
+    describe("Squad Collision (friendly on enemy)", () => {
+        test.todo("User has opened Map Screen")
 
-            test.todo("User selects a friendly squad")
+        test.todo("User issued a move order to a squad")
 
-            test.todo('/^User selects option "(.*)"$/')
+        test.todo("Squad collides with enemy")
 
-            test.todo("User selects a location in the map")
+        test.todo('/^The "(.*)" modal is displayed$/')
+    })
 
-            test.todo("Game is unpaused")
+    describe("Squad Collision (enemy on friendly)", () => {
+        test.todo("User has opened Map Screen")
 
-            test.todo("Unit moves to that location")
-        })
+        test.todo("An enemy squad walks toward a friendly unit")
 
-        describe("Squad Collision (friendly on enemy)", () => {
-            test.todo("User has opened Map Screen")
+        test.todo("Enemy squad collides with friendly squad")
 
-            test.todo("User issued a move order to a squad")
+        test.todo('/^The "(.*)" modal is displayed$/')
+    })
 
-            test.todo("Squad collides with enemy")
+    describe("Enemy Encountered Modal", () => {
+        test.todo("User has opened Map Screen")
 
-            test.todo('/^The "(.*)" modal is displayed$/')
-        })
+        test.todo('/^The "(.*)" modal is opened$/')
 
-        describe("Squad Collision (enemy on friendly)", () => {
-            test.todo("User has opened Map Screen")
+        test.todo('/^User selects option "(.*)"$/')
 
-            test.todo("An enemy squad walks toward a friendly unit")
-
-            test.todo("Enemy squad collides with friendly squad")
-
-            test.todo('/^The "(.*)" modal is displayed$/')
-        })
-
-        describe("Enemy Encountered Modal", () => {
-            test.todo("User has opened Map Screen")
-
-            test.todo('/^The "(.*)" modal is opened$/')
-
-            test.todo('/^User selects option "(.*)"$/')
-
-            test.todo('/^The next screen should be "(.*)"$/')
-        })
+        test.todo('/^The next screen should be "(.*)"$/')
     })
 })
 
