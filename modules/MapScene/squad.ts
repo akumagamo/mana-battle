@@ -13,7 +13,7 @@ export const createSquad =
             .setDataEnabled()
             .setSize(UNIT_WIDTH, UNIT_HEIGHT)
             .setDisplaySize(UNIT_WIDTH, UNIT_HEIGHT)
-            .setName(`squad-${id.get("squad")}`)
+            .setName(id.get("squad") || "")
 
         sprite.body.setSize(UNIT_WIDTH * 4, UNIT_HEIGHT)
         createSquadEvents(scene, map, sprite)

@@ -62,7 +62,7 @@ describe("Map Screen", () => {
         assertOptionVisibilityInUI("View Squad Details Button", true)
       )
 
-      test.skip(
+      test(
         `Then I ${should(canSeeEditOption)} see the View Move Squad option`,
         assertOptionVisibilityInUI("Move Squad Button", canSeeEditOption)
       )
@@ -193,7 +193,7 @@ async function assertAllSquadsAreVisible() {
     const squads: SquadIndex = scene.data.get("_state").squads
 
     const allRendered = squads.every((squad) =>
-      Boolean(scene.children.getByName(`squad-${squad.id.get("squad")}`))
+      Boolean(scene.children.getByName(squad.id.get("squad")))
     )
 
     if (!allRendered) throw new Error("Not all squads have been rendered")
@@ -254,9 +254,11 @@ async function selectAnySquadFromForce(force: string) {
 
     if (!squadId) throw new Error('Invalid squad: no id')
 
-    const squad = scene.children.getByName(`squad-${squadId}`)
+    const squad = scene.children.getByName(squadId)
 
     if (!squad) throw new Error("Squad not created")
+
     squad.emit("pointerup")
+
   }, {force})
 }

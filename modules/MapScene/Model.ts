@@ -1,5 +1,6 @@
 import {Map} from "immutable"
 
+const SCREEN_KEY = 'Map Screen'
 const PARAMS_KEY = "Map Screen Data"
 const STATE_KEY = "_state"
 const PLAYER_ID = "PLAYER"
@@ -38,6 +39,15 @@ export const createSquad = (
   y,
 })
 
+export const getSquad = (id: string) => (state: MapSceneState) => {
+  const squad = state.squads.find(squad => squad.id.equals(createSquadId(id)))
+  if (!squad) throw new Error(`Invalid squad id supplied: ${id} `)
+  return squad
+}
+
+export const isAllied = (squad:Squad) => squad.force.get('force') === "PLAYER"
+export const isEnemy = (squad:Squad) => squad.force.get('force') === "CPU"
+
 export type City = {
   id: CityId
   name: string
@@ -62,9 +72,9 @@ export const createForceId = (id: string): ForceId =>
   }) as Map<"force", string>
 
 export const setState = (scene: Phaser.Scene, s: MapSceneState) =>
-  scene.data.set(STATE_KEY, s)
+  scene.scene.get(SCREEN_KEY).data.set(STATE_KEY, s)
 export const getState = (scene: Phaser.Scene) =>
-  scene.data.get(STATE_KEY) as MapSceneState
+  scene.scene.get(SCREEN_KEY).data.get(STATE_KEY) as MapSceneState
 
 export type MapSceneState = {
   squads: SquadIndex
