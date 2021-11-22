@@ -1,5 +1,5 @@
 import Phaser from "phaser"
-import {MapScreenProperties} from "../../MapScene/Model"
+import { MapScreenProperties } from "../../MapScene/Model"
 import TitleScene from "../../TitleScene/phaser"
 import MapScene from "../../MapScene/phaser"
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../_shared/constants"
@@ -12,23 +12,29 @@ declare global {
 }
 
 const Core = {
-  key: "Core",
-  preload: function(this:Phaser.Scene){ preload(this)},
-  create: function(this:Phaser.Scene){
-    this.game.events.on('Start Title Screen', ()=>{
-      this.game.scene.add(TitleScene.key, TitleScene, true);
-    })
+    key: "Core",
+    preload: function (this: Phaser.Scene) {
+        preload(this)
+    },
+    create: function (this: Phaser.Scene) {
+        this.game.events.on("Start Title Screen", () => {
+            this.game.scene.add(TitleScene.key, TitleScene, true)
+        })
 
-    this.game.events.on('Start Map Screen', (params:MapScreenProperties)=>{
-      this.game.scene.add(MapScene.key, MapScene, true, params);
-    })
+        this.game.events.on(
+            "Start Map Screen",
+            (params: MapScreenProperties) => {
+                this.game.scene.add(MapScene.key, MapScene, true, params)
+            }
+        )
 
-    if (process.env.NODE_ENV !== "development") {
-      this.game.events.emit('Start Title Screen')
-    }
+        const isNotHeadless = navigator.languages.length > 1
+        if (isNotHeadless) {
+            this.game.events.emit("Start Title Screen")
+        }
 
-    this.game.events.emit('Core Screen Created')
-  }
+        this.game.events.emit("Core Screen Created")
+    },
 }
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -57,8 +63,7 @@ export const main = () => {
     const game = new Phaser.Game(config)
     game.scale.lockOrientation(Phaser.Scale.PORTRAIT)
 
-  if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === "development") {
         window.game = game
     }
-
 }

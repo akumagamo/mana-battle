@@ -1,4 +1,4 @@
-import puppeteer from "puppeteer"
+import dsl from "puppeteer"
 import Phaser from "phaser"
 
 declare global {
@@ -7,10 +7,24 @@ declare global {
     }
 }
 
+const port = process.env.CI ? 3333 : 3000
+
+export function openGame() {
+    beforeAll(async () => {
+        await page.goto(`http://localhost:${port}`)
+        await waitForSceneCreation(page, "Core Screen")
+    })
+}
+
+export async function removeScene(scene: string) {
+    await page.evaluate((scene) => {
+        window.game.scene.remove(scene)
+    }, scene)
+}
 /** Returns data from a scene. It must be serializable, otherwise it
  * will return  undefined */
 export const getData = async (
-    page: puppeteer.Page,
+    page: dsl.Page,
     sceneName: string,
     key: string
 ) => {
@@ -24,10 +38,7 @@ export const getData = async (
     )
 }
 
-export const currentScreenIs = async (
-    page: puppeteer.Page,
-    sceneName: string
-) => {
+export const currentScreenIs = async (page: dsl.Page, sceneName: string) => {
     const ok = await page.evaluate(
         ({ sceneName }) => {
             return window.game.scene.isActive(sceneName)
@@ -37,14 +48,11 @@ export const currentScreenIs = async (
 
     if (!ok) throw new Error(`Screen ${sceneName} is not active`)
 }
-export const startNewGame = async (page: puppeteer.Page) => {
+export const startNewGame = async (page: dsl.Page) => {
     await click(1280 / 2, 768 / 2, page)
 }
-export const openGame = async (page: puppeteer.Page) => {
-    await page.goto("http://localhost:3333")
-}
 
-export const click = async (x: number, y: number, page: puppeteer.Page) => {
+export const click = async (x: number, y: number, page: dsl.Page) => {
     await page.waitForTimeout(300) // equals 200 actions per minute
     page.mouse.click(x, y)
 }
@@ -52,7 +60,7 @@ export const click = async (x: number, y: number, page: puppeteer.Page) => {
 export const dragAndDrop = async (
     from: { x: number; y: number },
     to: { x: number; y: number },
-    page: puppeteer.Page
+    page: dsl.Page
 ) => {
     await page.waitForTimeout(300)
     page.mouse.move(from.x || 0, from.y || 0)
@@ -66,7 +74,7 @@ export const dragAndDrop = async (
 }
 
 export async function clickButton(
-    page: puppeteer.Page,
+    page: dsl.Page,
     scene: string,
     label: string
 ) {
@@ -91,7 +99,7 @@ export async function clickButton(
 }
 
 export async function sceneHasChild(
-    page: puppeteer.Page,
+    page: dsl.Page,
     scene: string,
     name: string,
     shouldExist: boolean
@@ -118,7 +126,7 @@ export async function sceneHasChild(
 }
 
 export async function buttonIsRendered(
-    page: puppeteer.Page,
+    page: dsl.Page,
     scene: string,
     label: string
 ) {
@@ -159,7 +167,7 @@ export async function buttonIsRendered(
 }
 
 export async function textIsVisible(
-    page: puppeteer.Page,
+    page: dsl.Page,
     scene: string,
     label: string
 ) {
@@ -182,7 +190,7 @@ export async function textIsVisible(
         )
 }
 export async function textIsNotVisible(
-    page: puppeteer.Page,
+    page: dsl.Page,
     scene: string,
     label: string
 ) {
@@ -205,10 +213,7 @@ export async function textIsNotVisible(
             `Text with label ${label} on scene ${scene} is present.`
         )
 }
-export async function waitForSceneCreation(
-    page: puppeteer.Page,
-    screen: string
-) {
+export async function waitForSceneCreation(page: dsl.Page, screen: string) {
     await page.evaluate(
         ({ screen }) => {
             return new Promise<void>((resolve) => {
@@ -221,11 +226,7 @@ export async function waitForSceneCreation(
     )
 }
 
-export async function setGameData(
-    page: puppeteer.Page,
-    key: string,
-    data: any
-) {
+export async function setGameData(page: dsl.Page, key: string, data: any) {
     await page.evaluate(
         ({ data }) => {
             window.game.registry.set(key, data)
