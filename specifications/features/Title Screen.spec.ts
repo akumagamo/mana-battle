@@ -15,12 +15,14 @@ describe("Title Screen", () => {
             await dsl.currentScreenIs(page, "Title Screen")
         })
 
-        const visibleOptions = [["New Game"], ["Credits"]]
-
-        test.each(visibleOptions)(
-            'I should see an option called "%s"',
-            async (btnName) => {
-                await optionIsVisible(btnName)
+        test.each`
+            optionName
+            ${"New Game"}
+            ${"Credits"}
+        `(
+            "I should see an option called $optionName",
+            async ({ optionName }: { optionName: string }) => {
+                await optionIsVisible(optionName)
             }
         )
     })
@@ -68,8 +70,6 @@ const textIsVisible = (text: string) =>
 
 const textIsNotVisible = (text: string) =>
     dsl.textIsNotVisible(page, "Title Screen", text)
-
-
 
 function openTitleScreen() {
     beforeAll(async () => {
