@@ -218,7 +218,7 @@ async function assertAllSquadsAreVisible() {
         const squads: SquadIndex = scene.data.get("_state").squads
 
         const allRendered = squads.every((squad) =>
-            Boolean(scene.children.getByName(squad.id.get("squad")))
+            Boolean(scene.children.getByName(squad.id.get("squad", "")))
         )
 
         if (!allRendered) throw new Error("Not all squads have been rendered")
