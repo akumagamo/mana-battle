@@ -116,13 +116,11 @@ describe("Map Screen", () => {
     })
 
     describe("Squad Movement", () => {
-        test.todo("User has opened Map Screen")
+        test("Given that I have nothing selected", assertNoEntityIsSelected)
 
-        test.todo("User has nothing selected")
+        test(`When I select an allied squad`, selectAnySquadFromForce("allied"))
 
-        test.todo("User selects a friendly squad")
-
-        test.todo('/^User selects option "(.*)"$/')
+        test('When I select the Move Squad option', selectOption("Map Screen UI")("Move Squad"))
 
         test.todo("User selects a location in the map")
 
