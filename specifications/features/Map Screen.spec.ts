@@ -31,7 +31,7 @@ describe("Map Screen", () => {
     describe("Map Creation", () => {
         openMapScreen(defaultParameters)
         test("I should be in the Map Screen", assertCurrentScreen)
-        test("I have nothing selected", assertNothingSelected)
+        test("I have nothing selected", assertNoEntityIsSelected)
         test("I should see the map", assertMapIsVisible)
         test("I should see all squads", assertAllSquadsAreVisible)
         test("I should see all cities", assertAllCitiesAreVisible)
@@ -88,15 +88,19 @@ describe("Map Screen", () => {
     })
 
     describe("Open Squad Details", () => {
-        test.todo("User has opened Map Screen")
-
-        test.todo("User has nothing selected")
-
-        test.todo("/^User selects a x")
-
-        test.todo("/^User selects option x")
-
-        test.todo('/^Modal "(.*)" is visible$/')
+        describe.each`
+            squadType
+            ${"allied"}
+            ${"enemy"}
+        `(
+            "view squad details for $squadType squad",
+            ({ squadType }: { squadType: ForceType }) => {
+                test("Given that I have nothing selected", assertNoEntityIsSelected)
+                test.todo(`When I select an ${squadType} squad`)
+                test.todo("When I select the Squad Details option ")
+                test.todo("Then I should see the Squad Details Modal")
+            }
+        )
     })
 
     describe("Squad Movement", () => {
@@ -233,11 +237,6 @@ async function assertMapIsVisible() {
     })
 
     expect(types).toContain("TilemapLayer")
-}
-
-async function assertNothingSelected() {
-    const selectedUnit = await dsl.getData(page, "Map Screen", "selectedUnit")
-    expect(selectedUnit).toBeUndefined()
 }
 
 function openMapScreen(params: MapScreenProperties) {
