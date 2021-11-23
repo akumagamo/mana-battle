@@ -1,5 +1,6 @@
 import { fadeIn } from "../UI/Transition"
 import checkSquadOverlap from "./events/checkSquadOverlap"
+import selectMoveDestination from "./events/selectMoveDestination"
 import { createMap } from "./map"
 import { createInitialState, getState, MapScreenProperties } from "./Model"
 import { createSquad } from "./squad"
@@ -25,4 +26,8 @@ export const create = async (scene: Phaser.Scene, params:MapScreenProperties) =>
     fadeIn(scene, 500)
 
     scene.game.events.emit("Map Screen Created")
+
+    scene.events.on('Select Move Destination', (squadId:string) =>{
+      selectMoveDestination(squadId, map, scene)
+    })
 }

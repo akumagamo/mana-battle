@@ -120,7 +120,10 @@ describe("Map Screen", () => {
 
         test(`When I select an allied squad`, selectAnySquadFromForce("allied"))
 
-        test('When I select the Move Squad option', selectOption("Map Screen UI")("Move Squad"))
+        test(
+            "When I select the Move Squad option",
+            selectOption("Map Screen UI")("Move Squad")
+        )
 
         test.todo("User selects a location in the map")
 
