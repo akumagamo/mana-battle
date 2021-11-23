@@ -58,7 +58,7 @@ describe("Map Screen", () => {
 
                 test(
                     `When I select an ${squadType} squad`,
-                    selectSquadOfType(squadType)
+                    selectAnySquadFromForce(squadType)
                 )
 
                 test(
@@ -69,7 +69,7 @@ describe("Map Screen", () => {
                 test(
                     `Then I should see the View Squad Details option`,
                     assertOptionVisibilityInUI({
-                        optionName: "View Squad Details Button",
+                        optionName: "View Squad Details",
                         shouldBeVisible: true,
                     })
                 )
@@ -77,9 +77,9 @@ describe("Map Screen", () => {
                 test(
                     `Then I ${should(
                         canSeeEditOption
-                    )} see the View Move Squad option`,
+                    )} see the Move Squad option`,
                     assertOptionVisibilityInUI({
-                        optionName: "Move Squad Button",
+                        optionName: "Move Squad",
                         shouldBeVisible: canSeeEditOption,
                     })
                 )
@@ -95,12 +95,18 @@ describe("Map Screen", () => {
         `(
             "view squad details for $squadType squad",
             ({ squadType }: { squadType: ForceType }) => {
-                test("Given that I have nothing selected", assertNoEntityIsSelected)
+                test(
+                    "Given that I have nothing selected",
+                    assertNoEntityIsSelected
+                )
                 test(
                     `When I select an ${squadType} squad`,
-                    selectSquadOfType(squadType)
+                    selectAnySquadFromForce(squadType)
                 )
-                test.todo("When I select the Squad Details option ")
+                test(
+                    "When I select the Squad Details option",
+                    selectOption("Map Screen UI")("View Squad Details")
+                )
                 test.todo("Then I should see the Squad Details Modal")
             }
         )
@@ -179,9 +185,28 @@ function assertOptionVisibilityInUI({
         )
 
         if (visible && !shouldBeVisible)
-            throw new Error(`Button "${optionName}" should not be visible`)
+            throw new Error(`Option "${optionName}" should not be visible`)
         else if (!visible && shouldBeVisible)
-            throw new Error(`Button "${optionName}" should be visible`)
+            throw new Error(`Option "${optionName}" should be visible`)
+    }
+}
+
+function selectOption(sceneName: string) {
+    return (optionName: string) => {
+        return async () =>
+            await page.evaluate(
+                ({ optionName, sceneName }) => {
+                    const scene = window.game.scene.getScene(sceneName)
+
+                    const option = scene.children.getByName(optionName)
+                    if (!option)
+                        throw new Error(
+                            `Scene ${sceneName} : Option with label "${optionName}" is not visible`
+                        )
+                    option.emit("pointerup")
+                },
+                { optionName, sceneName }
+            )
     }
 }
 
@@ -253,40 +278,33 @@ function openMapScreen(params: MapScreenProperties) {
 }
 
 type ForceType = "allied" | "enemy"
-function selectSquadOfType(squadType: ForceType) {
-    return async () => {
-        if (squadType === "allied") {
-            selectAnySquadFromForce("PLAYER")
-        } else if (squadType === "enemy") {
-            selectAnySquadFromForce("CPU")
-        } else throw new Error(`Invalid squad type: ${squadType}`)
-    }
-}
+
 async function assertCurrentScreen() {
     await dsl.currentScreenIs(page, "Map Screen")
 }
 
-async function selectAnySquadFromForce(force: string) {
-    await page.evaluate(
-        ({ force }) => {
-            const scene = window.game.scene.getScene("Map Screen")
-            console.log(scene.data.get("_state"))
-            const first = (
-                scene.data.get("_state") as MapSceneState
-            ).squads.find((s: Squad) => s.force.get("force") === force)
+function selectAnySquadFromForce(forceType: string) {
+    const force = forceType === "enemy" ? "CPU" : "PLAYER"
+    return async () =>
+        await page.evaluate(
+            ({ force }) => {
+                const scene = window.game.scene.getScene("Map Screen")
+                const first = (
+                    scene.data.get("_state") as MapSceneState
+                ).squads.find((s: Squad) => s.force.get("force") === force)
 
-            if (!first) throw new Error("No squad for selection")
+                if (!first) throw new Error("No squad for selection")
 
-            const squadId = first.id.get("squad")
+                const squadId = first.id.get("squad")
 
-            if (!squadId) throw new Error("Invalid squad: no id")
+                if (!squadId) throw new Error("Invalid squad: no id")
 
-            const squad = scene.children.getByName(squadId)
+                const squad = scene.children.getByName(squadId)
 
-            if (!squad) throw new Error("Squad not created")
+                if (!squad) throw new Error("Squad not created")
 
-            squad.emit("pointerup")
-        },
-        { force }
-    )
+                squad.emit("pointerup")
+            },
+            { force }
+        )
 }
