@@ -96,7 +96,10 @@ describe("Map Screen", () => {
             "view squad details for $squadType squad",
             ({ squadType }: { squadType: ForceType }) => {
                 test("Given that I have nothing selected", assertNoEntityIsSelected)
-                test.todo(`When I select an ${squadType} squad`)
+                test(
+                    `When I select an ${squadType} squad`,
+                    selectSquadOfType(squadType)
+                )
                 test.todo("When I select the Squad Details option ")
                 test.todo("Then I should see the Squad Details Modal")
             }
