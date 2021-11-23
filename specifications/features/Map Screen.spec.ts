@@ -107,7 +107,10 @@ describe("Map Screen", () => {
                     "When I select the Squad Details option",
                     selectOption("Map Screen UI")("View Squad Details")
                 )
-                test.todo("Then I should see the Squad Details Modal")
+                test(
+                    "Then I should see the Squad Details Modal",
+                    textIsVisibleInUI("These are the squad details")
+                )
             }
         )
     })
@@ -307,4 +310,8 @@ function selectAnySquadFromForce(forceType: string) {
             },
             { force }
         )
+}
+
+function textIsVisibleInUI(text: string) {
+    return async () => dsl.textIsVisible(page, "Map Screen UI", text)
 }

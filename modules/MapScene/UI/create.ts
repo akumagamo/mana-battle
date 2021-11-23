@@ -1,6 +1,7 @@
 import UI from "../../UI"
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../_shared/constants"
 import { getState, getSquad, isAllied } from "../Model"
+import createSquadDetailsModal from "./squadDetailsModal"
 
 const BG_TEXTURE = "panel"
 const PANEL_HEIGHT = 100
@@ -22,7 +23,7 @@ export const create = async (scene: Phaser.Scene) => {
             SCREEN_HEIGHT - 50,
             VIEW_SQUAD_DETAILS_LABEL,
             () => {
-                console.log("view squad details for", squadId)
+                createSquadDetailsModal(scene)
             }
         )
 
