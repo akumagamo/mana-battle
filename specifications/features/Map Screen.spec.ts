@@ -9,7 +9,7 @@ import {
     Squad,
 } from "../../modules/MapScene/Model"
 
-dsl.openGame()
+beforeAll(dsl.openGame)
 
 afterAll(async () => {
     await dsl.removeScene("Map Screen")

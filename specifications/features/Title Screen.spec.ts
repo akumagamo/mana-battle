@@ -1,7 +1,7 @@
 import * as dsl from "../dsl"
 import "expect-puppeteer"
 
-dsl.openGame()
+beforeAll(dsl.openGame)
 
 afterAll(async () => {
     await dsl.removeScene("Title Screen")

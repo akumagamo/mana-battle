@@ -9,14 +9,16 @@ declare global {
 
 const port = process.env.CI ? 3333 : 3000
 
-export function openGame() {
+export async function openGame() {
     const url = `http://localhost:${port}`
+    console.log(`Opening ${url}`)
+    console.time(`page load`)
 
-    console.log(`opening ${url}`)
-    beforeAll(async () => {
-        await page.goto(url)
-        await waitForSceneCreation(page, "Core Screen")
-    })
+    await page.goto(url)
+    await waitForSceneCreation(page, "Core Screen")
+
+    console.log(`Page is ready for testing`)
+    console.timeEnd(`page load`)
 }
 
 export async function removeScene(scene: string) {
