@@ -33,20 +33,22 @@ describe("Map Screen", () => {
         test("Then I should see the map", assertMapIsVisible)
         test("Then I should see all squads", assertAllSquadsAreVisible)
         test("Then I should see all cities", assertAllCitiesAreVisible)
-        test("Then I the game is unpaused", assertGameIsUnpaused)
+        test("Then I the game is unpaused", gameShouldBePaused(false))
     })
 
     describe("Squad Selection", () => {
         describe.each`
-            squadType   | canSeeEditOption
-            ${"allied"} | ${true}
-            ${"enemy"}  | ${false}
+            squadId | squadType   | canSeeEditOption
+            ${"0"}  | ${"allied"} | ${true}
+            ${"1"}  | ${"enemy"}  | ${false}
         `(
             "$squadType squad selection",
             ({
                 squadType,
                 canSeeEditOption,
+                squadId,
             }: {
+                squadId: string
                 squadType: ForceType
                 canSeeEditOption: boolean
             }) => {
@@ -57,10 +59,10 @@ describe("Map Screen", () => {
 
                 test(
                     `When I select an ${squadType} squad`,
-                    selectAnySquadFromForce(squadType)
+                    selectSquad(squadId)
                 )
 
-                test("Then the game is paused", assertGameIsPaused)
+                test("Then the game is paused", gameShouldBePaused(true))
 
                 test(
                     `Then I should see the View Squad Details option`,
@@ -85,19 +87,25 @@ describe("Map Screen", () => {
 
     describe("Open Squad Details", () => {
         describe.each`
-            squadType
-            ${"allied"}
-            ${"enemy"}
+            squadId | squadType
+            ${"0"}  | ${"allied"}
+            ${"1"}  | ${"enemy"}
         `(
             "view squad details for $squadType squad",
-            ({ squadType }: { squadType: ForceType }) => {
+            ({
+                squadId,
+                squadType,
+            }: {
+                squadId: string
+                squadType: string
+            }) => {
                 test(
                     "Given that I have nothing selected",
                     assertNoEntityIsSelected
                 )
                 test(
-                    `When I select an ${squadType} squad`,
-                    selectAnySquadFromForce(squadType)
+                    `When I select an "${squadType}" squad`,
+                    selectSquad(squadId)
                 )
                 test(
                     "When I select the Squad Details option",
@@ -114,16 +122,20 @@ describe("Map Screen", () => {
     describe("Squad Movement", () => {
         test("Given that I have nothing selected", assertNoEntityIsSelected)
 
-        test(`When I select an allied squad`, selectAnySquadFromForce("allied"))
+        test(`When I select an allied squad`, selectSquad("0"))
 
         test(
             "When I select the Move Squad option",
             selectOption("Map Screen UI")("Move Squad")
         )
 
-        test.todo("User selects a location in the map")
+        test.skip("When I select a location in the map", async function () {
+            // const position = await page.evaluate(()=>{
+            // })
+            page.mouse.click(120, 120)
+        })
 
-        test.todo("Then the game is unpaused")
+        test.skip("Then the game is unpaused", gameShouldBePaused(false))
 
         test.todo("Unit moves to that location")
     })
@@ -210,11 +222,15 @@ function selectOption(sceneName: string) {
     }
 }
 
-async function assertGameIsPaused() {
-    await page.evaluate(() => {
-        const scene = window.game.scene.getScene("Map Screen")
-        if (!scene.physics.world.isPaused) throw new Error("Game is not paused")
-    })
+function gameShouldBePaused(shouldBePaused: boolean) {
+    return async () =>
+        await page.evaluate((shouldBePaused) => {
+            const scene = window.game.scene.getScene("Map Screen")
+            if (shouldBePaused && !scene.physics.world.isPaused)
+                throw new Error("Game is not paused")
+            else if (!shouldBePaused && scene.physics.world.isPaused)
+                throw new Error("Game should not be paused")
+        }, shouldBePaused)
 }
 
 async function assertNoEntityIsSelected() {
@@ -223,13 +239,6 @@ async function assertNoEntityIsSelected() {
         const screenUI = window.game.scene.getScene("Map Screen UI")
         const selectedUnitUI = screenUI.children.getByName("Selected Unit Info")
         if (selectedUnitUI) throw new Error("There is a selected unit")
-    })
-}
-
-async function assertGameIsUnpaused() {
-    await page.evaluate(() => {
-        const scene = window.game.scene.getScene("Map Screen")
-        if (scene.physics.world.isPaused) throw new Error("Game is paused")
     })
 }
 
@@ -268,10 +277,6 @@ async function assertMapIsVisible() {
     expect(types).toContain("TilemapLayer")
 }
 
-function openMapScreen(params: MapScreenProperties) {
-    beforeAll(resetScreen(params))
-}
-
 type ForceType = "allied" | "enemy"
 
 function resetScreen(params: MapScreenProperties) {
@@ -284,29 +289,19 @@ function resetScreen(params: MapScreenProperties) {
     }
 }
 
-function selectAnySquadFromForce(forceType: string) {
-    const force = forceType === "enemy" ? "CPU" : "PLAYER"
+function selectSquad(id: string) {
     return async () =>
         await page.evaluate(
-            ({ force }) => {
+            ({ id }) => {
                 const scene = window.game.scene.getScene("Map Screen")
-                const first = (
-                    scene.data.get("_state") as MapSceneState
-                ).squads.find((s: Squad) => s.force.get("force") === force)
 
-                if (!first) throw new Error("No squad for selection")
-
-                const squadId = first.id.get("squad")
-
-                if (!squadId) throw new Error("Invalid squad: no id")
-
-                const squad = scene.children.getByName(squadId)
+                const squad = scene.children.getByName(id)
 
                 if (!squad) throw new Error("Squad not created")
 
                 squad.emit("pointerup")
             },
-            { force }
+            { id }
         )
 }
 
