@@ -88,6 +88,7 @@ describe("Map Screen", () => {
     })
 
     describe("Open Squad Details", () => {
+
         describe.each`
             squadType
             ${"allied"}
@@ -95,6 +96,8 @@ describe("Map Screen", () => {
         `(
             "view squad details for $squadType squad",
             ({ squadType }: { squadType: ForceType }) => {
+
+                openMapScreen(defaultParameters)
                 test(
                     "Given that I have nothing selected",
                     assertNoEntityIsSelected
@@ -116,6 +119,8 @@ describe("Map Screen", () => {
     })
 
     describe("Squad Movement", () => {
+
+        openMapScreen(defaultParameters)
         test("Given that I have nothing selected", assertNoEntityIsSelected)
 
         test(`When I select an allied squad`, selectAnySquadFromForce("allied"))
@@ -125,7 +130,7 @@ describe("Map Screen", () => {
             selectOption("Map Screen UI")("Move Squad")
         )
 
-        test.todo("User selects a location in the map")
+        test("User selects a location in the map", selectMapLocation(120,120))
 
         test.todo("Game is unpaused")
 
@@ -311,6 +316,13 @@ function selectAnySquadFromForce(forceType: string) {
             },
             { force }
         )
+}
+
+function selectMapLocation(x:number,y:number){
+  return async ()=>{
+    await page.mouse.click(x,y)
+    await page.waitForTimeout(5000);
+  }
 }
 
 function textIsVisibleInUI(text: string) {

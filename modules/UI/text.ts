@@ -11,17 +11,16 @@ import { Scene } from "phaser"
 let metrics: Phaser.Types.GameObjects.Text.TextMetrics | undefined = undefined
 
 export default (scene: Scene) => (x: number, y: number, str: string | number) => {
-    const text = scene.add.text(
-        x,
-        y,
-        typeof str === "number" ? str.toString() : str,
-        {
+    const label = typeof str === "number" ? str.toString() : str
+    const text = scene.add
+        .text(x, y, label, {
             color: "#ffffff",
             fontSize: "24px",
             fontFamily: "sans-serif",
             metrics,
-        }
-    )
+        })
+        .setName(label)
+        .setOrigin(0.5)
 
     if (!metrics) {
         metrics = text.getTextMetrics()

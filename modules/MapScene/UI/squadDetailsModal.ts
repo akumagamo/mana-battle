@@ -6,7 +6,7 @@ import {
     SCREEN_WIDTH,
 } from "../../_shared/constants"
 
-export default function createSquadDetailsModal(scene: Phaser.Scene) {
+export default (scene: Phaser.Scene) => () => {
     const group = scene.add.group().setName("Squad Details Window")
 
     const panel = scene.add
