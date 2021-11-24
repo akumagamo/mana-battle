@@ -20,9 +20,9 @@ async function buttonClicked(scene: Phaser.Scene) {
     const defaultParameters = createMapScreenProperties({
         squads: [
             [100, 100, "PLAYER"],
+            [200, 200, "CPU"],
             [800, 900, "PLAYER"],
             [900, 900, "PLAYER"],
-            [200, 200, "CPU"],
         ],
         cities: [
             [50, 50, "PLAYER"],

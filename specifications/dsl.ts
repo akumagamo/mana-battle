@@ -12,13 +12,12 @@ const port = process.env.CI ? 3333 : 3000
 export async function openGame() {
     const url = `http://localhost:${port}`
     console.log(`Opening ${url}`)
-    console.time(`page load`)
+    console.time(`Page is ready for testing`)
 
     await page.goto(url)
     await waitForSceneCreation(page, "Core Screen")
 
-    console.log(`Page is ready for testing`)
-    console.timeEnd(`page load`)
+    console.timeEnd(`Page is ready for testing`)
 }
 
 export async function removeScene(scene: string) {

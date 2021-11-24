@@ -62,6 +62,8 @@ describe("Map Screen", () => {
                     selectSquad(squadId)
                 )
 
+                page.waitForTimeout(10000)
+
                 test("Then the game is paused", gameShouldBePaused(true))
 
                 test(
@@ -120,24 +122,38 @@ describe("Map Screen", () => {
     })
 
     describe("Squad Movement", () => {
-        test("Given that I have nothing selected", assertNoEntityIsSelected)
+        describe("Move to target location", () => {
+            test(
+                "Given that I am selecting the target destination for a squad",
+                selectMovementTargetForSquad("0")
+            )
+            test.skip("When I select a location in the map", async function () {
+                // const position = await page.evaluate(()=>{
+                // })
+                page.mouse.click(120, 120)
+            })
 
-        test(`When I select an allied squad`, selectSquad("0"))
+            test.skip("Then the game is unpaused", gameShouldBePaused(false))
 
-        test(
-            "When I select the Move Squad option",
-            selectOption("Map Screen UI")("Move Squad")
-        )
-
-        test.skip("When I select a location in the map", async function () {
-            // const position = await page.evaluate(()=>{
-            // })
-            page.mouse.click(120, 120)
+            test.todo("Unit moves to that location")
         })
 
-        test.skip("Then the game is unpaused", gameShouldBePaused(false))
+        describe("Selecting a squad while selecting a movement target has no effect", () => {
+            test(
+                "Given that I am selecting the target destination for a squad",
+                selectMovementTargetForSquad("0")
+            )
 
-        test.todo("Unit moves to that location")
+            test(
+                "When I attempt to select the position where another unit is",
+                selectSquad("1")
+            )
+
+            test(
+                "Then I should still be selecting a target destination",
+                gameShouldBePaused(true)
+            )
+        })
     })
 
     describe("Squad Collision (friendly on enemy)", () => {
@@ -170,6 +186,51 @@ describe("Map Screen", () => {
         test.todo('/^The next screen should be "(.*)"$/')
     })
 })
+
+function selectSquad(id: string) {
+    return async () => {
+        const { x, y } = await page.evaluate(
+            ({ id }: { id: string }) => {
+                const sprite = window.game.scene
+                    .getScene("Map Screen")
+                    .children.getByName(id) as Phaser.Physics.Arcade.Sprite
+
+                const { canvas } = window.game
+                const camera =
+                    window.game.scene.getScene("Map Screen").cameras.main
+
+                const scaleX = 1 / window.game.scale.displayScale.x
+                const scaleY = 1 / window.game.scale.displayScale.y
+                const x =
+                    scaleX * sprite.x +
+                    canvas.offsetLeft -
+                    scaleX * camera.scrollX
+                const y =
+                    scaleY * sprite.y +
+                    canvas.offsetTop -
+                    scaleY * camera.scrollY
+
+                return {
+                    x,
+                    y,
+                }
+            },
+            { id }
+        )
+
+        await page.mouse.click(x, y)
+    }
+}
+
+function selectMovementTargetForSquad(id: string) {
+    return async () => {
+        await assertNoEntityIsSelected()
+
+        await selectSquad(id)()
+
+        await selectOption("Map Screen UI")("Move Squad")()
+    }
+}
 
 function should(condition: boolean) {
     return condition ? "should" : "shouldn't"
@@ -289,21 +350,21 @@ function resetScreen(params: MapScreenProperties) {
     }
 }
 
-function selectSquad(id: string) {
-    return async () =>
-        await page.evaluate(
-            ({ id }) => {
-                const scene = window.game.scene.getScene("Map Screen")
+// function selectSquad(id: string) {
+//     return async () =>
+//         await page.evaluate(
+//             ({ id }) => {
+//                 const scene = window.game.scene.getScene("Map Screen")
 
-                const squad = scene.children.getByName(id)
+//                 const squad = scene.children.getByName(id)
 
-                if (!squad) throw new Error("Squad not created")
+//                 if (!squad) throw new Error("Squad not created")
 
-                squad.emit("pointerup")
-            },
-            { id }
-        )
-}
+//                 squad.emit("pointerup")
+//             },
+//             { id }
+//         )
+// }
 
 function textIsVisibleInUI(text: string) {
     return async () => dsl.textIsVisible(page, "Map Screen UI", text)

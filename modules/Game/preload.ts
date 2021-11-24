@@ -26,7 +26,7 @@ export function progressBar(scene: Phaser.Scene) {
     // scene.load.on("fileprogress", (file: Phaser.Loader.File) => {
     //   console.log(file.src);
     // });
-    scene.load.on("complete", function() {
+    scene.load.on("complete", function () {
         //console.log("complete!");
         progressBar.destroy()
         progressBox.destroy()
@@ -35,7 +35,7 @@ export function progressBar(scene: Phaser.Scene) {
 
 const jobs = ["soldier"]
 export default (scene: Phaser.Scene) => {
-    jobs.forEach(job => {
+    jobs.forEach((job) => {
         scene.load.json(`${job}-data`, `${PUBLIC_URL}/jobs/${job}/data.json`)
         scene.load.atlas(
             `${job}_atlas`,
@@ -44,21 +44,23 @@ export default (scene: Phaser.Scene) => {
         )
     })
 
+    scene.load.image("squad_test", `${PUBLIC_URL}/sprites/squad_test.png`)
+
     scene.load.spritesheet("fire", `${PUBLIC_URL}/fire.svg`, {
         frameWidth: 50,
         frameHeight: 117,
         endFrame: 6,
     })
-    ;["map/kenney_tileset"].forEach(str =>
+    ;["map/kenney_tileset"].forEach((str) =>
         scene.load.image(str, PUBLIC_URL + "/" + str + ".png")
     )
-    ;["maps/map"].forEach(str =>
+    ;["maps/map"].forEach((str) =>
         scene.load.tilemapTiledJSON(str, PUBLIC_URL + "/" + str + ".json")
     )
-    ;["backgrounds/sunset", "board"].forEach(str =>
+    ;["backgrounds/sunset", "board"].forEach((str) =>
         scene.load.image(str, PUBLIC_URL + "/" + str + ".svg")
     )
-    ;["backgrounds/plain"].forEach(str =>
+    ;["backgrounds/plain"].forEach((str) =>
         scene.load.image(str, PUBLIC_URL + "/" + str + ".png")
     )
     const ui = [
