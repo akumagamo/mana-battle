@@ -69,8 +69,8 @@ export default function (
         scene.events.on(Phaser.Scenes.Events.UPDATE, checkArrival)
         scene.events.on(Phaser.Scenes.Events.UPDATE, adjustSpeed)
 
-        events.emit("Squad Deselected")
-        events.emit(EVENT_CLOSE_SELET_MOVE_DESTINATION)
+        events(scene).emit("Squad Deselected")
+        events(scene).emit(EVENT_CLOSE_SELET_MOVE_DESTINATION)
         scene.physics.world.resume()
     }
 }

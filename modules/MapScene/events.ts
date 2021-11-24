@@ -1,5 +1,3 @@
-import EventEmitter from "events"
-
-const events = new EventEmitter()
+const events = (scene: Phaser.Scene) => scene.scene.get("Map Screen").events
 
 export default events

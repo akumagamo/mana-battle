@@ -21,7 +21,7 @@ export function squadSelected(scene: Phaser.Scene) {
 
         if (isAllied(getSquad(squadId)(getState(scene)))) {
             UI.button(scene)(250, SCREEN_HEIGHT - 50, MOVE_SQUAD_LABEL, () => {
-                events.emit("Select Move Destination", squadId)
+                events(scene).emit("Select Move Destination", squadId)
             })
         }
     }

@@ -27,7 +27,7 @@ export default (scene: Phaser.Scene) => {
 
     actions.forEach(listen(scene))
 
-    events.on(EVENT_CLOSE_SELET_MOVE_DESTINATION, () => {
+    events(scene).on(EVENT_CLOSE_SELET_MOVE_DESTINATION, () => {
         SELECT_MOVE_DESTIONATION_OPTIONS.forEach((opt) => {
             scene.children.getByName(opt)?.destroy()
         })
@@ -36,7 +36,7 @@ export default (scene: Phaser.Scene) => {
 
 function listen(scene: Phaser.Scene) {
     return (ev: (scn: Phaser.Scene) => (squad: string) => void) => {
-        events.on("Select Move Destination", ev(scene))
+        events(scene).on("Select Move Destination", ev(scene))
     }
 }
 
@@ -58,6 +58,6 @@ function renderCancelOption(scene: Phaser.Scene) {
             SCREEN_WIDTH - 150,
             SCREEN_HEIGHT - 60,
             CANCEL_OPTION_LABEL,
-            () => events.emit("Move Squad Cancelled", squad)
+            () => events(scene).emit("Move Squad Cancelled", squad)
         )
 }

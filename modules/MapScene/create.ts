@@ -30,7 +30,7 @@ export const create = async (
 
     scene.game.events.emit("Map Screen Created")
 
-    events.on("Select Move Destination", (squadId: string) => {
+    events(scene).on("Select Move Destination", (squadId: string) => {
         selectMoveDestination(squadId, map, scene)
     })
 }
