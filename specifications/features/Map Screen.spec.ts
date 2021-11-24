@@ -29,13 +29,11 @@ const defaultParameters = createMapScreenProperties({
 
 describe("Map Screen", () => {
     describe("Map Creation", () => {
-        openMapScreen(defaultParameters)
-        test("I should be in the Map Screen", assertCurrentScreen)
-        test("I have nothing selected", assertNoEntityIsSelected)
-        test("I should see the map", assertMapIsVisible)
-        test("I should see all squads", assertAllSquadsAreVisible)
-        test("I should see all cities", assertAllCitiesAreVisible)
-        test("Game is unpaused", assertGameIsUnpaused)
+        test("Given that I have nothing selected", assertNoEntityIsSelected)
+        test("Then I should see the map", assertMapIsVisible)
+        test("Then I should see all squads", assertAllSquadsAreVisible)
+        test("Then I should see all cities", assertAllCitiesAreVisible)
+        test("Then I the game is unpaused", assertGameIsUnpaused)
     })
 
     describe("Squad Selection", () => {
@@ -52,19 +50,17 @@ describe("Map Screen", () => {
                 squadType: ForceType
                 canSeeEditOption: boolean
             }) => {
-                openMapScreen(defaultParameters)
-
-                test("When I have no squad selected", assertNoEntityIsSelected)
+                test(
+                    "Given that I have no squad selected",
+                    assertNoEntityIsSelected
+                )
 
                 test(
                     `When I select an ${squadType} squad`,
                     selectAnySquadFromForce(squadType)
                 )
 
-                test(
-                    "Then I should see that the game is paused",
-                    assertGameIsPaused
-                )
+                test("Then the game is paused", assertGameIsPaused)
 
                 test(
                     `Then I should see the View Squad Details option`,
@@ -127,7 +123,7 @@ describe("Map Screen", () => {
 
         test.todo("User selects a location in the map")
 
-        test.todo("Game is unpaused")
+        test.todo("Then the game is unpaused")
 
         test.todo("Unit moves to that location")
     })
@@ -222,6 +218,7 @@ async function assertGameIsPaused() {
 }
 
 async function assertNoEntityIsSelected() {
+    await resetScreen(defaultParameters)()
     await page.evaluate(() => {
         const screenUI = window.game.scene.getScene("Map Screen UI")
         const selectedUnitUI = screenUI.children.getByName("Selected Unit Info")
@@ -272,19 +269,19 @@ async function assertMapIsVisible() {
 }
 
 function openMapScreen(params: MapScreenProperties) {
-    beforeAll(async () => {
+    beforeAll(resetScreen(params))
+}
+
+type ForceType = "allied" | "enemy"
+
+function resetScreen(params: MapScreenProperties) {
+    return async () => {
         await page.evaluate((params) => {
             window.game.scene.remove("Map Screen UI")
             window.game.scene.remove("Map Screen")
             window.game.events.emit("Start Map Screen", params)
         }, params)
-    })
-}
-
-type ForceType = "allied" | "enemy"
-
-async function assertCurrentScreen() {
-    await dsl.currentScreenIs(page, "Map Screen")
+    }
 }
 
 function selectAnySquadFromForce(forceType: string) {
