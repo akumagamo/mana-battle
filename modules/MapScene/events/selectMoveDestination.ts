@@ -44,6 +44,7 @@ export default function (
         if (distance <= 10) {
             sprite.body.velocity.reset()
             clearEvents()
+            scene.events.emit("Squad Arrived", sprite.name)
         }
     }
     function movementOrderAssigned(pointer: Phaser.Input.Pointer) {

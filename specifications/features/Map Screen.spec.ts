@@ -127,15 +127,14 @@ describe("Map Screen", () => {
                 "Given that I am selecting the target destination for a squad",
                 selectMovementTargetForSquad("0")
             )
-            test.skip("When I select a location in the map", async function () {
-                // const position = await page.evaluate(()=>{
-                // })
-                page.mouse.click(120, 120)
+            test("When I select a location in the map", async function () {
+                await page.mouse.click(110, 110)
+                await page.waitForTimeout(50)
             })
 
-            test.skip("Then the game is unpaused", gameShouldBePaused(false))
+            test("Then the game is unpaused", gameShouldBePaused(false))
 
-            test.todo("Unit moves to that location")
+            test("Unit moves to that location", waitForSquadArrival("0"))
         })
 
         describe("Selecting a squad while selecting a movement target has no effect", () => {
@@ -350,22 +349,19 @@ function resetScreen(params: MapScreenProperties) {
     }
 }
 
-// function selectSquad(id: string) {
-//     return async () =>
-//         await page.evaluate(
-//             ({ id }) => {
-//                 const scene = window.game.scene.getScene("Map Screen")
-
-//                 const squad = scene.children.getByName(id)
-
-//                 if (!squad) throw new Error("Squad not created")
-
-//                 squad.emit("pointerup")
-//             },
-//             { id }
-//         )
-// }
-
+function waitForSquadArrival(squadId: string) {
+    return async () => {
+        await page.evaluate((expectedId: string) => {
+            return new Promise<string>((resolve) => {
+                window.game.scene
+                    .getScene("Map Screen")
+                    .events.once("Squad Arrived", (id: string) => {
+                        if (expectedId === id) resolve(id)
+                    })
+            })
+        }, squadId)
+    }
+}
 function textIsVisibleInUI(text: string) {
     return async () => dsl.textIsVisible(page, "Map Screen UI", text)
 }
