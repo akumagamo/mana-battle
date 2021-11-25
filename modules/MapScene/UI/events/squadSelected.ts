@@ -13,14 +13,14 @@ export function squadSelected(scene: Phaser.Scene) {
         deleteOptions(scene)(squadId)
 
         UI.button(scene)(
-            100,
+            200,
             SCREEN_HEIGHT - 50,
             VIEW_SQUAD_DETAILS_LABEL,
             createSquadDetailsModal(scene)
         )
 
         if (isAllied(getSquad(squadId)(getState(scene)))) {
-            UI.button(scene)(250, SCREEN_HEIGHT - 50, MOVE_SQUAD_LABEL, () => {
+            UI.button(scene)(500, SCREEN_HEIGHT - 50, MOVE_SQUAD_LABEL, () => {
                 events(scene).emit("Select Move Destination", squadId)
             })
         }

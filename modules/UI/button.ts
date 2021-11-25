@@ -20,9 +20,10 @@ export default (scene: Scene) =>
             .setDisplaySize(width, height)
 
         const text_ = text(scene)(0, 0, label)
-        text_.setOrigin(0.5)
-        text_.setShadow(2, 2, "#000")
-        text_.setColor("#fff")
+            .setOrigin(0.5)
+            .setShadow(2, 2, "#000")
+            .setColor("#fff")
+            .setFontStyle("bold")
 
         const container = scene.add
             .container(x, y)
