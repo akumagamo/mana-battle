@@ -59,7 +59,7 @@ describe("Map Screen", () => {
 
                 test(
                     `When I select an ${squadType} squad`,
-                    selectSquad(squadId)
+                    dsl.click("Map Screen")(squadId)
                 )
 
                 page.waitForTimeout(10000)
@@ -107,7 +107,7 @@ describe("Map Screen", () => {
                 )
                 test(
                     `When I select an "${squadType}" squad`,
-                    selectSquad(squadId)
+                    dsl.click('Map Screen')(squadId)
                 )
                 test(
                     "When I select the Squad Details option",
@@ -145,7 +145,7 @@ describe("Map Screen", () => {
 
             test(
                 "When I attempt to select the position where another unit is",
-                selectSquad("1")
+                dsl.click('Map Screen')("1")
             )
 
             test(
@@ -186,46 +186,11 @@ describe("Map Screen", () => {
     })
 })
 
-function selectSquad(id: string) {
-    return async () => {
-        const { x, y } = await page.evaluate(
-            ({ id }: { id: string }) => {
-                const sprite = window.game.scene
-                    .getScene("Map Screen")
-                    .children.getByName(id) as Phaser.Physics.Arcade.Sprite
-
-                const { canvas } = window.game
-                const camera =
-                    window.game.scene.getScene("Map Screen").cameras.main
-
-                const scaleX = 1 / window.game.scale.displayScale.x
-                const scaleY = 1 / window.game.scale.displayScale.y
-                const x =
-                    scaleX * sprite.x +
-                    canvas.offsetLeft -
-                    scaleX * camera.scrollX
-                const y =
-                    scaleY * sprite.y +
-                    canvas.offsetTop -
-                    scaleY * camera.scrollY
-
-                return {
-                    x,
-                    y,
-                }
-            },
-            { id }
-        )
-
-        await page.mouse.click(x, y)
-    }
-}
-
 function selectMovementTargetForSquad(id: string) {
     return async () => {
         await assertNoEntityIsSelected()
 
-        await selectSquad(id)()
+        await dsl.click("Map Screen")(id)()
 
         await selectOption("Map Screen UI")("Move Squad")()
     }

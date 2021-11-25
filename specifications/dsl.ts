@@ -25,22 +25,6 @@ export async function removeScene(scene: string) {
         window.game.scene.remove(scene)
     }, scene)
 }
-/** Returns data from a scene. It must be serializable, otherwise it
- * will return  undefined */
-export const getData = async (
-    page: dsl.Page,
-    sceneName: string,
-    key: string
-) => {
-    return await page.evaluate(
-        ({ sceneName, key }) => {
-            const scene = window.game.scene.getScene(sceneName)
-
-            return scene.data.get(key)
-        },
-        { sceneName, key }
-    )
-}
 
 export const currentScreenIs = async (page: dsl.Page, sceneName: string) => {
     const ok = await page.evaluate(
@@ -52,21 +36,13 @@ export const currentScreenIs = async (page: dsl.Page, sceneName: string) => {
 
     if (!ok) throw new Error(`Screen ${sceneName} is not active`)
 }
-export const startNewGame = async (page: dsl.Page) => {
-    await click(1280 / 2, 768 / 2, page)
-}
-
-export const click = async (x: number, y: number, page: dsl.Page) => {
-    await page.waitForTimeout(300) // equals 200 actions per minute
-    page.mouse.click(x, y)
-}
 
 export const dragAndDrop = async (
     from: { x: number; y: number },
     to: { x: number; y: number },
     page: dsl.Page
 ) => {
-    await page.waitForTimeout(300)
+    await page.waitForTimeout(100)
     page.mouse.move(from.x || 0, from.y || 0)
     page.mouse.down()
 
@@ -77,6 +53,9 @@ export const dragAndDrop = async (
     page.mouse.up()
 }
 
+/**
+ * @TODO: replace with `click`?
+ */
 export async function clickButton(
     page: dsl.Page,
     scene: string,
@@ -193,6 +172,10 @@ export async function textIsVisible(
             `Text with label "${label}" on scene "${scene}" is not present.`
         )
 }
+
+/** 
+ * @TODO: make visible/not visible a parameter
+ */
 export async function textIsNotVisible(
     page: dsl.Page,
     scene: string,
@@ -217,6 +200,9 @@ export async function textIsNotVisible(
             `Text with label ${label} on scene ${scene} is present.`
         )
 }
+/**
+ * @TODO: refactor this as 'waitForGameEvent'
+ */
 export async function waitForSceneCreation(page: dsl.Page, screen: string) {
     await page.evaluate(
         ({ screen }) => {
@@ -230,11 +216,34 @@ export async function waitForSceneCreation(page: dsl.Page, screen: string) {
     )
 }
 
-export async function setGameData(page: dsl.Page, key: string, data: any) {
-    await page.evaluate(
-        ({ data }) => {
-            window.game.registry.set(key, data)
+/**
+ * Attempts to click in an object that is a direct child of a scene.
+ * @TODO: make this throw an error if the object position is outside the screen
+ */
+export const click = (scene: string) => (id: string) => async () => {
+    const { x, y } = await page.evaluate(
+        ({ id, scene }: { id: string; scene: string }) => {
+            const sprite = window.game.scene
+                .getScene(scene)
+                .children.getByName(id) as Phaser.GameObjects.Sprite
+
+            const { canvas } = window.game
+            const camera = window.game.scene.getScene(scene).cameras.main
+
+            const scaleX = 1 / window.game.scale.displayScale.x
+            const scaleY = 1 / window.game.scale.displayScale.y
+            const x =
+                scaleX * sprite.x + canvas.offsetLeft - scaleX * camera.scrollX
+            const y =
+                scaleY * sprite.y + canvas.offsetTop - scaleY * camera.scrollY
+
+            return {
+                x,
+                y,
+            }
         },
-        { data }
+        { id, scene }
     )
+
+    await page.mouse.click(x, y)
 }
