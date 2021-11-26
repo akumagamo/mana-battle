@@ -11,10 +11,6 @@ describe("Title Screen", () => {
     describe("Opening the Title Screen", () => {
         openTitleScreen()
 
-        test("I should be in the Title Screen", async () => {
-            await dsl.currentScreenIs(page, "Title Screen")
-        })
-
         test.each`
             optionName
             ${"New Game"}
@@ -56,20 +52,19 @@ describe("Title Screen", () => {
         test("When I choose the 'New Game' option", async () =>
             await choose("New Game"))
         test("Then the next screen should be the 'Map Screen'", async () =>
-            await dsl.waitForSceneCreation(page, "Map Screen"))
+            await dsl.waitForSceneCreation("Map Screen"))
     })
 })
 
-const choose = (label: string) => dsl.clickButton(page, "Title Screen", label)
+const choose = (label: string) => dsl.clickButton("Title Screen", label)
 
 const optionIsVisible = (label: string) =>
-    dsl.buttonIsRendered(page, "Title Screen", label)
+    dsl.buttonIsRendered("Title Screen", label)
 
-const textIsVisible = (text: string) =>
-    dsl.textIsVisible(page, "Title Screen", text)
+const textIsVisible = (text: string) => dsl.textIsVisible("Title Screen", text)
 
 const textIsNotVisible = (text: string) =>
-    dsl.textIsNotVisible(page, "Title Screen", text)
+    dsl.textIsNotVisible("Title Screen", text)
 
 function openTitleScreen() {
     beforeAll(async () => {

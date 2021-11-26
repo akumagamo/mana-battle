@@ -15,7 +15,7 @@ export async function openGame() {
     console.time(`Page is ready for testing`)
 
     await page.goto(url)
-    await waitForSceneCreation(page, "Core Screen")
+    await waitForSceneCreation("Core Screen")
 
     console.timeEnd(`Page is ready for testing`)
 }
@@ -26,32 +26,20 @@ export async function removeScene(scene: string) {
     }, scene)
 }
 
-export const currentScreenIs = async (page: dsl.Page, sceneName: string) => {
-    const ok = await page.evaluate(
-        ({ sceneName }) => {
-            return window.game.scene.isActive(sceneName)
-        },
-        { sceneName }
-    )
-
-    if (!ok) throw new Error(`Screen ${sceneName} is not active`)
-}
-
 export const drag = async ([x, y]: number[], [x_, y_]: number[]) => {
-    page.mouse.move(x, y)
+    await page.mouse.move(x, y)
 
-    page.mouse.down()
+    await page.mouse.down()
 
-    page.mouse.move(x_, y_)
+    await page.mouse.move(x_, y_)
 
-    page.mouse.up()
+    await page.mouse.up()
 }
 
 /**
  * @TODO: replace with `click`?
  */
 export async function clickButton(
-    page: dsl.Page,
     scene: string,
     label: string
 ) {
@@ -75,35 +63,7 @@ export async function clickButton(
         )
 }
 
-export async function sceneHasChild(
-    page: dsl.Page,
-    scene: string,
-    name: string,
-    shouldExist: boolean
-) {
-    const exists = await page.evaluate(
-        ({ scene, name }) => {
-            const element = window.game.scene
-                .getScene(scene)
-                .children.getByName(name)
-
-            return Boolean(element)
-        },
-        { scene, name }
-    )
-
-    if (shouldExist && !exists)
-        throw new Error(
-            `Element with name "${name}" on scene "${scene}" should exist.`
-        )
-    else if (!shouldExist && exists)
-        throw new Error(
-            `Element with name "${name}" on scene "${scene}" shouldn't exist.`
-        )
-}
-
 export async function buttonIsRendered(
-    page: dsl.Page,
     scene: string,
     label: string
 ) {
@@ -144,7 +104,6 @@ export async function buttonIsRendered(
 }
 
 export async function textIsVisible(
-    page: dsl.Page,
     scene: string,
     label: string
 ) {
@@ -171,7 +130,6 @@ export async function textIsVisible(
  * @TODO: make visible/not visible a parameter
  */
 export async function textIsNotVisible(
-    page: dsl.Page,
     scene: string,
     label: string
 ) {
@@ -197,7 +155,7 @@ export async function textIsNotVisible(
 /**
  * @TODO: refactor this as 'waitForGameEvent'
  */
-export async function waitForSceneCreation(page: dsl.Page, screen: string) {
+export async function waitForSceneCreation(screen: string) {
     await page.evaluate(
         ({ screen }) => {
             return new Promise<void>((resolve) => {

@@ -330,7 +330,7 @@ function waitForSquadArrival(squadId: string) {
     }
 }
 function textIsVisibleInUI(text: string) {
-    return async () => dsl.textIsVisible(page, "Map Screen UI", text)
+    return async () => dsl.textIsVisible("Map Screen UI", text)
 }
 
 function mapShouldBeDraggable(shouldBeDraggable: boolean) {
