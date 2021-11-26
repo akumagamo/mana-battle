@@ -5,8 +5,6 @@ import {
     SquadIndex,
     CityIndex,
     createMapScreenProperties,
-    MapSceneState,
-    Squad,
 } from "../../modules/MapScene/Model"
 
 beforeAll(dsl.openGame)
@@ -34,6 +32,10 @@ describe("Map Screen", () => {
         test("Then I should see all squads", assertAllSquadsAreVisible)
         test("Then I should see all cities", assertAllCitiesAreVisible)
         test("Then I the game is unpaused", gameShouldBePaused(false))
+        test(
+            "Then I should be able to move the map",
+            mapShouldBeDraggable(true)
+        )
     })
 
     describe("Squad Selection", () => {
@@ -107,7 +109,7 @@ describe("Map Screen", () => {
                 )
                 test(
                     `When I select an "${squadType}" squad`,
-                    dsl.click('Map Screen')(squadId)
+                    dsl.click("Map Screen")(squadId)
                 )
                 test(
                     "When I select the Squad Details option",
@@ -145,7 +147,7 @@ describe("Map Screen", () => {
 
             test(
                 "When I attempt to select the position where another unit is",
-                dsl.click('Map Screen')("1")
+                dsl.click("Map Screen")("1")
             )
 
             test(
@@ -329,4 +331,21 @@ function waitForSquadArrival(squadId: string) {
 }
 function textIsVisibleInUI(text: string) {
     return async () => dsl.textIsVisible(page, "Map Screen UI", text)
+}
+
+function mapShouldBeDraggable(shouldBeDraggable: boolean) {
+    return async () => {
+        const initialPosition = await dsl.getPositonOf("Map Screen")("0")
+
+        await dsl.drag([300, 300], [150, 150])
+
+        const finalPosition = await dsl.getPositonOf("Map Screen")("0")
+
+        if (shouldBeDraggable) {
+            expect(finalPosition.x).toBeLessThan(initialPosition.x)
+            expect(finalPosition.y).toBeLessThan(initialPosition.y)
+        } else {
+            expect(finalPosition).toStrictEqual(initialPosition)
+        }
+    }
 }

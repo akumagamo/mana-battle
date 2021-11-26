@@ -37,19 +37,13 @@ export const currentScreenIs = async (page: dsl.Page, sceneName: string) => {
     if (!ok) throw new Error(`Screen ${sceneName} is not active`)
 }
 
-export const dragAndDrop = async (
-    from: { x: number; y: number },
-    to: { x: number; y: number },
-    page: dsl.Page
-) => {
-    await page.waitForTimeout(100)
-    page.mouse.move(from.x || 0, from.y || 0)
+export const drag = async ([x, y]: number[], [x_, y_]: number[]) => {
+    page.mouse.move(x, y)
+
     page.mouse.down()
 
-    await page.waitForTimeout(100)
-    page.mouse.move(to.x || 0, to.y || 0)
+    page.mouse.move(x_, y_)
 
-    await page.waitForTimeout(100)
     page.mouse.up()
 }
 
@@ -173,7 +167,7 @@ export async function textIsVisible(
         )
 }
 
-/** 
+/**
  * @TODO: make visible/not visible a parameter
  */
 export async function textIsNotVisible(
@@ -216,12 +210,8 @@ export async function waitForSceneCreation(page: dsl.Page, screen: string) {
     )
 }
 
-/**
- * Attempts to click in an object that is a direct child of a scene.
- * @TODO: make this throw an error if the object position is outside the screen
- */
-export const click = (scene: string) => (id: string) => async () => {
-    const { x, y } = await page.evaluate(
+export const getPositonOf = (scene: string) => async (id: string) =>
+    page.evaluate(
         ({ id, scene }: { id: string; scene: string }) => {
             const sprite = window.game.scene
                 .getScene(scene)
@@ -232,6 +222,7 @@ export const click = (scene: string) => (id: string) => async () => {
 
             const scaleX = 1 / window.game.scale.displayScale.x
             const scaleY = 1 / window.game.scale.displayScale.y
+            
             const x =
                 scaleX * sprite.x + canvas.offsetLeft - scaleX * camera.scrollX
             const y =
@@ -245,5 +236,11 @@ export const click = (scene: string) => (id: string) => async () => {
         { id, scene }
     )
 
+/**
+ * Attempts to click in an object that is a direct child of a scene.
+ * @TODO: make this throw an error if the object position is outside the screen
+ */
+export const click = (scene: string) => (id: string) => async () => {
+    const { x, y } = await getPositonOf(scene)(id)
     await page.mouse.click(x, y)
 }
