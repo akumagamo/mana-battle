@@ -111,13 +111,25 @@ describe("Map Screen", () => {
                     `When I select an "${squadType}" squad`,
                     dsl.click("Map Screen")(squadId)
                 )
+
+                test(
+                    "Then I should still be able to move the map",
+                    mapShouldBeDraggable(true)
+                )
+
                 test(
                     "When I select the Squad Details option",
                     selectOption("Map Screen UI")("View Squad Details")
                 )
+
                 test(
                     "Then I should see the Squad Details Modal",
                     textIsVisibleInUI("These are the squad details")
+                )
+
+                test(
+                    "Then I should no longer be able to move the map",
+                    mapShouldBeDraggable(false)
                 )
             }
         )
@@ -334,11 +346,13 @@ function textIsVisibleInUI(text: string) {
     return async () => dsl.textIsVisible("Map Screen UI", text)
 }
 
+/* We drag the screen by the corner, to also check if the map is draggable
+ * when an modal window is opened */
 function mapShouldBeDraggable(shouldBeDraggable: boolean) {
     return async () => {
         const initialPosition = await dsl.getPositonOf("Map Screen")("0")
 
-        await dsl.drag([300, 300], [150, 150])
+        await dsl.drag([50, 300], [10, 150])
 
         const finalPosition = await dsl.getPositonOf("Map Screen")("0")
 

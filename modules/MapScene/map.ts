@@ -25,6 +25,13 @@ function makeMapDraggable(
     scene.input.dragDistanceThreshold = DRAG_DISTANCE_THRESHOLD
 
     scene.input.on("drag", (pointer: any) => {
+        if (
+            scene.scene
+                .get("Map Screen UI")
+                .children.getByName("Close Squad Details")
+        )
+            return
+
         const deltaX = pointer.prevPosition.x - pointer.x
         const deltaY = pointer.prevPosition.y - pointer.y
 
