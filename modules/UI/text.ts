@@ -16,7 +16,7 @@ export default (scene: Scene) => (x: number, y: number, str: string | number) =>
         .text(x, y, label, {
             color: "#ffffff",
             fontSize: "24px",
-            fontFamily: "sans-serif",
+            fontFamily: "'Laila', sans-serif",
             metrics,
         })
         .setName(label)

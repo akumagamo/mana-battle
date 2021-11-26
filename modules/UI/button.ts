@@ -20,10 +20,6 @@ export default (scene: Scene) =>
             .setDisplaySize(width, height)
 
         const text_ = text(scene)(0, 0, label)
-            .setOrigin(0.5)
-            .setShadow(2, 2, "#000")
-            .setColor("#fff")
-            .setFontStyle("bold")
 
         const container = scene.add
             .container(x, y)
@@ -37,6 +33,7 @@ export default (scene: Scene) =>
             })
             .on("pointerup", () => {
                 if (disabled) return
+                scene.events.emit(`Button ${label} clicked`)
                 //if (process.env.SOUND_ENABLED) scene.sound.add("click1").play()
                 onClick()
             })

@@ -20,14 +20,17 @@ async function buttonClicked(scene: Phaser.Scene) {
         .image(CENTER_X, CENTER_Y, "panel")
         .setDisplaySize(SCREEN_WIDTH / 1.5, SCREEN_HEIGHT / 1.5)
 
+    const title = UI.text(scene)(CENTER_X, 160, "Game Credits")
+        .setFontSize(36)
+        .setColor("#000")
+
     const text = [
-        "Game Credits",
         "> Game Design & Programming",
         "Leonardo Farroco",
         "> Music",
         "Jonathan Shaw",
     ].map((line, i) =>
-        UI.text(scene)(CENTER_Y, 200 + i * 50, line)
+        UI.text(scene)(CENTER_X, 240 + i * 50, line)
             .setAlign("center")
             .setColor("#000")
     )
@@ -39,5 +42,5 @@ async function buttonClicked(scene: Phaser.Scene) {
         () => group.destroy(true)
     )
 
-    ;[panel, ...text, closeCreditsBtn].map((el) => group.add(el))
+    ;[panel, title, ...text, closeCreditsBtn].map((el) => group.add(el))
 }
