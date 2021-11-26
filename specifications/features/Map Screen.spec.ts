@@ -51,7 +51,7 @@ describe("Map Screen", () => {
                 squadId,
             }: {
                 squadId: string
-                squadType: ForceType
+                squadType: string
                 canSeeEditOption: boolean
             }) => {
                 test(
@@ -304,8 +304,6 @@ async function assertMapIsVisible() {
     expect(types).toContain("TilemapLayer")
 }
 
-type ForceType = "allied" | "enemy"
-
 function resetScreen(params: MapScreenProperties) {
     return async () => {
         await page.evaluate((params) => {
@@ -316,6 +314,9 @@ function resetScreen(params: MapScreenProperties) {
     }
 }
 
+/**
+ * @TODO: replace this with `waitForEvent`
+ */
 function waitForSquadArrival(squadId: string) {
     return async () => {
         await page.evaluate((expectedId: string) => {
