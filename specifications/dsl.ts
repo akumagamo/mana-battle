@@ -188,16 +188,10 @@ export const getPositonOf = (scene: string) => async (id: string) =>
                 .getScene(scene)
                 .children.getByName(id) as Phaser.GameObjects.Sprite
 
-            const { canvas } = window.game
             const camera = window.game.scene.getScene(scene).cameras.main
 
-            const scaleX = 1 / window.game.scale.displayScale.x
-            const scaleY = 1 / window.game.scale.displayScale.y
-
-            const x =
-                scaleX * sprite.x + canvas.offsetLeft - scaleX * camera.scrollX
-            const y =
-                scaleY * sprite.y + canvas.offsetTop - scaleY * camera.scrollY
+            const x = sprite.x + -camera.scrollX
+            const y = sprite.y + -camera.scrollY
 
             return {
                 x,

@@ -144,7 +144,7 @@ describe("Map Screen", () => {
                 selectMovementTargetForSquad("0")
             )
             test("When I select a location in the map", async function () {
-                await page.mouse.click(110, 110)
+                await page.mouse.click(150, 150)
                 await page.waitForTimeout(50)
             })
 
