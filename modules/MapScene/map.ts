@@ -27,7 +27,7 @@ function makeMapDraggable(
     scene.input.dragTimeThreshold = DRAG_TIME_THRESHOLD
     scene.input.dragDistanceThreshold = DRAG_DISTANCE_THRESHOLD
 
-    scene.input.on("drag", (pointer: any) => {
+    scene.input.on(Phaser.Input.Events.DRAG, (pointer: any) => {
         const deltaX = pointer.prevPosition.x - pointer.x
         const deltaY = pointer.prevPosition.y - pointer.y
 
