@@ -1,4 +1,3 @@
-import dsl from "puppeteer"
 import Phaser from "phaser"
 
 declare global {
@@ -136,7 +135,7 @@ export async function checkVisibility(
         throw new Error(
             `Element with name "${name}" on screen "${scene}" doesn't exist.`
         )
-    else if (textIsVisible && !shouldBeVisible)
+    else if (isVisible  && !shouldBeVisible)
         throw new Error(
             `Element with name "${name}" on screen "${scene}" should not exist.`
         )

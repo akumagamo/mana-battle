@@ -6,11 +6,6 @@ const STATE_KEY = "_state"
 const PLAYER_ID = "PLAYER"
 const CPU_ID = "CPU"
 
-export type Environment = {
-    scene: Phaser.Scene
-    state: MapSceneState
-}
-
 type Identifier<A> = Map<A, string>
 
 type SquadId = Identifier<"squad">
@@ -39,7 +34,7 @@ export const createSquad = (
     y,
 })
 
-export const getSquad = (id: string) => (state: MapSceneState) => {
+export const getSquad = (id: string) => (state: State) => {
     const squad = state.squads.find((squad) =>
         squad.id.equals(createSquadId(id))
     )
@@ -75,7 +70,7 @@ export const createForceId = (id: string): ForceId =>
 
 export const setState = (
     scene: Phaser.Scene,
-    fn: (s: MapSceneState) => MapSceneState
+    fn: (s: State) => State
 ) => {
     const state = scene.data.get(STATE_KEY)
 
@@ -84,9 +79,9 @@ export const setState = (
     scene.data.set(STATE_KEY, updatedState)
 }
 export const getState = (scene: Phaser.Scene) =>
-    scene.scene.get(SCREEN_KEY).data.get(STATE_KEY) as MapSceneState
+    scene.scene.get(SCREEN_KEY).data.get(STATE_KEY) as State
 
-export type MapSceneState = {
+export type State = {
     squads: SquadIndex
     cities: CityIndex
 }
@@ -123,7 +118,7 @@ export const createMapScreenProperties = ({
     })),
 })
 
-export const createInitialState = (data: MapScreenProperties) => {
+export const createInitialState = (data: MapScreenProperties):State => {
     const state = {
         cities: data.cities.reduce(
             (xs, x) =>
@@ -160,7 +155,7 @@ export const getSceneParameters = (scene: Phaser.Scene) => {
     return data
 }
 
-export const getPlayerSquads = (state: MapSceneState) =>
+export const getPlayerSquads = (state: State) =>
     state.squads.filter((sqd) => sqd.force.equals(createForceId(PLAYER_ID)))
-export const getEnemySquads = (state: MapSceneState) =>
+export const getEnemySquads = (state: State) =>
     state.squads.filter((sqd) => sqd.force.equals(createForceId(CPU_ID)))

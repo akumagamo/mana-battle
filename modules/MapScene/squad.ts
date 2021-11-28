@@ -8,8 +8,6 @@ export const createSquad = (scene: Phaser.Scene) => (squad: Squad) => {
     const sprite = scene.physics.add
         .sprite(x, y, "squad_test")
         .setDataEnabled()
-        // .setSize(UNIT_WIDTH, UNIT_HEIGHT)
-        // .setDisplaySize(UNIT_WIDTH, UNIT_HEIGHT)
         .setName(id.get("squad") || "")
 
     sprite.body.setSize(UNIT_WIDTH, UNIT_HEIGHT)
