@@ -15,15 +15,19 @@ export default function (
             squadId
         ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 
-    clearEvents()
+    clearEvents(layer)
 
-    layer.on(Phaser.Input.Events.POINTER_UP, movementOrderAssigned)
-
-    function clearEvents() {
-        layer.off(Phaser.Input.Events.POINTER_UP)
-    }
-
-    function movementOrderAssigned(pointer: Phaser.Input.Pointer) {
+    layer.on(
+        Phaser.Input.Events.POINTER_UP,
+        movementOrderAssigned(sprite, layer)
+    )
+}
+function movementOrderAssigned(
+    sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
+    layer: Phaser.Tilemaps.TilemapLayer
+) {
+    return (pointer: Phaser.Input.Pointer) => {
+        const { scene } = sprite
         const userDraggedInsteadOfClicking =
             Phaser.Math.Distance.Between(
                 pointer.upX,
@@ -33,7 +37,7 @@ export default function (
             ) > CLICK_THRESHOLD
         if (userDraggedInsteadOfClicking) return
 
-        clearEvents()
+        clearEvents(layer)
 
         const target = { x: pointer.worldX, y: pointer.worldY }
         sprite.data.set(UNIT_DATA_TARGET, target)
@@ -50,3 +54,6 @@ export default function (
     }
 }
 
+function clearEvents(layer: Phaser.Tilemaps.TilemapLayer) {
+    layer.off(Phaser.Input.Events.POINTER_UP)
+}

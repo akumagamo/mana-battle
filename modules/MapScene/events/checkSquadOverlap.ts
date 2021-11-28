@@ -1,11 +1,8 @@
 import CombatScene from "../../CombatScene/phaser"
 import { fadeOut } from "../../UI/Transition"
 import MapScreen from "../phaser"
-export default function checkCollision(scene: Phaser.Scene) {
-    scene.events.on(Phaser.Scenes.Events.UPDATE, check, scene)
-}
-function check(this: Phaser.Scene) {
-    const scene = this
+
+const check = (scene: Phaser.Scene) => () => {
     const squads =
         (scene.data.get(
             "Map Screen Squads"
@@ -22,4 +19,8 @@ function check(this: Phaser.Scene) {
             scene.scene.start(CombatScene.key)
             scene.scene.remove(MapScreen.key)
         })
+}
+
+export default function checkCollision(scene: Phaser.Scene) {
+    scene.events.on(Phaser.Scenes.Events.UPDATE, check(scene))
 }
