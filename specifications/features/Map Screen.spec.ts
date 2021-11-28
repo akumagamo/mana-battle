@@ -122,10 +122,12 @@ describe("Map Screen", () => {
                     selectOption("Map Screen UI")("View Squad Details")
                 )
 
-                test(
-                    "Then I should see the Squad Details Modal",
-                    textIsVisibleInUI("These are the squad details")
-                )
+                test("Then I should see the Squad Details Modal", async () =>
+                    dsl.checkVisibility(
+                        "Map Screen UI",
+                        "Squad Details Window",
+                        true
+                    ))
 
                 test(
                     "Then I should no longer be able to move the map",

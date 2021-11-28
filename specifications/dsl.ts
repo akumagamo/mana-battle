@@ -39,10 +39,7 @@ export const drag = async ([x, y]: number[], [x_, y_]: number[]) => {
 /**
  * @TODO: replace with `click`?
  */
-export async function clickButton(
-    scene: string,
-    label: string
-) {
+export async function clickButton(scene: string, label: string) {
     const clicked = await page.evaluate(
         ({ scene, label }) => {
             const btn = window.game.scene
@@ -63,10 +60,7 @@ export async function clickButton(
         )
 }
 
-export async function buttonIsRendered(
-    scene: string,
-    label: string
-) {
+export async function buttonIsRendered(scene: string, label: string) {
     const ok = await page.evaluate(
         ({ scene, label }) => {
             //@ts-ignore
@@ -103,10 +97,7 @@ export async function buttonIsRendered(
         )
 }
 
-export async function textIsVisible(
-    scene: string,
-    label: string
-) {
+export async function textIsVisible(scene: string, label: string) {
     const isVisible = await page.evaluate(
         ({ scene, label }) => {
             const text = window.game.scene
@@ -126,13 +117,35 @@ export async function textIsVisible(
         )
 }
 
+export async function checkVisibility(
+    scene: string,
+    name: string,
+    shouldBeVisible: boolean
+) {
+    const isVisible = await page.evaluate(
+        ({ scene, name }) => {
+            const gameObject = window.game.scene
+                .getScene(scene)
+                .children.getByName(name)
+            return Boolean(gameObject)
+        },
+        { scene, name }
+    )
+
+    if (!isVisible && shouldBeVisible)
+        throw new Error(
+            `Element with name "${name}" on screen "${scene}" doesn't exist.`
+        )
+    else if (textIsVisible && !shouldBeVisible)
+        throw new Error(
+            `Element with name "${name}" on screen "${scene}" should not exist.`
+        )
+}
+
 /**
  * @TODO: make visible/not visible a parameter
  */
-export async function textIsNotVisible(
-    scene: string,
-    label: string
-) {
+export async function textIsNotVisible(scene: string, label: string) {
     const isVisible = await page.evaluate(
         ({ scene, label }) => {
             const text = window.game.scene
@@ -180,7 +193,7 @@ export const getPositonOf = (scene: string) => async (id: string) =>
 
             const scaleX = 1 / window.game.scale.displayScale.x
             const scaleY = 1 / window.game.scale.displayScale.y
-            
+
             const x =
                 scaleX * sprite.x + canvas.offsetLeft - scaleX * camera.scrollX
             const y =

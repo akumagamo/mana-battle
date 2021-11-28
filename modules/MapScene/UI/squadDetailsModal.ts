@@ -7,7 +7,16 @@ import {
 } from "../../_shared/constants"
 
 export default (scene: Phaser.Scene) => () => {
-    const group = scene.add.group().setName("Squad Details Window")
+    const container = scene.add.container().setName("Squad Details Window")
+
+    /** This layer not only gives the modal more focus, but also blocks
+     *  interactions with elements below (that's why it is interactive) */
+    const bg = scene.add
+        .image(CENTER_X, CENTER_Y, "panel")
+        .setDisplaySize(SCREEN_WIDTH + 100, SCREEN_HEIGHT)
+        .setTint(0x000000)
+        .setAlpha(0.5)
+        .setInteractive()
 
     const panel = scene.add
         .image(CENTER_X, CENTER_Y, "panel")
@@ -23,8 +32,8 @@ export default (scene: Phaser.Scene) => () => {
         CENTER_X,
         SCREEN_HEIGHT - 200,
         "Close Squad Details",
-        () => group.destroy(true)
+        () => container.destroy(true)
     )
 
-    ;[panel, ...text, closeModalOption].map((el) => group.add(el))
+    container.add([bg, panel, ...text, closeModalOption])
 }
