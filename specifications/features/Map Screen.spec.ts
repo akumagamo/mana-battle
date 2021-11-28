@@ -2,9 +2,9 @@ import * as dsl from "../dsl"
 import "expect-puppeteer"
 import {
     MapScreenProperties,
-    SquadIndex,
-    CityIndex,
     createMapScreenProperties,
+    SquadDTO,
+    CityDTO,
 } from "../../modules/MapScene/Model"
 
 beforeAll(dsl.openGame)
@@ -14,7 +14,7 @@ afterAll(async () => {
     await dsl.removeScene("Map Screen UI")
 })
 
-const defaultParameters = createMapScreenProperties({
+const defaultParameters: MapScreenProperties = createMapScreenProperties({
     squads: [
         [100, 100, "PLAYER"],
         [200, 200, "CPU"],
@@ -29,8 +29,14 @@ describe("Map Screen", () => {
     describe("Map Creation", () => {
         test("Given that I have nothing selected", assertNoEntityIsSelected)
         test("Then I should see the map", assertMapIsVisible)
-        test("Then I should see all squads", assertAllSquadsAreVisible)
-        test("Then I should see all cities", assertAllCitiesAreVisible)
+        test(
+            "Then I should see all squads",
+            assertAllSquadsAreVisible(defaultParameters)
+        )
+        test(
+            "Then I should see all cities",
+            assertAllCitiesAreVisible(defaultParameters)
+        )
         test("Then I the game is unpaused", gameShouldBePaused(false))
         test(
             "Then I should be able to move the map",
@@ -283,29 +289,30 @@ async function assertNoEntityIsSelected() {
     })
 }
 
-async function assertAllCitiesAreVisible() {
-    await page.evaluate(() => {
-        const scene = window.game.scene.getScene("Map Screen")
-        const cities: CityIndex = scene.data.get("_state").cities
-        const allRendered = cities.every((city) =>
-            Boolean(scene.children.getByName(`city-${city.id.get("city")}`))
-        )
-        if (!allRendered)
-            throw new Error("Not all cities squads have been rendered")
-    })
+function assertAllCitiesAreVisible({ cities }: MapScreenProperties) {
+    return async () =>
+        await page.evaluate((cities: CityDTO[]) => {
+            const scene = window.game.scene.getScene("Map Screen")
+            const allRendered = cities.every((city) =>
+                Boolean(scene.children.getByName(`city-${city.id}`))
+            )
+            if (!allRendered)
+                throw new Error("Not all cities squads have been rendered")
+        }, cities)
 }
 
-async function assertAllSquadsAreVisible() {
-    await page.evaluate(() => {
-        const scene = window.game.scene.getScene("Map Screen")
-        const squads: SquadIndex = scene.data.get("_state").squads
+function assertAllSquadsAreVisible({ squads }: MapScreenProperties) {
+    return async () =>
+        await page.evaluate((squads: SquadDTO[]) => {
+            const scene = window.game.scene.getScene("Map Screen")
 
-        const allRendered = squads.every((squad) =>
-            Boolean(scene.children.getByName(squad.id.get("squad", "")))
-        )
+            const allRendered = squads.every((squad) =>
+                Boolean(scene.children.getByName(squad.id))
+            )
 
-        if (!allRendered) throw new Error("Not all squads have been rendered")
-    })
+            if (!allRendered)
+                throw new Error("Not all squads have been rendered")
+        }, squads)
 }
 
 async function assertMapIsVisible() {

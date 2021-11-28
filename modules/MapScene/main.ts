@@ -9,19 +9,21 @@ import MapSceneUI from "./UI/phaser"
 import events from "./events"
 
 export default async (scene: Phaser.Scene, params: MapScreenProperties) => {
-    scene.scene.add(MapSceneUI.key, MapSceneUI)
-    scene.scene.run(MapSceneUI.key)
-
     const map = createMap(scene)
 
     checkSquadOverlap(scene)
 
     const initialState = createInitialState(params)
-    setState(scene, () => initialState)
+    const setState_ = setState(initialState)
+
+    const UI = MapSceneUI(initialState)
+
+    scene.scene.add(UI.key, UI)
+    scene.scene.run(UI.key)
 
     initialState.squads.forEach(createSquad(scene))
 
-    initialState.cities.forEach(createCity(scene, initialState))
+    initialState.cities.forEach(createCity(scene))
 
     fadeIn(scene, 500)
 

@@ -1,8 +1,9 @@
-import { create } from "./create"
+import { State } from "../Model"
+import create from "./create"
 
-export default {
+export default (state: State) => ({
     key: "Map Screen UI",
     create: function (this: Phaser.Scene) {
-        create(this)
+        create(this, state)
     },
-}
+})
