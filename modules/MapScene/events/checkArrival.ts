@@ -11,12 +11,12 @@ export function checkArrival(scene: Phaser.Scene) {
         ).forEach((sprite) => {
             const isMoving =
                 sprite.body.velocity.x !== 0 || sprite.body.velocity.y !== 0
-
-            if (!isMoving) return
-
             const target = sprite.data.get(
                 UNIT_DATA_TARGET
-            ) as Phaser.Math.Vector2
+            ) as Phaser.Math.Vector2 | null
+
+            if (!isMoving || !target) return
+
             const distance = Phaser.Math.Distance.BetweenPoints(sprite, target)
 
             if (distance <= 10) {
