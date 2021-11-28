@@ -73,8 +73,16 @@ export const createForceId = (id: string): ForceId =>
         force: id,
     }) as Map<"force", string>
 
-export const setState = (scene: Phaser.Scene, s: MapSceneState) =>
-    scene.scene.get(SCREEN_KEY).data.set(STATE_KEY, s)
+export const setState = (
+    scene: Phaser.Scene,
+    fn: (s: MapSceneState) => MapSceneState
+) => {
+    const state = scene.data.get(STATE_KEY)
+
+    const updatedState = fn(state)
+
+    scene.data.set(STATE_KEY, updatedState)
+}
 export const getState = (scene: Phaser.Scene) =>
     scene.scene.get(SCREEN_KEY).data.get(STATE_KEY) as MapSceneState
 
@@ -115,10 +123,7 @@ export const createMapScreenProperties = ({
     })),
 })
 
-export const createInitialState = (
-    scene: Phaser.Scene,
-    data: MapScreenProperties
-) => {
+export const createInitialState = (data: MapScreenProperties) => {
     const state = {
         cities: data.cities.reduce(
             (xs, x) =>
@@ -139,7 +144,6 @@ export const createInitialState = (
             Map() as SquadIndex
         ),
     }
-    setState(scene, state)
     return state
 }
 

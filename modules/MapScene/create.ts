@@ -2,7 +2,7 @@ import { fadeIn } from "../UI/Transition"
 import checkSquadOverlap from "./events/checkSquadOverlap"
 import selectMoveDestination from "./events/selectMoveDestination"
 import { createMap } from "./map"
-import { createInitialState, MapScreenProperties } from "./Model"
+import { createInitialState, MapScreenProperties, setState } from "./Model"
 import { createSquad } from "./squad"
 import { createCity } from "./city"
 import MapSceneUI from "./UI/phaser"
@@ -20,11 +20,12 @@ export const create = async (
 
     checkSquadOverlap(scene)
 
-    const state = createInitialState(scene, params)
+    const initialState = createInitialState(params)
+    setState(scene, () => initialState)
 
-    state.squads.forEach(createSquad(scene))
+    initialState.squads.forEach(createSquad(scene))
 
-    state.cities.forEach(createCity(scene, state))
+    initialState.cities.forEach(createCity(scene, initialState))
 
     fadeIn(scene, 500)
 
