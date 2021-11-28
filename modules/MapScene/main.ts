@@ -8,10 +8,7 @@ import { createCity } from "./city"
 import MapSceneUI from "./UI/phaser"
 import events from "./events"
 
-export const create = async (
-    scene: Phaser.Scene,
-    params: MapScreenProperties
-) => {
+export default async (scene: Phaser.Scene, params: MapScreenProperties) => {
     //remove from here (scenes should be decoupled)
     scene.scene.add(MapSceneUI.key, MapSceneUI)
     scene.scene.run(MapSceneUI.key)
