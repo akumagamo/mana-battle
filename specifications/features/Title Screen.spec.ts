@@ -51,8 +51,10 @@ describe("Title Screen", () => {
         openTitleScreen()
         test("When I choose the 'New Game' option", async () =>
             await choose("New Game"))
-        test("Then the next screen should be the 'Map Screen'", async () =>
-            await dsl.waitForSceneCreation("Map Screen"))
+        test(
+            "Then the next screen should be the 'Map Screen'",
+            dsl.waitForSceneCreation("Map Screen")
+        )
     })
 })
 

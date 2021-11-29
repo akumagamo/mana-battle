@@ -178,13 +178,22 @@ describe("Map Screen", () => {
     })
 
     describe("Squad Collision (friendly on enemy)", () => {
-        test.todo("User has opened Map Screen")
+        test(
+            "Given that I am selecting the target destination for a squad",
+            selectMovementTargetForSquad("0")
+        )
+        test("Given that I issued a move order that will encounter an enemy", async function () {
+            await page.mouse.click(300, 300)
+        })
+        test(
+            "When my squad collides with the enemy",
+            dsl.waitForEvent("Map Screen", "Squad Collision")
+        )
 
-        test.todo("User issued a move order to a squad")
-
-        test.todo("Squad collides with enemy")
-
-        test.todo('/^The "(.*)" modal is displayed$/')
+        test(
+            "Then I should go to the Combat Screen",
+            dsl.waitForSceneCreation("Combat Screen")
+        )
     })
 
     describe("Squad Collision (enemy on friendly)", () => {
@@ -220,10 +229,6 @@ function selectMovementTargetForSquad(id: string) {
 
 function should(condition: boolean) {
     return condition ? "should" : "shouldn't"
-}
-
-function is(condition: boolean) {
-    return condition ? "is" : "isn't"
 }
 
 function assertOptionVisibilityInUI({
@@ -350,9 +355,6 @@ function waitForSquadArrival(squadId: string) {
             })
         }, squadId)
     }
-}
-function textIsVisibleInUI(text: string) {
-    return async () => dsl.textIsVisible("Map Screen UI", text)
 }
 
 /* We drag the screen by the corner, to also check if the map is draggable

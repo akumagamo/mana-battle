@@ -14,7 +14,7 @@ export async function openGame() {
     console.time(`Page is ready for testing`)
 
     await page.goto(url)
-    await waitForSceneCreation("Core Screen")
+    await waitForSceneCreation("Core Screen")()
 
     console.timeEnd(`Page is ready for testing`)
 }
@@ -135,7 +135,7 @@ export async function checkVisibility(
         throw new Error(
             `Element with name "${name}" on screen "${scene}" doesn't exist.`
         )
-    else if (isVisible  && !shouldBeVisible)
+    else if (isVisible && !shouldBeVisible)
         throw new Error(
             `Element with name "${name}" on screen "${scene}" should not exist.`
         )
@@ -166,18 +166,21 @@ export async function textIsNotVisible(scene: string, label: string) {
 }
 /**
  * @TODO: refactor this as 'waitForGameEvent'
+ * use a single event manager for the whole game
+ * (no difference between game and scene events)
  */
-export async function waitForSceneCreation(screen: string) {
-    await page.evaluate(
-        ({ screen }) => {
-            return new Promise<void>((resolve) => {
-                window.game.events.once(`${screen} Created`, () => {
-                    resolve()
+export function waitForSceneCreation(screen: string) {
+    return async () =>
+        await page.evaluate(
+            ({ screen }) => {
+                return new Promise<void>((resolve) => {
+                    window.game.events.once(`${screen} Created`, () => {
+                        resolve()
+                    })
                 })
-            })
-        },
-        { screen }
-    )
+            },
+            { screen }
+        )
 }
 
 export const getPositonOf = (scene: string) => async (id: string) =>
@@ -207,4 +210,21 @@ export const getPositonOf = (scene: string) => async (id: string) =>
 export const click = (scene: string) => (id: string) => async () => {
     const { x, y } = await getPositonOf(scene)(id)
     await page.mouse.click(x, y)
+}
+
+export function waitForEvent<A>(scene: string, event: string) {
+    return async () => {
+        await page.evaluate(
+            ({ event, scene }: { event: string; scene: string }) => {
+                return new Promise<A>((resolve) => {
+                    window.game.scene
+                        .getScene(scene)
+                        .events.once(event, (payload: A) => {
+                            resolve(payload)
+                        })
+                })
+            },
+            { event, scene }
+        )
+    }
 }

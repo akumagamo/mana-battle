@@ -1,4 +1,4 @@
-import { fadeIn, fadeOut } from "../UI/Transition"
+import { fadeIn } from "../UI/Transition"
 import selectMoveDestination from "./events/selectMoveDestination"
 import { createMap } from "./map"
 import {
@@ -10,8 +10,8 @@ import {
 import { createSquad } from "./squad"
 import { createCity } from "./city"
 import MapSceneUI from "./UI/phaser"
-import CombatScene from "../CombatScene/phaser"
 import events from "./events"
+import { squadCollision } from "./events/squadCollision"
 
 export default async (scene: Phaser.Scene, params: MapScreenProperties) => {
     const map = createMap(scene)
@@ -36,14 +36,10 @@ export default async (scene: Phaser.Scene, params: MapScreenProperties) => {
     const alliedGroup = allies.map(createSquad(scene))
     const enemyGroup = enemies.map(createSquad(scene))
 
-    scene.physics.add.collider(alliedGroup, enemyGroup, async (_a, _b) => {
-        scene.physics.pause()
+    scene.events.on("Squad Collision", squadCollision(scene))
 
-        await fadeOut(scene, 500)
-
-        scene.scene.add(CombatScene.key, CombatScene)
-        scene.scene.start(CombatScene.key)
-        scene.scene.remove(scene)
+    scene.physics.add.collider(alliedGroup, enemyGroup, async (a, b) => {
+        scene.events.emit("Squad Collision", [a.name, b.name])
     })
 
     initialState.cities.forEach(createCity(scene))

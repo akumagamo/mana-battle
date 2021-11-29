@@ -11,12 +11,13 @@ import {
 import { fadeIn, fadeOut } from "../UI/Transition"
 import { cartesianToIsometric } from "../_shared/utils"
 
-// IDEA: inject UI module to reduce coupling
 export const create = async (scene: Phaser.Scene) => {
     createBackground(scene)
     renderUnits(scene)
     debugReturnButton(scene)
     await fadeIn(scene, 500)
+
+    scene.game.events.emit("Combat Screen Created")
 }
 
 function renderUnits(scene: Phaser.Scene) {
