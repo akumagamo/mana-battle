@@ -7,9 +7,9 @@
     "scripts": {
         "start": "webpack serve --config webpack.dev.js",
         "test-server": "webpack serve --config webpack.dev.js --port=3333",
-        "deploy": "webpack --config webpack.prod.js",
         "test": "jest --verbose --runInBand",
-        "test-watch": "jest --verbose --runInBand --watch",
+        "test-watch": "yarn test --watch",
+        "deploy": "webpack --config webpack.prod.js",
         "prepare": "husky install"
     },
     "husky": {
