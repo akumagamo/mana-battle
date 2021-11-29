@@ -190,6 +190,10 @@ describe("Map Screen", () => {
             dsl.waitForEvent("Map Screen", "Squad Collision")
         )
 
+        test.todo("Then I should see a Combat Preview Modal")
+
+        test.todo(`When I select "Confirm" in the Combat Preview Modal`)
+
         test(
             "Then I should go to the Combat Screen",
             dsl.waitForSceneCreation("Combat Screen")
@@ -197,23 +201,16 @@ describe("Map Screen", () => {
     })
 
     describe("Squad Collision (enemy on friendly)", () => {
-        test.todo("User has opened Map Screen")
+        test.todo(
+            "Given that an enemy squad is moving towards one of my squads"
+        )
+        test.todo("When the enemy squad collides with my squad")
 
-        test.todo("An enemy squad walks toward a friendly unit")
+        test.todo("Then I should see a Combat Preview Modal")
 
-        test.todo("Enemy squad collides with friendly squad")
+        test.todo(`When I select "Confirm" in the Combat Preview Modal`)
 
-        test.todo('/^The "(.*)" modal is displayed$/')
-    })
-
-    describe("Enemy Encountered Modal", () => {
-        test.todo("User has opened Map Screen")
-
-        test.todo('/^The "(.*)" modal is opened$/')
-
-        test.todo('/^User selects option "(.*)"$/')
-
-        test.todo('/^The next screen should be "(.*)"$/')
+        test.todo("Then I should go to the Combat Screen")
     })
 })
 
