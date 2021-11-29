@@ -10,7 +10,7 @@ const ciConfig = process.env.CI ?
     server: {
       command: "yarn test-server",
       port: 3333,
-      launchTimeout: 10000,
+      launchTimeout: 30000,
     }
   } : {}
 
