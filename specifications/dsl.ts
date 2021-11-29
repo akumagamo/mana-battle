@@ -6,9 +6,8 @@ declare global {
     }
 }
 
-const port = process.env.CI ? 3333 : 3000
-
 export async function openGame() {
+    const port = process.env.CI ? 3333 : 3000
     const url = `http://localhost:${port}`
     console.log(`Opening ${url}`)
     console.time(`Page is ready for testing`)
