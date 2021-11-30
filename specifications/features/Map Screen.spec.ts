@@ -70,8 +70,6 @@ describe("Map Screen", () => {
                     dsl.click("Map Screen")(squadId)
                 )
 
-                page.waitForTimeout(10000)
-
                 test("Then the game is paused", gameShouldBePaused(true))
 
                 test(

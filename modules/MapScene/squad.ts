@@ -1,16 +1,16 @@
 import squadClicked from "./events/squadClicked"
 import { Squad } from "./Model"
-const UNIT_WIDTH = 50
-const UNIT_HEIGHT = 100
 
 export const createSquad = (scene: Phaser.Scene) => (squad: Squad) => {
     const { x, y, id } = squad
+
     const sprite = scene.physics.add
-        .sprite(x, y, "squad_test")
+        .sprite(x, y, "soldier-map")
         .setDataEnabled()
         .setName(id.get("squad") || "")
+        .play("map-walk-down")
+        .setScale(2)
 
-    sprite.body.setSize(UNIT_WIDTH, UNIT_HEIGHT)
     createSquadEvents(scene, sprite)
     return sprite
 }

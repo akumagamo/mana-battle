@@ -42,6 +42,14 @@ export default (scene: Phaser.Scene) => {
             `assets/jobs/${job}/animations.png`,
             `assets/jobs/${job}/animations.json`
         )
+
+        const mapSpriteKey = `${job}-map`
+
+        scene.load.spritesheet(
+            mapSpriteKey,
+            `${PUBLIC_URL}/jobs/${job}/map-animations.png`,
+            { frameWidth: 32, frameHeight: 32, endFrame: 11 }
+        )
     })
 
     scene.load.image("squad_test", `${PUBLIC_URL}/sprites/squad_test.png`)
