@@ -17,7 +17,7 @@ afterAll(async () => {
 const defaultParameters: MapScreenProperties = createMapScreenProperties({
     squads: [
         [100, 100, "PLAYER"],
-        [200, 200, "CPU"],
+        [200, 100, "CPU"],
     ],
     cities: [
         [50, 50, "PLAYER"],
@@ -148,7 +148,7 @@ describe("Map Screen", () => {
                 selectMovementTargetForSquad("0")
             )
             test("When I select a location in the map", async function () {
-                await page.mouse.click(150, 150)
+                await page.mouse.click(150, 250)
                 await page.waitForTimeout(50)
             })
 
@@ -181,7 +181,7 @@ describe("Map Screen", () => {
             selectMovementTargetForSquad("0")
         )
         test("Given that I issued a move order that will encounter an enemy", async function () {
-            await page.mouse.click(300, 300)
+            await page.mouse.click(300, 100)
         })
         test(
             "When my squad collides with the enemy",
@@ -209,6 +209,20 @@ describe("Map Screen", () => {
         test.todo(`When I select "Confirm" in the Combat Preview Modal`)
 
         test.todo("Then I should go to the Combat Screen")
+    })
+
+    describe("Character sprites", () => {
+        describe.each`
+            direction  | moveTo
+            ${"down"}  | ${[100, 300]}
+            ${"right"} | ${[300, 100]}
+            ${"left"}  | ${[50, 100]}
+            ${"top"}   | ${[100, 50]}
+        `(
+            `When I move to $direction, then the character sprite should change 
+             to the correspondent animation`,
+            () => {}
+        )
     })
 })
 

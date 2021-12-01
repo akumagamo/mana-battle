@@ -1,15 +1,16 @@
 {
-    "columns": 17,
-    "image": "../map/kenney_tileset.png",
-    "imageheight": 768,
-    "imagewidth": 1088,
+    "columns": 24,
+    "image": "pipo.png",
+    "imageheight": 1852,
+    "imagewidth": 1536,
     "margin": 0,
-    "name": "kenney",
+    "name": "pipo",
     "spacing": 0,
-    "tilecount": 204,
+    "tilecount": 672,
     "tiledversion": "1.7.2",
     "tileheight": 64,
     "tilewidth": 64,
     "type": "tileset",
     "version": "1.6"
 }
+

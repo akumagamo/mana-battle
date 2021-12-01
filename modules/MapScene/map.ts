@@ -6,9 +6,9 @@ const DRAG_DISTANCE_THRESHOLD = 10
 
 export function createMap(scene: Phaser.Scene) {
     const map = scene.make.tilemap({ key: "maps/map" })
-    const tileset = map.addTilesetImage("kenney", "map/kenney_tileset")
-    map.createLayer("bg", [tileset])
-    const layer = map.createLayer("elevations", [tileset])
+    const tileset = map.addTilesetImage("pipo")
+    const layer = map.createLayer("bg", [tileset])
+    map.createLayer("elevations", [tileset])
     map.createLayer("doodads", [tileset])
     map.setCollisionByProperty({ collides: true })
 

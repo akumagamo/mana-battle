@@ -48,7 +48,6 @@ const Core = {
                 start,
                 end,
             })
-            console.log(`>>`, frames)
             const config = {
                 key: `map-walk-${dir}`,
                 frames,

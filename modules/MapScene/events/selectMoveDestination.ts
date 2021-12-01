@@ -35,6 +35,7 @@ function movementOrderAssigned(
                 pointer.downX,
                 pointer.downY
             ) > CLICK_THRESHOLD
+
         if (userDraggedInsteadOfClicking) return
 
         clearEvents(layer)

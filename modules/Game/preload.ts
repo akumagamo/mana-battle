@@ -59,8 +59,8 @@ export default (scene: Phaser.Scene) => {
         frameHeight: 117,
         endFrame: 6,
     })
-    ;["map/kenney_tileset"].forEach((str) =>
-        scene.load.image(str, PUBLIC_URL + "/" + str + ".png")
+    ;["pipo"].forEach((str) =>
+        scene.load.image(str, PUBLIC_URL + "/tileset/" + str + ".png")
     )
     ;["maps/map"].forEach((str) =>
         scene.load.tilemapTiledJSON(str, PUBLIC_URL + "/" + str + ".json")

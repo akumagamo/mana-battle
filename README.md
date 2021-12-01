@@ -28,3 +28,12 @@ https://lfarroco.github.io/mana_public/
 
 # 📰 News
 🐦 Twitter - https://twitter.com/mana_battle
+
+
+# :penAssets
+
+Map Character Sprites
+https://pipoya.itch.io/pipoya-free-rpg-character-sprites-32x32
+
+Map Tileset
+https://ladyluck.itch.io/ysmael-map-resource
