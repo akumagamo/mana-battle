@@ -19,7 +19,6 @@ function createSquadEvents(
     scene: Phaser.Scene,
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 ) {
-    sprite.body.onCollide = true // this might be unecessary
     sprite.setInteractive()
 
     sprite.on(Phaser.Input.Events.POINTER_UP, () => squadClicked(sprite, scene))

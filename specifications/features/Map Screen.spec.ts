@@ -46,19 +46,21 @@ describe("Map Screen", () => {
 
     describe("Squad Selection", () => {
         describe.each`
-            squadId | squadType   | canSeeEditOption
-            ${"0"}  | ${"allied"} | ${true}
-            ${"1"}  | ${"enemy"}  | ${false}
+            squadId | squadType   | canSeeEditOption | cursorColor
+            ${"0"}  | ${"allied"} | ${true}          | ${"green"}
+            ${"1"}  | ${"enemy"}  | ${false}         | ${"red"}
         `(
             "$squadType squad selection",
             ({
                 squadType,
                 canSeeEditOption,
                 squadId,
+                cursorColor,
             }: {
                 squadId: string
                 squadType: string
                 canSeeEditOption: boolean
+                cursorColor: string
             }) => {
                 test(
                     "Given that I have no squad selected",
@@ -71,6 +73,10 @@ describe("Map Screen", () => {
                 )
 
                 test("Then the game is paused", gameShouldBePaused(true))
+
+                test.skip(`Then there should be a "${cursorColor}" cursor signaling that
+                  the squad is selected`, () => {})
+                //squadHasCursor(squadId, cursorColor)
 
                 test(
                     `Then I should see the View Squad Details option`,

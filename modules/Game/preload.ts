@@ -71,6 +71,8 @@ export default (scene: Phaser.Scene) => {
     ;["backgrounds/plain"].forEach((str) =>
         scene.load.image(str, PUBLIC_URL + "/" + str + ".png")
     )
+
+    scene.load.image("chara_cursor", PUBLIC_URL + "/chara/chara_cursor.svg")
     const ui = [
         "arrow_right",
         "panel",
