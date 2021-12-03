@@ -1,5 +1,7 @@
 import { fadeIn } from "../UI/Transition"
-import selectMoveDestination from "./events/selectMoveDestination"
+import selectMoveDestination, {
+    UNIT_DATA_TARGET,
+} from "./events/selectMoveDestination"
 import { createMap } from "./map"
 import {
     createInitialState,
@@ -51,4 +53,19 @@ export default async (scene: Phaser.Scene, params: MapScreenProperties) => {
     events(scene).on("Select Move Destination", (squadId: string) => {
         selectMoveDestination(squadId, map, scene)
     })
+    events(scene).on(
+        "Resume Squad Movement",
+        (sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) => {
+            const target = sprite.data.get(
+                UNIT_DATA_TARGET
+            ) as Phaser.Math.Vector2
+            const tile = map.getTileAtWorldXY(target.x, target.y)
+
+            scene.physics.moveToObject(
+                sprite,
+                { x: target.x, y: target.y },
+                tile.properties.speed
+            )
+        }
+    )
 }
