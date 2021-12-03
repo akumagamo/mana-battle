@@ -1,5 +1,8 @@
 import events from "../events"
-import { EVENT_CLOSE_SELET_MOVE_DESTINATION } from "../UI/events/selectMoveDestination"
+import {
+    EVENT_CLOSE_SELET_MOVE_DESTINATION,
+    SELECTED_SQUAD_OPTIONS,
+} from "../UI/events/selectMoveDestination"
 
 export const UNIT_DATA_TARGET = "target"
 const CLICK_THRESHOLD = 5
@@ -51,9 +54,13 @@ function movementOrderAssigned(
             tile.properties.speed
         )
 
-        events(scene).emit("Squad Deselected")
+      //todo: move this to ui event "enable options"
+        const elements = SELECTED_SQUAD_OPTIONS.map((name) =>
+            scene.scene.get("Map Screen UI").children.getByName(name)
+        ) as Phaser.GameObjects.Container[]
+        elements.forEach((el) => el.setAlpha(1).setInteractive())
+
         events(scene).emit(EVENT_CLOSE_SELET_MOVE_DESTINATION)
-        scene.physics.world.resume()
     }
 }
 

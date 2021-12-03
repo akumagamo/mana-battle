@@ -9,7 +9,10 @@ export default (scene: Scene) =>
         x: number,
         y: number,
         label: string,
-        onClick: () => void,
+        onClick: (
+            container: Phaser.GameObjects.Container,
+            btnText: Phaser.GameObjects.Text
+        ) => void,
         disabled = false,
         width = 300,
         height = 80
@@ -35,7 +38,7 @@ export default (scene: Scene) =>
                 if (disabled) return
                 scene.events.emit(`Button ${label} clicked`)
                 //if (process.env.SOUND_ENABLED) scene.sound.add("click1").play()
-                onClick()
+                onClick(container, text_)
             })
             .on("pointerover", () => {
                 if (disabled) return

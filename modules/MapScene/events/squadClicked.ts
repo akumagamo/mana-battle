@@ -22,6 +22,4 @@ export default function (
     scene.children.bringToTop(sprite)
 
     events(scene).emit("Squad Selected", sprite.name)
-
-    scene.physics.world.pause()
 }

@@ -20,7 +20,7 @@ export const EVENT_CLOSE_SELET_MOVE_DESTINATION =
 
 export default (scene: Phaser.Scene) => {
     const actions = [
-        deleteOptions,
+        disableOptions,
         renderSelectDestionationLabel,
         renderCancelOption,
     ]
@@ -32,6 +32,7 @@ export default (scene: Phaser.Scene) => {
             scene.children.getByName(opt)?.destroy()
         })
     })
+    11
 }
 
 function listen(scene: Phaser.Scene) {
@@ -40,11 +41,16 @@ function listen(scene: Phaser.Scene) {
     }
 }
 
-export function deleteOptions(scene: Phaser.Scene) {
+export const SELECTED_SQUAD_OPTIONS = [
+    VIEW_SQUAD_DETAILS_LABEL,
+    MOVE_SQUAD_LABEL,
+]
+export function disableOptions(scene: Phaser.Scene) {
     return (_squad: string) => {
-        ;[VIEW_SQUAD_DETAILS_LABEL, MOVE_SQUAD_LABEL]
-            .map((name) => scene.children.getByName(name))
-            .forEach((el) => el?.destroy())
+        const elements = SELECTED_SQUAD_OPTIONS.map((name) =>
+            scene.children.getByName(name)
+        ) as Phaser.GameObjects.Container[]
+        elements.forEach((el) => el.setAlpha(0.4).disableInteractive())
     }
 }
 function renderSelectDestionationLabel(scene: Phaser.Scene) {

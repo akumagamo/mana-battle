@@ -230,6 +230,41 @@ describe("Map Screen", () => {
             () => {}
         )
     })
+
+    describe("User Interface", () => {
+        describe("Stronghold option", () => {
+            test.todo(`When the Map Screen UI is visible`)
+            test.todo(`Then the UI should present a "Go to Stronghold" option`)
+            test.todo(`When I select the "Go to Stronghold" option`)
+            test.todo(`Then the camera should take me to my stronghold`)
+        })
+        describe("Squad List option", () => {
+            test.todo(`When the Map Screen UI is visible`)
+            test.todo(`Then the UI should present a "Squad List" option`)
+            test.todo(`When I select the "Squad List" option`)
+            test.todo(`Then a Squad List Modal should be presented`)
+        })
+        describe("City List option", () => {
+            test.todo(`When the Map Screen UI is visible`)
+            test.todo(`Then the UI should present a "City List" option`)
+            test.todo(`When I select the "City List" option`)
+            test.todo(`Then a City List Modal should be presented`)
+        })
+        describe("Pause option", () => {
+            test.todo(`When the Map Screen UI is visible`)
+            test.todo(`When the game is unpaused`)
+            test.todo(`Then the UI should present a "Pause" option`)
+            test.todo(`When I select the "Pause" option`)
+            test.todo(`Then the game is paused`)
+        })
+        describe("Unpause option", () => {
+            test.todo(`When the Map Screen UI is visible`)
+            test.todo(`When the game is paused`)
+            test.todo(`Then the UI should present a "Unpause" option`)
+            test.todo(`When I select the "Unpause" option`)
+            test.todo(`Then the game should be unpaused`)
+        })
+    })
 })
 
 function selectMovementTargetForSquad(id: string) {

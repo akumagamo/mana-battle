@@ -3,15 +3,17 @@ import { SCREEN_HEIGHT } from "../../../_shared/constants"
 import events from "../../events"
 import { getSquad, isAllied, State } from "../../Model"
 import createSquadDetailsModal from "../squadDetailsModal"
-import { deleteOptions } from "./selectMoveDestination"
+import { disableOptions, SELECTED_SQUAD_OPTIONS } from "./selectMoveDestination"
 
 export const VIEW_SQUAD_DETAILS_LABEL = "View Squad Details"
 export const MOVE_SQUAD_LABEL = "Move Squad"
 
 export function squadSelected(scene: Phaser.Scene, state: State) {
     return (squadId: string) => {
-        deleteOptions(scene)(squadId)
-
+        console.log(`re-rendering ui for squad`)
+        SELECTED_SQUAD_OPTIONS.forEach((opt) =>
+            scene.children.getByName(opt)?.destroy()
+        )
         UI.button(scene)(
             200,
             SCREEN_HEIGHT - 50,
