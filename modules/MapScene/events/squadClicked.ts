@@ -14,12 +14,21 @@ export default function (
     scene.children.each((child) =>
         child.name.endsWith("/cursor") ? child.destroy() : null
     )
-    scene.add
-        .image(sprite.x, sprite.y + 25, "chara_cursor")
+    const cursor = scene.add
+        .image(0, 0, "chara_cursor")
         .setScale(0.2)
         .setName(sprite.name + "/cursor")
+        .on("removedfromscene", () => {
+            scene.events.removeListener("update", updatePosition)
+        })
+
+    scene.events.on("update", updatePosition)
 
     scene.children.bringToTop(sprite)
 
     events(scene).emit("Squad Selected", sprite.name)
+
+    function updatePosition() {
+        cursor.setPosition(sprite.x, sprite.y + 30)
+    }
 }

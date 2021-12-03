@@ -43,8 +43,6 @@ function movementOrderAssigned(
 
         clearEvents(layer)
 
-        scene.children.getByName(sprite.name + "/cursor")?.destroy()
-
         const target = { x: pointer.worldX, y: pointer.worldY }
         sprite.data.set(UNIT_DATA_TARGET, target)
         const tile = layer.getTileAtWorldXY(target.x, target.y)
