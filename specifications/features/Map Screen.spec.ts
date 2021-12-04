@@ -391,16 +391,17 @@ function resetScreen(params: MapScreenProperties) {
 }
 
 /**
- * @TODO: replace this with `waitForEvent`
+ * @TODO: replace this with `waitForSquaEvent`
  */
 function waitForSquadArrival(squadId: string) {
     return async () => {
-        await page.evaluate((expectedId: string) => {
-            return new Promise<string>((resolve) => {
+        await page.evaluate((id: string) => {
+            return new Promise<void>((resolve) => {
                 window.game.scene
                     .getScene("Map Screen")
-                    .events.once("Squad Arrived", (id: string) => {
-                        if (expectedId === id) resolve(id)
+                    .children.getByName(id)
+                    .on("Arrived at target", () => {
+                        resolve()
                     })
             })
         }, squadId)

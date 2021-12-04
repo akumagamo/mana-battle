@@ -46,16 +46,11 @@ function movementOrderAssigned(
         const target = { x: pointer.worldX, y: pointer.worldY }
         sprite.data.set(UNIT_DATA_TARGET, target)
 
-        // move this to sprite.on...
         scene.events.emit("Resume Squad Movement", sprite)
 
-        //todo: move this to ui event "enable options"
-        const elements = SELECTED_SQUAD_OPTIONS.map((name) =>
-            scene.scene.get("Map Screen UI").children.getByName(name)
-        ) as Phaser.GameObjects.Container[]
-        elements.forEach((el) => el.setAlpha(1).setInteractive())
-
         events(scene).emit(EVENT_CLOSE_SELET_MOVE_DESTINATION)
+
+        events(scene).emit("Squad Selected", sprite.name)
     }
 }
 

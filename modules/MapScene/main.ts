@@ -53,6 +53,7 @@ export default async (scene: Phaser.Scene, params: MapScreenProperties) => {
     events(scene).on("Select Move Destination", (squadId: string) => {
         selectMoveDestination(squadId, map, scene)
     })
+
     events(scene).on(
         "Resume Squad Movement",
         (sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) => {

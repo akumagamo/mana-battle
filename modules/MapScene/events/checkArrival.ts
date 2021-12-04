@@ -1,3 +1,4 @@
+import { ARRIVED_AT_TARGET } from "../squad"
 import { UNIT_DATA_TARGET } from "./selectMoveDestination"
 
 export function checkArrival(scene: Phaser.Scene) {
@@ -22,6 +23,7 @@ export function checkArrival(scene: Phaser.Scene) {
             if (distance <= 10) {
                 sprite.body.velocity.reset()
                 scene.events.emit("Squad Arrived", sprite.name)
+                sprite.emit(ARRIVED_AT_TARGET)
             }
         })
     }

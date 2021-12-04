@@ -1,5 +1,8 @@
+import { UNIT_DATA_TARGET } from "./events/selectMoveDestination"
 import squadClicked from "./events/squadClicked"
 import { Squad } from "./Model"
+
+export const ARRIVED_AT_TARGET = "Arrived at target"
 
 export const createSquad = (scene: Phaser.Scene) => (squad: Squad) => {
     const { x, y, id } = squad
@@ -22,4 +25,8 @@ function createSquadEvents(
     sprite.setInteractive()
 
     sprite.on(Phaser.Input.Events.POINTER_UP, () => squadClicked(sprite, scene))
+
+    sprite.on(ARRIVED_AT_TARGET, () => {
+        sprite.data.remove(UNIT_DATA_TARGET)
+    })
 }

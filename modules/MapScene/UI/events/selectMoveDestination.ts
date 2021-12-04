@@ -50,7 +50,7 @@ export function disableOptions(scene: Phaser.Scene) {
         const elements = SELECTED_SQUAD_OPTIONS.map((name) =>
             scene.children.getByName(name)
         ) as Phaser.GameObjects.Container[]
-        elements.forEach((el) => el.setAlpha(0.4).disableInteractive())
+        elements.forEach((el) => el.destroy())
     }
 }
 function renderSelectDestionationLabel(scene: Phaser.Scene) {
