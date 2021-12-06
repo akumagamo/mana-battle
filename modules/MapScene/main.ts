@@ -3,12 +3,7 @@ import selectMoveDestination, {
     UNIT_DATA_TARGET,
 } from "./events/selectMoveDestination"
 import { createMap } from "./map"
-import {
-    createInitialState,
-    MapScreenProperties,
-    setState,
-    Squad,
-} from "./Model"
+import { createInitialState, MapScreenProperties, Squad, State } from "./Model"
 import { createSquad } from "./squad"
 import { createCity } from "./city"
 import MapSceneUI from "./UI/phaser"
@@ -16,28 +11,14 @@ import events from "./events"
 import { squadCollision } from "./events/squadCollision"
 
 export default async (scene: Phaser.Scene, params: MapScreenProperties) => {
+    const initialState = createInitialState(params)
+
     const map = createMap(scene)
 
-    const initialState = createInitialState(params)
-    const setState_ = setState(initialState)
-
-    const UI = MapSceneUI(initialState)
-
-    scene.scene.add(UI.key, UI)
-    scene.scene.run(UI.key)
+    createUI(initialState, scene)
     createAnimations(scene)
 
-    const { allies, enemies } = initialState.squads.reduce(
-        (xs, x) => {
-            if (x.force.get("force") === "PLAYER")
-                return { ...xs, allies: xs.allies.concat([x]) }
-            else return { ...xs, enemies: xs.enemies.concat([x]) }
-        },
-        { allies: [] as Squad[], enemies: [] as Squad[] }
-    )
-
-    const alliedGroup = allies.map(createSquad(scene))
-    const enemyGroup = enemies.map(createSquad(scene))
+    const { alliedGroup, enemyGroup } = createSquads(initialState, scene)
 
     scene.events.on("Squad Collision", squadCollision(scene))
 
@@ -47,9 +28,7 @@ export default async (scene: Phaser.Scene, params: MapScreenProperties) => {
 
     initialState.cities.forEach(createCity(scene))
 
-    fadeIn(scene, 500)
-
-    scene.game.events.emit("Map Screen Created")
+    await fadeIn(scene, 500)
 
     events(scene).on("Select Move Destination", (squadId: string) => {
         selectMoveDestination(squadId, map, scene)
@@ -70,6 +49,29 @@ export default async (scene: Phaser.Scene, params: MapScreenProperties) => {
             )
         }
     )
+
+    scene.game.events.emit("Map Screen Created")
+}
+
+function createSquads(initialState: State, scene: Phaser.Scene) {
+    const { allies, enemies } = initialState.squads.reduce(
+        (xs, x) => {
+            if (x.force.get("force") === "PLAYER")
+                return { ...xs, allies: xs.allies.concat([x]) }
+            else return { ...xs, enemies: xs.enemies.concat([x]) }
+        },
+        { allies: [] as Squad[], enemies: [] as Squad[] }
+    )
+
+    const alliedGroup = allies.map(createSquad(scene))
+    const enemyGroup = enemies.map(createSquad(scene))
+    return { alliedGroup, enemyGroup }
+}
+
+function createUI(initialState: State, scene: Phaser.Scene) {
+    const UI = MapSceneUI(initialState)
+    scene.scene.add(UI.key, UI)
+    scene.scene.run(UI.key)
 }
 
 function createAnimations(scene: Phaser.Scene) {

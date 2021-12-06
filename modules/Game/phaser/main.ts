@@ -8,6 +8,8 @@ import preload from "../preload"
 declare global {
     interface Window {
         game: Phaser.Game
+        getMapScene: () => Phaser.Scene
+        getMapSceneUI: () => Phaser.Scene
     }
 }
 
@@ -65,5 +67,7 @@ export const main = () => {
 
     if (process.env.NODE_ENV === "development") {
         window.game = game
+        window.getMapScene = () => game.scene.getScene("Map Screen")
+        window.getMapSceneUI = () => game.scene.getScene("Map Screen UI")
     }
 }

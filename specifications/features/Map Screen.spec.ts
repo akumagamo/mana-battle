@@ -72,8 +72,6 @@ describe("Map Screen", () => {
                     dsl.click("Map Screen")(squadId)
                 )
 
-                test("Then the game is paused", gameShouldBePaused(true))
-
                 test.skip(`Then there should be a "${cursorColor}" cursor signaling that
                   the squad is selected`, () => {})
                 //squadHasCursor(squadId, cursorColor)
@@ -158,8 +156,6 @@ describe("Map Screen", () => {
                 await page.waitForTimeout(50)
             })
 
-            test("Then the game is unpaused", gameShouldBePaused(false))
-
             test("Unit moves to that location", waitForSquadArrival("0"))
         })
 
@@ -176,7 +172,10 @@ describe("Map Screen", () => {
 
             test(
                 "Then I should still be selecting a target destination",
-                gameShouldBePaused(true)
+                assertOptionVisibilityInUI({
+                    optionName: "Select Destination",
+                    shouldBeVisible: true,
+                })
             )
         })
     })
@@ -337,11 +336,16 @@ function gameShouldBePaused(shouldBePaused: boolean) {
 
 async function assertNoEntityIsSelected() {
     await resetScreen(defaultParameters)()
-    await page.evaluate(() => {
-        const screenUI = window.game.scene.getScene("Map Screen UI")
-        const selectedUnitUI = screenUI.children.getByName("Selected Unit Info")
-        if (selectedUnitUI) throw new Error("There is a selected unit")
+    await dsl.waitForSceneCreation("Map Screen")()
+    const hasSelected = await page.evaluate(() => {
+        const cursor = window
+            .getMapScene()
+            .children.list.filter((element) => element.name.endsWith("cursor"))
+
+        return cursor && cursor.length > 0
     })
+
+    if (hasSelected) throw new Error("has an selected squad")
 }
 
 function assertAllCitiesAreVisible({ cities }: MapScreenProperties) {
@@ -372,9 +376,7 @@ function assertAllSquadsAreVisible({ squads }: MapScreenProperties) {
 
 async function assertMapIsVisible() {
     const types = await page.evaluate(() => {
-        return window.game.scene
-            .getScene("Map Screen")
-            .children.list.map((child) => child.type)
+        return window.getMapScene().children.list.map((child) => child.type)
     })
 
     expect(types).toContain("TilemapLayer")
