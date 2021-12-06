@@ -124,7 +124,6 @@ export async function checkVisibility(
 ) {
     const isVisible = await page.evaluate(
         ({ scene, name }) => {
-            console.log(`>>>`, window.game.scene.getScene(scene).children)
             const gameObject = window.game.scene
                 .getScene(scene)
                 .children.getByName(name)
