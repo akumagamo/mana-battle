@@ -400,7 +400,7 @@ function waitForSquadArrival(squadId: string) {
                 window.game.scene
                     .getScene("Map Screen")
                     .children.getByName(id)
-                    .on("Arrived at target", () => {
+                    ?.on("Arrived at target", () => {
                         resolve()
                     })
             })

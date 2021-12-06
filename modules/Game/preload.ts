@@ -23,58 +23,18 @@ export function progressBar(scene: Phaser.Scene) {
         )
     })
 
-    // scene.load.on("fileprogress", (file: Phaser.Loader.File) => {
-    //   console.log(file.src);
-    // });
     scene.load.on("complete", function () {
-        //console.log("complete!");
         progressBar.destroy()
         progressBox.destroy()
     })
 }
 
-const jobs = ["soldier"]
 export default (scene: Phaser.Scene) => {
-    jobs.forEach((job) => {
-        scene.load.json(`${job}-data`, `${PUBLIC_URL}/jobs/${job}/data.json`)
-        scene.load.atlas(
-            `${job}_atlas`,
-            `assets/jobs/${job}/animations.png`,
-            `assets/jobs/${job}/animations.json`
-        )
 
-        const mapSpriteKey = `${job}-map`
-
-        scene.load.spritesheet(
-            mapSpriteKey,
-            `${PUBLIC_URL}/jobs/${job}/map-animations.png`,
-            { frameWidth: 32, frameHeight: 32, endFrame: 11 }
-        )
-    })
-
-    scene.load.image("squad_test", `${PUBLIC_URL}/sprites/squad_test.png`)
-
-    scene.load.spritesheet("fire", `${PUBLIC_URL}/fire.svg`, {
-        frameWidth: 50,
-        frameHeight: 117,
-        endFrame: 6,
-    })
-    ;["pipo"].forEach((str) =>
-        scene.load.image(str, PUBLIC_URL + "/tileset/" + str + ".png")
-    )
-    ;["maps/map"].forEach((str) =>
-        scene.load.tilemapTiledJSON(str, PUBLIC_URL + "/" + str + ".json")
-    )
     ;["backgrounds/sunset", "board"].forEach((str) =>
         scene.load.image(str, PUBLIC_URL + "/" + str + ".svg")
     )
-    ;["backgrounds/plain"].forEach((str) =>
-        scene.load.image(str, PUBLIC_URL + "/" + str + ".png")
-    )
-
-    scene.load.image("chara_cursor", PUBLIC_URL + "/chara/chara_cursor.svg")
     const ui = [
-        "arrow_right",
         "panel",
         "announcement_bg",
         "button_move",
@@ -101,8 +61,6 @@ export default (scene: Phaser.Scene) => {
             scene.load.audio(id, `${PUBLIC_URL}/music/${id}.ogg`)
         })
     }
-
-    scene.load.image("arrow", `${PUBLIC_URL}/arrow.svg`)
 
     progressBar(scene)
 }

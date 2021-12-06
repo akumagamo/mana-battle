@@ -25,6 +25,7 @@ export default async (scene: Phaser.Scene, params: MapScreenProperties) => {
 
     scene.scene.add(UI.key, UI)
     scene.scene.run(UI.key)
+    createAnimations(scene)
 
     const { allies, enemies } = initialState.squads.reduce(
         (xs, x) => {
@@ -69,4 +70,34 @@ export default async (scene: Phaser.Scene, params: MapScreenProperties) => {
             )
         }
     )
+}
+
+function createAnimations(scene: Phaser.Scene) {
+    const jobs = ["soldier", "skeleton"]
+
+    jobs.forEach((job) => {
+        const mapSpriteKey = `${job}-map`
+
+        const directions = [
+            { dir: "down", start: 0, end: 2 },
+            { dir: "left", start: 3, end: 5 },
+            { dir: "right", start: 6, end: 8 },
+            { dir: "top", start: 9, end: 11 },
+        ]
+
+        directions.forEach(({ dir, start, end }) => {
+            const frames = scene.anims.generateFrameNumbers(mapSpriteKey, {
+                start,
+                end,
+            })
+            const config = {
+                key: `${job}-map-walk-${dir}`,
+                frames,
+                frameRate: 3,
+                repeat: -1,
+            }
+
+            scene.anims.create(config)
+        })
+    })
 }

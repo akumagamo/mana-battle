@@ -7,11 +7,12 @@ export const ARRIVED_AT_TARGET = "Arrived at target"
 export const createSquad = (scene: Phaser.Scene) => (squad: Squad) => {
     const { x, y, id } = squad
 
+    const job = squad.force.get("force") === "PLAYER" ? "soldier" : "skeleton"
     const sprite = scene.physics.add
-        .sprite(x, y, "soldier-map")
+        .sprite(x, y, `${job}-map`)
         .setDataEnabled()
         .setName(id.get("squad") || "")
-        .play("map-walk-down")
+        .play(`${job}-map-walk-down`)
         .setScale(2)
 
     createSquadEvents(scene, sprite)
