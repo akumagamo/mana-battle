@@ -224,9 +224,41 @@ describe("Map Screen", () => {
             ${"left"}  | ${[50, 100]}
             ${"top"}   | ${[100, 50]}
         `(
-            `When I move to $direction, then the character sprite should change 
-             to the correspondent animation`,
-            () => {}
+            `When a squad is moving to "$direction", then it should adjust its animation`,
+            ({
+                direction,
+                moveTo,
+            }: {
+                direction: string
+                moveTo: number[]
+            }) => {
+                test(
+                    "Given that I have nothing selected",
+                    assertNoEntityIsSelected
+                )
+                const [x, y] = moveTo
+                test(
+                    "When I select a movement target",
+                    selectMovementTargetForSquad("0")
+                )
+                test(`When I select a position to the "${direction}" of the squad`, async () => {
+                    await page.mouse.click(x, y)
+                    await page.waitForTimeout(30)
+                })
+                test(`Then the sprite should face that direction`, async () => {
+                    const animation = await page.evaluate(() => {
+                        const sqd = window
+                            .getMapScene()
+                            .children.getByName(
+                                "0"
+                            ) as Phaser.Physics.Arcade.Sprite
+
+                        return sqd.anims.getName()
+                    })
+
+                    expect(animation).toEqual(`soldier-map-walk-${direction}`)
+                })
+            }
         )
     })
 

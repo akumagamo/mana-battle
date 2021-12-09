@@ -51,6 +51,8 @@ function movementOrderAssigned(
         events(scene).emit(EVENT_CLOSE_SELET_MOVE_DESTINATION)
 
         events(scene).emit("Squad Selected", sprite.name)
+
+        sprite.emit("updateAnimation")
     }
 }
 
