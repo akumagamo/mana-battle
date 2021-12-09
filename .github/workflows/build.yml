@@ -26,20 +26,8 @@ jobs:
               env:
                   NODE_ENV: "production"
 
-            - name: Copy Assets
+            - name: Copy assets into distribution directory
               run: cp -r assets/ dist/assets/
-
-            - name: Copy index
-              run: cp modules/Browser/index.html dist/index.html
-
-            - name: Create dist for bundle
-              run: mkdir dist/dist/
-
-            - name: Copy bundle
-              run: mv dist/bundle.js dist/dist/bundle.js
-
-            - name: Copy license
-              run: mv dist/bundle.js.LICENSE.txt dist/dist/bundle.js.LICENSE.txt
 
             - name: Deploy
               uses: peaceiris/actions-gh-pages@v3
