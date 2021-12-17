@@ -1,4 +1,4 @@
-import * as dsl from "../dsl"
+import * as dsl from "../_shared/dsl"
 import "expect-puppeteer"
 
 beforeAll(dsl.openGame)
