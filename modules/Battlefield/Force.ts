@@ -60,16 +60,38 @@ export const removeUnit = (
     force: Force,
     id: UnitId
 ): [errors: string[], force: Force] => {
-    const unitNotInBenchError = force.unitsWithoutSquad.has(id)
-        ? []
-        : [Errors.UNIT_NOT_IN_BENCH(id)]
+    const { error, unit } = getUnitInBench(force, id)
+    const errors = [...error]
 
-    const updateForce = () => ({
-        ...force,
-        unitsWithoutSquad: force.unitsWithoutSquad.delete(id),
-    })
+    const updateForce = () =>
+        unit
+            ? {
+                  ...force,
+                  unitsWithoutSquad: force.unitsWithoutSquad.delete(id),
+              }
+            : force
 
-    return [[...unitNotInBenchError], updateForce()]
+    return [errors, updateForce()]
+}
+export const updateUnit = (
+    force: Force,
+    updatedUnit: Unit
+): [errors: string[], force: Force] => {
+    const { error, unit } = getUnitInBench(force, updatedUnit.id)
+    const errors = [...error]
+
+    const updateForce = () =>
+        unit
+            ? {
+                  ...force,
+                  unitsWithoutSquad: force.unitsWithoutSquad.set(
+                      updatedUnit.id,
+                      updatedUnit
+                  ),
+              }
+            : force
+
+    return [errors, updateForce()]
 }
 
 /**
@@ -192,6 +214,16 @@ export const removeSquad = (
             : force
 
     return [[...squadNotFoundError], updateForce()]
+}
+
+function getUnitInBench(force: Force, id: UnitId) {
+    const unit = force.unitsWithoutSquad.get(id)
+    const error = unit ? [] : [Errors.UNIT_NOT_IN_BENCH(id)]
+
+    return {
+        error,
+        unit,
+    }
 }
 
 function getSquadInBench(

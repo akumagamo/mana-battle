@@ -7,6 +7,7 @@ import {
     removeSquad,
     addUnit,
     removeUnit,
+    updateUnit,
 } from "./Force"
 import * as Errors from "./Force.errors"
 import { Squad, SquadId } from "./Squad"
@@ -149,5 +150,22 @@ describe("removeUnit", () => {
         const [_errs, force] = removeUnit(defaultForce, id)
 
         expect(force.unitsWithoutSquad.has(id)).toBeFalsy()
+    })
+})
+
+describe("updateUnit", () => {
+    const newUnit = (id: string) => ({ id: UnitId(id), name: "New Name" })
+    test("should report error if trying to remove an unit not in the bench", () => {
+        const [errs, force] = updateUnit(defaultForce, newUnit("x1"))
+
+        console.log(force.unitsWithoutSquad.toJS())
+        expect(errs).toStrictEqual([Errors.UNIT_NOT_IN_BENCH("x1")])
+        expect(defaultForce).toStrictEqual(force)
+    })
+    test("should update valid unit in the bench", () => {
+        const [id] = ids
+        const [_errs, force] = updateUnit(defaultForce, newUnit(id))
+
+        expect(force.unitsWithoutSquad.get(id)?.name).toEqual(newUnit(id).name)
     })
 })
