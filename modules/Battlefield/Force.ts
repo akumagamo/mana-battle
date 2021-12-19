@@ -56,10 +56,21 @@ export const addUnit = (force: Force, unit: Unit) => ({
     unitsWithoutSquad: force.unitsWithoutSquad.set(unit.id, unit),
 })
 
-export const removeUnit = (force: Force, unit: Unit) => ({
-    ...force,
-    unitsWithoutSquad: force.unitsWithoutSquad.delete(unit.id),
-})
+export const removeUnit = (
+    force: Force,
+    id: UnitId
+): [errors: string[], force: Force] => {
+    const unitNotInBenchError = force.unitsWithoutSquad.has(id)
+        ? []
+        : [Errors.UNIT_NOT_IN_BENCH(id)]
+
+    const updateForce = () => ({
+        ...force,
+        unitsWithoutSquad: force.unitsWithoutSquad.delete(id),
+    })
+
+    return [[...unitNotInBenchError], updateForce()]
+}
 
 /**
  * Rule: All unitIds must be in force.unitsWithoutSquad
