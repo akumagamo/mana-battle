@@ -4,6 +4,7 @@ import TitleScene from "./phaser"
 import UI from "../UI"
 import { fadeOut } from "../UI/Transition"
 import { createMapScreenProperties } from "../MapScene/Model"
+import { main } from "../Battlefield/main"
 
 export default (scene: Phaser.Scene) => {
     UI.button(scene)(CENTER_X, CENTER_Y, "New Game", () => buttonClicked(scene))
@@ -31,6 +32,9 @@ async function buttonClicked(scene: Phaser.Scene) {
         ],
     })
 
-    scene.game.events.emit("Start Map Screen", defaultParameters)
+    const ev = main(scene)
+
+    ev.emit("start")
+
     scene.scene.remove(TitleScene.key)
 }

@@ -6,7 +6,6 @@ import { createMap } from "./map"
 import { createInitialState, MapScreenProperties, Squad, State } from "./Model"
 import { createSquad } from "./squad"
 import { createCity } from "./city"
-import MapSceneUI from "./UI/phaser"
 import events from "./events"
 import { squadCollision } from "./events/squadCollision"
 
@@ -15,7 +14,6 @@ export default async (scene: Phaser.Scene, params: MapScreenProperties) => {
 
     const map = createMap(scene)
 
-    createUI(initialState, scene)
     createAnimations(scene)
 
     const { alliedGroup, enemyGroup } = createSquads(initialState, scene)
@@ -66,12 +64,6 @@ function createSquads(initialState: State, scene: Phaser.Scene) {
     const alliedGroup = allies.map(createSquad(scene))
     const enemyGroup = enemies.map(createSquad(scene))
     return { alliedGroup, enemyGroup }
-}
-
-function createUI(initialState: State, scene: Phaser.Scene) {
-    const UI = MapSceneUI(initialState)
-    scene.scene.add(UI.key, UI)
-    scene.scene.run(UI.key)
 }
 
 function createAnimations(scene: Phaser.Scene) {
