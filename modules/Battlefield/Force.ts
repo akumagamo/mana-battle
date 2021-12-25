@@ -1,5 +1,7 @@
-import { Map, Set } from "immutable"
+import { fromNullable, right } from "fp-ts/lib/Either"
+import { Map } from "immutable"
 import { Collection } from "../_shared/Entity"
+import { Fallible, runFallible } from "../_shared/Fallible"
 import * as Errors from "./Force.errors"
 import {
     boardIndex,
@@ -11,7 +13,7 @@ import {
 } from "./Squad"
 import { Unit, UnitId } from "./Unit"
 
-type Relationship = "ALLY" | "ENEMY" | "NEUTRAL"
+export type Relationship = "ALLY" | "ENEMY" | "NEUTRAL"
 export const Relationships: { [x in Relationship]: Relationship } = {
     ALLY: "ALLY",
     ENEMY: "ENEMY",
@@ -24,8 +26,8 @@ export const ForceControllers: { [x in ForceController]: ForceController } = {
     COMPUTER: "COMPUTER",
 }
 
-type ForceId = string & { _forceId: never }
-const ForceId = (id: string) => id as ForceId
+export type ForceId = string & { _forceId: never }
+export const ForceId = (id: string) => id as ForceId
 
 export type Force = {
     id: ForceId
@@ -56,190 +58,149 @@ export const addUnit = (force: Force, unit: Unit) => ({
     unitsWithoutSquad: force.unitsWithoutSquad.set(unit.id, unit),
 })
 
-export const removeUnit = (
-    force: Force,
-    id: UnitId
-): [errors: string[], force: Force] => {
-    const { error, unit } = getUnitInBench(force, id)
-    const errors = [...error]
-
-    const updateForce = () =>
-        unit
-            ? {
-                  ...force,
-                  unitsWithoutSquad: force.unitsWithoutSquad.delete(id),
-              }
-            : force
-
-    return [errors, updateForce()]
-}
-export const updateUnit = (
-    force: Force,
-    updatedUnit: Unit
-): [errors: string[], force: Force] => {
-    const { error, unit } = getUnitInBench(force, updatedUnit.id)
-    const errors = [...error]
-
-    const updateForce = () =>
-        unit
-            ? {
-                  ...force,
-                  unitsWithoutSquad: force.unitsWithoutSquad.set(
-                      updatedUnit.id,
-                      updatedUnit
-                  ),
-              }
-            : force
-
-    return [errors, updateForce()]
-}
-
-/**
- * Rule: All unitIds must be in force.unitsWithoutSquad
- * Rule: unitIds cannot be empty
- * Rule: unitIds cannot have more than 5 items
- */
-export const addSquad = (
-    force: Force,
-    unitIds: UnitId[]
-): [string[], Force] => {
-    const { unitsWithoutSquad, nonDispatchedSquads, dispatchedSquads } = force
-
-    const units = unitIds.reduce((xs, id) => {
-        const unit = unitsWithoutSquad.get(id)
-
-        if (unit) return xs.concat([unit])
-        else return xs
-    }, [] as Unit[])
-
-    const nonExistingMembers = Set(unitIds).subtract(
-        Set(units.map((u) => u.id))
-    )
-
-    const unitsNotInBenchErrors = nonExistingMembers
-        .map(Errors.UNIT_NOT_IN_BENCH)
-        .toJS() as string[]
-
-    const minSizeError = unitIds.length < 1 ? [Errors.FORCE_SQUAD_MIN_SIZE] : []
-
-    const maxSizeError = unitIds.length > 5 ? [Errors.FORCE_SQUAD_MAX_SIZE] : []
-
-    const errors = [...unitsNotInBenchErrors, ...minSizeError, ...maxSizeError]
-
-    const totalSquads = dispatchedSquads.size + nonDispatchedSquads.size
-
-    const board = boardIndex(3, 3)
-    const squad = createSquad(
-        `force/${force.id}/squads/${totalSquads}`,
-        units.map((u, i) => [u, board[i]])
-    )
-
-    const updateForce = () => ({
+export const removeUnit = (force: Force, id: UnitId): Fallible<Force> => {
+    return runFallible(right(force), [unitShouldBeInBench(id)], (force) => ({
         ...force,
-        unitsWithoutSquad: unitsWithoutSquad.deleteAll(unitIds),
-        nonDispatchedSquads: nonDispatchedSquads.set(squad.id, squad),
-    })
-
-    return [errors, errors.length > 0 ? force : updateForce()]
+        unitsWithoutSquad: force.unitsWithoutSquad.delete(id),
+    }))
 }
-
-/**
- * Rule: squadId must exist in the bench
- */
-export const dispatchSquad = (
-    force: Force,
-    squadId: SquadId
-): [string[], Force] => {
-    const { nonDispatchedSquads, dispatchedSquads } = force
-
-    const { error: squadNotFoundError, squad } = getSquadInBench(force, squadId)
-
-    const updateForce = () =>
-        squad
-            ? {
-                  ...force,
-                  nonDispatchedSquads: nonDispatchedSquads.delete(squadId),
-                  dispatchedSquads: dispatchedSquads.set(squadId, {
-                      ...squad,
-                      position: MapPosition(force.stronghold),
-                  }),
-              }
-            : force
-
-    return [[...squadNotFoundError], updateForce()]
-}
-
-/**
- * Rule: squadId must exist in dispatchSquad collection
- */
-export const retreatSquad = (
-    force: Force,
-    squadId: SquadId
-): [errors: string[], force: Force] => {
-    const { nonDispatchedSquads, dispatchedSquads } = force
-
-    const { error: squadNotFoundError, squad } = getDispatchedSquad(
-        force,
-        squadId
+export const updateUnit = (force: Force, updatedUnit: Unit): Fallible<Force> =>
+    runFallible(
+        right(force),
+        [unitShouldBeInBench(updatedUnit.id)],
+        (force_) => ({
+            ...force_,
+            unitsWithoutSquad: force.unitsWithoutSquad.set(
+                updatedUnit.id,
+                updatedUnit
+            ),
+        })
     )
 
-    const updateForce = () =>
-        squad
-            ? {
-                  ...force,
-                  dispatchedSquads: dispatchedSquads.delete(squadId),
-                  nonDispatchedSquads: nonDispatchedSquads.set(squadId, squad),
-              }
-            : force
+export const addSquad =
+    (unitIds: UnitId[]) =>
+    (force: Force): Fallible<Force> => {
+        const { unitsWithoutSquad, nonDispatchedSquads, dispatchedSquads } =
+            force
 
-    return [[...squadNotFoundError], updateForce()]
-}
+        return runFallible(
+            right(force),
+            [
+                squadHasMinSize(unitIds),
+                squadIsBelowMaxSize(unitIds),
+                ...unitsAreInBench(unitIds, unitsWithoutSquad),
+            ],
+            (force_) => {
+                const units = getAllFrom(unitIds, unitsWithoutSquad)
 
-export const removeSquad = (
-    force: Force,
-    squadId: SquadId
-): [errors: string[], force: Force] => {
-    const { nonDispatchedSquads, unitsWithoutSquad } = force
-    const { error: squadNotFoundError, squad } = getSquadInBench(force, squadId)
+                const totalSquads =
+                    dispatchedSquads.size + nonDispatchedSquads.size
 
-    const updateForce = () =>
-        squad
-            ? {
-                  ...force,
-                  nonDispatchedSquads: nonDispatchedSquads.delete(squadId),
-                  unitsWithoutSquad: unitsWithoutSquad.merge(
-                      squad.members.map((squad) => squad.unit)
-                  ),
-              }
-            : force
-
-    return [[...squadNotFoundError], updateForce()]
-}
-
-function getUnitInBench(force: Force, id: UnitId) {
-    const unit = force.unitsWithoutSquad.get(id)
-    const error = unit ? [] : [Errors.UNIT_NOT_IN_BENCH(id)]
-
-    return {
-        error,
-        unit,
+                const board = boardIndex(3, 3)
+                const squad = createSquad(
+                    `force/${force.id}/squads/${totalSquads}`,
+                    force.id,
+                    units.map((u, i) => [u, board[i]])
+                )
+                return {
+                    ...force_,
+                    unitsWithoutSquad: unitsWithoutSquad.deleteAll(unitIds),
+                    nonDispatchedSquads: nonDispatchedSquads.set(
+                        squad.id,
+                        squad
+                    ),
+                }
+            }
+        )
     }
+
+export const dispatchSquad =
+    (squadId: SquadId) =>
+    (force: Force): Fallible<Force> => {
+        const { nonDispatchedSquads, dispatchedSquads } = force
+
+        return runFallible(getSquadInBench(force, squadId), [], (squad) => {
+            const dispatched: DispatchedSquad = {
+                ...squad,
+                position: MapPosition(force.stronghold),
+            }
+            return {
+                ...force,
+                nonDispatchedSquads: nonDispatchedSquads.delete(squad.id),
+                dispatchedSquads: dispatchedSquads.set(squad.id, dispatched),
+            }
+        })
+    }
+
+export const retreatSquad =
+    (squadId: SquadId) =>
+    (force: Force): Fallible<Force> => {
+        const { nonDispatchedSquads, dispatchedSquads } = force
+
+        return runFallible(getDispatchedSquad(force, squadId), [], (squad) => ({
+            ...force,
+            dispatchedSquads: dispatchedSquads.delete(squadId),
+            nonDispatchedSquads: nonDispatchedSquads.set(squadId, squad),
+        }))
+    }
+
+export const removeSquad =
+    (squadId: SquadId) =>
+    (force: Force): Fallible<Force> => {
+        const { nonDispatchedSquads, unitsWithoutSquad } = force
+
+        return runFallible(getSquadInBench(force, squadId), [], (squad) => ({
+            ...force,
+            nonDispatchedSquads: nonDispatchedSquads.delete(squadId),
+            unitsWithoutSquad: unitsWithoutSquad.merge(
+                squad.members.map((squad) => squad.unit)
+            ),
+        }))
+    }
+
+function getAllFrom<A>(ids: string[], collection: Collection<A>) {
+    return ids.reduce((xs, id) => {
+        const item = collection.get(id)
+        if (item) return xs.concat([item])
+        else return xs
+    }, [] as A[])
 }
 
-function getSquadInBench(
-    force: Force,
-    squadId: SquadId
-): { error: string[]; squad: Squad | undefined } {
-    const squad = force.nonDispatchedSquads.get(squadId)
-    const error = squad ? [] : [Errors.SQUAD_NOT_BENCHED(squadId)]
-    return { error, squad }
+function unitsAreInBench(
+    unitIds: UnitId[],
+    unitsWithoutSquad: Collection<Unit>
+): [string, (f: Force) => boolean][] {
+    return unitIds.map((id) => [
+        Errors.UNIT_NOT_IN_BENCH(id),
+        (_f: Force) => unitsWithoutSquad.has(id),
+    ])
 }
 
-function getDispatchedSquad(
-    force: Force,
-    squadId: SquadId
-): { error: string[]; squad: Squad | undefined } {
-    const squad = force.dispatchedSquads.get(squadId)
-    const error = squad ? [] : [Errors.SQUAD_NOT_DISPATCHED(squadId)]
-    return { error, squad }
+function squadIsBelowMaxSize(
+    unitIds: UnitId[]
+): [string, (a: Force) => boolean] {
+    return [Errors.FORCE_SQUAD_MAX_SIZE, (_f: Force) => unitIds.length <= 5]
+}
+
+function squadHasMinSize(unitIds: UnitId[]): [string, (a: Force) => boolean] {
+    return [Errors.FORCE_SQUAD_MIN_SIZE, (_f: Force) => unitIds.length > 0]
+}
+
+function unitShouldBeInBench(id: UnitId): [string, (a: Force) => boolean] {
+    return [
+        `Unit ${id} should be in the bench.`,
+        (f) => Boolean(f.unitsWithoutSquad.get(id)),
+    ]
+}
+
+function getSquadInBench(force: Force, squadId: SquadId): Fallible<Squad> {
+    return fromNullable([Errors.SQUAD_NOT_BENCHED(squadId)])(
+        force.nonDispatchedSquads.get(squadId, null)
+    )
+}
+
+function getDispatchedSquad(force: Force, squadId: SquadId): Fallible<Squad> {
+    return fromNullable([Errors.SQUAD_NOT_DISPATCHED(squadId)])(
+        force.dispatchedSquads.get(squadId, null)
+    )
 }

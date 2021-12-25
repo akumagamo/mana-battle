@@ -1,4 +1,7 @@
+import { isLeft, left, chain } from "fp-ts/lib/Either"
+import { pipe } from "fp-ts/lib/function"
 import { Range } from "immutable"
+import { Fallible } from "../_shared/Fallible"
 import {
     createForce,
     addSquad,
@@ -8,9 +11,10 @@ import {
     addUnit,
     removeUnit,
     updateUnit,
+    Force,
 } from "./Force"
 import * as Errors from "./Force.errors"
-import { Squad, SquadId } from "./Squad"
+import { SquadId } from "./Squad"
 import { createUnit, UnitId } from "./Unit"
 
 const ids = Range(0, 10)
@@ -24,16 +28,17 @@ const defaultForce = ids
 
 describe("addSquad", () => {
     test("should report an error if trying to add an unit that is not benched", () => {
-        const [errs, force_] = addSquad(defaultForce, [UnitId("x1")])
+        const result = addSquad([UnitId("x1")])(defaultForce)
 
-        expect(errs).toStrictEqual([Errors.UNIT_NOT_IN_BENCH("x1")])
-        expect(defaultForce).toStrictEqual(force_)
+        expect(result).toStrictEqual(left([Errors.UNIT_NOT_IN_BENCH("x1")]))
     })
     test("should remove units from bench when squad is created", () => {
-        const [_, force_] = addSquad(defaultForce, ids.slice(0, 3))
+        const result = addSquad(ids.slice(0, 3))(defaultForce)
 
         ids.slice(0, 3).forEach((id) => {
-            expect(force_.unitsWithoutSquad.has(id)).toBeFalsy()
+            const right = expectNoErrors(result)
+
+            expect(right.unitsWithoutSquad.has(id)).toBeFalsy()
         })
     })
     test("should place units in newly created squad", () => {
@@ -41,131 +46,140 @@ describe("addSquad", () => {
 
         const testIds = ids.slice(0, 3)
 
-        const [_, force] = addSquad(defaultForce, testIds)
+        const result = addSquad(testIds)(defaultForce)
 
-        const squad = force.nonDispatchedSquads.first() as Squad
+        const right = expectNoErrors(result)
 
-        expect(squad.members.keySeq().toJS()).toEqual(testIds)
+        const squad = right.nonDispatchedSquads.first()
+        expect(squad?.members.keySeq().toJS()).toEqual(testIds)
     })
 
     test("should report an error if trying to pass an empty list of units", () => {
-        const [errs, force_] = addSquad(defaultForce, [])
+        const result = addSquad([])(defaultForce)
 
-        expect(errs).toStrictEqual([Errors.FORCE_SQUAD_MIN_SIZE])
-        expect(defaultForce).toStrictEqual(force_)
+        expect(result).toStrictEqual(left([Errors.FORCE_SQUAD_MIN_SIZE]))
     })
     test("should report an error if passing more than 5 units", () => {
-        const [errs, force_] = addSquad(defaultForce, ids)
+        const result = addSquad(ids)(defaultForce)
 
-        expect(errs).toStrictEqual([Errors.FORCE_SQUAD_MAX_SIZE])
-        expect(defaultForce).toStrictEqual(force_)
+        expect(result).toStrictEqual(left([Errors.FORCE_SQUAD_MAX_SIZE]))
     })
 })
 describe("dispatchSquad", () => {
     test("should report an error passing a squad id that is not benched", () => {
-        const [errs, force_] = dispatchSquad(defaultForce, SquadId("s1"))
+        const result = dispatchSquad(SquadId("s1"))(defaultForce)
 
-        expect(errs).toStrictEqual([Errors.SQUAD_NOT_BENCHED("s1")])
-        expect(defaultForce).toStrictEqual(force_)
+        expect(result).toStrictEqual(left([Errors.SQUAD_NOT_BENCHED("s1")]))
     })
 
     test("should move the squad from the bench to the dispatched collection", () => {
-        const [_, force] = addSquad(defaultForce, ids.slice(0, 3))
-
         const id = SquadId("force/test/squads/0")
-        expect((force.nonDispatchedSquads.first() as Squad).id).toEqual(id)
-        expect(force.dispatchedSquads.isEmpty()).toBeTruthy()
+        const result = pipe(
+            defaultForce,
+            addSquad(ids.slice(0, 3)),
+            chain(dispatchSquad(id))
+        )
 
-        const [__, force_] = dispatchSquad(force, id)
+        const right = expectNoErrors(result)
 
-        expect((force_.dispatchedSquads.first() as Squad).id).toEqual(id)
-        expect(force_.nonDispatchedSquads.isEmpty()).toBeTruthy()
+        expect(right.dispatchedSquads.first()?.id).toEqual(id)
+        expect(right.nonDispatchedSquads.isEmpty()).toBeTruthy()
     })
 })
 
 describe("retreatSquad", () => {
     test("should report an error passing a squad id that is not dispatched", () => {
-        const [errs, force_] = retreatSquad(defaultForce, SquadId("s1"))
+        const result = retreatSquad(SquadId("s1"))(defaultForce)
 
-        expect(errs).toStrictEqual([Errors.SQUAD_NOT_DISPATCHED("s1")])
-        expect(defaultForce).toStrictEqual(force_)
+        expect(result).toStrictEqual(left([Errors.SQUAD_NOT_DISPATCHED("s1")]))
     })
     test("should move the squad from the dispatched collection to the bench", () => {
-        const [_, force] = addSquad(defaultForce, ids.slice(0, 3))
-
         const id = SquadId("force/test/squads/0")
-        const [__, dispatched] = dispatchSquad(force, id)
 
-        expect((dispatched.dispatchedSquads.first() as Squad).id).toEqual(id)
-        expect(dispatched.nonDispatchedSquads.isEmpty()).toBeTruthy()
+        const result = pipe(
+            defaultForce,
+            addSquad(ids.slice(0, 3)),
+            chain(dispatchSquad(id)),
+            chain(retreatSquad(id))
+        )
 
-        const [___, force_] = retreatSquad(dispatched, id)
+        const right = expectNoErrors(result)
 
-        expect((force_.nonDispatchedSquads.first() as Squad).id).toEqual(id)
-        expect(force_.dispatchedSquads.isEmpty()).toBeTruthy()
+        expect(right.dispatchedSquads.size).toEqual(0)
+        expect(right.nonDispatchedSquads.size).toEqual(1)
     })
 })
 
 describe("removeSquad", () => {
     test("should report an error passing a squad id that is not benched", () => {
-        const [errs, force_] = removeSquad(defaultForce, SquadId("s1"))
+        const result = removeSquad(SquadId("s1"))(defaultForce)
 
-        expect(errs).toStrictEqual([Errors.SQUAD_NOT_BENCHED("s1")])
-        expect(defaultForce).toStrictEqual(force_)
+        expect(result).toStrictEqual(left([Errors.SQUAD_NOT_BENCHED("s1")]))
     })
     test("should remove squad from the bench", () => {
         const id = SquadId("force/test/squads/0")
 
-        const [_, forceWithSquad] = addSquad(defaultForce, ids.slice(0, 3))
-        const [errs, forceAfterSquadRemoval] = removeSquad(forceWithSquad, id)
+        const result = pipe(
+            defaultForce,
+            addSquad(ids.slice(0, 3)),
+            chain(removeSquad(id))
+        )
+        const right = expectNoErrors(result)
 
-        expect(errs).toStrictEqual([])
-        expect(forceAfterSquadRemoval.nonDispatchedSquads.has(id)).toBeFalsy()
+        expect(right.nonDispatchedSquads.has(id)).toBeFalsy()
     })
-    test("should place units in the bench", () => {
+    test("should place units from removed squad in the bench", () => {
         const id = SquadId("force/test/squads/0")
 
-        const [_, forceWithSquad] = addSquad(defaultForce, ids.slice(0, 3))
-        const squad = forceWithSquad.nonDispatchedSquads.get(id) as Squad
+        const ids_ = ids.slice(0, 3)
+        const result = pipe(
+            defaultForce,
+            addSquad(ids_),
+            chain(removeSquad(id))
+        )
 
-        const [_errs, forceAfterSquadRemoval] = removeSquad(forceWithSquad, id)
+        const right = expectNoErrors(result)
 
-        console.log(forceAfterSquadRemoval)
-        squad.members.forEach((_v, k) =>
-            expect(forceAfterSquadRemoval.unitsWithoutSquad.has(k)).toBeTruthy()
+        ids_.forEach((id) =>
+            expect(right.unitsWithoutSquad.has(id)).toBeTruthy()
         )
     })
 })
 
 describe("removeUnit", () => {
     test("should report error if trying to remove an unit not in the bench", () => {
-        const [errs, force] = removeUnit(defaultForce, UnitId("x1"))
+        const result = removeUnit(defaultForce, UnitId("x1"))
 
-        console.log(force.unitsWithoutSquad.toJS())
-        expect(errs).toStrictEqual([Errors.UNIT_NOT_IN_BENCH("x1")])
-        expect(defaultForce).toStrictEqual(force)
+        expect(result).toStrictEqual(left([Errors.UNIT_NOT_IN_BENCH("x1")]))
     })
     test("should remove valid unit from the bench", () => {
         const [id] = ids
-        const [_errs, force] = removeUnit(defaultForce, id)
+        const result = removeUnit(defaultForce, id)
 
-        expect(force.unitsWithoutSquad.has(id)).toBeFalsy()
+        const right = expectNoErrors(result)
+
+        expect(right.unitsWithoutSquad.has(id)).toBeFalsy()
     })
 })
 
 describe("updateUnit", () => {
     const newUnit = (id: string) => ({ id: UnitId(id), name: "New Name" })
     test("should report error if trying to remove an unit not in the bench", () => {
-        const [errs, force] = updateUnit(defaultForce, newUnit("x1"))
+        const result = updateUnit(defaultForce, newUnit("x1"))
 
-        console.log(force.unitsWithoutSquad.toJS())
-        expect(errs).toStrictEqual([Errors.UNIT_NOT_IN_BENCH("x1")])
-        expect(defaultForce).toStrictEqual(force)
+        expect(result).toStrictEqual(left([Errors.UNIT_NOT_IN_BENCH("x1")]))
     })
     test("should update valid unit in the bench", () => {
         const [id] = ids
-        const [_errs, force] = updateUnit(defaultForce, newUnit(id))
+        const result = updateUnit(defaultForce, newUnit(id))
 
-        expect(force.unitsWithoutSquad.get(id)?.name).toEqual(newUnit(id).name)
+        const right = expectNoErrors(result)
+
+        expect(right.unitsWithoutSquad.get(id)?.name).toEqual(newUnit(id).name)
     })
 })
+
+function expectNoErrors(result: Fallible<Force>) {
+    if (isLeft(result)) throw new Error(result.left.join(","))
+    else return result.right
+}
