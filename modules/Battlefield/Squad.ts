@@ -1,4 +1,7 @@
+import { right } from "fp-ts/lib/Either"
 import { List, Map, Range } from "immutable"
+import { Condition, Fallible, runFallible } from "../_shared/Fallible"
+import { ForceId } from "./Force"
 import { Unit, UnitId } from "./Unit"
 
 export type SquadId = string & { _squadId: never }
@@ -10,6 +13,7 @@ export const MapPosition = (pos: { x: number; y: number }) => pos as MapPosition
 
 export type Squad = {
     id: SquadId
+    force: ForceId
     members: Map<
         UnitId,
         {
@@ -24,13 +28,37 @@ export type DispatchedSquad = Squad & {
 
 export const createSquad = (
     id: string,
+    force: ForceId,
     members: [Unit, MemberPosition][]
-): Squad => ({
-    id: SquadId(id),
-    members: Map(
-        members.map(([unit, position]) => [unit.id, { unit, position }])
-    ),
-})
+): Fallible<Squad> =>
+    runFallible<null, Squad>(
+        right(null),
+        [
+            ...members
+                .filter(([unit, pos]) =>
+                    members.find(
+                        ([unit_, pos_]) =>
+                            unit.id !== unit_.id &&
+                            pos.x === pos_.x &&
+                            pos.y === pos_.y
+                    )
+                )
+                .map(([unit, pos]) =>
+                    Condition(
+                        unitInSamePositionError(unit.id, pos),
+                        () => false
+                    )
+                ),
+        ],
+        () => ({
+            id: SquadId(id),
+            force,
+            members: Map(
+                members.map(([unit, position]) => [unit.id, { unit, position }])
+            ),
+        })
+    )
+
 export const createDispatchedSquad = (
     squad: Squad,
     position: MapPosition
@@ -93,3 +121,12 @@ export const boardIndex = (width: number, height: number): MemberPosition[] => {
 }
 
 export const defaultBoard = boardIndex(3, 3)
+
+export function unitInSamePositionError(
+    id: string,
+    pos: MemberPosition
+): string {
+    return `Unit ${id} is on ${JSON.stringify(
+        pos
+    )}, but there is another unit there.`
+}

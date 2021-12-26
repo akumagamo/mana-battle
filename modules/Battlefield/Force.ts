@@ -1,7 +1,7 @@
 import { fromNullable, right } from "fp-ts/lib/Either"
 import { Map } from "immutable"
 import { Collection } from "../_shared/Entity"
-import { Fallible, runFallible } from "../_shared/Fallible"
+import { Condition, Fallible, runFallible } from "../_shared/Fallible"
 import * as Errors from "./Force.errors"
 import {
     boardIndex,
@@ -59,15 +59,19 @@ export const addUnit = (force: Force, unit: Unit) => ({
 })
 
 export const removeUnit = (force: Force, id: UnitId): Fallible<Force> => {
-    return runFallible(right(force), [unitShouldBeInBench(id)], (force) => ({
-        ...force,
-        unitsWithoutSquad: force.unitsWithoutSquad.delete(id),
-    }))
+    return runFallible(
+        right(force),
+        [unitShouldBeInBench(force, id)],
+        (force) => ({
+            ...force,
+            unitsWithoutSquad: force.unitsWithoutSquad.delete(id),
+        })
+    )
 }
 export const updateUnit = (force: Force, updatedUnit: Unit): Fallible<Force> =>
     runFallible(
         right(force),
-        [unitShouldBeInBench(updatedUnit.id)],
+        [unitShouldBeInBench(force, updatedUnit.id)],
         (force_) => ({
             ...force_,
             unitsWithoutSquad: force.unitsWithoutSquad.set(
@@ -83,27 +87,27 @@ export const addSquad =
         const { unitsWithoutSquad, nonDispatchedSquads, dispatchedSquads } =
             force
 
-        return runFallible(
-            right(force),
+        const units = getAllFrom(unitIds, unitsWithoutSquad)
+
+        const totalSquads = dispatchedSquads.size + nonDispatchedSquads.size
+
+        const board = boardIndex(3, 3)
+        const squad = createSquad(
+            `force/${force.id}/squads/${totalSquads}`,
+            force.id,
+            units.map((u, i) => [u, board[i]])
+        )
+
+        return runFallible<Squad, Force>(
+            squad,
             [
                 squadHasMinSize(unitIds),
                 squadIsBelowMaxSize(unitIds),
                 ...unitsAreInBench(unitIds, unitsWithoutSquad),
             ],
-            (force_) => {
-                const units = getAllFrom(unitIds, unitsWithoutSquad)
-
-                const totalSquads =
-                    dispatchedSquads.size + nonDispatchedSquads.size
-
-                const board = boardIndex(3, 3)
-                const squad = createSquad(
-                    `force/${force.id}/squads/${totalSquads}`,
-                    force.id,
-                    units.map((u, i) => [u, board[i]])
-                )
+            (squad) => {
                 return {
-                    ...force_,
+                    ...force,
                     unitsWithoutSquad: unitsWithoutSquad.deleteAll(unitIds),
                     nonDispatchedSquads: nonDispatchedSquads.set(
                         squad.id,
@@ -169,28 +173,24 @@ function getAllFrom<A>(ids: string[], collection: Collection<A>) {
 function unitsAreInBench(
     unitIds: UnitId[],
     unitsWithoutSquad: Collection<Unit>
-): [string, (f: Force) => boolean][] {
-    return unitIds.map((id) => [
-        Errors.UNIT_NOT_IN_BENCH(id),
-        (_f: Force) => unitsWithoutSquad.has(id),
-    ])
+) {
+    return unitIds.map((id) =>
+        Condition(Errors.UNIT_NOT_IN_BENCH(id), () => unitsWithoutSquad.has(id))
+    )
 }
 
-function squadIsBelowMaxSize(
-    unitIds: UnitId[]
-): [string, (a: Force) => boolean] {
-    return [Errors.FORCE_SQUAD_MAX_SIZE, (_f: Force) => unitIds.length <= 5]
+function squadIsBelowMaxSize(unitIds: UnitId[]) {
+    return Condition(Errors.FORCE_SQUAD_MAX_SIZE, () => unitIds.length <= 5)
 }
 
-function squadHasMinSize(unitIds: UnitId[]): [string, (a: Force) => boolean] {
-    return [Errors.FORCE_SQUAD_MIN_SIZE, (_f: Force) => unitIds.length > 0]
+function squadHasMinSize(unitIds: UnitId[]) {
+    return Condition(Errors.FORCE_SQUAD_MIN_SIZE, () => unitIds.length > 0)
 }
 
-function unitShouldBeInBench(id: UnitId): [string, (a: Force) => boolean] {
-    return [
-        `Unit ${id} should be in the bench.`,
-        (f) => Boolean(f.unitsWithoutSquad.get(id)),
-    ]
+function unitShouldBeInBench(f: Force, id: UnitId) {
+    return Condition(`Unit ${id} should be in the bench.`, () =>
+        Boolean(f.unitsWithoutSquad.get(id))
+    )
 }
 
 function getSquadInBench(force: Force, squadId: SquadId): Fallible<Squad> {

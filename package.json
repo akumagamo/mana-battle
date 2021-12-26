@@ -55,6 +55,7 @@
         "@types/immutable": "^3.8.7",
         "astarjs": "^1.1.0",
         "copy-webpack-plugin": "^10.0.0",
+        "fp-ts": "^2.11.5",
         "immutable": "^4.0.0-rc.12",
         "phaser": "^3.55.2",
         "puppeteer": "^12.0.1",

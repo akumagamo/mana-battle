@@ -60,7 +60,7 @@ describe("addSquad", () => {
         expect(result).toStrictEqual(left([Errors.FORCE_SQUAD_MIN_SIZE]))
     })
     test("should report an error if passing more than 5 units", () => {
-        const result = addSquad(ids)(defaultForce)
+        const result = addSquad(ids.slice(0, 8))(defaultForce)
 
         expect(result).toStrictEqual(left([Errors.FORCE_SQUAD_MAX_SIZE]))
     })
