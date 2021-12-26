@@ -1,10 +1,10 @@
-import { isRight, left, right } from "fp-ts/lib/Either"
-import { runFallible } from "./Fallible"
+import { left, right } from "fp-ts/lib/Either"
+import { Condition, runFallible } from "./Fallible"
 
 test("it should run a valid check", () => {
     const result = runFallible(
         right(8),
-        [["It should be 8", (one) => one / 2 === 4]],
+        [Condition("It should be 8", (n) => n / 2 === 4)],
         (one) => one * 2
     )
 
@@ -14,7 +14,7 @@ test("it should run a valid check", () => {
 test("it should not run an invalid check", () => {
     const result = runFallible(
         right(9),
-        [["It should be 8", (n) => n / 2 === 4]],
+        [Condition("It should be 8", (n) => n / 2 === 4)],
         (n) => n * 2
     )
 
@@ -24,8 +24,8 @@ test("it should report only failed checks", () => {
     const result = runFallible(
         right(11),
         [
-            ["It should be greater than 8", (n) => n > 8],
-            ["It should be even", (n) => n % 2 === 0],
+            Condition("It should be greater than 8", (n) => n > 8),
+            Condition("It should be even", (n) => n % 2 === 0),
         ],
         () => "this will not run"
     )
@@ -36,7 +36,7 @@ test("it should report only failed checks", () => {
 test("it should not break if selectors fail", () => {
     const result = runFallible(
         left(["sorry"]),
-        [["It should be 8", (one) => one / 2 === 4]],
+        [Condition("It should be 8", (one) => one / 2 === 4)],
         (one) => one * 2
     )
 
@@ -47,8 +47,8 @@ test("it should propagate errors if a selector has failed", () => {
     const result = runFallible(
         left(["sorry!", "the value is not here."]),
         [
-            ["It should be 8", (n) => n === 8],
-            ["It should be 4", (n) => n === 4],
+            Condition("It should be 8", (n) => n === 8),
+            Condition("It should be 4", (n) => n === 4),
         ],
         (n) => n
     )
