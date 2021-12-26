@@ -1,5 +1,10 @@
 import { left, right } from "fp-ts/lib/Either"
-import { Condition, runFallible } from "./Fallible"
+import {
+    Condition,
+    runFallible,
+    selectNullable,
+    validateProperties,
+} from "./Fallible"
 
 test("it should run a valid check", () => {
     const result = runFallible(
@@ -54,4 +59,38 @@ test("it should propagate errors if a selector has failed", () => {
     )
 
     expect(result).toEqual(left(["sorry!", "the value is not here."]))
+})
+
+test("should propagate errors if validating invalid object", () => {
+    const result = validateProperties({
+        name: right("name"),
+        age: right(22),
+        zipcode: left(["invalid zipcode"]),
+    })
+
+    expect(result).toStrictEqual(left(["invalid zipcode"]))
+})
+
+test("should return object if properties are valid", () => {
+    const result = validateProperties({
+        name: right("name"),
+        age: right(22),
+        zipcode: right(188999),
+    })
+
+    expect(result).toStrictEqual(
+        right({
+            name: "name",
+            age: 22,
+            zipcode: 188999,
+        })
+    )
+})
+test("should generating an error when selecting a nullable", () => {
+    const result = selectNullable("an error", null)
+    expect(result).toStrictEqual(left(["an error"]))
+})
+test("should generate a valid value if not selecting a nullable", () => {
+    const result = selectNullable("an error", 22)
+    expect(result).toStrictEqual(right(22))
 })

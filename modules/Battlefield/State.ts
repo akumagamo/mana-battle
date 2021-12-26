@@ -2,6 +2,11 @@ import { Map } from "immutable"
 import { Collection } from "../_shared/Entity"
 import { Force, ForceId, Relationships, Relationship } from "./Force"
 import { City } from "./City"
+import {
+    runFallible,
+    validateProperties,
+    selectNullable,
+} from "../_shared/Fallible"
 
 export type State = {
     forces: Collection<Force>
@@ -35,33 +40,32 @@ export const addCity = (state: State, city: City) => ({
     cities: state.cities.set(city.id, city),
 })
 
-
-
 export const updateRelationship = (
     state: State,
-    source: ForceId,
-    target: ForceId,
+    sourceId: ForceId,
+    targetId: ForceId,
     relation: Relationship
-): [string[], State] => {
-    const source_ = state.forces.get(source)
-    const target_ = state.forces.get(target)
+) => {
+    const sel = {
+        source: selectNullable(
+            `Source should exist (provided ${sourceId})`,
+            state.forces.get(sourceId, null)
+        ),
+        target: selectNullable(
+            `Target should exist (provided ${targetId})`,
+            state.forces.get(targetId, null)
+        ),
+    }
 
-    const missingSource = !source_ ? [`Invalid source id (${source})`] : []
+    const args = validateProperties<{ source: Force; target: Force }>(sel)
 
-    const missingTarget = !target_ ? [`Invalid target id (${target})`] : []
-
-    const errors = [...missingSource, ...missingTarget]
-
-    return [
-        errors,
-        source_ && target_
-            ? {
-                  ...state,
-                  forces: state.forces.set(target, {
-                      ...target_,
-                      relations: target_.relations.set(source_.id, relation),
-                  }),
-              }
-            : state,
-    ]
+    return runFallible(args, [], ({ source, target }) => {
+        return {
+            ...state,
+            forces: state.forces.set(target.id, {
+                ...target,
+                relations: target.relations.set(source.id, relation),
+            }),
+        }
+    })
 }
