@@ -61,8 +61,14 @@ test("it should propagate errors if a selector has failed", () => {
     expect(result).toEqual(left(["sorry!", "the value is not here."]))
 })
 
+type User = {
+    name: string
+    age: number
+    zipcode: number
+}
+
 test("should propagate errors if validating invalid object", () => {
-    const result = validateProperties({
+    const result = validateProperties<User>({
         name: right("name"),
         age: right(22),
         zipcode: left(["invalid zipcode"]),
@@ -72,7 +78,7 @@ test("should propagate errors if validating invalid object", () => {
 })
 
 test("should return object if properties are valid", () => {
-    const result = validateProperties({
+    const result = validateProperties<User>({
         name: right("name"),
         age: right(22),
         zipcode: right(188999),
