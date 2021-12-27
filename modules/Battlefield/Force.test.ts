@@ -24,7 +24,7 @@ const ids = Range(0, 10)
 
 const defaultForce = ids
     .map(createUnit)
-    .reduce((xs, x) => addUnit(xs, x), createForce("test"))
+    .reduce((xs, x) => addUnit(x)(xs), createForce("test"))
 
 describe("addSquad", () => {
     test("should report an error if trying to add an unit that is not benched", () => {

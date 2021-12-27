@@ -1,14 +1,14 @@
+import { ForceId } from "../../Battlefield/Force"
+import { Squad, SquadId } from "../../Battlefield/Squad"
 import events from "../events"
-import {
-    EVENT_CLOSE_SELET_MOVE_DESTINATION,
-    SELECTED_SQUAD_OPTIONS,
-} from "../UI/events/selectMoveDestination"
+import { EVENT_CLOSE_SELET_MOVE_DESTINATION } from "../UI/events/selectMoveDestination"
 
 export const UNIT_DATA_TARGET = "target"
 const CLICK_THRESHOLD = 5
 
 export default function (
-    squadId: string,
+    forceId: ForceId,
+    squadId: SquadId,
     layer: Phaser.Tilemaps.TilemapLayer,
     scene: Phaser.Scene
 ) {
@@ -22,10 +22,11 @@ export default function (
 
     layer.on(
         Phaser.Input.Events.POINTER_UP,
-        movementOrderAssigned(sprite, layer)
+        movementOrderAssigned(forceId, sprite, layer)
     )
 }
 function movementOrderAssigned(
+    forceId: ForceId,
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
     layer: Phaser.Tilemaps.TilemapLayer
 ) {
@@ -50,7 +51,7 @@ function movementOrderAssigned(
 
         events(scene).emit(EVENT_CLOSE_SELET_MOVE_DESTINATION)
 
-        events(scene).emit("Squad Selected", sprite.name)
+        events(scene).emit("Squad Selected", forceId, sprite.name)
 
         sprite.emit("updateAnimation")
     }

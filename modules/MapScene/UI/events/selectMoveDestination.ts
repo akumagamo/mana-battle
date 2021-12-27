@@ -1,3 +1,6 @@
+import { ForceId } from "../../../Battlefield/Force"
+import { SquadId } from "../../../Battlefield/Squad"
+import { State } from "../../../Battlefield/State"
 import UI from "../../../UI"
 import {
     CENTER_X,
@@ -32,11 +35,12 @@ export default (scene: Phaser.Scene) => {
             scene.children.getByName(opt)?.destroy()
         })
     })
-    11
 }
 
 function listen(scene: Phaser.Scene) {
-    return (ev: (scn: Phaser.Scene) => (squad: string) => void) => {
+    return (
+        ev: (scn: Phaser.Scene) => (squadId: SquadId, forceId: ForceId) => void
+    ) => {
         events(scene).on("Select Move Destination", ev(scene))
     }
 }
@@ -46,7 +50,7 @@ export const SELECTED_SQUAD_OPTIONS = [
     MOVE_SQUAD_LABEL,
 ]
 export function disableOptions(scene: Phaser.Scene) {
-    return (_squad: string) => {
+    return (_squad: SquadId, _forceId: ForceId) => {
         const elements = SELECTED_SQUAD_OPTIONS.map((name) =>
             scene.children.getByName(name)
         ) as Phaser.GameObjects.Container[]
@@ -54,16 +58,16 @@ export function disableOptions(scene: Phaser.Scene) {
     }
 }
 function renderSelectDestionationLabel(scene: Phaser.Scene) {
-    return (_squad: string) =>
+    return (_squad: SquadId, _forceId: ForceId) =>
         UI.text(scene)(CENTER_X, 50, SELECT_DESTINATION_LABEL)
 }
 
 function renderCancelOption(scene: Phaser.Scene) {
-    return (squad: string) =>
+    return (squad: SquadId, force: ForceId) =>
         UI.button(scene)(
             SCREEN_WIDTH - 150,
             SCREEN_HEIGHT - 60,
             CANCEL_OPTION_LABEL,
-            () => events(scene).emit("Move Squad Cancelled", squad)
+            () => events(scene).emit("Move Squad Cancelled", force, squad)
         )
 }

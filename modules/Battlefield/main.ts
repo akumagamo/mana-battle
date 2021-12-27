@@ -1,13 +1,78 @@
 import createUI from "../MapScene/UI/main"
 import createMapScreen from "../MapScene/main"
-import { State } from "./State"
+import { pipe } from "fp-ts/lib/function"
+import { addCity, addForce, emptyState } from "./State"
+import {
+    addSquad,
+    addUnit,
+    createForce,
+    dispatchSquad,
+    Force,
+    ForceControllers,
+    ForceId,
+} from "./Force"
+import { createUnit } from "./Unit"
+import { range } from "fp-ts/lib/NonEmptyArray"
+import { createCity, City } from "./City"
+import { runFallible, validateProperties } from "../_shared/Fallible"
+import { SquadId } from "./Squad"
+import { chain } from "fp-ts/lib/Either"
 
-export const main = (scene: Phaser.Scene, mapId: string) => {
+export const main = (scene: Phaser.Scene) => {
     return {
         start: () => {
-            const state = getMap(mapId)
-            createMapScreen(scene, state)
-            createUI(scene)
+            const units = range(0, 10).map((n) => createUnit(n.toString()))
+
+            const player = pipe(
+                units.reduce((xs, x) => addUnit(x)(xs), {
+                    ...createForce("PLAYER"),
+                    stronghold: { x: 100, y: 100 },
+                    controller: ForceControllers.PLAYER,
+                }),
+                addSquad(units.map((u) => u.id).slice(0, 4)),
+                chain(dispatchSquad(SquadId("force/PLAYER/squads/0")))
+            )
+
+            const computer = pipe(
+                units.reduce((xs, x) => addUnit(x)(xs), {
+                    ...createForce("COMPUTER"),
+                    stronghold: { x: 200, y: 100 },
+                }),
+                addSquad(units.map((u) => u.id).slice(0, 4)),
+                chain(dispatchSquad(SquadId("force/COMPUTER/squads/0")))
+            )
+
+            const playerCity = {
+                ...createCity("c1"),
+                position: { x: 100, y: 100 },
+                force: ForceId("PLAYER"),
+            } as City
+            const computerCity = {
+                ...createCity("c2"),
+                position: { x: 200, y: 100 },
+                force: ForceId("COMPUTER"),
+            } as City
+
+            const forces = {
+                player,
+                computer,
+            }
+
+            const res =
+                validateProperties<{ player: Force; computer: Force }>(forces)
+
+            runFallible(res, [], ({ player, computer }) => {
+                const state = pipe(
+                    emptyState,
+                    addForce(player),
+                    addForce(computer),
+                    addCity(playerCity),
+                    addCity(computerCity)
+                )
+
+                createMapScreen(scene, state)
+                createUI(scene, state)
+            })
         },
         destroy: () => {
             //something like

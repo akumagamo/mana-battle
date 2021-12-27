@@ -1,4 +1,4 @@
-import { State } from "../Model"
+import { State } from "../../Battlefield/State"
 import create from "./create"
 
 export default (state: State) => ({

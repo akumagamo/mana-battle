@@ -1,6 +1,10 @@
+import { ForceId } from "../../Battlefield/Force"
+import { SquadId } from "../../Battlefield/Squad"
 import events from "../events"
 
 export default function (
+    forceId: ForceId,
+    squadId: SquadId,
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
     scene: Phaser.Scene
 ) {
@@ -26,7 +30,7 @@ export default function (
 
     scene.children.bringToTop(sprite)
 
-    events(scene).emit("Squad Selected", sprite.name)
+    events(scene).emit("Squad Selected", forceId, squadId)
 
     function updatePosition() {
         cursor.setPosition(sprite.x, sprite.y + 30)

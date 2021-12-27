@@ -18,7 +18,7 @@ export const emptyState = {
     cities: Map() as Collection<City>,
 }
 
-export const addForce = (state: State, force: Force) => ({
+export const addForce = (force: Force) => (state: State) => ({
     ...state,
     forces: state.forces
         .map((f) => ({
@@ -35,7 +35,7 @@ export const addForce = (state: State, force: Force) => ({
         }),
 })
 
-export const addCity = (state: State, city: City) => ({
+export const addCity = (city: City) => (state: State) => ({
     ...state,
     cities: state.cities.set(city.id, city),
 })

@@ -1,7 +1,5 @@
 import Phaser from "phaser"
-import { MapScreenProperties } from "../../MapScene/Model"
 import TitleScene from "../../TitleScene/phaser"
-import MapScene from "../../MapScene/phaser"
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../_shared/constants"
 import preload from "../preload"
 
@@ -22,13 +20,6 @@ const Core = {
         this.game.events.on("Start Title Screen", () => {
             this.game.scene.add(TitleScene.key, TitleScene, true)
         })
-
-        this.game.events.on(
-            "Start Map Screen",
-            (params: MapScreenProperties) => {
-                this.game.scene.add(MapScene.key, MapScene, true, params)
-            }
-        )
 
         const isNotHeadless = navigator.languages.length > 1
         if (isNotHeadless) {

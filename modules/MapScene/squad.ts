@@ -1,40 +1,49 @@
+import { Force, ForceId } from "../Battlefield/Force"
+import { DispatchedSquad, SquadId } from "../Battlefield/Squad"
 import { UNIT_DATA_TARGET } from "./events/selectMoveDestination"
 import squadClicked from "./events/squadClicked"
-import { Squad } from "./Model"
 
 export const ARRIVED_AT_TARGET = "Arrived at target"
 
-export const createSquad = (scene: Phaser.Scene) => (squad: Squad) => {
-    const { x, y, id } = squad
+export const createSquad =
+    (scene: Phaser.Scene) => (squad: DispatchedSquad, force: Force) => {
+        const {
+            position: { x, y },
+            id,
+        } = squad
 
-    const directionKey = (dir: string) => `${job}-map-walk-${dir}`
+        const directionKey = (dir: string) => `${job}-map-walk-${dir}`
 
-    const job = squad.force.get("force") === "PLAYER" ? "soldier" : "skeleton"
-    const sprite = scene.physics.add
-        .sprite(x, y, `${job}-map`)
-        .setDataEnabled()
-        .setName(id.get("squad") || "")
-        .play(directionKey("down"))
-        .setScale(2)
+        const job = force.id === "PLAYER" ? "soldier" : "skeleton"
+        const sprite = scene.physics.add
+            .sprite(x, y, `${job}-map`)
+            .setDataEnabled()
+            .setName(id)
+            .play(directionKey("down"))
+            .setScale(2)
 
-    createSquadEvents(scene, sprite)
+        createSquadEvents(force.id, squad.id, scene, sprite)
 
-    sprite.on(
-        "updateAnimation",
-        updateSquadOrientation(sprite, (dir) => {
-            sprite.anims.play(directionKey(dir))
-        })
-    )
-    return sprite
-}
+        sprite.on(
+            "updateAnimation",
+            updateSquadOrientation(sprite, (dir) => {
+                sprite.anims.play(directionKey(dir))
+            })
+        )
+        return sprite
+    }
 
 function createSquadEvents(
+    forceId: ForceId,
+    squadId: SquadId,
     scene: Phaser.Scene,
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 ) {
     sprite.setInteractive()
 
-    sprite.on(Phaser.Input.Events.POINTER_UP, () => squadClicked(sprite, scene))
+    sprite.on(Phaser.Input.Events.POINTER_UP, () =>
+        squadClicked(forceId, squadId, sprite, scene)
+    )
 
     sprite.on(ARRIVED_AT_TARGET, () => {
         sprite.data.remove(UNIT_DATA_TARGET)

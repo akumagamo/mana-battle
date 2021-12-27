@@ -49,11 +49,11 @@ export const createForce = (id: string): Force => ({
     unitsWithoutSquad: Map() as Collection<Unit>,
     dispatchedSquads: Map() as Collection<DispatchedSquad>,
     nonDispatchedSquads: Map() as Collection<Squad>,
-    controller: "COMPUTER" as "COMPUTER",
+    controller: ForceControllers.COMPUTER,
     relations: Map() as Map<ForceId, Relationship>,
 })
 
-export const addUnit = (force: Force, unit: Unit) => ({
+export const addUnit = (unit: Unit) => (force: Force) => ({
     ...force,
     unitsWithoutSquad: force.unitsWithoutSquad.set(unit.id, unit),
 })
@@ -92,8 +92,9 @@ export const addSquad =
         const totalSquads = dispatchedSquads.size + nonDispatchedSquads.size
 
         const board = boardIndex(3, 3)
+        const id = `force/${force.id}/squads/${totalSquads}`
         const squad = createSquad(
-            `force/${force.id}/squads/${totalSquads}`,
+            id,
             force.id,
             units.map((u, i) => [u, board[i]])
         )
