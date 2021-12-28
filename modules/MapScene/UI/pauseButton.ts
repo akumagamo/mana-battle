@@ -1,37 +1,10 @@
 import button from "../../UI/button"
 import { SCREEN_WIDTH } from "../../_shared/constants"
-import { UNIT_DATA_TARGET } from "../events/selectMoveDestination"
-import resumeSquadMovement from "../events/resumeSquadMovement"
-import {
-    UNPAUSE_GAME_CMD,
-    PAUSE_GAME_CMD,
-    UNPAUSE_LABEL,
-    PAUSE_LABEL,
-    PAUSE_BUTTON_KEY,
-} from "./create"
+import { UNPAUSE_LABEL, PAUSE_LABEL, PAUSE_BUTTON_KEY } from "./create"
 import { MapScreen } from "../Model"
 
 export default function (scene: Phaser.Scene) {
-    const { scene: mapScreen } = MapScreen(scene.scene.manager)
-
-    mapScreen.events.on(UNPAUSE_GAME_CMD, () => {
-        mapScreen.physics.resume()
-
-        // Phaser bug? When a move order is issued
-        // when the physics engine is paused, the sprite
-        // moves infinitelly to the right.
-        // Here we reissue the move order (if any) to all squads
-        mapScreen.children.each((sprite) => {
-            if (sprite.data && sprite.data.get(UNIT_DATA_TARGET))
-                resumeSquadMovement(
-                    sprite as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
-                )(scene)
-        })
-    })
-
-    mapScreen.events.on(PAUSE_GAME_CMD, () => {
-        mapScreen.physics.pause()
-    })
+    const { scene: mapScreen, events } = MapScreen(scene.scene.manager)
 
     button(scene)(
         SCREEN_WIDTH - 150,
@@ -43,10 +16,11 @@ export default function (scene: Phaser.Scene) {
         ) => {
             if (mapScreen.physics.world.isPaused) {
                 text.setText(PAUSE_LABEL)
-                mapScreen.events.emit(UNPAUSE_GAME_CMD)
+                events.unpauseGame()
             } else {
                 text.setText(UNPAUSE_LABEL)
-                mapScreen.events.emit(PAUSE_GAME_CMD)
+
+                events.pauseGame()
             }
         }
     ).setName(PAUSE_BUTTON_KEY)

@@ -1,9 +1,6 @@
 import events from "../events"
-import moveSquadCancelled from "./events/moveSquadCancelled"
 import pauseButton from "./pauseButton"
 
-export const UNPAUSE_GAME_CMD = "Game Paused"
-export const PAUSE_GAME_CMD = "Game Unpaused"
 export const PAUSE_LABEL = "Pause"
 export const UNPAUSE_LABEL = "Unpause"
 export const PAUSE_BUTTON_KEY = "Pause Button"
