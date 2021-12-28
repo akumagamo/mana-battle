@@ -20,6 +20,7 @@ export async function openGame() {
     console.timeEnd(`Page is ready for testing`)
 }
 
+// todo: this should be shared with the game
 export async function removeScene(scene: string) {
     await page.evaluate((scene) => {
         window.game.scene.remove(scene)

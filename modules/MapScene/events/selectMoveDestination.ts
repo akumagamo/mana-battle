@@ -1,12 +1,13 @@
 import { ForceId } from "../../Battlefield/Force"
 import { Squad, SquadId } from "../../Battlefield/Squad"
 import events from "../events"
-import { EVENT_CLOSE_SELET_MOVE_DESTINATION } from "../UI/events/selectMoveDestination"
+import * as selectMoveDestinationUI from "../UI/events/selectMoveDestination"
+import * as resumeSquadMovement from "../events/resumeSquadMovement"
 
 export const UNIT_DATA_TARGET = "target"
 const CLICK_THRESHOLD = 5
 
-export default function (
+export default function selectMoveDestination(
     forceId: ForceId,
     squadId: SquadId,
     layer: Phaser.Tilemaps.TilemapLayer,
@@ -47,9 +48,13 @@ function movementOrderAssigned(
         const target = { x: pointer.worldX, y: pointer.worldY }
         sprite.data.set(UNIT_DATA_TARGET, target)
 
-        scene.events.emit("Resume Squad Movement", sprite)
+        resumeSquadMovement.emit(sprite)
 
-        events(scene).emit(EVENT_CLOSE_SELET_MOVE_DESTINATION)
+        // this is a map/battlefield event, not a UI one
+        // here we should dispatch a command to the UI
+        events(scene).emit(
+            selectMoveDestinationUI.EVENT_CLOSE_SELET_MOVE_DESTINATION
+        )
 
         events(scene).emit("Squad Selected", forceId, sprite.name)
 
@@ -59,4 +64,15 @@ function movementOrderAssigned(
 
 function clearEvents(layer: Phaser.Tilemaps.TilemapLayer) {
     layer.off(Phaser.Input.Events.POINTER_UP)
+}
+export const listen = (
+    scene: Phaser.Scene,
+    map: Phaser.Tilemaps.TilemapLayer
+) => {
+    events(scene).on(
+        "Select Move Destination",
+        (forceId: ForceId, squadId: SquadId) => {
+            selectMoveDestination(forceId, squadId, map, scene)
+        }
+    )
 }

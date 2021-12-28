@@ -1,8 +1,19 @@
 import { fadeOut } from "../../UI/Transition"
 import CombatScene from "../../CombatScene/phaser"
+import { SquadId } from "../../Battlefield/Squad"
 
-export function squadCollision(scene: Phaser.Scene) {
-    return async ([_idA, _idB]: [string, string]) => {
+export function listen(scene: Phaser.Scene) {
+    scene.events.on("Squad Collision", squadCollision(scene))
+}
+
+export const emit =
+    (scene: Phaser.Scene) =>
+    ([a, b]: [a: SquadId, b: SquadId]) =>
+        scene.events.emit("Squad Collision", [a, b])
+
+export const squadCollision =
+    (scene: Phaser.Scene) =>
+    async ([_a, _b]: [SquadId, SquadId]) => {
         scene.physics.pause()
 
         await fadeOut(scene, 500)
@@ -11,4 +22,3 @@ export function squadCollision(scene: Phaser.Scene) {
         scene.scene.start(CombatScene.key)
         scene.scene.remove(scene)
     }
-}

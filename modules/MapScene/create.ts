@@ -1,16 +1,13 @@
 import { fadeIn } from "../UI/Transition"
-import selectMoveDestination, {
-    UNIT_DATA_TARGET,
-} from "./events/selectMoveDestination"
+import * as selectMoveDestination from "./events/selectMoveDestination"
+import * as resumeSquadMovement from "./events/resumeSquadMovement"
 import { createMap } from "./map"
 import { createSquad } from "./squad"
 import { createCity } from "./city"
-import events from "./events"
-import { squadCollision } from "./events/squadCollision"
+import * as squadCollision from "./events/squadCollision"
 import { Map } from "immutable"
 import { State } from "../Battlefield/State"
 import { SquadId } from "../Battlefield/Squad"
-import { ForceId } from "../Battlefield/Force"
 
 export default async (scene: Phaser.Scene, { forces, cities }: State) => {
     const map = createMap(scene)
@@ -38,38 +35,20 @@ export default async (scene: Phaser.Scene, { forces, cities }: State) => {
                     toJS(squads_),
                     toJS(squads__),
                     (a, b) => {
-                        scene.events.emit("Squad Collision", [a.name, b.name])
+                        squadCollision.emit(scene)([
+                            SquadId(a.name),
+                            SquadId(b.name),
+                        ])
                     }
                 )
         })
     )
 
-    scene.events.on("Squad Collision", squadCollision(scene))
+    squadCollision.listen(scene)
+    selectMoveDestination.listen(scene, map)
+    resumeSquadMovement.listen(scene, map)
 
     await fadeIn(scene, 500)
-
-    events(scene).on(
-        "Select Move Destination",
-        (forceId: ForceId, squadId: SquadId) => {
-            selectMoveDestination(forceId, squadId, map, scene)
-        }
-    )
-
-    events(scene).on(
-        "Resume Squad Movement",
-        (sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) => {
-            const target = sprite.data.get(
-                UNIT_DATA_TARGET
-            ) as Phaser.Math.Vector2
-            const tile = map.getTileAtWorldXY(target.x, target.y)
-
-            scene.physics.moveToObject(
-                sprite,
-                { x: target.x, y: target.y },
-                tile.properties.speed
-            )
-        }
-    )
 
     scene.game.events.emit("Map Screen Created")
 }

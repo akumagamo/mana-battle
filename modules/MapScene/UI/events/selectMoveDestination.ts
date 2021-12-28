@@ -37,13 +37,13 @@ export default (scene: Phaser.Scene) => {
     })
 }
 
-function listen(scene: Phaser.Scene) {
-    return (
-        ev: (scn: Phaser.Scene) => (squadId: SquadId, forceId: ForceId) => void
-    ) => {
+export const listen =
+    (scene: Phaser.Scene) =>
+    (ev: (scn: Phaser.Scene) => (squadId: SquadId, forceId: ForceId) => void) =>
         events(scene).on("Select Move Destination", ev(scene))
-    }
-}
+
+export const emit = (scene: Phaser.Scene, forceId: ForceId, squadId: SquadId) =>
+    events(scene).emit("Select Move Destination", forceId, squadId)
 
 export const SELECTED_SQUAD_OPTIONS = [
     VIEW_SQUAD_DETAILS_LABEL,
