@@ -1,10 +1,9 @@
 import { fadeIn } from "../UI/Transition"
 import * as selectMoveDestination from "./events/selectMoveDestination"
-import resumeSquadMovement from "./events/resumeSquadMovement"
 import { createMap } from "./map"
 import { createSquad } from "./squad"
 import { createCity } from "./city"
-import * as squadCollision from "./events/squadCollision"
+import squadCollision from "./events/squadCollision"
 import { Map } from "immutable"
 import { State } from "../Battlefield/State"
 import { SquadId } from "../Battlefield/Squad"
@@ -35,7 +34,7 @@ export default async (scene: Phaser.Scene, { forces, cities }: State) => {
                     toJS(squads_),
                     toJS(squads__),
                     (a, b) => {
-                        squadCollision.emit(scene)([
+                        squadCollision(scene)([
                             SquadId(a.name),
                             SquadId(b.name),
                         ])
@@ -44,7 +43,6 @@ export default async (scene: Phaser.Scene, { forces, cities }: State) => {
         })
     )
 
-    squadCollision.listen(scene)
     selectMoveDestination.listen(scene, map)
 
     await fadeIn(scene, 500)
