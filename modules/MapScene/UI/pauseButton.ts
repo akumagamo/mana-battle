@@ -12,7 +12,7 @@ import {
 import { MapScreen } from "../Model"
 
 export default function (scene: Phaser.Scene) {
-    const mapScreen = MapScreen(scene.scene.manager)
+    const { scene: mapScreen } = MapScreen(scene.scene.manager)
 
     mapScreen.events.on(UNPAUSE_GAME_CMD, () => {
         mapScreen.physics.resume()

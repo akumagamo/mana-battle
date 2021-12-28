@@ -2,6 +2,7 @@ import { Force, ForceId } from "../Battlefield/Force"
 import { DispatchedSquad, SquadId } from "../Battlefield/Squad"
 import { UNIT_DATA_TARGET } from "./events/selectMoveDestination"
 import squadClicked from "./events/squadClicked"
+import { MapScreen } from "./Model"
 
 export const ARRIVED_AT_TARGET = "Arrived at target"
 
@@ -41,8 +42,10 @@ function createSquadEvents(
 ) {
     sprite.setInteractive()
 
+    const mapScreen = MapScreen(scene.scene.manager)
+
     sprite.on(Phaser.Input.Events.POINTER_UP, () =>
-        squadClicked(forceId, squadId, sprite, scene)
+        mapScreen.events.squadClicked(forceId, squadId, sprite)
     )
 
     sprite.on(ARRIVED_AT_TARGET, () => {
