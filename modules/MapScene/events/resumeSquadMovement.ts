@@ -1,12 +1,12 @@
+import { MapScreen } from "../Model"
 import { UNIT_DATA_TARGET } from "./selectMoveDestination"
 
-export default (
-        map: Phaser.Tilemaps.TilemapLayer,
-        sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
-    ) =>
+export default (sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) =>
     (scene: Phaser.Scene) => {
         const { x, y } = sprite.data.get(UNIT_DATA_TARGET)
-        const tile = map.getTileAtWorldXY(x, y)
+        const tile = MapScreen(scene.scene.manager)
+            .tilemap()
+            .getTileAtWorldXY(x, y)
 
         scene.physics.moveToObject(sprite, { x, y }, tile.properties.speed)
     }

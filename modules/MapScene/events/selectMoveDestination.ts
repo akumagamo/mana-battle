@@ -3,6 +3,7 @@ import { SquadId } from "../../Battlefield/Squad"
 import events from "../events"
 import * as selectMoveDestinationUI from "../UI/events/selectMoveDestination"
 import resumeSquadMovement from "../events/resumeSquadMovement"
+import { MapScreen } from "../Model"
 
 export const UNIT_DATA_TARGET = "target"
 const CLICK_THRESHOLD = 5
@@ -12,24 +13,21 @@ export default function selectMoveDestination(
     squadId: SquadId,
     scene: Phaser.Scene
 ) {
-    const mapScreen = scene.scene.get("Map Screen").children
+    const mapScreen = MapScreen(scene.scene.manager)
 
-    const sprite = mapScreen.getByName(
-        squadId
-    ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+    const sprite = mapScreen.getSprite(squadId)
 
-    const layer = mapScreen.getByName("bg") as Phaser.Tilemaps.TilemapLayer
+    const layer = mapScreen.tilemap()
     clearEvents(layer)
 
     layer.on(
         Phaser.Input.Events.POINTER_UP,
-        movementOrderAssigned(forceId, sprite, layer)
+        movementOrderAssigned(forceId, sprite)
     )
 }
 function movementOrderAssigned(
     forceId: ForceId,
-    sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
-    layer: Phaser.Tilemaps.TilemapLayer
+    sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 ) {
     return (pointer: Phaser.Input.Pointer) => {
         const { scene } = sprite
@@ -43,12 +41,13 @@ function movementOrderAssigned(
 
         if (userDraggedInsteadOfClicking) return
 
+        const layer = MapScreen(scene.scene.manager).tilemap()
         clearEvents(layer)
 
         const target = { x: pointer.worldX, y: pointer.worldY }
         sprite.data.set(UNIT_DATA_TARGET, target)
 
-        resumeSquadMovement(layer, sprite)(scene)
+        resumeSquadMovement(sprite)(scene)
 
         // this is a map/battlefield event, not a UI one
         // here we should dispatch a command to the UI

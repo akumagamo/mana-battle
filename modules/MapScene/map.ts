@@ -1,5 +1,6 @@
 import { adjustSpeed } from "./events/adjustSpeed"
 import { checkArrival } from "./events/checkArrival"
+import { MapScreen } from "./Model"
 
 const DRAG_TIME_THRESHOLD = 200
 const DRAG_DISTANCE_THRESHOLD = 10
@@ -7,24 +8,22 @@ const DRAG_DISTANCE_THRESHOLD = 10
 export function createMap(scene: Phaser.Scene) {
     const map = scene.make.tilemap({ key: "maps/map" })
     const tileset = map.addTilesetImage("pipo")
-    const layer = map.createLayer("bg", [tileset])
+    const layer = map.createLayer("bg", [tileset]).setName("bg")
 
-    layer.name = "bg"
     map.createLayer("elevations", [tileset])
     map.createLayer("doodads", [tileset])
 
     map.setCollisionByProperty({ collides: true })
 
-    makeMapDraggable(scene, layer)
+    makeMapDraggable(scene)
 
     return layer
 }
 
-function makeMapDraggable(
-    scene: Phaser.Scene,
-    layer: Phaser.Tilemaps.TilemapLayer
-) {
+function makeMapDraggable(scene: Phaser.Scene) {
     const { input, cameras, events } = scene
+
+    const layer = MapScreen(scene.scene.manager).tilemap()
 
     cameras.main.setBounds(layer.x, layer.y, layer.width, layer.height)
     layer.setInteractive()
@@ -45,5 +44,5 @@ function makeMapDraggable(
     })
 
     events.on(Phaser.Scenes.Events.UPDATE, checkArrival(scene))
-    events.on(Phaser.Scenes.Events.UPDATE, adjustSpeed(scene, layer))
+    events.on(Phaser.Scenes.Events.UPDATE, adjustSpeed(scene))
 }

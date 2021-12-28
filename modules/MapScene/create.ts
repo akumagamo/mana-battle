@@ -1,5 +1,4 @@
 import { fadeIn } from "../UI/Transition"
-import * as selectMoveDestination from "./events/selectMoveDestination"
 import { createMap } from "./map"
 import { createSquad } from "./squad"
 import { createCity } from "./city"
@@ -9,7 +8,7 @@ import { State } from "../Battlefield/State"
 import { SquadId } from "../Battlefield/Squad"
 
 export default async (scene: Phaser.Scene, { forces, cities }: State) => {
-    const map = createMap(scene)
+    createMap(scene)
 
     createAnimations(scene)
 

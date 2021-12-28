@@ -1,7 +1,6 @@
-export function adjustSpeed(
-    scene: Phaser.Scene,
-    layer: Phaser.Tilemaps.TilemapLayer
-) {
+import { MapScreen } from "../Model"
+
+export function adjustSpeed(scene: Phaser.Scene) {
     return () =>
         (
             scene.children.getAll(
@@ -14,7 +13,9 @@ export function adjustSpeed(
                 sprite.body.velocity.x !== 0 || sprite.body.velocity.y !== 0
             if (isMoving) {
                 const pos = sprite.getBottomCenter()
-                const tile = layer.getTileAtWorldXY(pos.x, pos.y)
+                const tile = MapScreen(scene.scene.manager)
+                    .tilemap()
+                    .getTileAtWorldXY(pos.x, pos.y)
                 if (!tile) return
 
                 const { angle } = sprite.body
