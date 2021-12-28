@@ -18,28 +18,33 @@ const SELECT_MOVE_DESTIONATION_OPTIONS = [
     CANCEL_OPTION_LABEL,
 ]
 
-export const EVENT_CLOSE_SELET_MOVE_DESTINATION =
-    "Close Select Move Destination"
-
 export default (scene: Phaser.Scene, forceId: ForceId, squadId: SquadId) => {
     const actions = [
-        disableOptions,
+        destroyOptions,
         renderSelectDestionationLabel,
         renderCancelOption,
     ]
 
     actions.forEach((action) => action(scene)(squadId, forceId))
 
-    events(scene).on(EVENT_CLOSE_SELET_MOVE_DESTINATION, () => {
-        SELECT_MOVE_DESTIONATION_OPTIONS.forEach((opt) => {
-            scene.children.getByName(opt)?.destroy()
-        })
-    })
-
     selectMoveDestination(forceId, squadId, scene)
 }
 
-export function disableOptions(scene: Phaser.Scene) {
+export const closeSelectMoveDestination = (scene: Phaser.Scene) => () => {
+    SELECT_MOVE_DESTIONATION_OPTIONS.forEach((opt) => {
+        const child = scene.children.getByName(opt)
+        if (!child) {
+            console.error(
+                `Element "${opt}" not available on`,
+                scene.children.list.map((c) => c.name)
+            )
+            return
+        }
+        child.destroy()
+    })
+}
+
+export function destroyOptions(scene: Phaser.Scene) {
     return () => {
         const SELECTED_SQUAD_OPTIONS = [
             VIEW_SQUAD_DETAILS_LABEL,

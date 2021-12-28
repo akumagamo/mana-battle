@@ -50,11 +50,7 @@ function movementOrderAssigned(
 
         resumeSquadMovement(sprite)(scene)
 
-        // this is a map/battlefield event, not a UI one
-        // here we should dispatch a command to the UI
-        events(scene).emit(
-            selectMoveDestinationUI.EVENT_CLOSE_SELET_MOVE_DESTINATION
-        )
+        mapScreen.events.closeSelectMoveDestionation()
 
         mapScreen.events.squadSelected(forceId, SquadId(sprite.name))
 

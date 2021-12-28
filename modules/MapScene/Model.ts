@@ -1,6 +1,7 @@
 import { SquadId } from "../Battlefield/Squad"
 import { State } from "../Battlefield/State"
 import squadClicked from "./events/squadClicked"
+import { closeSelectMoveDestination } from "./UI/events/selectMoveDestination"
 import squadSelected from "./UI/events/squadSelected"
 
 export const MapScreen = (manager: Phaser.Scenes.SceneManager) => {
@@ -21,6 +22,7 @@ export const MapScreen = (manager: Phaser.Scenes.SceneManager) => {
         events: {
             squadClicked: squadClicked(scene),
             squadSelected: squadSelected(ui),
+            closeSelectMoveDestionation: closeSelectMoveDestination(ui),
         },
     }
 }
