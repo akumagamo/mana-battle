@@ -5,6 +5,12 @@ import { MapScreen } from "./Model"
 
 export const ARRIVED_AT_TARGET = "Arrived at target"
 
+export const directionKey = (job: string, dir: string) =>
+    `${job}-map-walk-${dir}`
+
+export const getSquadJob = (forceId: ForceId) =>
+    forceId === "PLAYER" ? "soldier" : "skeleton"
+
 export const createSquad =
     (scene: Phaser.Scene) => (squad: DispatchedSquad, force: Force) => {
         const {
@@ -12,24 +18,17 @@ export const createSquad =
             id,
         } = squad
 
-        const directionKey = (dir: string) => `${job}-map-walk-${dir}`
+        const job = getSquadJob(force.id)
 
-        const job = force.id === "PLAYER" ? "soldier" : "skeleton"
         const sprite = scene.physics.add
             .sprite(x, y, `${job}-map`)
             .setDataEnabled()
             .setName(id)
-            .play(directionKey("down"))
+            .play(directionKey(job, "down"))
             .setScale(2)
 
         createSquadEvents(force.id, squad.id, scene, sprite)
 
-        sprite.on(
-            "updateAnimation",
-            updateSquadOrientation(sprite, (dir) => {
-                sprite.anims.play(directionKey(dir))
-            })
-        )
         return sprite
     }
 
@@ -52,22 +51,20 @@ function createSquadEvents(
     })
 }
 
-function updateSquadOrientation(
+export function updateSquadOrientation(
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
     direction: (dir: string) => void
 ) {
-    return () => {
-        const { x, y } = sprite.body.velocity
+    const { x, y } = sprite.body.velocity
 
-        const absX = Math.abs(x)
-        const absY = Math.abs(y)
+    const absX = Math.abs(x)
+    const absY = Math.abs(y)
 
-        if (absX > absY) {
-            if (x > 0) direction("right")
-            else direction("left")
-        } else {
-            if (y > 0) direction("down")
-            else direction("top")
-        }
+    if (absX > absY) {
+        if (x > 0) direction("right")
+        else direction("left")
+    } else {
+        if (y > 0) direction("down")
+        else direction("top")
     }
 }

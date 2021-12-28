@@ -4,6 +4,7 @@ import events from "../events"
 import * as selectMoveDestinationUI from "../UI/events/selectMoveDestination"
 import resumeSquadMovement from "../events/resumeSquadMovement"
 import { MapScreen } from "../Model"
+import { directionKey, getSquadJob, updateSquadOrientation } from "../squad"
 
 export const UNIT_DATA_TARGET = "target"
 const CLICK_THRESHOLD = 5
@@ -54,7 +55,9 @@ function movementOrderAssigned(
 
         mapScreen.events.squadSelected(forceId, SquadId(sprite.name))
 
-        sprite.emit("updateAnimation")
+        updateSquadOrientation(sprite, (dir) => {
+            sprite.anims.play(directionKey(getSquadJob(forceId), dir))
+        })
     }
 }
 
