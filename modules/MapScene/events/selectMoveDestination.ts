@@ -10,15 +10,15 @@ const CLICK_THRESHOLD = 5
 export default function selectMoveDestination(
     forceId: ForceId,
     squadId: SquadId,
-    layer: Phaser.Tilemaps.TilemapLayer,
     scene: Phaser.Scene
 ) {
-    const sprite = scene.scene
-        .get("Map Screen")
-        .children.getByName(
-            squadId
-        ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+    const mapScreen = scene.scene.get("Map Screen").children
 
+    const sprite = mapScreen.getByName(
+        squadId
+    ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+
+    const layer = mapScreen.getByName("bg") as Phaser.Tilemaps.TilemapLayer
     clearEvents(layer)
 
     layer.on(
@@ -64,15 +64,4 @@ function movementOrderAssigned(
 
 function clearEvents(layer: Phaser.Tilemaps.TilemapLayer) {
     layer.off(Phaser.Input.Events.POINTER_UP)
-}
-export const listen = (
-    scene: Phaser.Scene,
-    map: Phaser.Tilemaps.TilemapLayer
-) => {
-    events(scene).on(
-        "Select Move Destination",
-        (forceId: ForceId, squadId: SquadId) => {
-            selectMoveDestination(forceId, squadId, map, scene)
-        }
-    )
 }

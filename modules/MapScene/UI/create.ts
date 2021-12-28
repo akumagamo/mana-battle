@@ -4,10 +4,8 @@ import { SCREEN_WIDTH } from "../../_shared/constants"
 import events from "../events"
 import { UNIT_DATA_TARGET } from "../events/selectMoveDestination"
 import moveSquadCancelled from "./events/moveSquadCancelled"
-import listenToSelectMovesDestinationEvents from "./events/selectMoveDestination"
 import { squadSelected } from "./events/squadSelected"
 import resumeSquadMovement from "../events/resumeSquadMovement"
-import { emitter } from "../../_shared/Event"
 
 const UNPAUSE_GAME_CMD = "Game Paused"
 const PAUSE_GAME_CMD = "Game Unpaused"
@@ -20,8 +18,6 @@ export default async (scene: Phaser.Scene, state: State) => {
     scene.game.events.emit("Map Screen UI Created")
 
     events(scene).on("Squad Selected", squadSelected(scene, state))
-
-    listenToSelectMovesDestinationEvents(scene)
 
     events(scene).on("Move Squad Cancelled", moveSquadCancelled(scene))
 

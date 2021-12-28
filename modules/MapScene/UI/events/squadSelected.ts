@@ -4,14 +4,16 @@ import { State } from "../../../Battlefield/State"
 import UI from "../../../UI"
 import { SCREEN_HEIGHT } from "../../../_shared/constants"
 import createSquadDetailsModal from "../squadDetailsModal"
-import * as selectMoveDestination from "./selectMoveDestination"
+import selectMoveDestination, {
+    SELECTED_SQUAD_OPTIONS,
+} from "./selectMoveDestination"
 
 export const VIEW_SQUAD_DETAILS_LABEL = "View Squad Details"
 export const MOVE_SQUAD_LABEL = "Move Squad"
 
 export function squadSelected(scene: Phaser.Scene, state: State) {
     return (forceId: ForceId, squadId: SquadId) => {
-        selectMoveDestination.SELECTED_SQUAD_OPTIONS.forEach((opt) =>
+        SELECTED_SQUAD_OPTIONS.forEach((opt) =>
             scene.children.getByName(opt)?.destroy()
         )
         UI.button(scene)(
@@ -28,7 +30,7 @@ export function squadSelected(scene: Phaser.Scene, state: State) {
 
         if (force.controller === ForceControllers.PLAYER) {
             UI.button(scene)(500, SCREEN_HEIGHT - 50, MOVE_SQUAD_LABEL, () =>
-                selectMoveDestination.emit(scene, forceId, squadId)
+                selectMoveDestination(scene, forceId, squadId)
             )
         }
     }

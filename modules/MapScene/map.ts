@@ -8,6 +8,8 @@ export function createMap(scene: Phaser.Scene) {
     const map = scene.make.tilemap({ key: "maps/map" })
     const tileset = map.addTilesetImage("pipo")
     const layer = map.createLayer("bg", [tileset])
+
+    layer.name = "bg"
     map.createLayer("elevations", [tileset])
     map.createLayer("doodads", [tileset])
 

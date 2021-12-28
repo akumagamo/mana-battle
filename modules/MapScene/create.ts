@@ -43,8 +43,6 @@ export default async (scene: Phaser.Scene, { forces, cities }: State) => {
         })
     )
 
-    selectMoveDestination.listen(scene, map)
-
     await fadeIn(scene, 500)
 
     scene.game.events.emit("Map Screen Created")
