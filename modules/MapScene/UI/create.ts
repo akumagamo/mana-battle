@@ -6,7 +6,8 @@ import { UNIT_DATA_TARGET } from "../events/selectMoveDestination"
 import moveSquadCancelled from "./events/moveSquadCancelled"
 import listenToSelectMovesDestinationEvents from "./events/selectMoveDestination"
 import { squadSelected } from "./events/squadSelected"
-import * as resumeSquadMovement from "../events/resumeSquadMovement"
+import resumeSquadMovement from "../events/resumeSquadMovement"
+import { emitter } from "../../_shared/Event"
 
 const UNPAUSE_GAME_CMD = "Game Paused"
 const PAUSE_GAME_CMD = "Game Unpaused"
@@ -41,9 +42,12 @@ function pauseButton(scene: Phaser.Scene, mapScreen: Phaser.Scene) {
         // Here we reissue the move order (if any) to all squads
         mapScreen.children.each((sprite) => {
             if (sprite.data && sprite.data.get(UNIT_DATA_TARGET))
-                resumeSquadMovement.emit(
+                resumeSquadMovement(
+                    scene.children.getByName(
+                        "bg"
+                    ) as Phaser.Tilemaps.TilemapLayer,
                     sprite as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
-                )
+                )(scene)
         })
     })
 

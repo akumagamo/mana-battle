@@ -1,6 +1,6 @@
 import { fadeIn } from "../UI/Transition"
 import * as selectMoveDestination from "./events/selectMoveDestination"
-import * as resumeSquadMovement from "./events/resumeSquadMovement"
+import resumeSquadMovement from "./events/resumeSquadMovement"
 import { createMap } from "./map"
 import { createSquad } from "./squad"
 import { createCity } from "./city"
@@ -46,7 +46,6 @@ export default async (scene: Phaser.Scene, { forces, cities }: State) => {
 
     squadCollision.listen(scene)
     selectMoveDestination.listen(scene, map)
-    resumeSquadMovement.listen(scene, map)
 
     await fadeIn(scene, 500)
 

@@ -1,8 +1,8 @@
 import { ForceId } from "../../Battlefield/Force"
-import { Squad, SquadId } from "../../Battlefield/Squad"
+import { SquadId } from "../../Battlefield/Squad"
 import events from "../events"
 import * as selectMoveDestinationUI from "../UI/events/selectMoveDestination"
-import * as resumeSquadMovement from "../events/resumeSquadMovement"
+import resumeSquadMovement from "../events/resumeSquadMovement"
 
 export const UNIT_DATA_TARGET = "target"
 const CLICK_THRESHOLD = 5
@@ -48,7 +48,7 @@ function movementOrderAssigned(
         const target = { x: pointer.worldX, y: pointer.worldY }
         sprite.data.set(UNIT_DATA_TARGET, target)
 
-        resumeSquadMovement.emit(sprite)
+        resumeSquadMovement(layer, sprite)(scene)
 
         // this is a map/battlefield event, not a UI one
         // here we should dispatch a command to the UI
