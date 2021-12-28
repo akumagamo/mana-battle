@@ -8,6 +8,7 @@ import {
 } from "../../../_shared/constants"
 import events from "../../events"
 import selectMoveDestination from "../../events/selectMoveDestination"
+import { MapScreen } from "../../Model"
 import { MOVE_SQUAD_LABEL, VIEW_SQUAD_DETAILS_LABEL } from "./squadSelected"
 
 const SELECT_DESTINATION_LABEL = "Select Destination"
@@ -68,6 +69,10 @@ function renderCancelOption(scene: Phaser.Scene) {
             SCREEN_WIDTH - 150,
             SCREEN_HEIGHT - 60,
             CANCEL_OPTION_LABEL,
-            () => events(scene).emit("Move Squad Cancelled", force, squad)
+            () =>
+                MapScreen(scene.scene.manager).events.moveSquadCancelled(
+                    force,
+                    squad
+                )
         )
 }

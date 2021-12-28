@@ -1,6 +1,7 @@
 import { SquadId } from "../Battlefield/Squad"
 import { State } from "../Battlefield/State"
 import squadClicked from "./events/squadClicked"
+import moveSquadCancelled from "./UI/events/moveSquadCancelled"
 import { closeSelectMoveDestination } from "./UI/events/selectMoveDestination"
 import squadSelected from "./UI/events/squadSelected"
 
@@ -21,6 +22,7 @@ export const MapScreen = (manager: Phaser.Scenes.SceneManager) => {
             scene.children.getByName("bg") as Phaser.Tilemaps.TilemapLayer,
         events: {
             squadClicked: squadClicked(scene),
+            moveSquadCancelled: moveSquadCancelled(scene),
             squadSelected: squadSelected(ui),
             closeSelectMoveDestionation: closeSelectMoveDestination(ui),
         },
