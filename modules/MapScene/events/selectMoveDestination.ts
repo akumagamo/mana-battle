@@ -31,6 +31,7 @@ function movementOrderAssigned(
 ) {
     return (pointer: Phaser.Input.Pointer) => {
         const { scene } = sprite
+        const mapScreen = MapScreen(scene.scene.manager)
         const userDraggedInsteadOfClicking =
             Phaser.Math.Distance.Between(
                 pointer.upX,
@@ -41,7 +42,7 @@ function movementOrderAssigned(
 
         if (userDraggedInsteadOfClicking) return
 
-        const layer = MapScreen(scene.scene.manager).tilemap()
+        const layer = mapScreen.tilemap()
         clearEvents(layer)
 
         const target = { x: pointer.worldX, y: pointer.worldY }
@@ -55,7 +56,7 @@ function movementOrderAssigned(
             selectMoveDestinationUI.EVENT_CLOSE_SELET_MOVE_DESTINATION
         )
 
-        events(scene).emit("Squad Selected", forceId, sprite.name)
+        mapScreen.events.squadSelected(forceId, SquadId(sprite.name))
 
         sprite.emit("updateAnimation")
     }

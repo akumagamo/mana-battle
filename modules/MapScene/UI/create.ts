@@ -1,7 +1,5 @@
-import { State } from "../../Battlefield/State"
 import events from "../events"
 import moveSquadCancelled from "./events/moveSquadCancelled"
-import { squadSelected } from "./events/squadSelected"
 import pauseButton from "./pauseButton"
 
 export const UNPAUSE_GAME_CMD = "Game Paused"
@@ -10,10 +8,8 @@ export const PAUSE_LABEL = "Pause"
 export const UNPAUSE_LABEL = "Unpause"
 export const PAUSE_BUTTON_KEY = "Pause Button"
 
-export default async (scene: Phaser.Scene, state: State) => {
+export default async (scene: Phaser.Scene) => {
     scene.game.events.emit("Map Screen UI Created")
-
-    events(scene).on("Squad Selected", squadSelected(scene, state))
 
     events(scene).on("Move Squad Cancelled", moveSquadCancelled(scene))
 

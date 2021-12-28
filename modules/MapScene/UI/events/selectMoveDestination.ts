@@ -39,15 +39,16 @@ export default (scene: Phaser.Scene, forceId: ForceId, squadId: SquadId) => {
     selectMoveDestination(forceId, squadId, scene)
 }
 
-export const SELECTED_SQUAD_OPTIONS = [
-    VIEW_SQUAD_DETAILS_LABEL,
-    MOVE_SQUAD_LABEL,
-]
 export function disableOptions(scene: Phaser.Scene) {
-    return (_squad: SquadId, _forceId: ForceId) => {
+    return () => {
+        const SELECTED_SQUAD_OPTIONS = [
+            VIEW_SQUAD_DETAILS_LABEL,
+            MOVE_SQUAD_LABEL,
+        ]
         const elements = SELECTED_SQUAD_OPTIONS.map((name) =>
             scene.children.getByName(name)
         ) as Phaser.GameObjects.Container[]
+
         elements.forEach((el) => el.destroy())
     }
 }

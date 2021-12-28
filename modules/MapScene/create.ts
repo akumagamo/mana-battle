@@ -7,7 +7,10 @@ import { Map } from "immutable"
 import { State } from "../Battlefield/State"
 import { SquadId } from "../Battlefield/Squad"
 
-export default async (scene: Phaser.Scene, { forces, cities }: State) => {
+export default async (scene: Phaser.Scene, state: State) => {
+    const { forces, cities } = state
+    scene.data.set("state", state)
+
     createMap(scene)
 
     createAnimations(scene)
