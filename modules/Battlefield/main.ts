@@ -23,25 +23,29 @@ export const main = (scene: Phaser.Scene) => {
         start: () => {
             const units = range(0, 10).map((n) => createUnit(n.toString()))
 
-            const playerForce = createForce("PLAYER")
             const player = pipe(
                 units.reduce((xs, x) => addUnit(x)(xs), {
-                    ...playerForce,
+                    ...createForce("PLAYER"),
                     stronghold: { x: 100, y: 100 },
                     controller: ForceControllers.PLAYER,
                 }),
                 addSquad(units.map((u) => u.id).slice(0, 4)),
-                chain(dispatchSquad(SquadId(playerForce.id, "0")))
+                chain((f) => {
+                    const id = f.nonDispatchedSquads.first()?.id
+                    return dispatchSquad(id as SquadId)(f)
+                })
             )
 
-            const computerForce = createForce("COMPUTER")
             const computer = pipe(
                 units.reduce((xs, x) => addUnit(x)(xs), {
-                    ...computerForce,
+                    ...createForce("COMPUTER"),
                     stronghold: { x: 200, y: 100 },
                 }),
                 addSquad(units.map((u) => u.id).slice(0, 4)),
-                chain(dispatchSquad(SquadId(computerForce.id, "0")))
+                chain((f) => {
+                    const id = f.nonDispatchedSquads.first()?.id
+                    return dispatchSquad(id as SquadId)(f)
+                })
             )
 
             const playerCity = {

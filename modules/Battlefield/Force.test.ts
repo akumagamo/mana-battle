@@ -67,118 +67,116 @@ describe("addSquad", () => {
 })
 describe("dispatchSquad", () => {
     test("should report an error passing a squad id that is not benched", () => {
-        const id = SquadId(defaultForce.id, "1")
+        const id = SquadId(defaultForce.id, "some non existing id")
         const result = dispatchSquad(id)(defaultForce)
 
         expect(result).toStrictEqual(left([Errors.SQUAD_NOT_BENCHED(id)]))
     })
 
     test("should move the squad from the bench to the dispatched collection", () => {
-        const id = SquadId(defaultForce.id, "0")
-        const result = pipe(
-            defaultForce,
-            addSquad(ids.slice(0, 3)),
-            chain(dispatchSquad(id))
+        const forceWithSquad = expectNoErrors(
+            pipe(defaultForce, addSquad(ids.slice(0, 3)))
         )
 
-        const right = expectNoErrors(result)
+        const id = forceWithSquad.nonDispatchedSquads.first()?.id
 
-        expect(right.dispatchedSquads.first()?.id).toEqual(id)
-        expect(right.nonDispatchedSquads.isEmpty()).toBeTruthy()
+        const forceWithoutSquad = expectNoErrors(
+            dispatchSquad(id as SquadId)(forceWithSquad)
+        )
+
+        expect(forceWithoutSquad.dispatchedSquads.first()?.id).toEqual(id)
+        expect(forceWithoutSquad.nonDispatchedSquads.isEmpty()).toBeTruthy()
     })
 })
 
 describe("retreatSquad", () => {
     test("should report an error passing a squad id that is not dispatched", () => {
-        const id = SquadId(defaultForce.id, "1")
+        const id = SquadId(defaultForce.id, "some non existing id")
         const result = retreatSquad(id)(defaultForce)
 
         expect(result).toStrictEqual(left([Errors.SQUAD_NOT_DISPATCHED(id)]))
     })
     test("should move the squad from the dispatched collection to the bench", () => {
-        const id = SquadId(defaultForce.id, "0")
-
-        const result = pipe(
-            defaultForce,
-            addSquad(ids.slice(0, 3)),
-            chain(dispatchSquad(id)),
-            chain(retreatSquad(id))
+        const benchedForce = expectNoErrors(
+            pipe(defaultForce, addSquad(ids.slice(0, 3)))
         )
 
-        const right = expectNoErrors(result)
+        const id = benchedForce.nonDispatchedSquads.first()?.id as SquadId
 
-        expect(right.dispatchedSquads.size).toEqual(0)
-        expect(right.nonDispatchedSquads.size).toEqual(1)
+        const result = expectNoErrors(
+            pipe(benchedForce, dispatchSquad(id), chain(retreatSquad(id)))
+        )
+
+        expect(result.dispatchedSquads.size).toEqual(0)
+        expect(result.nonDispatchedSquads.size).toEqual(1)
     })
 })
 
 describe("removeSquad", () => {
     test("should report an error passing a squad id that is not benched", () => {
-        const id = SquadId(defaultForce.id, "1")
+        const id = SquadId(defaultForce.id, "some non existing id")
         const result = removeSquad(id)(defaultForce)
 
         expect(result).toStrictEqual(left([Errors.SQUAD_NOT_BENCHED(id)]))
     })
     test("should remove squad from the bench", () => {
-        const id = SquadId(defaultForce.id, "0")
-
-        const result = pipe(
-            defaultForce,
-            addSquad(ids.slice(0, 3)),
-            chain(removeSquad(id))
+        const benchedForce = expectNoErrors(
+            pipe(defaultForce, addSquad(ids.slice(0, 3)))
         )
-        const right = expectNoErrors(result)
 
-        expect(right.nonDispatchedSquads.has(id)).toBeFalsy()
+        const id = benchedForce.nonDispatchedSquads.first()?.id as SquadId
+        const result = expectNoErrors(removeSquad(id)(benchedForce))
+
+        expect(result.nonDispatchedSquads.isEmpty()).toBeTruthy()
     })
     test("should place units from removed squad in the bench", () => {
-        const id = SquadId(defaultForce.id, "0")
+        const ids_ = defaultForce.unitsWithoutSquad
+            .slice(0, 3)
+            .keySeq()
+            .toJS() as UnitId[]
 
-        const ids_ = ids.slice(0, 3)
-        const result = pipe(
-            defaultForce,
-            addSquad(ids_),
-            chain(removeSquad(id))
-        )
+        const benchedForce = expectNoErrors(pipe(defaultForce, addSquad(ids_)))
 
-        const right = expectNoErrors(result)
+        const id = benchedForce.nonDispatchedSquads.first()?.id as SquadId
+
+        const result = expectNoErrors(removeSquad(id)(benchedForce))
 
         ids_.forEach((id) =>
-            expect(right.unitsWithoutSquad.has(id)).toBeTruthy()
+            expect(result.unitsWithoutSquad.has(id)).toBeTruthy()
         )
     })
 })
 
 describe("removeUnit", () => {
     test("should report error if trying to remove an unit not in the bench", () => {
-        const result = removeUnit(defaultForce, UnitId("x1"))
+        const result = removeUnit(defaultForce, UnitId("some non existing id"))
 
-        expect(result).toStrictEqual(left([Errors.UNIT_NOT_IN_BENCH("x1")]))
+        expect(result).toStrictEqual(
+            left([Errors.UNIT_NOT_IN_BENCH("some non existing id")])
+        )
     })
     test("should remove valid unit from the bench", () => {
         const [id] = ids
-        const result = removeUnit(defaultForce, id)
+        const result = expectNoErrors(removeUnit(defaultForce, id))
 
-        const right = expectNoErrors(result)
-
-        expect(right.unitsWithoutSquad.has(id)).toBeFalsy()
+        expect(result.unitsWithoutSquad.has(id)).toBeFalsy()
     })
 })
 
 describe("updateUnit", () => {
     const newUnit = (id: string) => ({ id: UnitId(id), name: "New Name" })
     test("should report error if trying to remove an unit not in the bench", () => {
-        const result = updateUnit(defaultForce, newUnit("x1"))
+        const result = updateUnit(defaultForce, newUnit("some non existing id"))
 
-        expect(result).toStrictEqual(left([Errors.UNIT_NOT_IN_BENCH("x1")]))
+        expect(result).toStrictEqual(
+            left([Errors.UNIT_NOT_IN_BENCH("some non existing id")])
+        )
     })
     test("should update valid unit in the bench", () => {
         const [id] = ids
-        const result = updateUnit(defaultForce, newUnit(id))
+        const result = expectNoErrors(updateUnit(defaultForce, newUnit(id)))
 
-        const right = expectNoErrors(result)
-
-        expect(right.unitsWithoutSquad.get(id)?.name).toEqual(newUnit(id).name)
+        expect(result.unitsWithoutSquad.get(id)?.name).toEqual(newUnit(id).name)
     })
 })
 
