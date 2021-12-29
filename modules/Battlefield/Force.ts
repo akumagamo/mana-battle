@@ -12,6 +12,7 @@ import {
     SquadId,
 } from "./Squad"
 import { Unit, UnitId } from "./Unit"
+import * as crypto from "crypto"
 
 export type Relationship = "ALLY" | "ENEMY" | "NEUTRAL"
 export const Relationships: { [x in Relationship]: Relationship } = {
@@ -89,12 +90,12 @@ export const addSquad =
 
         const units = getAllFrom(unitIds, unitsWithoutSquad)
 
+        // fixme: this will lead to collisions as squads are removed
         const totalSquads = dispatchedSquads.size + nonDispatchedSquads.size
 
         const board = boardIndex(3, 3)
-        const id = `force/${force.id}/squads/${totalSquads}`
         const squad = createSquad(
-            id,
+            totalSquads.toString(),
             force.id,
             units.map((u, i) => [u, board[i]])
         )

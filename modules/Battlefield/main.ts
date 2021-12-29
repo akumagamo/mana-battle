@@ -23,23 +23,25 @@ export const main = (scene: Phaser.Scene) => {
         start: () => {
             const units = range(0, 10).map((n) => createUnit(n.toString()))
 
+            const playerForce = createForce("PLAYER")
             const player = pipe(
                 units.reduce((xs, x) => addUnit(x)(xs), {
-                    ...createForce("PLAYER"),
+                    ...playerForce,
                     stronghold: { x: 100, y: 100 },
                     controller: ForceControllers.PLAYER,
                 }),
                 addSquad(units.map((u) => u.id).slice(0, 4)),
-                chain(dispatchSquad(SquadId("force/PLAYER/squads/0")))
+                chain(dispatchSquad(SquadId(playerForce.id, "0")))
             )
 
+            const computerForce = createForce("COMPUTER")
             const computer = pipe(
                 units.reduce((xs, x) => addUnit(x)(xs), {
-                    ...createForce("COMPUTER"),
+                    ...computerForce,
                     stronghold: { x: 200, y: 100 },
                 }),
                 addSquad(units.map((u) => u.id).slice(0, 4)),
-                chain(dispatchSquad(SquadId("force/COMPUTER/squads/0")))
+                chain(dispatchSquad(SquadId(computerForce.id, "0")))
             )
 
             const playerCity = {
@@ -61,7 +63,7 @@ export const main = (scene: Phaser.Scene) => {
             const res =
                 validateProperties<{ player: Force; computer: Force }>(forces)
 
-            runFallible(res, [], ({ player, computer }) => {
+            const result = runFallible(res, [], ({ player, computer }) => {
                 const state = pipe(
                     emptyState,
                     addForce(player),
@@ -73,6 +75,8 @@ export const main = (scene: Phaser.Scene) => {
                 createMapScreen(scene, state)
                 createUI(scene, state)
             })
+
+            console.log(result)
         },
         destroy: () => {
             //something like

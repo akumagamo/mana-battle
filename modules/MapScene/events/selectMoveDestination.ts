@@ -51,7 +51,7 @@ function movementOrderAssigned(
 
         mapScreen.events.closeSelectMoveDestionation()
 
-        mapScreen.events.squadSelected(forceId, SquadId(sprite.name))
+        mapScreen.events.squadSelected(forceId, sprite.name as SquadId)
 
         updateSquadOrientation(sprite, (dir) => {
             sprite.anims.play(directionKey(getSquadJob(forceId), dir))

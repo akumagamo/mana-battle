@@ -5,7 +5,15 @@ import { ForceId } from "./Force"
 import { Unit, UnitId } from "./Unit"
 
 export type SquadId = string & { _squadId: never }
-export const SquadId = (id: string) => id as SquadId
+export const SquadId = (forceId: ForceId, id: string) =>
+    `force/${forceId}/squads/${id}` as SquadId
+export const parseSquadId = (id: SquadId) => {
+    const [, force] = id.split("/")
+    return {
+        force: ForceId(force),
+        squad: id,
+    }
+}
 
 type MapPosition = { x: number; y: number } & { _mapPosition: never }
 
@@ -27,7 +35,7 @@ export type DispatchedSquad = Squad & {
 }
 
 export const createSquad = (
-    id: string,
+    idSegment: string,
     force: ForceId,
     members: [Unit, MemberPosition][]
 ): Fallible<Squad> =>
@@ -51,7 +59,7 @@ export const createSquad = (
                 ),
         ],
         () => ({
-            id: SquadId(id),
+            id: SquadId(force, idSegment),
             force,
             members: Map(
                 members.map(([unit, position]) => [unit.id, { unit, position }])

@@ -13,7 +13,7 @@ test("should create a 2d board based on width and height", () => {
 })
 
 test("should report errors if trying to create a squad with two units in the same position", () => {
-    const res = createSquad("s1", ForceId("f1"), [
+    const res = createSquad("0", ForceId("f1"), [
         [createUnit("u1"), { x: 1, y: 1 }],
         [createUnit("u2"), { x: 1, y: 1 }],
     ])

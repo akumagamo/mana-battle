@@ -67,13 +67,14 @@ describe("addSquad", () => {
 })
 describe("dispatchSquad", () => {
     test("should report an error passing a squad id that is not benched", () => {
-        const result = dispatchSquad(SquadId("s1"))(defaultForce)
+        const id = SquadId(defaultForce.id, "1")
+        const result = dispatchSquad(id)(defaultForce)
 
-        expect(result).toStrictEqual(left([Errors.SQUAD_NOT_BENCHED("s1")]))
+        expect(result).toStrictEqual(left([Errors.SQUAD_NOT_BENCHED(id)]))
     })
 
     test("should move the squad from the bench to the dispatched collection", () => {
-        const id = SquadId("force/test/squads/0")
+        const id = SquadId(defaultForce.id, "0")
         const result = pipe(
             defaultForce,
             addSquad(ids.slice(0, 3)),
@@ -89,12 +90,13 @@ describe("dispatchSquad", () => {
 
 describe("retreatSquad", () => {
     test("should report an error passing a squad id that is not dispatched", () => {
-        const result = retreatSquad(SquadId("s1"))(defaultForce)
+        const id = SquadId(defaultForce.id, "1")
+        const result = retreatSquad(id)(defaultForce)
 
-        expect(result).toStrictEqual(left([Errors.SQUAD_NOT_DISPATCHED("s1")]))
+        expect(result).toStrictEqual(left([Errors.SQUAD_NOT_DISPATCHED(id)]))
     })
     test("should move the squad from the dispatched collection to the bench", () => {
-        const id = SquadId("force/test/squads/0")
+        const id = SquadId(defaultForce.id, "0")
 
         const result = pipe(
             defaultForce,
@@ -112,12 +114,13 @@ describe("retreatSquad", () => {
 
 describe("removeSquad", () => {
     test("should report an error passing a squad id that is not benched", () => {
-        const result = removeSquad(SquadId("s1"))(defaultForce)
+        const id = SquadId(defaultForce.id, "1")
+        const result = removeSquad(id)(defaultForce)
 
-        expect(result).toStrictEqual(left([Errors.SQUAD_NOT_BENCHED("s1")]))
+        expect(result).toStrictEqual(left([Errors.SQUAD_NOT_BENCHED(id)]))
     })
     test("should remove squad from the bench", () => {
-        const id = SquadId("force/test/squads/0")
+        const id = SquadId(defaultForce.id, "0")
 
         const result = pipe(
             defaultForce,
@@ -129,7 +132,7 @@ describe("removeSquad", () => {
         expect(right.nonDispatchedSquads.has(id)).toBeFalsy()
     })
     test("should place units from removed squad in the bench", () => {
-        const id = SquadId("force/test/squads/0")
+        const id = SquadId(defaultForce.id, "0")
 
         const ids_ = ids.slice(0, 3)
         const result = pipe(

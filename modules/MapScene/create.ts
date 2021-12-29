@@ -37,8 +37,8 @@ export default async (scene: Phaser.Scene, state: State) => {
                     toJS(squads__),
                     (a, b) => {
                         squadCollision(scene)([
-                            SquadId(a.name),
-                            SquadId(b.name),
+                            (a.name) as SquadId,
+                            (b.name) as SquadId,
                         ])
                     }
                 )

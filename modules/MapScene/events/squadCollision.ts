@@ -1,6 +1,6 @@
 import { fadeOut } from "../../UI/Transition"
 import CombatScene from "../../CombatScene/phaser"
-import { SquadId, DispatchedSquad } from "../../Battlefield/Squad"
+import { SquadId, DispatchedSquad, parseSquadId } from "../../Battlefield/Squad"
 import {
     selectNullable,
     Fallible,
@@ -17,10 +17,10 @@ export default (scene: Phaser.Scene) => async (squadIds: [SquadId, SquadId]) => 
     const squads = right(
         squadIds
             .map((id) => {
-                const [, force] = id.split("/")
+                const { force } = parseSquadId(id)
 
                 return selectNullable(
-                    `Should have a squad with id ${id} on ${squadIds.toString()}`,
+                    `Should have a dispatched squad with id ${id} on ${squadIds.toString()}`,
                     state.forces
                         .get(force, null)
                         ?.dispatchedSquads.get(id, null)
