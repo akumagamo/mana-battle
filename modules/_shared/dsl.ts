@@ -192,6 +192,7 @@ export const getPositonOf = (scene: string) => async (id: string) =>
                 .getScene(scene)
                 .children.getByName(id) as Phaser.GameObjects.Sprite
 
+            console.log(`....`, sprite)
             const camera = window.game.scene.getScene(scene).cameras.main
 
             const x = sprite.x + -camera.scrollX
@@ -212,6 +213,19 @@ export const getPositonOf = (scene: string) => async (id: string) =>
 export const click = (scene: string) => (id: string) => async () => {
     const { x, y } = await getPositonOf(scene)(id)
     await page.mouse.click(x, y)
+}
+
+export const getForceSquads = async (force: string) => {
+    return await page.evaluate((force) => {
+        return (
+            (window
+                .mapScreen()
+                .getState()
+                .forces.get(force)
+                ?.dispatchedSquads.keySeq()
+                .toJS() as string[]) || ([] as string[])
+        )
+    }, force)
 }
 
 export function waitForEvent<A>(scene: string, event: string) {

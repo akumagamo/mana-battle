@@ -18,7 +18,7 @@ export default (scene: Phaser.Scene) => {
 async function buttonClicked(scene: Phaser.Scene) {
     await fadeOut(scene, 500 / GAME_SPEED)
 
-    main(scene).start()
+    main(scene.scene.manager).start()
 
     scene.scene.remove(TitleScene.key)
 }

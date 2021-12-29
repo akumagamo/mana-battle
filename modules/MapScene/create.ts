@@ -11,6 +11,7 @@ export default async (scene: Phaser.Scene, state: State) => {
     const { forces, cities } = state
     scene.data.set("state", state)
 
+    console.log(`creating...`)
     createMap(scene)
 
     createAnimations(scene)
@@ -37,8 +38,8 @@ export default async (scene: Phaser.Scene, state: State) => {
                     toJS(squads__),
                     (a, b) => {
                         squadCollision(scene)([
-                            (a.name) as SquadId,
-                            (b.name) as SquadId,
+                            a.name as SquadId,
+                            b.name as SquadId,
                         ])
                     }
                 )
@@ -47,6 +48,7 @@ export default async (scene: Phaser.Scene, state: State) => {
 
     await fadeIn(scene, 500)
 
+    console.log(`!!!!`)
     scene.game.events.emit("Map Screen Created")
 }
 

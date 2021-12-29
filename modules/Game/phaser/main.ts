@@ -3,13 +3,17 @@ import { MapScreen } from "../../MapScene/Model"
 import TitleScene from "../../TitleScene/phaser"
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../_shared/constants"
 import preload from "../preload"
+import ScreenController, {
+    ScreenController as Controller,
+} from "../ScreenController"
 
 declare global {
     interface Window {
         game: Phaser.Game
         getMapScene: () => Phaser.Scene
         getMapSceneUI: () => Phaser.Scene
-        mapScreen: any
+        mapScreen: () => ReturnType<typeof MapScreen>
+        screenController: () => Controller
     }
 }
 
@@ -63,5 +67,6 @@ export const main = () => {
         window.getMapScene = () => game.scene.getScene("Map Screen")
         window.getMapSceneUI = () => game.scene.getScene("Map Screen UI")
         window.mapScreen = () => MapScreen(game.scene.getScene("Map Screen"))
+        window.screenController = () => ScreenController(game.scene)
     }
 }

@@ -14,7 +14,7 @@ describe("Map Screen", () => {
         test("Then I should see the map", assertMapIsVisible)
         test.todo("Then I should see all squads")
         test.todo("Then I should see all cities")
-        test("Then I the game is unpaused", gameShouldBePaused(false))
+        test("Then the game is unpaused", gameShouldBePaused(false))
         test(
             "Then I should be able to move the map",
             mapShouldBeDraggable(true)
@@ -23,18 +23,16 @@ describe("Map Screen", () => {
 
     describe("Squad Selection", () => {
         describe.each`
-            squadId | squadType   | canSeeEditOption | cursorColor
-            ${"0"}  | ${"allied"} | ${true}          | ${"green"}
-            ${"1"}  | ${"enemy"}  | ${false}         | ${"red"}
+            squadType     | canSeeEditOption | cursorColor
+            ${"PLAYER"}   | ${true}          | ${"green"}
+            ${"COMPUTER"} | ${false}         | ${"red"}
         `(
             "$squadType squad selection",
             ({
                 squadType,
                 canSeeEditOption,
-                squadId,
                 cursorColor,
             }: {
-                squadId: string
                 squadType: string
                 canSeeEditOption: boolean
                 cursorColor: string
@@ -46,7 +44,7 @@ describe("Map Screen", () => {
 
                 test(
                     `When I select an ${squadType} squad`,
-                    dsl.click("Map Screen")(squadId)
+                    clickOnAnyForceSquad(squadType)
                 )
 
                 test.skip(`Then there should be a "${cursorColor}" cursor signaling that
@@ -76,25 +74,19 @@ describe("Map Screen", () => {
 
     describe("Open Squad Details", () => {
         describe.each`
-            squadId | squadType
-            ${"0"}  | ${"allied"}
-            ${"1"}  | ${"enemy"}
+            squadType
+            ${"PLAYER"}
+            ${"COMPUTER"}
         `(
             "view squad details for $squadType squad",
-            ({
-                squadId,
-                squadType,
-            }: {
-                squadId: string
-                squadType: string
-            }) => {
+            ({ squadType }: { squadType: string }) => {
                 test(
                     "Given that I have nothing selected",
                     assertNoEntityIsSelected
                 )
                 test(
                     `When I select an "${squadType}" squad`,
-                    dsl.click("Map Screen")(squadId)
+                    clickOnAnyForceSquad(squadType)
                 )
 
                 test(
@@ -124,28 +116,31 @@ describe("Map Screen", () => {
 
     describe("Squad Movement", () => {
         describe("Move to target location", () => {
-            test(
-                "Given that I am selecting the target destination for a squad",
-                selectMovementTargetForSquad("0")
-            )
+            test("Given that I am selecting the target destination for a squad", async () => {
+                const [id] = await dsl.getForceSquads("PLAYER")
+                selectMovementTargetForSquad(id)
+            })
             test("When I select a location in the map", async function () {
                 await page.mouse.click(150, 250)
                 await page.waitForTimeout(50)
             })
 
-            test("Unit moves to that location", waitForSquadArrival("0"))
+            test("Unit moves to that location", async () => {
+                const [id] = await dsl.getForceSquads("PLAYER")
+                waitForSquadArrival(id)
+            })
         })
 
         describe("Selecting a squad while selecting a movement target has no effect", () => {
-            test(
-                "Given that I am selecting the target destination for a squad",
-                selectMovementTargetForSquad("0")
-            )
+            test("Given that I am selecting the target destination for a squad", async () => {
+                const [id] = await dsl.getForceSquads("PLAYER")
+                selectMovementTargetForSquad(id)
+            })
 
-            test(
-                "When I attempt to select the position where another unit is",
-                dsl.click("Map Screen")("1")
-            )
+            test("When I attempt to select the position where another unit is", async () => {
+                const [id] = await dsl.getForceSquads("PLAYER")
+                dsl.click("Map Screen")(id)
+            })
 
             test(
                 "Then I should still be selecting a target destination",
@@ -158,10 +153,10 @@ describe("Map Screen", () => {
     })
 
     describe("Squad Collision (friendly on enemy)", () => {
-        test(
-            "Given that I am selecting the target destination for a squad",
-            selectMovementTargetForSquad("0")
-        )
+        test("Given that I am selecting the target destination for a squad", async () => {
+            const [id] = await dsl.getForceSquads("PLAYER")
+            selectMovementTargetForSquad(id)
+        })
         test("Given that I issued a move order that will encounter an enemy", async function () {
             await page.mouse.click(300, 100)
         })
@@ -214,10 +209,10 @@ describe("Map Screen", () => {
                     assertNoEntityIsSelected
                 )
                 const [x, y] = moveTo
-                test(
-                    "When I select a movement target",
-                    selectMovementTargetForSquad("0")
-                )
+                test("When I select a movement target", async () => {
+                    const [id] = await dsl.getForceSquads("PLAYER")
+                    selectMovementTargetForSquad(id)
+                })
                 test(`When I select a position to the "${direction}" of the squad`, async () => {
                     await page.mouse.click(x, y)
                     await page.waitForTimeout(30)
@@ -274,6 +269,15 @@ describe("Map Screen", () => {
         })
     })
 })
+
+function clickOnAnyForceSquad(
+    squadType: string
+): jest.ProvidesCallback | undefined {
+    return async () => {
+        const [id] = await dsl.getForceSquads(squadType)
+        dsl.click("Map Screen")(id)
+    }
+}
 
 function selectMovementTargetForSquad(id: string) {
     return async () => {
@@ -346,6 +350,7 @@ function gameShouldBePaused(shouldBePaused: boolean) {
 async function assertNoEntityIsSelected() {
     await resetScreen()()
     await dsl.waitForSceneCreation("Map Screen")()
+
     const hasSelected = await page.evaluate(() => {
         const cursor = window
             .getMapScene()
@@ -368,9 +373,8 @@ async function assertMapIsVisible() {
 function resetScreen() {
     return async () => {
         await page.evaluate(() => {
-            window.game.scene.remove("Map Screen UI")
-            window.game.scene.remove("Map Screen")
-            window.game.events.emit("Start Map Screen")
+            window.screenController().removeAll()
+            window.screenController().screens.battlefield.start()
         })
     }
 }
@@ -397,11 +401,12 @@ function waitForSquadArrival(squadId: string) {
  * when an modal window is opened */
 function mapShouldBeDraggable(shouldBeDraggable: boolean) {
     return async () => {
-        const initialPosition = await dsl.getPositonOf("Map Screen")("0")
+        const [id] = await dsl.getForceSquads("PLAYER")
+        const initialPosition = await dsl.getPositonOf("Map Screen")(id)
 
         await dsl.drag([50, 300], [10, 150])
 
-        const finalPosition = await dsl.getPositonOf("Map Screen")("0")
+        const finalPosition = await dsl.getPositonOf("Map Screen")(id)
 
         if (shouldBeDraggable) {
             expect(finalPosition.x).toBeLessThan(initialPosition.x)
