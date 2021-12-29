@@ -6,7 +6,6 @@ import {
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
 } from "../../../_shared/constants"
-import events from "../../events"
 import selectMoveDestination from "../../events/selectMoveDestination"
 import { MapScreen } from "../../Model"
 import { MOVE_SQUAD_LABEL, VIEW_SQUAD_DETAILS_LABEL } from "./squadSelected"

@@ -1,7 +1,5 @@
 import { ForceId } from "../../Battlefield/Force"
 import { SquadId } from "../../Battlefield/Squad"
-import events from "../events"
-import * as selectMoveDestinationUI from "../UI/events/selectMoveDestination"
 import resumeSquadMovement from "../events/resumeSquadMovement"
 import { MapScreen } from "../Model"
 import { directionKey, getSquadJob, updateSquadOrientation } from "../squad"
