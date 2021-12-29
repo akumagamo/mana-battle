@@ -4,7 +4,7 @@ import { UNIT_DATA_TARGET } from "./selectMoveDestination"
 export default (sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) =>
     (scene: Phaser.Scene) => {
         const { x, y } = sprite.data.get(UNIT_DATA_TARGET)
-        const tile = MapScreen(scene.scene.manager)
+        const tile = MapScreen(scene)
             .tilemap()
             .getTileAtWorldXY(x, y)
 

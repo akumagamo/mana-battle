@@ -7,7 +7,7 @@ import moveSquadCancelled from "./UI/events/moveSquadCancelled"
 import { closeSelectMoveDestination } from "./UI/events/selectMoveDestination"
 import squadSelected from "./UI/events/squadSelected"
 
-export const MapScreen = (manager: Phaser.Scenes.SceneManager) => {
+export const MapScreen = ({ scene: { manager } }: Phaser.Scene) => {
     const scene = manager.getScene("Map Screen")
     const ui = manager.getScene("Map Screen UI")
     const getState = () => scene.data.get("state") as State

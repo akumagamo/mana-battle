@@ -68,10 +68,6 @@ function renderCancelOption(scene: Phaser.Scene) {
             SCREEN_WIDTH - 150,
             SCREEN_HEIGHT - 60,
             CANCEL_OPTION_LABEL,
-            () =>
-                MapScreen(scene.scene.manager).events.moveSquadCancelled(
-                    force,
-                    squad
-                )
+            () => MapScreen(scene).events.moveSquadCancelled(force, squad)
         )
 }

@@ -3,7 +3,7 @@ import { SquadId } from "../../Battlefield/Squad"
 import { MapScreen } from "../Model"
 
 export default (scene: Phaser.Scene) => (forceId: ForceId, squadId: SquadId) => {
-    const { events, getSprite } = MapScreen(scene.scene.manager)
+    const { events, getSprite } = MapScreen(scene)
 
     const sprite = getSprite(squadId)
     if (

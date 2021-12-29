@@ -12,7 +12,7 @@ export default function selectMoveDestination(
     squadId: SquadId,
     scene: Phaser.Scene
 ) {
-    const mapScreen = MapScreen(scene.scene.manager)
+    const mapScreen = MapScreen(scene)
 
     const sprite = mapScreen.getSprite(squadId)
 
@@ -30,7 +30,7 @@ function movementOrderAssigned(
 ) {
     return (pointer: Phaser.Input.Pointer) => {
         const { scene } = sprite
-        const mapScreen = MapScreen(scene.scene.manager)
+        const mapScreen = MapScreen(scene)
         const userDraggedInsteadOfClicking =
             Phaser.Math.Distance.Between(
                 pointer.upX,

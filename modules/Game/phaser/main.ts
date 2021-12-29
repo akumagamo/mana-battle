@@ -62,8 +62,6 @@ export const main = () => {
         window.game = game
         window.getMapScene = () => game.scene.getScene("Map Screen")
         window.getMapSceneUI = () => game.scene.getScene("Map Screen UI")
-        window.mapScreen = ()=>MapScreen(
-            game.scene.getScene("Map Screen").scene.manager
-        )
+        window.mapScreen = () => MapScreen(game.scene.getScene("Map Screen"))
     }
 }

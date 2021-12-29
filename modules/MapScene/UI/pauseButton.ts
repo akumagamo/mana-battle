@@ -4,7 +4,7 @@ import { UNPAUSE_LABEL, PAUSE_LABEL, PAUSE_BUTTON_KEY } from "./create"
 import { MapScreen } from "../Model"
 
 export default function (scene: Phaser.Scene) {
-    const { scene: mapScreen, events } = MapScreen(scene.scene.manager)
+    const { scene: mapScreen, events } = MapScreen(scene)
 
     button(scene)(
         SCREEN_WIDTH - 150,

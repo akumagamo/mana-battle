@@ -40,7 +40,7 @@ function createSquadEvents(
 ) {
     sprite.setInteractive()
 
-    const mapScreen = MapScreen(scene.scene.manager)
+    const mapScreen = MapScreen(scene)
 
     sprite.on(Phaser.Input.Events.POINTER_UP, () =>
         mapScreen.events.squadClicked(forceId, squadId)

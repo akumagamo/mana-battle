@@ -11,7 +11,7 @@ export const MOVE_SQUAD_LABEL = "Move Squad"
 
 export default (scene: Phaser.Scene) => {
     return (forceId: ForceId, squadId: SquadId) => {
-        const { getState } = MapScreen(scene.scene.manager)
+        const { getState } = MapScreen(scene)
         const state = getState()
 
         UI.button(scene)(

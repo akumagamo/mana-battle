@@ -13,7 +13,7 @@ export function adjustSpeed(scene: Phaser.Scene) {
                 sprite.body.velocity.x !== 0 || sprite.body.velocity.y !== 0
             if (isMoving) {
                 const pos = sprite.getBottomCenter()
-                const tile = MapScreen(scene.scene.manager)
+                const tile = MapScreen(scene)
                     .tilemap()
                     .getTileAtWorldXY(pos.x, pos.y)
                 if (!tile) return

@@ -23,7 +23,7 @@ export function createMap(scene: Phaser.Scene) {
 function makeMapDraggable(scene: Phaser.Scene) {
     const { input, cameras, events } = scene
 
-    const layer = MapScreen(scene.scene.manager).tilemap()
+    const layer = MapScreen(scene).tilemap()
 
     cameras.main.setBounds(layer.x, layer.y, layer.width, layer.height)
     layer.setInteractive()

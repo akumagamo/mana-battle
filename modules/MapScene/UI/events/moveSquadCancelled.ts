@@ -3,7 +3,7 @@ import { SquadId } from "../../../Battlefield/Squad"
 import { MapScreen } from "../../Model"
 
 export default (scene: Phaser.Scene) => (forceId: ForceId, squadId: SquadId) => {
-    const { events } = MapScreen(scene.scene.manager)
+    const { events } = MapScreen(scene)
 
     events.closeSelectMoveDestionation()
     events.squadSelected(forceId, squadId)
