@@ -164,9 +164,11 @@ describe("removeUnit", () => {
 })
 
 describe("updateUnit", () => {
-    const newUnit = (id: string) => ({ id: UnitId(id), name: "New Name" })
     test("should report error if trying to remove an unit not in the bench", () => {
-        const result = updateUnit(defaultForce, newUnit("some non existing id"))
+        const result = updateUnit(
+            defaultForce,
+            createUnit("some non existing id")
+        )
 
         expect(result).toStrictEqual(
             left([Errors.UNIT_NOT_IN_BENCH("some non existing id")])
@@ -174,9 +176,11 @@ describe("updateUnit", () => {
     })
     test("should update valid unit in the bench", () => {
         const [id] = ids
-        const result = expectNoErrors(updateUnit(defaultForce, newUnit(id)))
 
-        expect(result.unitsWithoutSquad.get(id)?.name).toEqual(newUnit(id).name)
+        const updatedUnit = { ...createUnit(id), name: "new name" }
+        const result = expectNoErrors(updateUnit(defaultForce, updatedUnit))
+
+        expect(result.unitsWithoutSquad.get(id)?.name).toEqual(updatedUnit.name)
     })
 })
 

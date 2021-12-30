@@ -1,32 +1,45 @@
+import { Map } from "immutable"
+import { Squad, SquadId } from "../Battlefield/Squad"
+import { hp, Unit, UnitId } from "../Battlefield/Unit"
 import { Arena, createArena } from "./arena"
-import { Job, RowPosition, Skill, Squad, Unit } from "./Model"
+import { Job, RowPosition, Skill } from "./Model"
 import { sortByInitiative } from "./utils"
 
-export default (squadA: Squad, squadB: Squad) => {
-    const units = sortByInitiative(squadA.units.merge(squadB.units))
+export default (squads: Map<SquadId, Squad>) => {
+    const unitIndex = squads.reduce(
+        (xs, x) => xs.merge(x.members.map((m) => m.unit)),
+        Map() as Map<UnitId, Unit>
+    )
 
-    const arena = createArena(squadA, squadB)
+    const units = sortByInitiative(unitIndex)
+
+    const arena = createArena(unitIndex, squads)
 
     return units.reduce(
         ({ units, actions }, unit) => {
-            const skill = getUnitSkill(unit)
+            const sqd = squads.find((s) =>
+                s.members.some((_v, k) => k === unit.id)
+            )
+            if (!sqd) throw new Error()
+            const skill = getUnitSkill(unit, sqd)
 
             const target = getTargetUnit(unit, arena)
+            if (!target) throw new Error()
 
             const updatedActions = actions.concat([
                 {
                     unit: unit.id,
                     skill: skill.id,
-                    target: target.id,
+                    target: target.unit.id,
                 },
             ])
 
-            const updatedUnits = units.map(unit_ => {
-                if (unit_.id === target.id) {
-                    //replace with bounded number
-                    const nextHp = unit_.hp - skill.damage
-                    const hp = nextHp < 0 ? 0 : nextHp
-                    return { ...unit_, hp }
+            const updatedUnits = units.map((unit_) => {
+                if (unit_.id === target.unit.id) {
+                    const [min, max] = unit.hp
+                    const nextHp = min - skill.damage
+                    const hp_ = nextHp < 0 ? 0 : nextHp
+                    return { ...unit_, ...hp([hp_, max]) }
                 } else {
                     return unit_
                 }
@@ -36,14 +49,14 @@ export default (squadA: Squad, squadB: Squad) => {
         },
         {
             units,
-            actions: [] as { unit: string; skill: string; target: string }[],
+            actions: [] as { unit: UnitId; skill: string; target: string }[],
         }
     )
 }
 
 const jobs: { [x: string]: Job } = {
-    fighter: {
-        id: "fighter",
+    soldier: {
+        id: "soldier",
         skills: {
             front: { id: "slash", times: 2 },
             middle: { id: "slash", times: 2 },
@@ -62,9 +75,9 @@ const skills: { [x: string]: Skill } = {
     slash: { id: "slash", damage: 22 },
 }
 
-function getUnitSkill(unit: Unit) {
+function getUnitSkill(unit: Unit, squad: Squad) {
     const job = jobs[unit.job]
-    const row = rowMap[unit.x]
+    const row = rowMap[squad.members.getIn([unit.id, "x"], 0) as number]
 
     const skillId = job.skills[row].id
 
@@ -72,6 +85,9 @@ function getUnitSkill(unit: Unit) {
 }
 
 function getTargetUnit(unit: Unit, arena: Arena) {
-    const enemies = arena.units.filter(u => u.squad !== unit.squad)
-    return enemies.first() as Unit
+    const enemies = arena.squads.find(
+        (sqd) => !sqd.members.some((_m, k) => k === unit.id)
+    )
+    if (!enemies) throw new Error()
+    return enemies.members.first()
 }

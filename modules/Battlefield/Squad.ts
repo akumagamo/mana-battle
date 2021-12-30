@@ -2,7 +2,7 @@ import { right } from "fp-ts/lib/Either"
 import { List, Map, Range } from "immutable"
 import { Condition, Fallible, runFallible } from "../_shared/Fallible"
 import { ForceId } from "./Force"
-import { Unit, UnitId } from "./Unit"
+import { singletonUnit, Unit, UnitId } from "./Unit"
 
 export type SquadId = string & { _squadId: never }
 export const SquadId = (forceId: ForceId, id: string) =>
@@ -19,17 +19,28 @@ type MapPosition = { x: number; y: number } & { _mapPosition: never }
 
 export const MapPosition = (pos: { x: number; y: number }) => pos as MapPosition
 
+export type Member = {
+    squad: SquadId
+    unit: Unit
+    position: MemberPosition
+}
+export const singletonMember = (): Member => ({
+    squad: SquadId(ForceId("NULL"), "NULL"),
+    unit: singletonUnit,
+    position: { x: 0, y: 0 },
+})
+
 export type Squad = {
     id: SquadId
     force: ForceId
-    members: Map<
-        UnitId,
-        {
-            unit: Unit
-            position: MemberPosition
-        }
-    >
+    members: Map<UnitId, Member>
 }
+
+export const singletonSquad = (): Squad => ({
+    id: SquadId(ForceId("NULL"), "NULL"),
+    force: ForceId("NULL"),
+    members: Map(),
+})
 export type DispatchedSquad = Squad & {
     position: MapPosition
 }
@@ -62,7 +73,10 @@ export const createSquad = (
             id: SquadId(force, idSegment),
             force,
             members: Map(
-                members.map(([unit, position]) => [unit.id, { unit, position }])
+                members.map(([unit, position]) => [
+                    unit.id,
+                    { unit, position, squad: SquadId(force, idSegment) },
+                ])
             ),
         })
     )

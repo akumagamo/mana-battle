@@ -192,7 +192,6 @@ export const getPositonOf = (scene: string) => async (id: string) =>
                 .getScene(scene)
                 .children.getByName(id) as Phaser.GameObjects.Sprite
 
-            console.log(`....`, sprite)
             const camera = window.game.scene.getScene(scene).cameras.main
 
             const x = sprite.x + -camera.scrollX

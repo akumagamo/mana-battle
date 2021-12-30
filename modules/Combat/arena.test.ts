@@ -1,37 +1,56 @@
+import { isLeft } from "fp-ts/lib/Either"
 import { Map } from "immutable"
-import { createArena, printArena } from "./arena"
-import { UnitCollection } from "./Model"
-import { defaultUnit } from "./utils.test"
+import { ForceId } from "../Battlefield/Force"
+import { createSquad, Squad, SquadId } from "../Battlefield/Squad"
+import { createUnit, Unit, UnitId } from "../Battlefield/Unit"
+import { createArena, showArena } from "./arena"
 
-const makeSquad = (id: string, ids: string[]) => ({
-    id,
-    units: ids.reduce(
-        (xs, x, i) => xs.set(x, { ...defaultUnit, id: x, x: i, y: i }),
-        Map() as UnitCollection
-    ),
-})
+const makeSquad = (
+    id: string,
+    force: string,
+    ids: string[]
+): { squad: Squad; units: [Unit, { x: number; y: number }][] } => {
+    const units = ids.reduce(
+        (xs, x, i) => xs.concat([[createUnit(x), { x: i, y: i }]]),
+        [] as [Unit, { x: number; y: number }][]
+    )
+    const sqd = createSquad(id, ForceId(force), units)
 
-const squadA = makeSquad("s1", ["a", "b", "c"])
-const squadB = makeSquad("s2", ["d", "e", "f"])
+    if (isLeft(sqd)) throw new Error()
+    else
+        return {
+            squad: sqd.right,
+            units,
+        }
+}
 
-const arena = createArena(squadA, squadB)
+const { squads, units } = [
+    makeSquad("s1", "PLAYER", ["a", "b", "c"]),
+    makeSquad("s2", "COMPUTER", ["d", "e", "f"]),
+].reduce(
+    (xs, { squad, units }) => ({
+        squads: xs.squads.set(squad.id, squad),
+        units: xs.units.merge(Map(units.map(([u]) => [u.id, u]))),
+    }),
+    {
+        squads: Map() as Map<SquadId, Squad>,
+        units: Map() as Map<UnitId, Unit>,
+    }
+)
 
+const arena = createArena(units, squads)
 it("should layout units as expected", () => {
-    expect(printArena(arena)).toEqual(`
+    expect(showArena(arena)).toEqual(`
 a ~ ~ ~ f ~ ~
 ~ b ~ ~ ~ e ~
 ~ ~ c ~ ~ ~ d
 `)
 })
 
-it("should have the same x/y values in the unit as in the grid", () => {
-    arena.units.forEach(unit => {
-        expect(unit.id).toEqual(arena.grid.getIn([unit.y, unit.x]))
-    })
-})
-
-it("should place all units in the `units` prop", () => {
-    squadA.units.merge(squadB.units).forEach(unit => {
-        expect(arena.units.get(unit.id)?.id).toEqual(unit.id)
+it("should have the same x/y values in the squad member position as in the grid", () => {
+    arena.squads.forEach((squad) => {
+        squad.members.forEach((m, k) => {
+            expect(k).toEqual(arena.grid.getIn([m.position.y, m.position.x]))
+        })
     })
 })

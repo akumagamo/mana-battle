@@ -1,41 +1,65 @@
 import { List, Map } from "immutable"
-import { Squad, Unit } from "./Model"
+import { Member, Squad, SquadId } from "../Battlefield/Squad"
+import { Unit, UnitId } from "../Battlefield/Unit"
 
 type Grid = Map<number, Map<number, string>>
 
 export type Arena = {
-    units: Map<string, Unit>
+    squads: Map<SquadId, Squad>
+    units: Map<UnitId, Unit>
     grid: Grid
 }
 
-export function createArena(squadA: Squad, squadB: Squad) {
+export function createArena(
+    units: Map<UnitId, Unit>,
+    squads: Map<SquadId, Squad>
+): Arena {
     const coords = List([0, 1, 2])
     const extendedCoords = coords
         .concat([coords.size])
         .concat(coords.map(transpose))
 
+    const playerSquad = squads.find((sqd) => sqd.force === "PLAYER")
+
+    if (!playerSquad) throw new Error()
+
+    const enemySquad = squads.find((sqd) => sqd.force !== "PLAYER")
+
+    if (!enemySquad) throw new Error()
+
     const arena = coords.reduce(
         (xs, x) =>
             xs.set(
                 x,
-                Map(extendedCoords.map(n => [n, "~"])) as Map<number, string>
+                Map(extendedCoords.map((n) => [n, "~"])) as Map<number, string>
             ),
         Map() as Grid
     )
 
-    const invertedSquadB = squadB.units.map(unit => ({
-        ...unit,
-        x: transpose(invert(unit.x)),
-        y: invert(unit.y),
-    }))
+    const invertedEnemySquad: Map<UnitId, Member> = enemySquad.members.map(
+        (member) => ({
+            ...member,
+            position: {
+                x: transpose(invert(member.position.x)),
+                y: invert(member.position.y),
+            },
+        })
+    )
 
-    const squadArena = squadA.units
-        .merge(invertedSquadB)
-        .reduce((xs, x) => xs.setIn([x.y, x.x], x.id), Map() as Grid)
+    const squadArena = playerSquad.members.merge(invertedEnemySquad)
+
+    const grid = squadArena.reduce(
+        (xs, x, k) => xs.setIn([x.position.y, x.position.x], k),
+        Map() as Grid
+    )
 
     return {
-        units: squadA.units.merge(invertedSquadB),
-        grid: arena.mergeDeep(squadArena),
+        squads: squads.map((sqd) => ({
+            ...sqd,
+            members: squadArena.filter((m) => m.squad === sqd.id),
+        })),
+        units,
+        grid: arena.mergeDeep(grid),
     }
 
     function transpose(n: number): number {
@@ -47,11 +71,11 @@ export function createArena(squadA: Squad, squadB: Squad) {
     }
 }
 
-export function printArena(arena: Arena) {
+export function showArena(arena: Arena) {
     return (
         "\n" +
         arena.grid
-            .map(col => col.toList().join(" "))
+            .map((col) => col.toList().join(" "))
             .toList()
             .join("\n") +
         "\n"

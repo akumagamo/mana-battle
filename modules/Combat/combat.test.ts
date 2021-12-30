@@ -1,45 +1,51 @@
-import { Map, Range, List } from "immutable"
-import { createUnit, Squad, UnitCollection } from "./Model"
+import { rights } from "fp-ts/lib/Array"
+import { pipe } from "fp-ts/lib/function"
+import { Map } from "immutable"
+import { ForceId } from "../Battlefield/Force"
+import { createSquad, Squad, SquadId } from "../Battlefield/Squad"
+import { createUnit } from "../Battlefield/Unit"
 import combat from "./combat"
+const squads = pipe(
+    [
+        createSquad("a", ForceId("PLAYER"), [
+            [createUnit("u1"), { x: 2, y: 2 }],
+        ]),
+        createSquad("b", ForceId("COMPUTER"), [
+            [createUnit("u9"), { x: 2, y: 2 }],
+        ]),
+    ],
+    rights
+)
 
-const COMBAT_BOARD_WIDTH = 3
+if (squads.length !== 2) throw new Error()
+const [a, b] = squads
 
-const pos = [0, 1, 2]
-
-const positions = [...pos.map((n) => [...pos])]
-
-const createSquad = (id: string, numberOfUnits: number): Squad => ({
-    id,
-    units: positions
-        .slice(0, numberOfUnits)
-        .reduce(
-            (xs, [x, y], key) =>
-                xs.set(id + key, { ...createUnit(id + key, id), x, y }),
-            Map() as UnitCollection
-        ),
-})
+const index = (Map() as Map<SquadId, Squad>).set(a.id, a).set(b.id, b)
 
 it(`should generate an action for each unit, if all of them stay alive during
     the turn's course`, () => {
-    const squadA: Squad = createSquad("a", 2)
-    const squadB: Squad = createSquad("b", 2)
-    const combat_ = combat(squadA, squadB)
+    const combat_ = combat(index)
 
-    const allUnits = squadA.units.merge(squadB.units)
-    expect(combat_.actions.length).toEqual(allUnits.size)
-    allUnits.forEach((unit) => {
-        expect(combat_.actions.map((action) => action.unit)).toContain(unit.id)
+    expect(combat_.actions.length).toEqual(
+        squads.reduce((xs, x) => xs + x.members.size, 0)
+    )
+
+    squads.forEach((sqd) => {
+        sqd.members.forEach((_m, k) => {
+            expect(combat_.actions.map((action) => action.unit)).toContain(k)
+        })
     })
 })
 
 it(`should record reduced HPs for attacked units (each squad with a
     single member, each being a fighter)`, () => {
-    const a = createSquad("a", 1)
-    const b = createSquad("b", 1)
-    const combat_ = combat(a, b)
-    const allUnits = a.units.merge(b.units)
+    const combat_ = combat(index)
 
-    combat_.units.forEach((unit) => {
-        expect(unit.hp).toBeLessThan(allUnits.get(unit.id)?.hp || Infinity)
+    squads.forEach((sqd) => {
+        sqd.members.forEach((m, k) => {
+            const [hp] = m.unit.hp
+            const [value] = combat_.units.find((u) => u.id === k)?.hp || [0]
+            expect(hp).toBeGreaterThan(value)
+        })
     })
 })
