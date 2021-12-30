@@ -47,6 +47,20 @@ export default async (scene: Phaser.Scene, state: State) => {
 
     await fadeIn(scene, 500)
 
+    scene.input.on("pointerdown", (p: Phaser.Input.Pointer) => {
+        const sprt = scene.add.image(p.x, p.y, "ping").setScale(0.2)
+        scene.tweens.add({
+            targets: sprt,
+            duration: 2000,
+            alpha: 0,
+            scaleX: 0.5,
+            scaleY: 0.5,
+            onComplete: () => {
+                sprt.destroy()
+            },
+        })
+    })
+
     scene.game.events.emit("Map Screen Created")
 }
 

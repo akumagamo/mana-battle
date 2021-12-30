@@ -1,7 +1,7 @@
 const baseConfig = {
   launch: {
     dumpio: true,
-    headless: true,
+    headless: false,
   }
 }
 

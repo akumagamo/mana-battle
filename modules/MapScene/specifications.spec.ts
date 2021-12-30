@@ -139,7 +139,7 @@ describe("Map Screen", () => {
 
             test("When I attempt to select the position where another unit is", async () => {
                 const [id] = await dsl.getForceSquads("PLAYER")
-                dsl.click("Map Screen")(id)
+                dsl.spriteEvent("Map Screen")(id, "pointerup")
             })
 
             test(
@@ -270,12 +270,10 @@ describe("Map Screen", () => {
     })
 })
 
-function clickOnAnyForceSquad(
-    squadType: string
-): jest.ProvidesCallback | undefined {
+function clickOnAnyForceSquad(squadType: string) {
     return async () => {
         const [id] = await dsl.getForceSquads(squadType)
-        dsl.click("Map Screen")(id)
+        await dsl.click("Map Screen")(id)()
     }
 }
 
@@ -312,8 +310,19 @@ function assertOptionVisibilityInUI({
 
         if (visible && !shouldBeVisible)
             throw new Error(`Option "${optionName}" should not be visible`)
-        else if (!visible && shouldBeVisible)
-            throw new Error(`Option "${optionName}" should be visible`)
+        else if (!visible && shouldBeVisible) {
+            const msg = `Option "${optionName}" should be visible`
+
+            const children = await page.evaluate(() => {
+                return window.game.scene
+                    .getScene("Map Screen UI")
+                    .children.list.map((c) => c.name)
+            })
+
+            throw new Error(
+                `${msg} - Available children are: ${JSON.stringify(children)}`
+            )
+        }
     }
 }
 

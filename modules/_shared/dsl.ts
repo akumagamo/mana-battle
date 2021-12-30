@@ -1,4 +1,5 @@
 import Phaser from "phaser"
+import { SquadId } from "../Battlefield/Squad"
 
 declare global {
     interface Window {
@@ -197,6 +198,7 @@ export const getPositonOf = (scene: string) => async (id: string) =>
             const x = sprite.x + -camera.scrollX
             const y = sprite.y + -camera.scrollY
 
+            console.log(`~~~~~`, x, y)
             return {
                 x,
                 y,
@@ -211,19 +213,33 @@ export const getPositonOf = (scene: string) => async (id: string) =>
  */
 export const click = (scene: string) => (id: string) => async () => {
     const { x, y } = await getPositonOf(scene)(id)
+
     await page.mouse.click(x, y)
 }
-
+export const spriteEvent =
+    (scene: string) => (id: string, event: string) => async () => {
+        page.evaluate(
+            ({ id, event }: { id: string; event: string }) => {
+                window
+                    .mapScreen()
+                    .getSprite(id as SquadId)
+                    .emit(event)
+            },
+            { id, scene, event }
+        )
+    }
 export const getForceSquads = async (force: string) => {
     return await page.evaluate((force) => {
-        return (
+        const ids =
             (window
                 .mapScreen()
                 .getState()
                 .forces.get(force)
                 ?.dispatchedSquads.keySeq()
                 .toJS() as string[]) || ([] as string[])
-        )
+
+        console.log(`>>>`, ids)
+        return ids
     }, force)
 }
 
