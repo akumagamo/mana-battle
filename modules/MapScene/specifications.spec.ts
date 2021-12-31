@@ -132,7 +132,7 @@ describe("Map Screen", () => {
             })
 
             test("When I attempt to select the position where another unit is", async () => {
-                await clickOnAnyForceSquad("COMPUTER")()
+                await dsl.clickOnForceSquad("COMPUTER")
             })
 
             test(
@@ -142,9 +142,6 @@ describe("Map Screen", () => {
                     shouldBeVisible: true,
                 })
             )
-            test("wait", async () => {
-                await page.waitForTimeout(1000)
-            })
         })
     })
 

@@ -11,7 +11,7 @@ export default (scene: Phaser.Scene) => (forceId: ForceId, squadId: SquadId) => 
             .get("Map Screen UI")
             .children.getByName("Select Destination")
     )
-        throw new Error()
+        return
 
     scene.children.each((child) =>
         child.name.endsWith("/cursor") ? child.destroy() : null

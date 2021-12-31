@@ -238,6 +238,14 @@ export const getForceSquads = async (force: string) => {
     }, force)
 }
 
+export const clickOnForceSquad = async (force: string) => {
+    const [id] = await getForceSquads(force)
+
+    await click("Map Screen")(id)()
+
+    return true
+}
+
 export function waitForEvent<A>(scene: string, event: string) {
     return async () => {
         await page.evaluate(
