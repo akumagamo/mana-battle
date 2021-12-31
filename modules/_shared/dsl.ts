@@ -187,18 +187,15 @@ export function waitForSceneCreation(screen: string) {
 }
 
 export const getPositonOf = (scene: string) => async (id: string) =>
-    page.evaluate(
+    await page.evaluate(
         ({ id, scene }: { id: string; scene: string }) => {
-            const sprite = window.game.scene
-                .getScene(scene)
-                .children.getByName(id) as Phaser.GameObjects.Sprite
+            const sprite = window.mapScreen().getSprite(id)
 
             const camera = window.game.scene.getScene(scene).cameras.main
 
             const x = sprite.x + -camera.scrollX
             const y = sprite.y + -camera.scrollY
 
-            console.log(`~~~~~`, x, y)
             return {
                 x,
                 y,

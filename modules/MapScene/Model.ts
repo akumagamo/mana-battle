@@ -1,4 +1,3 @@
-import { SquadId } from "../Battlefield/Squad"
 import { State } from "../Battlefield/State"
 import pauseGame from "./events/pauseGame"
 import squadClicked from "./events/squadClicked"
@@ -16,7 +15,7 @@ export const MapScreen = ({ scene: { manager } }: Phaser.Scene) => {
         scene,
         ui,
         getState,
-        getSprite: (id: SquadId) =>
+        getSprite: (id: string) =>
             scene.children.getByName(
                 id
             ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,

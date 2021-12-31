@@ -1,5 +1,6 @@
 import * as dsl from "../_shared/dsl"
 import "expect-puppeteer"
+import { SquadId } from "../Battlefield/Squad"
 
 beforeAll(dsl.openGame)
 
@@ -138,7 +139,7 @@ describe("Map Screen", () => {
             })
 
             test("When I attempt to select the position where another unit is", async () => {
-                const [id] = await dsl.getForceSquads("PLAYER")
+                const [id] = await dsl.getForceSquads("COMPUTER")
                 dsl.spriteEvent("Map Screen")(id, "pointerup")
             })
 
@@ -149,6 +150,9 @@ describe("Map Screen", () => {
                     shouldBeVisible: true,
                 })
             )
+            test("wait", async () => {
+                await page.waitForTimeout(5000)
+            })
         })
     })
 
@@ -191,10 +195,10 @@ describe("Map Screen", () => {
     describe("Character sprites", () => {
         describe.each`
             direction  | moveTo
-            ${"down"}  | ${[100, 300]}
-            ${"right"} | ${[300, 100]}
-            ${"left"}  | ${[50, 100]}
-            ${"top"}   | ${[100, 50]}
+            ${"down"}  | ${[0, 50]}
+            ${"right"} | ${[50, 0]}
+            ${"left"}  | ${[-50, 0]}
+            ${"top"}   | ${[0, -50]}
         `(
             `When a squad is moving to "$direction", then it should adjust its animation`,
             ({
@@ -211,19 +215,27 @@ describe("Map Screen", () => {
                 const [x, y] = moveTo
                 test("When I select a movement target", async () => {
                     const [id] = await dsl.getForceSquads("PLAYER")
-                    selectMovementTargetForSquad(id)
+
+                    await selectMovementTargetForSquad(id)()
+                    await page.waitForTimeout(1000)
                 })
                 test(`When I select a position to the "${direction}" of the squad`, async () => {
-                    await page.mouse.click(x, y)
+                    const [id] = await dsl.getForceSquads("PLAYER")
+                    const pos = await dsl.getPositonOf("Map Screen")(id)
+                    await page.mouse.click(pos.x + x, pos.y + y)
                     await page.waitForTimeout(30)
                 })
                 test(`Then the sprite should face that direction`, async () => {
                     const animation = await page.evaluate(() => {
-                        const sqd = window
-                            .getMapScene()
-                            .children.getByName(
-                                "0"
-                            ) as Phaser.Physics.Arcade.Sprite
+                        const ids = window
+                            .mapScreen()
+                            .getState()
+                            .forces.get("PLAYER")
+                            ?.dispatchedSquads.keySeq()
+                            .toJS() as SquadId[]
+
+                        console.log(`>>>`, ids)
+                        const sqd = window.mapScreen().getSprite(ids[0])
 
                         return sqd.anims.getName()
                     })
@@ -281,8 +293,9 @@ function selectMovementTargetForSquad(id: string) {
     return async () => {
         await assertNoEntityIsSelected()
 
-        await dsl.click("Map Screen")(id)()
+        //await dsl.click("Map Screen")(id)()
 
+        await clickOnAnyForceSquad("PLAYER")()
         await selectOption("Map Screen UI")("Move Squad")()
     }
 }
