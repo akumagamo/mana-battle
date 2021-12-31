@@ -36,6 +36,7 @@ export default async (scene: Phaser.Scene, state: State) => {
                     toJS(squads_),
                     toJS(squads__),
                     (a, b) => {
+                        scene.events.emit("Squad Collision")
                         squadCollision(scene)([
                             a.name as SquadId,
                             b.name as SquadId,

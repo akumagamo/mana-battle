@@ -11,7 +11,7 @@ afterAll(async () => {
 
 describe("Map Screen", () => {
     describe("Map Creation", () => {
-        test("Given that I have nothing selected", assertNoEntityIsSelected)
+        beforeAll(assertNoEntityIsSelected)
         test("Then I should see the map", assertMapIsVisible)
         test.todo("Then I should see all squads")
         test.todo("Then I should see all cities")
@@ -38,11 +38,7 @@ describe("Map Screen", () => {
                 canSeeEditOption: boolean
                 cursorColor: string
             }) => {
-                test(
-                    "Given that I have no squad selected",
-                    assertNoEntityIsSelected
-                )
-
+                beforeAll(assertNoEntityIsSelected)
                 test(
                     `When I select an ${squadType} squad`,
                     clickOnAnyForceSquad(squadType)
@@ -81,10 +77,7 @@ describe("Map Screen", () => {
         `(
             "view squad details for $squadType squad",
             ({ squadType }: { squadType: string }) => {
-                test(
-                    "Given that I have nothing selected",
-                    assertNoEntityIsSelected
-                )
+                beforeAll(assertNoEntityIsSelected)
                 test(
                     `When I select an "${squadType}" squad`,
                     clickOnAnyForceSquad(squadType)
@@ -117,9 +110,9 @@ describe("Map Screen", () => {
 
     describe("Squad Movement", () => {
         describe("Move to target location", () => {
+            beforeAll(assertNoEntityIsSelected)
             test("Given that I am selecting the target destination for a squad", async () => {
-                const [id] = await dsl.getForceSquads("PLAYER")
-                selectMovementTargetForSquad(id)
+                await selectMovementTargetForSquad()()
             })
             test("When I select a location in the map", async function () {
                 await page.mouse.click(150, 250)
@@ -133,14 +126,13 @@ describe("Map Screen", () => {
         })
 
         describe("Selecting a squad while selecting a movement target has no effect", () => {
+            beforeAll(assertNoEntityIsSelected)
             test("Given that I am selecting the target destination for a squad", async () => {
-                const [id] = await dsl.getForceSquads("PLAYER")
-                selectMovementTargetForSquad(id)
+                await selectMovementTargetForSquad()()
             })
 
             test("When I attempt to select the position where another unit is", async () => {
-                const [id] = await dsl.getForceSquads("COMPUTER")
-                dsl.spriteEvent("Map Screen")(id, "pointerup")
+                await clickOnAnyForceSquad("COMPUTER")()
             })
 
             test(
@@ -151,18 +143,21 @@ describe("Map Screen", () => {
                 })
             )
             test("wait", async () => {
-                await page.waitForTimeout(5000)
+                await page.waitForTimeout(1000)
             })
         })
     })
 
     describe("Squad Collision (friendly on enemy)", () => {
-        test("Given that I am selecting the target destination for a squad", async () => {
-            const [id] = await dsl.getForceSquads("PLAYER")
-            selectMovementTargetForSquad(id)
-        })
+        beforeAll(assertNoEntityIsSelected)
+        test(
+            "Given that I am selecting the target destination for a squad",
+            selectMovementTargetForSquad()
+        )
         test("Given that I issued a move order that will encounter an enemy", async function () {
-            await page.mouse.click(300, 100)
+            const [id] = await dsl.getForceSquads("COMPUTER")
+            const pos = await dsl.getPositonOf("Map Screen")(id)
+            await page.mouse.click(pos.x + 50, pos.y)
         })
         test(
             "When my squad collides with the enemy",
@@ -208,16 +203,10 @@ describe("Map Screen", () => {
                 direction: string
                 moveTo: number[]
             }) => {
-                test(
-                    "Given that I have nothing selected",
-                    assertNoEntityIsSelected
-                )
+                beforeAll(assertNoEntityIsSelected)
                 const [x, y] = moveTo
                 test("When I select a movement target", async () => {
-                    const [id] = await dsl.getForceSquads("PLAYER")
-
-                    await selectMovementTargetForSquad(id)()
-                    await page.waitForTimeout(1000)
+                    await selectMovementTargetForSquad()()
                 })
                 test(`When I select a position to the "${direction}" of the squad`, async () => {
                     const [id] = await dsl.getForceSquads("PLAYER")
@@ -234,7 +223,6 @@ describe("Map Screen", () => {
                             ?.dispatchedSquads.keySeq()
                             .toJS() as SquadId[]
 
-                        console.log(`>>>`, ids)
                         const sqd = window.mapScreen().getSprite(ids[0])
 
                         return sqd.anims.getName()
@@ -282,19 +270,15 @@ describe("Map Screen", () => {
     })
 })
 
-function clickOnAnyForceSquad(squadType: string) {
+function clickOnAnyForceSquad(forceId: string) {
     return async () => {
-        const [id] = await dsl.getForceSquads(squadType)
+        const [id] = await dsl.getForceSquads(forceId)
         await dsl.click("Map Screen")(id)()
     }
 }
 
-function selectMovementTargetForSquad(id: string) {
+function selectMovementTargetForSquad() {
     return async () => {
-        await assertNoEntityIsSelected()
-
-        //await dsl.click("Map Screen")(id)()
-
         await clickOnAnyForceSquad("PLAYER")()
         await selectOption("Map Screen UI")("Move Squad")()
     }

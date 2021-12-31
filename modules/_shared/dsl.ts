@@ -227,16 +227,14 @@ export const spriteEvent =
     }
 export const getForceSquads = async (force: string) => {
     return await page.evaluate((force) => {
-        const ids =
+        return (
             (window
                 .mapScreen()
                 .getState()
                 .forces.get(force)
                 ?.dispatchedSquads.keySeq()
                 .toJS() as string[]) || ([] as string[])
-
-        console.log(`>>>`, ids)
-        return ids
+        )
     }, force)
 }
 

@@ -1,4 +1,4 @@
-import { Either, isLeft, isRight, Left, left, right } from "fp-ts/lib/Either"
+import { Either, isLeft, Left, left, right } from "fp-ts/lib/Either"
 
 export type Fallible<A> = Either<string[], A>
 
